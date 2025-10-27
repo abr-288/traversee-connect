@@ -1,0 +1,271 @@
+import { useState } from "react";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Star, Users, Briefcase, Fuel, Settings } from "lucide-react";
+
+const Cars = () => {
+  const [priceRange, setPriceRange] = useState([0, 150000]);
+
+  const cars = [
+    {
+      id: 1,
+      name: "Toyota Corolla",
+      category: "Berline",
+      price: 25000,
+      rating: 4.7,
+      reviews: 142,
+      image: "/placeholder.svg",
+      seats: 5,
+      transmission: "Automatique",
+      fuel: "Essence",
+      luggage: 3
+    },
+    {
+      id: 2,
+      name: "Toyota RAV4",
+      category: "SUV",
+      price: 45000,
+      rating: 4.8,
+      reviews: 98,
+      image: "/placeholder.svg",
+      seats: 5,
+      transmission: "Automatique",
+      fuel: "Essence",
+      luggage: 4
+    },
+    {
+      id: 3,
+      name: "Renault Clio",
+      category: "Économique",
+      price: 18000,
+      rating: 4.5,
+      reviews: 167,
+      image: "/placeholder.svg",
+      seats: 5,
+      transmission: "Manuelle",
+      fuel: "Essence",
+      luggage: 2
+    },
+    {
+      id: 4,
+      name: "Mercedes Classe E",
+      category: "Luxe",
+      price: 85000,
+      rating: 4.9,
+      reviews: 73,
+      image: "/placeholder.svg",
+      seats: 5,
+      transmission: "Automatique",
+      fuel: "Diesel",
+      luggage: 3
+    },
+    {
+      id: 5,
+      name: "Hyundai Tucson",
+      category: "SUV",
+      price: 38000,
+      rating: 4.6,
+      reviews: 115,
+      image: "/placeholder.svg",
+      seats: 5,
+      transmission: "Automatique",
+      fuel: "Essence",
+      luggage: 4
+    },
+    {
+      id: 6,
+      name: "Kia Picanto",
+      category: "Citadine",
+      price: 15000,
+      rating: 4.4,
+      reviews: 203,
+      image: "/placeholder.svg",
+      seats: 4,
+      transmission: "Manuelle",
+      fuel: "Essence",
+      luggage: 2
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      <Navbar />
+      
+      <main className="flex-1 container mx-auto px-4 py-8">
+        <h1 className="text-4xl font-bold mb-8">Location de Voitures</h1>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Filtres */}
+          <aside className="lg:col-span-1 space-y-6">
+            <Card className="p-6">
+              <h2 className="text-xl font-semibold mb-4">Filtres</h2>
+              
+              <div className="space-y-6">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Lieu de prise en charge</label>
+                  <Input placeholder="Ville ou aéroport..." />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Catégorie</label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Toutes" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Toutes</SelectItem>
+                      <SelectItem value="economy">Économique</SelectItem>
+                      <SelectItem value="sedan">Berline</SelectItem>
+                      <SelectItem value="suv">SUV</SelectItem>
+                      <SelectItem value="luxury">Luxe</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-2 block">
+                    Prix par jour: {priceRange[0].toLocaleString()} - {priceRange[1].toLocaleString()} FCFA
+                  </label>
+                  <Slider
+                    min={0}
+                    max={150000}
+                    step={5000}
+                    value={priceRange}
+                    onValueChange={setPriceRange}
+                    className="mt-4"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Transmission</label>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2">
+                      <input type="checkbox" className="rounded" />
+                      <span className="text-sm">Automatique</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input type="checkbox" className="rounded" />
+                      <span className="text-sm">Manuelle</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Carburant</label>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2">
+                      <input type="checkbox" className="rounded" />
+                      <span className="text-sm">Essence</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input type="checkbox" className="rounded" />
+                      <span className="text-sm">Diesel</span>
+                    </label>
+                  </div>
+                </div>
+
+                <Button className="w-full">Appliquer les filtres</Button>
+              </div>
+            </Card>
+          </aside>
+
+          {/* Liste des voitures */}
+          <div className="lg:col-span-3 space-y-6">
+            <div className="flex justify-between items-center">
+              <p className="text-muted-foreground">{cars.length} véhicules disponibles</p>
+              <Select defaultValue="popular">
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="popular">Plus populaires</SelectItem>
+                  <SelectItem value="price-asc">Prix croissant</SelectItem>
+                  <SelectItem value="price-desc">Prix décroissant</SelectItem>
+                  <SelectItem value="rating">Mieux notés</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {cars.map((car) => (
+                <Card key={car.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                  <img
+                    src={car.image}
+                    alt={car.name}
+                    className="w-full h-48 object-cover"
+                  />
+                  <CardContent className="p-6">
+                    <div className="mb-3">
+                      <span className="px-3 py-1 bg-muted rounded-full text-xs font-medium">
+                        {car.category}
+                      </span>
+                    </div>
+                    
+                    <h3 className="text-xl font-semibold mb-3">{car.name}</h3>
+
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="flex">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-4 h-4 ${
+                              i < Math.floor(car.rating)
+                                ? "fill-accent text-accent"
+                                : "text-gray-300"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-sm text-muted-foreground">
+                        {car.rating} ({car.reviews} avis)
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 mb-4 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        <Users className="w-4 h-4" />
+                        <span>{car.seats} places</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Briefcase className="w-4 h-4" />
+                        <span>{car.luggage} bagages</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Settings className="w-4 h-4" />
+                        <span>{car.transmission}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Fuel className="w-4 h-4" />
+                        <span>{car.fuel}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center mt-4 pt-4 border-t">
+                      <div>
+                        <p className="text-sm text-muted-foreground">À partir de</p>
+                        <p className="text-2xl font-bold text-primary">
+                          {car.price.toLocaleString()} <span className="text-sm">FCFA</span>
+                        </p>
+                        <p className="text-xs text-muted-foreground">par jour</p>
+                      </div>
+                      <Button>Réserver</Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
+};
+
+export default Cars;
