@@ -15,7 +15,7 @@ const Navbar = () => {
             <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center transition-smooth group-hover:shadow-primary">
               <Plane className="w-6 h-6 text-primary-foreground" />
             </div>
-            <span className="text-2xl font-bold text-foreground">Voyage<span className="text-primary">CI</span></span>
+            <span className="text-2xl font-bold text-foreground">Yamou<span className="text-secondary">sso</span></span>
           </Link>
 
           {/* Desktop Navigation */}
