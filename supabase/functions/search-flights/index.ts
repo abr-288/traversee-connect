@@ -179,7 +179,6 @@ serve(async (req) => {
       JSON.stringify({
         success: true,
         data: flights.data || [],
-        meta: flights.meta,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

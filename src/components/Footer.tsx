@@ -4,8 +4,32 @@ import { Input } from "@/components/ui/input";
 import { Facebook, Twitter, Instagram, Youtube, Mail } from "lucide-react";
 import logoDark from "@/assets/logo-dark.png";
 import logoLight from "@/assets/logo-light.png";
+import { useState } from "react";
+import { useNewsletterSubscribe } from "@/hooks/useNewsletterSubscribe";
+import { toast } from "sonner";
 
 const Footer = () => {
+  const [email, setEmail] = useState("");
+  const { subscribe, loading } = useNewsletterSubscribe();
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email) {
+      toast.error("Veuillez entrer votre email");
+      return;
+    }
+
+    const result = await subscribe(email);
+    
+    if (result) {
+      toast.success(result.message || "Inscription réussie !");
+      setEmail("");
+    } else {
+      toast.error("Erreur lors de l'inscription");
+    }
+  };
+
   return (
     <footer className="bg-primary border-t border-primary-light">
       <div className="container mx-auto px-4 py-12">
@@ -105,17 +129,24 @@ const Footer = () => {
             <p className="text-white/80 text-sm mb-4">
               Inscrivez-vous pour recevoir nos offres exclusives et nos dernières actualités.
             </p>
-            <div className="space-y-2">
+            <form onSubmit={handleNewsletterSubmit} className="space-y-2">
               <div className="flex gap-2">
-                <Input placeholder="Votre email" type="email" className="flex-1" />
-                <Button className="gradient-primary shadow-primary">
+                <Input 
+                  placeholder="Votre email" 
+                  type="email" 
+                  className="flex-1"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading}
+                />
+                <Button type="submit" className="bg-secondary hover:bg-secondary/90 text-primary" disabled={loading}>
                   <Mail className="w-4 h-4" />
                 </Button>
               </div>
               <p className="text-xs text-white/70">
                 En vous inscrivant, vous acceptez notre politique de confidentialité.
               </p>
-            </div>
+            </form>
           </div>
         </div>
 
