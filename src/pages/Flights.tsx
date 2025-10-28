@@ -39,9 +39,15 @@ const Flights = () => {
     returnDate?: string,
     adults: number = 1
   ) => {
+    // Extract IATA code from format "City (CODE)" -> "CODE"
+    const extractIataCode = (location: string) => {
+      const match = location.match(/\(([A-Z]{3})\)/);
+      return match ? match[1] : location;
+    };
+
     const result = await searchFlights({
-      origin,
-      destination,
+      origin: extractIataCode(origin),
+      destination: extractIataCode(destination),
       departureDate,
       returnDate,
       adults,
