@@ -48,6 +48,42 @@ export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProp
       return;
     }
 
+    // Check if service exists in DB, if not create it
+    let serviceId = service.id;
+    const { data: existingService } = await supabase
+      .from("services")
+      .select("id")
+      .eq("id", service.id)
+      .maybeSingle();
+
+    if (!existingService) {
+      // Create the service in the database
+      const { data: newService, error: serviceError } = await supabase
+        .from("services")
+        .insert({
+          name: service.name,
+          type: service.type as any,
+          price_per_unit: service.price_per_unit,
+          currency: service.currency,
+          location: "Côte d'Ivoire",
+          available: true,
+        } as any)
+        .select()
+        .single();
+
+      if (serviceError) {
+        toast({
+          title: "Erreur",
+          description: "Impossible de créer le service",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
+      serviceId = newService.id;
+    }
+
     // Calculate days
     const start = new Date(startDate);
     const end = endDate ? new Date(endDate) : start;
@@ -56,7 +92,7 @@ export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProp
 
     const { error } = await supabase.from("bookings").insert({
       user_id: user.id,
-      service_id: service.id,
+      service_id: serviceId,
       start_date: startDate,
       end_date: endDate || startDate,
       guests,

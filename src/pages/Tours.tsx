@@ -7,9 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Star, MapPin, Clock, Users } from "lucide-react";
+import { BookingDialog } from "@/components/BookingDialog";
 
 const Tours = () => {
   const [priceRange, setPriceRange] = useState([0, 1000000]);
+  const [selectedTour, setSelectedTour] = useState<any>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const tours = [
     {
@@ -224,7 +227,18 @@ const Tours = () => {
                           {tour.price.toLocaleString()} <span className="text-sm">FCFA</span>
                         </p>
                       </div>
-                      <Button>Réserver</Button>
+                      <Button onClick={() => {
+                        setSelectedTour({
+                          id: tour.id.toString(),
+                          name: tour.name,
+                          price_per_unit: tour.price,
+                          currency: "FCFA",
+                          type: "tour"
+                        });
+                        setDialogOpen(true);
+                      }}>
+                        Réserver
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -233,6 +247,14 @@ const Tours = () => {
           </div>
         </div>
       </main>
+
+      {selectedTour && (
+        <BookingDialog 
+          open={dialogOpen} 
+          onOpenChange={setDialogOpen}
+          service={selectedTour}
+        />
+      )}
 
       <Footer />
     </div>

@@ -7,9 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Plane, Clock, Calendar, Briefcase } from "lucide-react";
+import { BookingDialog } from "@/components/BookingDialog";
 
 const Flights = () => {
   const [priceRange, setPriceRange] = useState([0, 2000000]);
+  const [selectedFlight, setSelectedFlight] = useState<any>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const flights = [
     {
@@ -267,7 +270,16 @@ const Flights = () => {
                           </p>
                           <p className="text-sm text-muted-foreground">FCFA</p>
                         </div>
-                        <Button size="lg" className="w-full">
+                        <Button size="lg" className="w-full" onClick={() => {
+                          setSelectedFlight({
+                            id: flight.id.toString(),
+                            name: `${flight.airline} - ${flight.from} → ${flight.to}`,
+                            price_per_unit: flight.price,
+                            currency: "FCFA",
+                            type: "flight"
+                          });
+                          setDialogOpen(true);
+                        }}>
                           Sélectionner
                         </Button>
                       </div>
@@ -279,6 +291,14 @@ const Flights = () => {
           </div>
         </div>
       </main>
+
+      {selectedFlight && (
+        <BookingDialog 
+          open={dialogOpen} 
+          onOpenChange={setDialogOpen}
+          service={selectedFlight}
+        />
+      )}
 
       <Footer />
     </div>

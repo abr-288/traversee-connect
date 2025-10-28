@@ -7,9 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Star, MapPin, Users, Wifi, UtensilsCrossed, Car } from "lucide-react";
+import { BookingDialog } from "@/components/BookingDialog";
 
 const Hotels = () => {
   const [priceRange, setPriceRange] = useState([0, 500000]);
+  const [selectedHotel, setSelectedHotel] = useState<any>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const hotels = [
     {
@@ -224,7 +227,18 @@ const Hotels = () => {
                           </p>
                           <p className="text-sm text-muted-foreground">par nuit</p>
                         </div>
-                        <Button size="lg">Réserver</Button>
+                        <Button size="lg" onClick={() => {
+                          setSelectedHotel({
+                            id: hotel.id.toString(),
+                            name: hotel.name,
+                            price_per_unit: hotel.price,
+                            currency: "FCFA",
+                            type: "hotel"
+                          });
+                          setDialogOpen(true);
+                        }}>
+                          Réserver
+                        </Button>
                       </div>
                     </CardContent>
                   </div>
@@ -234,6 +248,14 @@ const Hotels = () => {
           </div>
         </div>
       </main>
+
+      {selectedHotel && (
+        <BookingDialog 
+          open={dialogOpen} 
+          onOpenChange={setDialogOpen}
+          service={selectedHotel}
+        />
+      )}
 
       <Footer />
     </div>

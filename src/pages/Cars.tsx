@@ -7,9 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Star, Users, Briefcase, Fuel, Settings } from "lucide-react";
+import { BookingDialog } from "@/components/BookingDialog";
 
 const Cars = () => {
   const [priceRange, setPriceRange] = useState([0, 150000]);
+  const [selectedCar, setSelectedCar] = useState<any>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const cars = [
     {
@@ -253,7 +256,18 @@ const Cars = () => {
                         </p>
                         <p className="text-xs text-muted-foreground">par jour</p>
                       </div>
-                      <Button>Réserver</Button>
+                      <Button onClick={() => {
+                        setSelectedCar({
+                          id: car.id.toString(),
+                          name: car.name,
+                          price_per_unit: car.price,
+                          currency: "FCFA",
+                          type: "car"
+                        });
+                        setDialogOpen(true);
+                      }}>
+                        Réserver
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -262,6 +276,14 @@ const Cars = () => {
           </div>
         </div>
       </main>
+
+      {selectedCar && (
+        <BookingDialog 
+          open={dialogOpen} 
+          onOpenChange={setDialogOpen}
+          service={selectedCar}
+        />
+      )}
 
       <Footer />
     </div>
