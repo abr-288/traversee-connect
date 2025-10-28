@@ -24,7 +24,7 @@ All colors MUST be HSL.
     --primary-dark: 225 45% 12%;
     
     /* Cyan Accent */
-    --secondary: 190 100% 50%; /* #00D4FF - Cyan brillant */
+    --secondary: 158 100% 48%; /* #00F59B - Vert clair */
     --secondary-foreground: 225 45% 18%;
     
     /* Green Accent */
@@ -42,19 +42,19 @@ All colors MUST be HSL.
 
     --border: 210 20% 90%;
     --input: 210 20% 90%;
-    --ring: 190 100% 50%;
+    --ring: 158 100% 48%;
     
     --radius: 0.75rem;
     
     /* Custom Design Tokens */
-    --gradient-primary: linear-gradient(135deg, hsl(190 100% 50%) 0%, hsl(158 100% 48%) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(225 45% 18% / 0.95) 0%, hsl(190 100% 50% / 0.3) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(158 100% 48%) 0%, hsl(145 90% 55%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(225 45% 18% / 0.95) 0%, hsl(158 100% 48% / 0.3) 100%);
     --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 20% 98%) 100%);
     
     --shadow-sm: 0 2px 8px hsl(210 20% 20% / 0.05);
     --shadow-md: 0 4px 16px hsl(210 20% 20% / 0.08);
     --shadow-lg: 0 8px 32px hsl(210 20% 20% / 0.12);
-    --shadow-primary: 0 8px 24px hsl(190 100% 50% / 0.3);
+    --shadow-primary: 0 8px 24px hsl(158 100% 48% / 0.3);
     --shadow-secondary: 0 8px 24px hsl(158 100% 48% / 0.3);
     
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -76,7 +76,7 @@ All colors MUST be HSL.
     --primary-light: 225 45% 30%;
     --primary-dark: 225 45% 14%;
 
-    --secondary: 190 100% 50%;
+    --secondary: 158 100% 48%;
     --secondary-foreground: 225 45% 18%;
     
     --accent-green: 158 100% 48%;
@@ -92,7 +92,7 @@ All colors MUST be HSL.
 
     --border: 210 25% 20%;
     --input: 210 25% 20%;
-    --ring: 190 100% 50%;
+    --ring: 158 100% 48%;
   }
 }
 
