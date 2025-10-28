@@ -171,7 +171,7 @@ const Payment = () => {
 
               <div className="space-y-4">
                 <Label className="text-base font-semibold">Méthode de paiement</Label>
-                <div className="grid gap-3">
+                <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="grid gap-3">
                   <Card 
                     className={cn(
                       "cursor-pointer transition-all hover:shadow-md",
@@ -288,7 +288,7 @@ const Payment = () => {
                       <RadioGroupItem value="bank_transfer" id="bank_transfer" />
                     </CardContent>
                   </Card>
-                </div>
+                </RadioGroup>
               </div>
 
               <Button
