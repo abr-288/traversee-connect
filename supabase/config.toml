@@ -1,1 +1,13 @@
 project_id = "jcjfjyvmtfvmrplonxrg"
+
+[functions.search-flights]
+verify_jwt = false
+
+[functions.search-hotels]
+verify_jwt = false
+
+[functions.process-payment]
+verify_jwt = true
+
+[functions.generate-invoice]
+verify_jwt = true
