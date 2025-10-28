@@ -7,17 +7,16 @@ import logoLight from "@/assets/logo-light.png";
 
 const Footer = () => {
   return (
-    <footer className="bg-card border-t border-border">
+    <footer className="bg-primary border-t border-primary-light">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           {/* Brand Section */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <img src={logoLight} alt="Bossiz Logo" className="h-12 w-auto dark:hidden" />
-              <img src={logoDark} alt="Bossiz Logo" className="h-12 w-auto hidden dark:block" />
-              <span className="text-2xl font-bold text-foreground">Bossiz</span>
+              <img src={logoLight} alt="Bossiz Logo" className="h-12 w-auto" />
+              <span className="text-2xl font-bold text-white">Bossiz</span>
             </div>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-white/80 text-sm">
               Votre partenaire de confiance pour des voyages inoubliables à travers le monde.
             </p>
             <div className="flex gap-3">
@@ -38,35 +37,35 @@ const Footer = () => {
 
           {/* Services */}
           <div>
-            <h3 className="font-bold text-foreground mb-4">Nos Services</h3>
+            <h3 className="font-bold text-white mb-4">Nos Services</h3>
             <ul className="space-y-3">
               <li>
-                <Link to="/flights" className="text-muted-foreground hover:text-primary transition-smooth">
+                <Link to="/flights" className="text-white/80 hover:text-secondary transition-smooth">
                   Vols
                 </Link>
               </li>
               <li>
-                <Link to="/hotels" className="text-muted-foreground hover:text-primary transition-smooth">
+                <Link to="/hotels" className="text-white/80 hover:text-secondary transition-smooth">
                   Hôtels
                 </Link>
               </li>
               <li>
-                <Link to="/flight-hotel" className="text-muted-foreground hover:text-primary transition-smooth">
+                <Link to="/flight-hotel" className="text-white/80 hover:text-secondary transition-smooth">
                   Vol + Hôtel
                 </Link>
               </li>
               <li>
-                <Link to="/cars" className="text-muted-foreground hover:text-primary transition-smooth">
+                <Link to="/cars" className="text-white/80 hover:text-secondary transition-smooth">
                   Voitures
                 </Link>
               </li>
               <li>
-                <Link to="/stays" className="text-muted-foreground hover:text-primary transition-smooth">
+                <Link to="/stays" className="text-white/80 hover:text-secondary transition-smooth">
                   Séjours
                 </Link>
               </li>
               <li>
-                <Link to="/activities" className="text-muted-foreground hover:text-primary transition-smooth">
+                <Link to="/activities" className="text-white/80 hover:text-secondary transition-smooth">
                   Activités
                 </Link>
               </li>
@@ -75,25 +74,25 @@ const Footer = () => {
 
           {/* Support */}
           <div>
-            <h3 className="font-bold text-foreground mb-4">Assistance</h3>
+            <h3 className="font-bold text-white mb-4">Assistance</h3>
             <ul className="space-y-3">
               <li>
-                <Link to="/support" className="text-muted-foreground hover:text-primary transition-smooth">
+                <Link to="/support" className="text-white/80 hover:text-secondary transition-smooth">
                   Centre d'aide
                 </Link>
               </li>
               <li>
-                <Link to="/support" className="text-muted-foreground hover:text-primary transition-smooth">
+                <Link to="/support" className="text-white/80 hover:text-secondary transition-smooth">
                   FAQ
                 </Link>
               </li>
               <li>
-                <Link to="/support" className="text-muted-foreground hover:text-primary transition-smooth">
+                <Link to="/support" className="text-white/80 hover:text-secondary transition-smooth">
                   Nous Contacter
                 </Link>
               </li>
               <li>
-                <Link to="/dashboard" className="text-muted-foreground hover:text-primary transition-smooth">
+                <Link to="/dashboard" className="text-white/80 hover:text-secondary transition-smooth">
                   Mes Réservations
                 </Link>
               </li>
@@ -102,8 +101,8 @@ const Footer = () => {
 
           {/* Newsletter */}
           <div>
-            <h3 className="font-bold text-foreground mb-4">Newsletter</h3>
-            <p className="text-muted-foreground text-sm mb-4">
+            <h3 className="font-bold text-white mb-4">Newsletter</h3>
+            <p className="text-white/80 text-sm mb-4">
               Inscrivez-vous pour recevoir nos offres exclusives et nos dernières actualités.
             </p>
             <div className="space-y-2">
@@ -113,7 +112,7 @@ const Footer = () => {
                   <Mail className="w-4 h-4" />
                 </Button>
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-white/70">
                 En vous inscrivant, vous acceptez notre politique de confidentialité.
               </p>
             </div>
@@ -121,21 +120,21 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-muted-foreground text-sm">
+        <div className="pt-8 border-t border-primary-light flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-white/80 text-sm">
             © 2025 Bossiz. Tous droits réservés.
           </p>
           <div className="flex gap-6 text-sm">
-            <Link to="/support" className="text-muted-foreground hover:text-primary transition-smooth">
+            <Link to="/support" className="text-white/80 hover:text-secondary transition-smooth">
               À propos
             </Link>
-            <Link to="/support" className="text-muted-foreground hover:text-primary transition-smooth">
+            <Link to="/support" className="text-white/80 hover:text-secondary transition-smooth">
               Conditions générales
             </Link>
-            <Link to="/support" className="text-muted-foreground hover:text-primary transition-smooth">
+            <Link to="/support" className="text-white/80 hover:text-secondary transition-smooth">
               Confidentialité
             </Link>
-            <Link to="/support" className="text-muted-foreground hover:text-primary transition-smooth">
+            <Link to="/support" className="text-white/80 hover:text-secondary transition-smooth">
               Aide
             </Link>
           </div>
