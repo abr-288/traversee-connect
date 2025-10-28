@@ -23,3 +23,6 @@ verify_jwt = false
 
 [functions.airport-info]
 verify_jwt = false
+
+[functions.car-rental]
+verify_jwt = false

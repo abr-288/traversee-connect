@@ -12,47 +12,44 @@ serve(async (req) => {
   }
 
   try {
-    const { from, to, amount } = await req.json();
+    const { pickupLocation, dropoffLocation, pickupDate, dropoffDate } = await req.json();
+    const RAPIDAPI_KEY = Deno.env.get('RAPIDAPI_KEY');
 
-    console.log('Converting currency:', { from, to, amount });
+    if (!RAPIDAPI_KEY) {
+      throw new Error('RAPIDAPI_KEY not configured');
+    }
 
-    // Using ExchangeRate-API (free, no API key required)
+    console.log('Searching car rentals:', { pickupLocation, dropoffLocation, pickupDate, dropoffDate });
+
+    // Using Car Rental API from RapidAPI
     const response = await fetch(
-      `https://api.exchangerate-api.com/v4/latest/${from}`
+      `https://car-rental6.p.rapidapi.com/searchLocation?location=${encodeURIComponent(pickupLocation)}`,
+      {
+        headers: {
+          'X-RapidAPI-Key': RAPIDAPI_KEY,
+          'X-RapidAPI-Host': 'car-rental6.p.rapidapi.com'
+        }
+      }
     );
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Currency API error:', response.status, errorText);
-      throw new Error(`Currency API error: ${response.status}`);
+      console.error('Car Rental API error:', response.status, errorText);
+      throw new Error(`Car Rental API error: ${response.status}`);
     }
 
     const data = await response.json();
-    
-    if (!data.rates || !data.rates[to]) {
-      throw new Error(`Currency ${to} not found in rates`);
-    }
-
-    const rate = data.rates[to];
-    const converted = amount * rate;
-
-    console.log('Currency conversion successful:', { rate, converted });
+    console.log('Car rental search successful');
 
     return new Response(
       JSON.stringify({
         success: true,
-        data: {
-          from,
-          to,
-          amount,
-          converted: parseFloat(converted.toFixed(2)),
-          rate: parseFloat(rate.toFixed(6)),
-        }
+        data: data,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
-    console.error('Error in currency-exchange function:', error);
+    console.error('Error in car-rental function:', error);
     return new Response(
       JSON.stringify({ 
         success: false, 
