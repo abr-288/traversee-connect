@@ -15,10 +15,11 @@ const Tours = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const tours = [
+    // Afrique
     {
       id: 1,
       name: "Safari au Parc National de la Comoé",
-      location: "Nord de la Côte d'Ivoire",
+      location: "Côte d'Ivoire",
       price: 250000,
       duration: "3 jours / 2 nuits",
       rating: 4.9,
@@ -28,58 +29,272 @@ const Tours = () => {
     },
     {
       id: 2,
-      name: "Découverte d'Abidjan City Tour",
-      location: "Abidjan",
-      price: 35000,
-      duration: "1 jour",
-      rating: 4.6,
-      reviews: 124,
-      image: "/placeholder.svg",
-      capacity: "1-15 personnes"
-    },
-    {
-      id: 3,
-      name: "Plages de Grand-Bassam",
-      location: "Grand-Bassam",
-      price: 45000,
-      duration: "1 jour",
-      rating: 4.7,
-      reviews: 156,
+      name: "Safari au Parc Kruger",
+      location: "Afrique du Sud",
+      price: 450000,
+      duration: "5 jours / 4 nuits",
+      rating: 4.9,
+      reviews: 312,
       image: "/placeholder.svg",
       capacity: "2-12 personnes"
     },
     {
-      id: 4,
-      name: "Randonnée au Mont Nimba",
-      location: "Région des Montagnes",
-      price: 180000,
-      duration: "2 jours / 1 nuit",
+      id: 3,
+      name: "Pyramides de Gizeh et Croisière sur le Nil",
+      location: "Égypte",
+      price: 520000,
+      duration: "7 jours / 6 nuits",
       rating: 4.8,
-      reviews: 63,
+      reviews: 456,
+      image: "/placeholder.svg",
+      capacity: "2-15 personnes"
+    },
+    {
+      id: 4,
+      name: "Trek du Kilimandjaro",
+      location: "Tanzanie",
+      price: 780000,
+      duration: "8 jours / 7 nuits",
+      rating: 4.9,
+      reviews: 189,
+      image: "/placeholder.svg",
+      capacity: "4-10 personnes"
+    },
+    {
+      id: 5,
+      name: "Safari et Plages de Zanzibar",
+      location: "Tanzanie",
+      price: 620000,
+      duration: "6 jours / 5 nuits",
+      rating: 4.8,
+      reviews: 234,
+      image: "/placeholder.svg",
+      capacity: "2-8 personnes"
+    },
+    {
+      id: 6,
+      name: "Désert du Sahara et Marrakech",
+      location: "Maroc",
+      price: 380000,
+      duration: "5 jours / 4 nuits",
+      rating: 4.7,
+      reviews: 278,
+      image: "/placeholder.svg",
+      capacity: "2-10 personnes"
+    },
+    // Europe
+    {
+      id: 7,
+      name: "Tour de Paris et Château de Versailles",
+      location: "France",
+      price: 420000,
+      duration: "4 jours / 3 nuits",
+      rating: 4.8,
+      reviews: 567,
+      image: "/placeholder.svg",
+      capacity: "2-15 personnes"
+    },
+    {
+      id: 8,
+      name: "Rome, Florence et Venise",
+      location: "Italie",
+      price: 550000,
+      duration: "7 jours / 6 nuits",
+      rating: 4.9,
+      reviews: 489,
+      image: "/placeholder.svg",
+      capacity: "2-12 personnes"
+    },
+    {
+      id: 9,
+      name: "Grèce Antique et Îles",
+      location: "Grèce",
+      price: 480000,
+      duration: "6 jours / 5 nuits",
+      rating: 4.8,
+      reviews: 345,
       image: "/placeholder.svg",
       capacity: "2-10 personnes"
     },
     {
-      id: 5,
-      name: "Visite des Plantations de Cacao",
-      location: "San Pedro",
-      price: 75000,
-      duration: "1 jour",
-      rating: 4.5,
-      reviews: 94,
+      id: 10,
+      name: "Barcelona et Costa Brava",
+      location: "Espagne",
+      price: 390000,
+      duration: "5 jours / 4 nuits",
+      rating: 4.7,
+      reviews: 412,
+      image: "/placeholder.svg",
+      capacity: "2-15 personnes"
+    },
+    // Asie
+    {
+      id: 11,
+      name: "Temples d'Angkor et Plages de Sihanoukville",
+      location: "Cambodge",
+      price: 460000,
+      duration: "6 jours / 5 nuits",
+      rating: 4.8,
+      reviews: 298,
+      image: "/placeholder.svg",
+      capacity: "2-12 personnes"
+    },
+    {
+      id: 12,
+      name: "Tokyo et Mont Fuji",
+      location: "Japon",
+      price: 720000,
+      duration: "7 jours / 6 nuits",
+      rating: 4.9,
+      reviews: 423,
+      image: "/placeholder.svg",
+      capacity: "2-10 personnes"
+    },
+    {
+      id: 13,
+      name: "Bangkok, Chiang Mai et Îles Phi Phi",
+      location: "Thaïlande",
+      price: 510000,
+      duration: "8 jours / 7 nuits",
+      rating: 4.8,
+      reviews: 534,
+      image: "/placeholder.svg",
+      capacity: "2-15 personnes"
+    },
+    {
+      id: 14,
+      name: "Bali: Temples, Rizières et Plages",
+      location: "Indonésie",
+      price: 490000,
+      duration: "7 jours / 6 nuits",
+      rating: 4.9,
+      reviews: 612,
+      image: "/placeholder.svg",
+      capacity: "2-12 personnes"
+    },
+    {
+      id: 15,
+      name: "Taj Mahal et Palais du Rajasthan",
+      location: "Inde",
+      price: 430000,
+      duration: "6 jours / 5 nuits",
+      rating: 4.7,
+      reviews: 367,
+      image: "/placeholder.svg",
+      capacity: "2-15 personnes"
+    },
+    // Amériques
+    {
+      id: 16,
+      name: "Machu Picchu et Vallée Sacrée",
+      location: "Pérou",
+      price: 680000,
+      duration: "7 jours / 6 nuits",
+      rating: 4.9,
+      reviews: 445,
+      image: "/placeholder.svg",
+      capacity: "2-12 personnes"
+    },
+    {
+      id: 17,
+      name: "New York City Explorer",
+      location: "États-Unis",
+      price: 590000,
+      duration: "5 jours / 4 nuits",
+      rating: 4.8,
+      reviews: 678,
       image: "/placeholder.svg",
       capacity: "2-20 personnes"
     },
     {
-      id: 6,
-      name: "Découverte de Man et ses cascades",
-      location: "Man",
-      price: 320000,
-      duration: "4 jours / 3 nuits",
-      rating: 4.9,
-      reviews: 71,
+      id: 18,
+      name: "Chutes du Niagara et Toronto",
+      location: "Canada",
+      price: 520000,
+      duration: "5 jours / 4 nuits",
+      rating: 4.7,
+      reviews: 289,
       image: "/placeholder.svg",
-      capacity: "2-8 personnes"
+      capacity: "2-15 personnes"
+    },
+    {
+      id: 19,
+      name: "Plages de Cancún et Pyramides Maya",
+      location: "Mexique",
+      price: 480000,
+      duration: "6 jours / 5 nuits",
+      rating: 4.8,
+      reviews: 523,
+      image: "/placeholder.svg",
+      capacity: "2-15 personnes"
+    },
+    {
+      id: 20,
+      name: "Rio de Janeiro et Iguazu",
+      location: "Brésil",
+      price: 610000,
+      duration: "7 jours / 6 nuits",
+      rating: 4.8,
+      reviews: 398,
+      image: "/placeholder.svg",
+      capacity: "2-12 personnes"
+    },
+    // Moyen-Orient
+    {
+      id: 21,
+      name: "Dubaï: Luxe et Désert",
+      location: "Émirats Arabes Unis",
+      price: 750000,
+      duration: "5 jours / 4 nuits",
+      rating: 4.9,
+      reviews: 712,
+      image: "/placeholder.svg",
+      capacity: "2-10 personnes"
+    },
+    {
+      id: 22,
+      name: "Istanbul: Orient et Occident",
+      location: "Turquie",
+      price: 420000,
+      duration: "5 jours / 4 nuits",
+      rating: 4.8,
+      reviews: 456,
+      image: "/placeholder.svg",
+      capacity: "2-15 personnes"
+    },
+    {
+      id: 23,
+      name: "Petra et Wadi Rum",
+      location: "Jordanie",
+      price: 560000,
+      duration: "6 jours / 5 nuits",
+      rating: 4.9,
+      reviews: 234,
+      image: "/placeholder.svg",
+      capacity: "2-12 personnes"
+    },
+    // Océanie
+    {
+      id: 24,
+      name: "Sydney, Grande Barrière de Corail",
+      location: "Australie",
+      price: 920000,
+      duration: "10 jours / 9 nuits",
+      rating: 4.9,
+      reviews: 389,
+      image: "/placeholder.svg",
+      capacity: "2-10 personnes"
+    },
+    {
+      id: 25,
+      name: "Nouvelle-Zélande: Hobbiton et Fjords",
+      location: "Nouvelle-Zélande",
+      price: 850000,
+      duration: "9 jours / 8 nuits",
+      rating: 4.9,
+      reviews: 267,
+      image: "/placeholder.svg",
+      capacity: "2-12 personnes"
     }
   ];
 

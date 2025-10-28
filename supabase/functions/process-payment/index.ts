@@ -32,8 +32,11 @@ serve(async (req) => {
 
     const LYGOS_API_KEY = Deno.env.get('LYGOS_API_KEY');
     if (!LYGOS_API_KEY) {
+      console.error('LYGOS_API_KEY not found in environment');
       throw new Error('Lygos API key not configured');
     }
+
+    console.log('Processing payment for booking:', bookingId, 'Amount:', amount, currency);
 
     // Créer une transaction de paiement avec Lygos
     const paymentResponse = await fetch('https://api.lygosapp.com/v1/payments', {
