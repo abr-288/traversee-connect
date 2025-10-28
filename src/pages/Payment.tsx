@@ -176,17 +176,33 @@ const Payment = () => {
       if (error) throw error;
 
       if (data.success) {
-        toast({
-          title: "Succès",
-          description: "Paiement effectué avec succès",
-        });
+        // Si Lygos retourne une URL de paiement, rediriger l'utilisateur
+        if (data.lygos_data?.payment_url) {
+          toast({
+            title: "Redirection vers le paiement",
+            description: "Vous allez être redirigé vers la page de paiement sécurisée...",
+          });
+          
+          // Ouvrir le lien de paiement Lygos dans un nouvel onglet
+          window.open(data.lygos_data.payment_url, '_blank');
+          
+          // Rediriger vers le dashboard après un court délai
+          setTimeout(() => {
+            navigate(`/dashboard?tab=bookings`);
+          }, 2000);
+        } else {
+          toast({
+            title: "Succès",
+            description: "Paiement effectué avec succès",
+          });
 
-        // Générer la facture
-        await supabase.functions.invoke("generate-invoice", {
-          body: { bookingId: booking.id },
-        });
+          // Générer la facture
+          await supabase.functions.invoke("generate-invoice", {
+            body: { bookingId: booking.id },
+          });
 
-        navigate(`/dashboard?tab=bookings`);
+          navigate(`/dashboard?tab=bookings`);
+        }
       } else {
         throw new Error(data.error || "Payment failed");
       }

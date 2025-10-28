@@ -51,25 +51,19 @@ serve(async (req) => {
         customer: customerInfo.name,
       });
       
-      const lygosResponse = await fetch('https://api.lygos.co/v1/payments', {
+      const lygosResponse = await fetch('https://api.lygosapp.com/v1/gateway', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${lygosApiKey}`,
+          'api-key': lygosApiKey,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           amount: amount,
-          currency: currency,
-          payment_method: paymentMethod,
-          customer: {
-            name: customerInfo.name,
-            email: customerInfo.email,
-            phone: customerInfo.phone,
-          },
-          payment_details: paymentDetails,
-          metadata: {
-            booking_id: bookingId,
-          },
+          shop_name: 'Booking Payment',
+          message: `Payment for booking ${bookingId}`,
+          order_id: bookingId,
+          success_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/payment-callback?status=success&booking_id=${bookingId}`,
+          failure_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/payment-callback?status=failed&booking_id=${bookingId}`,
         }),
       });
 
@@ -85,14 +79,14 @@ serve(async (req) => {
       console.log('Lygos response:', lygosData);
 
       paymentData = {
-        transaction_id: lygosData.transaction_id || `TXN-${Date.now()}`,
-        status: lygosData.status === 'success' || lygosData.status === 'completed' || lygosData.status === 'approved' ? 'success' : 'pending',
-        payment_url: lygosData.payment_url || null,
-        message: lygosData.message || 'Payment processed',
+        transaction_id: lygosData.id || `TXN-${Date.now()}`,
+        status: 'pending',
+        payment_url: lygosData.link || null,
+        message: 'Payment gateway created. Please complete payment at the provided URL.',
         raw_response: lygosData,
       };
       
-      console.log('Payment data processed:', paymentData);
+      console.log('Payment gateway created:', paymentData);
     } catch (error) {
       console.error('Error calling Lygos API:', error);
       throw new Error(`Failed to process payment: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -121,13 +115,7 @@ serve(async (req) => {
       throw new Error('Failed to record payment');
     }
 
-    // Mettre à jour le statut de réservation si le paiement est réussi
-    if (paymentData.status === 'success') {
-      await supabase
-        .from('bookings')
-        .update({ payment_status: 'paid', status: 'confirmed' })
-        .eq('id', bookingId);
-    }
+    // Le statut sera mis à jour par le callback webhook de Lygos
 
     return new Response(
       JSON.stringify({
