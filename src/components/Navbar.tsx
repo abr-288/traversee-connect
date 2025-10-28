@@ -73,19 +73,19 @@ const Navbar = () => {
               <>
                 {isAdmin && (
                   <Link to="/admin">
-                    <Button variant="ghost" size="sm" className="gap-2">
+                    <Button variant="ghost" size="sm" className="gap-2 text-white hover:bg-white/10">
                       <LayoutDashboard className="w-4 h-4" />
                       Admin
                     </Button>
                   </Link>
                 )}
                 <Link to="/dashboard">
-                  <Button variant="ghost" size="sm" className="gap-2">
+                  <Button variant="ghost" size="sm" className="gap-2 text-white hover:bg-white/10">
                     <User className="w-4 h-4" />
                     Mon Compte
                   </Button>
                 </Link>
-                <Button variant="ghost" size="sm" className="gap-2" onClick={handleLogout}>
+                <Button variant="ghost" size="sm" className="gap-2 text-white hover:bg-white/10" onClick={handleLogout}>
                   <LogOut className="w-4 h-4" />
                   Déconnexion
                 </Button>
@@ -93,13 +93,13 @@ const Navbar = () => {
             ) : (
               <>
                 <Link to="/auth">
-                  <Button variant="ghost" size="sm" className="gap-2">
+                  <Button variant="ghost" size="sm" className="gap-2 text-white hover:bg-white/10">
                     <User className="w-4 h-4" />
                     Connexion
                   </Button>
                 </Link>
                 <Link to="/auth">
-                  <Button size="sm" className="gradient-primary shadow-primary">
+                  <Button size="sm" className="bg-secondary hover:bg-secondary/90 text-primary">
                     S'inscrire
                   </Button>
                 </Link>
@@ -174,19 +174,19 @@ const Navbar = () => {
                   <>
                     {isAdmin && (
                       <Link to="/admin" className="w-full">
-                        <Button variant="outline" className="w-full gap-2">
+                        <Button variant="outline" className="w-full gap-2 text-white border-white/20 hover:bg-white/10">
                           <LayoutDashboard className="w-4 h-4" />
                           Admin
                         </Button>
                       </Link>
                     )}
                     <Link to="/dashboard" className="w-full">
-                      <Button variant="outline" className="w-full gap-2">
+                      <Button variant="outline" className="w-full gap-2 text-white border-white/20 hover:bg-white/10">
                         <User className="w-4 h-4" />
                         Mon Compte
                       </Button>
                     </Link>
-                    <Button variant="outline" className="w-full gap-2" onClick={handleLogout}>
+                    <Button variant="outline" className="w-full gap-2 text-white border-white/20 hover:bg-white/10" onClick={handleLogout}>
                       <LogOut className="w-4 h-4" />
                       Déconnexion
                     </Button>
@@ -194,13 +194,13 @@ const Navbar = () => {
                 ) : (
                   <>
                     <Link to="/auth" className="w-full">
-                      <Button variant="outline" className="w-full gap-2">
+                      <Button variant="outline" className="w-full gap-2 text-white border-white/20 hover:bg-white/10">
                         <User className="w-4 h-4" />
                         Connexion
                       </Button>
                     </Link>
                     <Link to="/auth" className="w-full">
-                      <Button className="w-full gradient-primary shadow-primary">
+                      <Button className="w-full bg-secondary hover:bg-secondary/90 text-primary">
                         S'inscrire
                       </Button>
                     </Link>
