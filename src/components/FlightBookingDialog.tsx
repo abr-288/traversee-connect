@@ -48,6 +48,8 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams }
     const customerEmail = formData.get("customerEmail") as string;
     const customerPhone = formData.get("customerPhone") as string;
     const passportNumber = formData.get("passportNumber") as string;
+    const passportIssueDate = formData.get("passportIssueDate") as string;
+    const passportExpiryDate = formData.get("passportExpiryDate") as string;
     const notes = formData.get("notes") as string;
 
     const { data: { user } } = await supabase.auth.getUser();
@@ -93,7 +95,13 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams }
       customer_name: customerName,
       customer_email: customerEmail,
       customer_phone: customerPhone,
-      notes: notes ? `${tripType}\nPasseport: ${passportNumber}\n${notes}` : `${tripType}\nPasseport: ${passportNumber}`,
+      booking_details: {
+        tripType,
+        passportNumber,
+        passportIssueDate,
+        passportExpiryDate,
+      },
+      notes: notes || null,
       currency: "FCFA",
       status: "pending",
       payment_status: "pending",
@@ -161,14 +169,23 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams }
             <Input id="passengers" name="passengers" type="number" min="1" max="9" defaultValue="1" required />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="customerName">Nom complet</Label>
-              <Input id="customerName" name="customerName" type="text" required />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="customerName">Nom complet</Label>
+            <Input id="customerName" name="customerName" type="text" required />
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="passportNumber">Numéro de passeport</Label>
               <Input id="passportNumber" name="passportNumber" type="text" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="passportIssueDate">Date de délivrance</Label>
+              <Input id="passportIssueDate" name="passportIssueDate" type="date" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="passportExpiryDate">Date d'expiration</Label>
+              <Input id="passportExpiryDate" name="passportExpiryDate" type="date" required />
             </div>
           </div>
 

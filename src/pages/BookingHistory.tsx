@@ -121,6 +121,8 @@ const BookingHistory = () => {
 
   const handleDownloadTicket = async (bookingId: string) => {
     try {
+      toast.info("Génération du billet en cours...");
+      
       const { data, error } = await supabase.functions.invoke("generate-ticket", {
         body: { bookingId },
       });
@@ -128,18 +130,16 @@ const BookingHistory = () => {
       if (error) throw error;
 
       if (data.success) {
-        // Créer un blob à partir du HTML
-        const blob = new Blob([data.ticket.html], { type: 'text/html' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `billet-${bookingId.substring(0, 8)}.html`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-        
-        toast.success("Billet téléchargé avec succès");
+        // Ouvrir dans une nouvelle fenêtre pour impression
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+          printWindow.document.write(data.ticket.html);
+          printWindow.document.close();
+          setTimeout(() => {
+            printWindow.print();
+          }, 250);
+        }
+        toast.success("Billet envoyé par email! Utilisez Ctrl+P pour sauvegarder en PDF");
       }
     } catch (error) {
       console.error("Error downloading ticket:", error);
