@@ -19,6 +19,7 @@ const Flights = () => {
   const [selectedFlight, setSelectedFlight] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [apiFlights, setApiFlights] = useState<any[]>([]);
+  const [flightSearchParams, setFlightSearchParams] = useState<{ departureDate: string; returnDate?: string } | undefined>();
 
   useEffect(() => {
     const from = searchParams.get("from");
@@ -28,6 +29,10 @@ const Flights = () => {
     const adults = searchParams.get("adults");
 
     if (from && to && date && adults) {
+      setFlightSearchParams({
+        departureDate: date,
+        returnDate: returnDate || undefined
+      });
       handleSearch(from, to, date, returnDate || undefined, parseInt(adults));
     }
   }, [searchParams]);
@@ -406,6 +411,7 @@ const Flights = () => {
           open={dialogOpen} 
           onOpenChange={setDialogOpen}
           flight={selectedFlight}
+          searchParams={flightSearchParams}
         />
       )}
 

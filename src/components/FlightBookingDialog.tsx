@@ -21,12 +21,22 @@ interface FlightBookingDialogProps {
     arrival: string;
     price: number;
     class: string;
+    departureDate?: string;
+    returnDate?: string;
+  };
+  searchParams?: {
+    departureDate: string;
+    returnDate?: string;
   };
 }
 
-export const FlightBookingDialog = ({ open, onOpenChange, flight }: FlightBookingDialogProps) => {
+export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams }: FlightBookingDialogProps) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  
+  const departureDate = searchParams?.departureDate || flight.departureDate || new Date().toISOString().split('T')[0];
+  const returnDate = searchParams?.returnDate || flight.returnDate;
+  const tripType = returnDate ? "Aller-retour" : "Aller simple";
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -57,14 +67,16 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight }: FlightBookin
         price_per_unit: flight.price,
         currency: "FCFA",
         location: flight.to,
+        destination: flight.from,
         available: true,
-        description: `${flight.airline} - Classe ${flight.class}`
-      } as any)
+        description: `${flight.airline} - Classe ${flight.class} - ${tripType}`
+      })
       .select()
       .single();
 
     if (serviceError) {
-      toast.error("Erreur lors de la création du service");
+      console.error("Service creation error:", serviceError);
+      toast.error("Erreur lors de la création du service: " + serviceError.message);
       setLoading(false);
       return;
     }
@@ -74,14 +86,14 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight }: FlightBookin
     const { data: booking, error } = await supabase.from("bookings").insert({
       user_id: user.id,
       service_id: newService.id,
-      start_date: flight.departure.split('T')[0],
-      end_date: flight.arrival.split('T')[0],
+      start_date: departureDate,
+      end_date: returnDate || departureDate,
       guests: passengers,
       total_price: totalPrice,
       customer_name: customerName,
       customer_email: customerEmail,
       customer_phone: customerPhone,
-      notes: notes ? `Passeport: ${passportNumber}\n${notes}` : `Passeport: ${passportNumber}`,
+      notes: notes ? `${tripType}\nPasseport: ${passportNumber}\n${notes}` : `${tripType}\nPasseport: ${passportNumber}`,
       currency: "FCFA",
       status: "pending",
       payment_status: "pending",
@@ -109,23 +121,33 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight }: FlightBookin
             Réserver votre vol
           </DialogTitle>
           <DialogDescription>
-            {flight.airline} • {flight.from} → {flight.to} • {flight.class}
+            {flight.airline} • {flight.from} → {flight.to} • {flight.class} • {tripType}
           </DialogDescription>
         </DialogHeader>
 
         <div className="bg-muted p-4 rounded-lg mb-4">
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <p className="text-muted-foreground">Départ</p>
-              <p className="font-semibold">{new Date(flight.departure).toLocaleString('fr-FR')}</p>
+              <p className="text-muted-foreground">Date de départ</p>
+              <p className="font-semibold">{new Date(departureDate).toLocaleDateString('fr-FR')}</p>
+            </div>
+            {returnDate && (
+              <div>
+                <p className="text-muted-foreground">Date de retour</p>
+                <p className="font-semibold">{new Date(returnDate).toLocaleDateString('fr-FR')}</p>
+              </div>
+            )}
+            <div>
+              <p className="text-muted-foreground">Horaire départ</p>
+              <p className="font-semibold">{flight.departure}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Arrivée</p>
-              <p className="font-semibold">{new Date(flight.arrival).toLocaleString('fr-FR')}</p>
+              <p className="text-muted-foreground">Horaire arrivée</p>
+              <p className="font-semibold">{flight.arrival}</p>
             </div>
-            <div>
+            <div className="col-span-2">
               <p className="text-muted-foreground">Prix par passager</p>
-              <p className="font-semibold text-primary">{flight.price.toLocaleString()} FCFA</p>
+              <p className="font-semibold text-primary text-xl">{flight.price.toLocaleString()} FCFA</p>
             </div>
           </div>
         </div>

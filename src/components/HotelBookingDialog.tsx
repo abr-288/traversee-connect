@@ -67,13 +67,15 @@ export const HotelBookingDialog = ({ open, onOpenChange, hotel }: HotelBookingDi
         price_per_unit: hotel.price,
         currency: "FCFA",
         location: hotel.location,
+        destination: hotel.location,
         available: true,
-      } as any)
+      })
       .select()
       .single();
 
     if (serviceError) {
-      toast.error("Erreur lors de la création du service");
+      console.error("Service creation error:", serviceError);
+      toast.error("Erreur lors de la création du service: " + serviceError.message);
       setLoading(false);
       return;
     }
