@@ -42,13 +42,17 @@ const Navbar = () => {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-4">
-            <Button variant="ghost" size="sm" className="gap-2">
-              <User className="w-4 h-4" />
-              Connexion
-            </Button>
-            <Button size="sm" className="gradient-primary shadow-primary">
-              S'inscrire
-            </Button>
+            <Link to="/auth">
+              <Button variant="ghost" size="sm" className="gap-2">
+                <User className="w-4 h-4" />
+                Connexion
+              </Button>
+            </Link>
+            <Link to="/auth">
+              <Button size="sm" className="gradient-primary shadow-primary">
+                S'inscrire
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -107,13 +111,17 @@ const Navbar = () => {
                 Événements
               </Link>
               <div className="flex flex-col gap-2 px-4 pt-4 border-t border-border">
-                <Button variant="outline" className="w-full gap-2">
-                  <User className="w-4 h-4" />
-                  Connexion
-                </Button>
-                <Button className="w-full gradient-primary shadow-primary">
-                  S'inscrire
-                </Button>
+                <Link to="/auth" className="w-full">
+                  <Button variant="outline" className="w-full gap-2">
+                    <User className="w-4 h-4" />
+                    Connexion
+                  </Button>
+                </Link>
+                <Link to="/auth" className="w-full">
+                  <Button className="w-full gradient-primary shadow-primary">
+                    S'inscrire
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
