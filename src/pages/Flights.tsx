@@ -55,15 +55,53 @@ const Flights = () => {
     });
 
     if (result?.success && result?.data) {
-      // Transform API data to ensure price is a number
-      const transformedFlights = result.data.map((flight: any) => ({
-        ...flight,
-        price: typeof flight.price === 'object' && flight.price?.grandTotal 
-          ? parseFloat(flight.price.grandTotal) 
+      // Transform Amadeus API data to match display structure
+      const transformedFlights = result.data.map((flight: any) => {
+        const firstSegment = flight.itineraries?.[0]?.segments?.[0];
+        const lastSegment = flight.itineraries?.[0]?.segments?.[flight.itineraries[0].segments.length - 1];
+        const allSegments = flight.itineraries?.[0]?.segments || [];
+        
+        // Calculate number of stops
+        const numberOfStops = allSegments.length - 1;
+        const stopsText = numberOfStops === 0 ? 'Direct' : numberOfStops === 1 ? '1 escale' : `${numberOfStops} escales`;
+        
+        // Extract departure and arrival times
+        const departureTime = firstSegment?.departure?.at ? new Date(firstSegment.departure.at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '';
+        const arrivalTime = lastSegment?.arrival?.at ? new Date(lastSegment.arrival.at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '';
+        
+        // Get airline code and convert to name
+        const airlineCode = flight.validatingAirlineCodes?.[0] || firstSegment?.carrierCode || '';
+        const airlineNames: Record<string, string> = {
+          'KQ': 'Kenya Airways',
+          'HF': 'Air Côte d\'Ivoire',
+          'EK': 'Emirates',
+          'KP': 'ASKY Airlines',
+          'AF': 'Air France',
+          'ET': 'Ethiopian Airlines'
+        };
+        
+        // Extract price
+        const price = typeof flight.price === 'object' && flight.price?.grandTotal 
+          ? parseFloat(flight.price.grandTotal) * 655 // Convert EUR to FCFA
           : typeof flight.price === 'number' 
           ? flight.price 
-          : parseFloat(flight.price?.total || 0)
-      }));
+          : parseFloat(flight.price?.total || 0) * 655;
+        
+        return {
+          id: flight.id,
+          airline: airlineNames[airlineCode] || airlineCode,
+          from: `${firstSegment?.departure?.iataCode || origin}`,
+          to: `${lastSegment?.arrival?.iataCode || destination}`,
+          departure: departureTime,
+          arrival: arrivalTime,
+          duration: flight.itineraries?.[0]?.duration?.replace('PT', '').replace('H', 'h ').replace('M', 'min') || '',
+          stops: stopsText,
+          price: Math.round(price),
+          class: flight.travelerPricings?.[0]?.fareDetailsBySegment?.[0]?.cabin || 'Économique',
+          date: departureDate
+        };
+      });
+      
       setApiFlights(transformedFlights);
       toast.success(`${transformedFlights.length} vols trouvés`);
     } else {

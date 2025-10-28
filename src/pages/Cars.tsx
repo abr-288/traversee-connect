@@ -44,17 +44,31 @@ const Cars = () => {
 
     if (result?.success && result?.data) {
       const carsArray = Array.isArray(result.data) ? result.data : [result.data];
-      // Transform API data to ensure price is a number
-      const transformedCars = carsArray.map((car: any) => ({
-        ...car,
-        price: typeof car.price === 'object' && car.price?.grandTotal 
+      // Transform API data to match display structure
+      const transformedCars = carsArray.map((car: any) => {
+        const price = typeof car.price === 'object' && car.price?.grandTotal 
           ? parseFloat(car.price.grandTotal) 
           : typeof car.price === 'number' 
           ? car.price 
-          : parseFloat(car.price?.total || car.price || 0)
-      }));
+          : parseFloat(car.price?.total || car.price || 0);
+        
+        return {
+          id: car.id || car.vehicle_id || Math.random().toString(),
+          name: car.name || car.vehicle_name || car.model || 'Véhicule',
+          category: car.category || car.vehicle_category || 'Standard',
+          price: Math.round(price),
+          rating: car.rating || 4.5,
+          reviews: car.reviews || car.review_count || 0,
+          image: car.image || car.vehicle_image || '/placeholder.svg',
+          seats: car.seats || car.passenger_capacity || 5,
+          transmission: car.transmission || 'Automatique',
+          fuel: car.fuel || car.fuel_type || 'Essence',
+          luggage: car.luggage || car.luggage_capacity || 3
+        };
+      });
+      
       setApiCars(transformedCars);
-      toast.success("Recherche de voitures effectuée");
+      toast.success(`${transformedCars.length} voitures trouvées`);
     } else {
       toast.error("Erreur lors de la recherche de voitures");
     }
