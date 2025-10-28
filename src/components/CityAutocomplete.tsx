@@ -1,0 +1,108 @@
+import { useState, useRef, useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import { MapPin } from "lucide-react";
+
+interface City {
+  name: string;
+  code?: string;
+  country: string;
+}
+
+interface CityAutocompleteProps {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  className?: string;
+}
+
+const popularCities: City[] = [
+  { name: "Abidjan", code: "ABJ", country: "Côte d'Ivoire" },
+  { name: "Paris", code: "CDG", country: "France" },
+  { name: "Dakar", code: "DSS", country: "Sénégal" },
+  { name: "Accra", code: "ACC", country: "Ghana" },
+  { name: "Lagos", code: "LOS", country: "Nigeria" },
+  { name: "Bamako", code: "BKO", country: "Mali" },
+  { name: "Casablanca", code: "CMN", country: "Maroc" },
+  { name: "Bruxelles", code: "BRU", country: "Belgique" },
+  { name: "Londres", code: "LHR", country: "Royaume-Uni" },
+  { name: "New York", code: "JFK", country: "États-Unis" },
+  { name: "Dubaï", code: "DXB", country: "Émirats Arabes Unis" },
+  { name: "Istanbul", code: "IST", country: "Turquie" },
+  { name: "Addis-Abeba", code: "ADD", country: "Éthiopie" },
+  { name: "Johannesburg", code: "JNB", country: "Afrique du Sud" },
+  { name: "Nairobi", code: "NBO", country: "Kenya" },
+];
+
+export const CityAutocomplete = ({
+  value,
+  onChange,
+  placeholder = "Ville ou aéroport",
+  className,
+}: CityAutocompleteProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [filteredCities, setFilteredCities] = useState<City[]>([]);
+  const inputRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (value.length > 0) {
+      const filtered = popularCities.filter(
+        (city) =>
+          city.name.toLowerCase().includes(value.toLowerCase()) ||
+          city.code?.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredCities(filtered);
+      setIsOpen(filtered.length > 0);
+    } else {
+      setFilteredCities([]);
+      setIsOpen(false);
+    }
+  }, [value]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (inputRef.current && !inputRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSelectCity = (city: City) => {
+    onChange(city.code ? `${city.name} (${city.code})` : city.name);
+    setIsOpen(false);
+  };
+
+  return (
+    <div ref={inputRef} className="relative">
+      <Input
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={() => value.length > 0 && setIsOpen(true)}
+        className={className}
+      />
+      {isOpen && filteredCities.length > 0 && (
+        <div className="absolute top-full left-0 right-0 mt-1 bg-background border rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
+          {filteredCities.map((city, index) => (
+            <button
+              key={index}
+              type="button"
+              onClick={() => handleSelectCity(city)}
+              className="w-full px-4 py-3 text-left hover:bg-muted flex items-start gap-3 transition-colors"
+            >
+              <MapPin className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="font-medium truncate">
+                  {city.name} {city.code && `(${city.code})`}
+                </p>
+                <p className="text-sm text-muted-foreground">{city.country}</p>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};

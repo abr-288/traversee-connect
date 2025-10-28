@@ -1,19 +1,90 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Hotel, Map, Car, Plane, Calendar as CalendarIcon, Users, Search, ArrowRightLeft, ArrowRight } from "lucide-react";
+import { Hotel, Map, Car, Plane, Calendar as CalendarIcon, Search, ArrowRightLeft, ArrowRight } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import heroImage from "@/assets/hero-beach.jpg";
+import { TravelersSelector } from "./TravelersSelector";
+import { CityAutocomplete } from "./CityAutocomplete";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
   const [checkIn, setCheckIn] = useState<Date>();
   const [checkOut, setCheckOut] = useState<Date>();
   const [activeTab, setActiveTab] = useState("hotel");
   const [tripType, setTripType] = useState<"round-trip" | "one-way">("round-trip");
+
+  // Hotel state
+  const [hotelDestination, setHotelDestination] = useState("");
+  const [hotelAdults, setHotelAdults] = useState(2);
+  const [hotelChildren, setHotelChildren] = useState(0);
+  const [hotelRooms, setHotelRooms] = useState(1);
+
+  // Flight state
+  const [flightFrom, setFlightFrom] = useState("");
+  const [flightTo, setFlightTo] = useState("");
+  const [flightDate, setFlightDate] = useState<Date>();
+  const [flightReturnDate, setFlightReturnDate] = useState<Date>();
+  const [flightAdults, setFlightAdults] = useState(1);
+  const [flightChildren, setFlightChildren] = useState(0);
+
+  // Tour state
+  const [tourDestination, setTourDestination] = useState("");
+  const [tourDate, setTourDate] = useState<Date>();
+  const [tourAdults, setTourAdults] = useState(2);
+  const [tourChildren, setTourChildren] = useState(0);
+
+  // Car state
+  const [carLocation, setCarLocation] = useState("");
+  const [carPickupDate, setCarPickupDate] = useState<Date>();
+  const [carReturnDate, setCarReturnDate] = useState<Date>();
+
+  const handleHotelSearch = () => {
+    const params = new URLSearchParams();
+    if (hotelDestination) params.set("destination", hotelDestination);
+    if (checkIn) params.set("checkIn", format(checkIn, "yyyy-MM-dd"));
+    if (checkOut) params.set("checkOut", format(checkOut, "yyyy-MM-dd"));
+    params.set("adults", hotelAdults.toString());
+    params.set("children", hotelChildren.toString());
+    params.set("rooms", hotelRooms.toString());
+    navigate(`/hotels?${params.toString()}`);
+  };
+
+  const handleFlightSearch = () => {
+    const params = new URLSearchParams();
+    if (flightFrom) params.set("from", flightFrom);
+    if (flightTo) params.set("to", flightTo);
+    if (flightDate) params.set("date", format(flightDate, "yyyy-MM-dd"));
+    if (tripType === "round-trip" && flightReturnDate) {
+      params.set("returnDate", format(flightReturnDate, "yyyy-MM-dd"));
+    }
+    params.set("adults", flightAdults.toString());
+    params.set("children", flightChildren.toString());
+    params.set("tripType", tripType);
+    navigate(`/flights?${params.toString()}`);
+  };
+
+  const handleTourSearch = () => {
+    const params = new URLSearchParams();
+    if (tourDestination) params.set("destination", tourDestination);
+    if (tourDate) params.set("date", format(tourDate, "yyyy-MM-dd"));
+    params.set("adults", tourAdults.toString());
+    params.set("children", tourChildren.toString());
+    navigate(`/tours?${params.toString()}`);
+  };
+
+  const handleCarSearch = () => {
+    const params = new URLSearchParams();
+    if (carLocation) params.set("location", carLocation);
+    if (carPickupDate) params.set("pickupDate", format(carPickupDate, "yyyy-MM-dd"));
+    if (carReturnDate) params.set("returnDate", format(carReturnDate, "yyyy-MM-dd"));
+    navigate(`/cars?${params.toString()}`);
+  };
 
   return (
     <section className="relative min-h-[700px] flex items-center pt-20">
@@ -69,7 +140,12 @@ const HeroSection = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground">Destination</label>
-                  <Input placeholder="Où allez-vous ?" className="h-12" />
+                  <Input 
+                    placeholder="Où allez-vous ?" 
+                    className="h-12"
+                    value={hotelDestination}
+                    onChange={(e) => setHotelDestination(e.target.value)}
+                  />
                 </div>
                 
                 <div className="space-y-2">
@@ -104,14 +180,22 @@ const HeroSection = () => {
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground">Voyageurs</label>
-                  <Button variant="outline" className="w-full h-12 justify-start text-left font-normal">
-                    <Users className="mr-2 h-4 w-4" />
-                    2 Adultes, 1 Chambre
-                  </Button>
+                  <TravelersSelector
+                    adults={hotelAdults}
+                    children={hotelChildren}
+                    rooms={hotelRooms}
+                    onAdultsChange={setHotelAdults}
+                    onChildrenChange={setHotelChildren}
+                    onRoomsChange={setHotelRooms}
+                    showRooms
+                  />
                 </div>
               </div>
 
-              <Button className="w-full md:w-auto px-8 h-12 gradient-primary shadow-primary text-lg gap-2">
+              <Button 
+                onClick={handleHotelSearch}
+                className="w-full md:w-auto px-8 h-12 gradient-primary shadow-primary text-lg gap-2"
+              >
                 <Search className="w-5 h-5" />
                 Rechercher
               </Button>
@@ -121,7 +205,12 @@ const HeroSection = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground">Destination</label>
-                  <Input placeholder="Où souhaitez-vous aller ?" className="h-12" />
+                  <Input 
+                    placeholder="Où souhaitez-vous aller ?" 
+                    className="h-12"
+                    value={tourDestination}
+                    onChange={(e) => setTourDestination(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground">Date</label>
@@ -129,20 +218,28 @@ const HeroSection = () => {
                     <PopoverTrigger asChild>
                       <Button variant="outline" className="w-full h-12 justify-start text-left font-normal">
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        Choisir une date
+                        {tourDate ? format(tourDate, "PPP", { locale: fr }) : "Choisir une date"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
-                      <Calendar mode="single" />
+                      <Calendar mode="single" selected={tourDate} onSelect={setTourDate} />
                     </PopoverContent>
                   </Popover>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground">Participants</label>
-                  <Input placeholder="Nombre de personnes" type="number" className="h-12" />
+                  <TravelersSelector
+                    adults={tourAdults}
+                    children={tourChildren}
+                    onAdultsChange={setTourAdults}
+                    onChildrenChange={setTourChildren}
+                  />
                 </div>
               </div>
-              <Button className="w-full md:w-auto px-8 h-12 gradient-primary shadow-primary text-lg gap-2">
+              <Button 
+                onClick={handleTourSearch}
+                className="w-full md:w-auto px-8 h-12 gradient-primary shadow-primary text-lg gap-2"
+              >
                 <Search className="w-5 h-5" />
                 Rechercher des circuits
               </Button>
@@ -152,7 +249,12 @@ const HeroSection = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground">Lieu de prise en charge</label>
-                  <Input placeholder="Ville ou aéroport" className="h-12" />
+                  <Input 
+                    placeholder="Ville ou aéroport" 
+                    className="h-12"
+                    value={carLocation}
+                    onChange={(e) => setCarLocation(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground">Date de début</label>
@@ -160,11 +262,11 @@ const HeroSection = () => {
                     <PopoverTrigger asChild>
                       <Button variant="outline" className="w-full h-12 justify-start text-left font-normal">
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        Date de prise en charge
+                        {carPickupDate ? format(carPickupDate, "PPP", { locale: fr }) : "Date de prise en charge"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
-                      <Calendar mode="single" />
+                      <Calendar mode="single" selected={carPickupDate} onSelect={setCarPickupDate} />
                     </PopoverContent>
                   </Popover>
                 </div>
@@ -174,16 +276,19 @@ const HeroSection = () => {
                     <PopoverTrigger asChild>
                       <Button variant="outline" className="w-full h-12 justify-start text-left font-normal">
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        Date de retour
+                        {carReturnDate ? format(carReturnDate, "PPP", { locale: fr }) : "Date de retour"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
-                      <Calendar mode="single" />
+                      <Calendar mode="single" selected={carReturnDate} onSelect={setCarReturnDate} />
                     </PopoverContent>
                   </Popover>
                 </div>
               </div>
-              <Button className="w-full md:w-auto px-8 h-12 gradient-primary shadow-primary text-lg gap-2">
+              <Button 
+                onClick={handleCarSearch}
+                className="w-full md:w-auto px-8 h-12 gradient-primary shadow-primary text-lg gap-2"
+              >
                 <Search className="w-5 h-5" />
                 Rechercher des voitures
               </Button>
@@ -217,11 +322,21 @@ const HeroSection = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground">Départ</label>
-                  <Input placeholder="Ville de départ" className="h-12" />
+                  <CityAutocomplete
+                    placeholder="Ville de départ"
+                    value={flightFrom}
+                    onChange={setFlightFrom}
+                    className="h-12"
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground">Arrivée</label>
-                  <Input placeholder="Destination" className="h-12" />
+                  <CityAutocomplete
+                    placeholder="Destination"
+                    value={flightTo}
+                    onChange={setFlightTo}
+                    className="h-12"
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground">Date de départ</label>
@@ -229,11 +344,11 @@ const HeroSection = () => {
                     <PopoverTrigger asChild>
                       <Button variant="outline" className="w-full h-12 justify-start text-left font-normal">
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        Date
+                        {flightDate ? format(flightDate, "PPP", { locale: fr }) : "Date"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
-                      <Calendar mode="single" />
+                      <Calendar mode="single" selected={flightDate} onSelect={setFlightDate} />
                     </PopoverContent>
                   </Popover>
                 </div>
@@ -244,21 +359,29 @@ const HeroSection = () => {
                       <PopoverTrigger asChild>
                         <Button variant="outline" className="w-full h-12 justify-start text-left font-normal">
                           <CalendarIcon className="mr-2 h-4 w-4" />
-                          Date
+                          {flightReturnDate ? format(flightReturnDate, "PPP", { locale: fr }) : "Date"}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0">
-                        <Calendar mode="single" />
+                        <Calendar mode="single" selected={flightReturnDate} onSelect={setFlightReturnDate} />
                       </PopoverContent>
                     </Popover>
                   </div>
                 )}
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground">Passagers</label>
-                  <Input placeholder="Nombre de passagers" type="number" className="h-12" />
+                  <TravelersSelector
+                    adults={flightAdults}
+                    children={flightChildren}
+                    onAdultsChange={setFlightAdults}
+                    onChildrenChange={setFlightChildren}
+                  />
                 </div>
               </div>
-              <Button className="w-full md:w-auto px-8 h-12 gradient-primary shadow-primary text-lg gap-2">
+              <Button 
+                onClick={handleFlightSearch}
+                className="w-full md:w-auto px-8 h-12 gradient-primary shadow-primary text-lg gap-2"
+              >
                 <Search className="w-5 h-5" />
                 Rechercher des vols
               </Button>
@@ -292,11 +415,21 @@ const HeroSection = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground">Départ</label>
-                  <Input placeholder="Ville de départ" className="h-12" />
+                  <CityAutocomplete
+                    placeholder="Ville de départ"
+                    value={flightFrom}
+                    onChange={setFlightFrom}
+                    className="h-12"
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground">Destination</label>
-                  <Input placeholder="Où allez-vous ?" className="h-12" />
+                  <Input 
+                    placeholder="Où allez-vous ?" 
+                    className="h-12"
+                    value={hotelDestination}
+                    onChange={(e) => setHotelDestination(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground">Date de départ</label>
@@ -304,11 +437,11 @@ const HeroSection = () => {
                     <PopoverTrigger asChild>
                       <Button variant="outline" className="w-full h-12 justify-start text-left font-normal">
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        Date
+                        {flightDate ? format(flightDate, "PPP", { locale: fr }) : "Date"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
-                      <Calendar mode="single" />
+                      <Calendar mode="single" selected={flightDate} onSelect={setFlightDate} />
                     </PopoverContent>
                   </Popover>
                 </div>
@@ -319,24 +452,35 @@ const HeroSection = () => {
                       <PopoverTrigger asChild>
                         <Button variant="outline" className="w-full h-12 justify-start text-left font-normal">
                           <CalendarIcon className="mr-2 h-4 w-4" />
-                          Date
+                          {flightReturnDate ? format(flightReturnDate, "PPP", { locale: fr }) : "Date"}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0">
-                        <Calendar mode="single" />
+                        <Calendar mode="single" selected={flightReturnDate} onSelect={setFlightReturnDate} />
                       </PopoverContent>
                     </Popover>
                   </div>
                 )}
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground">Passagers & Chambres</label>
-                  <Button variant="outline" className="w-full h-12 justify-start text-left font-normal">
-                    <Users className="mr-2 h-4 w-4" />
-                    2 Adultes, 1 Chambre
-                  </Button>
+                  <TravelersSelector
+                    adults={hotelAdults}
+                    children={hotelChildren}
+                    rooms={hotelRooms}
+                    onAdultsChange={setHotelAdults}
+                    onChildrenChange={setHotelChildren}
+                    onRoomsChange={setHotelRooms}
+                    showRooms
+                  />
                 </div>
               </div>
-              <Button className="w-full md:w-auto px-8 h-12 gradient-primary shadow-primary text-lg gap-2">
+              <Button 
+                onClick={() => {
+                  handleFlightSearch();
+                  handleHotelSearch();
+                }}
+                className="w-full md:w-auto px-8 h-12 gradient-primary shadow-primary text-lg gap-2"
+              >
                 <Search className="w-5 h-5" />
                 Rechercher Vol + Hôtel
               </Button>
