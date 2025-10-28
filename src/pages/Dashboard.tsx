@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Calendar, CreditCard, Package, MapPin } from "lucide-react";
 
 interface Booking {
@@ -141,6 +142,12 @@ const Dashboard = () => {
       <Navbar />
       <main className="flex-1 container mx-auto px-4 py-8 mt-20">
         <h1 className="text-3xl font-bold mb-8">Mon Tableau de Bord</h1>
+        
+        <div className="flex gap-4 mb-6">
+          <Button onClick={() => navigate("/booking-history")} className="gradient-primary shadow-primary">
+            Voir toutes mes réservations
+          </Button>
+        </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">

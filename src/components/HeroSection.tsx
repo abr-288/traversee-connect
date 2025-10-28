@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Hotel, Map, Car, Plane, Calendar as CalendarIcon, Search, ArrowRightLeft, ArrowRight } from "lucide-react";
+import { Hotel, Map, Car, Plane, Calendar as CalendarIcon, Search, ArrowRightLeft, ArrowRight, MapPin } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import heroSlide1 from "@/assets/hero-slide-1.jpg";
@@ -15,6 +15,7 @@ import heroSlide4 from "@/assets/hero-slide-4.jpg";
 import heroSlide5 from "@/assets/hero-slide-5.jpg";
 import { TravelersSelector } from "./TravelersSelector";
 import { CityAutocomplete } from "./CityAutocomplete";
+import { MultiCityFlightForm } from "./MultiCityFlightForm";
 
 const HERO_SLIDES = [heroSlide1, heroSlide2, heroSlide3, heroSlide4, heroSlide5];
 
@@ -24,7 +25,7 @@ const HeroSection = () => {
   const [checkIn, setCheckIn] = useState<Date>();
   const [checkOut, setCheckOut] = useState<Date>();
   const [activeTab, setActiveTab] = useState("hotel");
-  const [tripType, setTripType] = useState<"round-trip" | "one-way">("round-trip");
+  const [tripType, setTripType] = useState<"round-trip" | "one-way" | "multi-city">("round-trip");
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -341,7 +342,30 @@ const HeroSection = () => {
                   <ArrowRight className="w-4 h-4" />
                   Aller simple
                 </button>
+                <button
+                  onClick={() => setTripType("multi-city")}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-smooth ${
+                    tripType === "multi-city"
+                      ? "bg-secondary text-secondary-foreground"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  }`}
+                >
+                  <MapPin className="w-4 h-4" />
+                  Multi-destinations
+                </button>
               </div>
+              
+              {tripType === "multi-city" ? (
+                <MultiCityFlightForm onSearch={(legs) => {
+                  const params = new URLSearchParams();
+                  params.set("tripType", "multi-city");
+                  params.set("legs", JSON.stringify(legs));
+                  params.set("adults", flightAdults.toString());
+                  params.set("children", flightChildren.toString());
+                  navigate(`/flights?${params.toString()}`);
+                }} />
+              ) : (
+              <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground">Départ</label>
@@ -408,6 +432,8 @@ const HeroSection = () => {
                 <Search className="w-5 h-5" />
                 Rechercher des vols
               </Button>
+              </>
+              )}
             </TabsContent>
 
             <TabsContent value="flight-hotel" className="space-y-4">
