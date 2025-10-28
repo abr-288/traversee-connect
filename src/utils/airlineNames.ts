@@ -1,0 +1,106 @@
+export const airlineNames: Record<string, string> = {
+  // Major African Airlines
+  'HF': 'Air Côte d\'Ivoire',
+  'KQ': 'Kenya Airways',
+  'ET': 'Ethiopian Airlines',
+  'KP': 'ASKY Airlines',
+  'SA': 'South African Airways',
+  'MS': 'EgyptAir',
+  'AT': 'Royal Air Maroc',
+  'UU': 'Air Austral',
+  'MD': 'Air Madagascar',
+  'FN': 'Fastjet',
+  'HC': 'Fly540',
+  'TB': 'TUI fly Belgium',
+  
+  // Major European Airlines
+  'AF': 'Air France',
+  'KL': 'KLM Royal Dutch Airlines',
+  'BA': 'British Airways',
+  'LH': 'Lufthansa',
+  'IB': 'Iberia',
+  'SN': 'Brussels Airlines',
+  'AZ': 'ITA Airways',
+  'TP': 'TAP Air Portugal',
+  'LX': 'Swiss International Air Lines',
+  'OS': 'Austrian Airlines',
+  'SK': 'Scandinavian Airlines',
+  'AY': 'Finnair',
+  'FR': 'Ryanair',
+  'U2': 'easyJet',
+  'VY': 'Vueling',
+  'W6': 'Wizz Air',
+  
+  // Middle Eastern Airlines
+  'EK': 'Emirates',
+  'QR': 'Qatar Airways',
+  'EY': 'Etihad Airways',
+  'TK': 'Turkish Airlines',
+  'SV': 'Saudi Arabian Airlines',
+  'GF': 'Gulf Air',
+  'RJ': 'Royal Jordanian',
+  'ME': 'Middle East Airlines',
+  
+  // American Airlines
+  'AA': 'American Airlines',
+  'UA': 'United Airlines',
+  'DL': 'Delta Air Lines',
+  'AC': 'Air Canada',
+  'AM': 'Aeromexico',
+  'CM': 'Copa Airlines',
+  'AV': 'Avianca',
+  'LA': 'LATAM Airlines',
+  
+  // Asian Airlines
+  'SQ': 'Singapore Airlines',
+  'CX': 'Cathay Pacific',
+  'NH': 'All Nippon Airways',
+  'JL': 'Japan Airlines',
+  'TG': 'Thai Airways',
+  'MH': 'Malaysia Airlines',
+  'PR': 'Philippine Airlines',
+  'AI': 'Air India',
+  'CZ': 'China Southern Airlines',
+  'MU': 'China Eastern Airlines',
+  'CA': 'Air China',
+  'KE': 'Korean Air',
+  'OZ': 'Asiana Airlines',
+  
+  // Australian/Pacific Airlines
+  'QF': 'Qantas',
+  'VA': 'Virgin Australia',
+  'NZ': 'Air New Zealand',
+  'FJ': 'Fiji Airways',
+  
+  // Low-Cost Carriers
+  'WN': 'Southwest Airlines',
+  'B6': 'JetBlue Airways',
+  'NK': 'Spirit Airlines',
+  'G4': 'Allegiant Air',
+  'F9': 'Frontier Airlines',
+  'VB': 'VivaAerobus',
+  'Y4': 'Volaris',
+  'JQ': 'Jetstar',
+  'TR': 'Scoot',
+  'Z2': 'AirAsia Philippines',
+  'FD': 'Thai AirAsia',
+  'AK': 'AirAsia',
+  '3K': 'Jetstar Asia',
+  '5J': 'Cebu Pacific',
+  
+  // Other Notable Airlines
+  'WY': 'Oman Air',
+  'UL': 'SriLankan Airlines',
+  'PK': 'Pakistan International Airlines',
+  'BG': 'Biman Bangladesh Airlines',
+  'BI': 'Royal Brunei Airlines',
+  'TN': 'Air Tahiti Nui',
+  'SB': 'Air Caledonie',
+  'UX': 'Air Europa',
+  'VN': 'Vietnam Airlines',
+  'GA': 'Garuda Indonesia',
+};
+
+export const getAirlineName = (code: string): string => {
+  return airlineNames[code] || code;
+};

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -11,6 +11,7 @@ import { Plane, Clock, Calendar, Briefcase, Loader2 } from "lucide-react";
 import { FlightBookingDialog } from "@/components/FlightBookingDialog";
 import { useFlightSearch } from "@/hooks/useFlightSearch";
 import { toast } from "sonner";
+import { getAirlineName } from "@/utils/airlineNames";
 
 const Flights = () => {
   const [searchParams] = useSearchParams();
@@ -20,6 +21,14 @@ const Flights = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [apiFlights, setApiFlights] = useState<any[]>([]);
   const [flightSearchParams, setFlightSearchParams] = useState<{ departureDate: string; returnDate?: string } | undefined>();
+  
+  // Filter states
+  const [filterOrigin, setFilterOrigin] = useState("");
+  const [filterDestination, setFilterDestination] = useState("");
+  const [filterStops, setFilterStops] = useState("all");
+  const [selectedAirlines, setSelectedAirlines] = useState<string[]>([]);
+  const [selectedClasses, setSelectedClasses] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState("cheapest");
 
   useEffect(() => {
     const from = searchParams.get("from");
@@ -76,14 +85,6 @@ const Flights = () => {
         
         // Get airline code and convert to name
         const airlineCode = flight.validatingAirlineCodes?.[0] || firstSegment?.carrierCode || '';
-        const airlineNames: Record<string, string> = {
-          'KQ': 'Kenya Airways',
-          'HF': 'Air Côte d\'Ivoire',
-          'EK': 'Emirates',
-          'KP': 'ASKY Airlines',
-          'AF': 'Air France',
-          'ET': 'Ethiopian Airlines'
-        };
         
         // Extract price
         const price = typeof flight.price === 'object' && flight.price?.grandTotal 
@@ -94,7 +95,8 @@ const Flights = () => {
         
         return {
           id: flight.id,
-          airline: airlineNames[airlineCode] || airlineCode,
+          airline: getAirlineName(airlineCode),
+          airlineCode: airlineCode,
           from: `${firstSegment?.departure?.iataCode || origin}`,
           to: `${lastSegment?.arrival?.iataCode || destination}`,
           departure: departureTime,
@@ -114,7 +116,7 @@ const Flights = () => {
     }
   };
 
-  const flights = [
+  const mockFlights = [
     {
       id: 1,
       airline: "Air Côte d'Ivoire",
@@ -195,6 +197,124 @@ const Flights = () => {
     }
   ];
 
+  // Get unique airlines from flights for filter
+  const availableAirlines = useMemo(() => {
+    const airlines = new Set<string>();
+    (apiFlights.length > 0 ? apiFlights : mockFlights).forEach(flight => {
+      airlines.add(flight.airline);
+    });
+    return Array.from(airlines).sort();
+  }, [apiFlights]);
+
+  // Toggle airline filter
+  const toggleAirline = (airline: string) => {
+    setSelectedAirlines(prev => 
+      prev.includes(airline) 
+        ? prev.filter(a => a !== airline)
+        : [...prev, airline]
+    );
+  };
+
+  // Toggle class filter
+  const toggleClass = (flightClass: string) => {
+    setSelectedClasses(prev => 
+      prev.includes(flightClass) 
+        ? prev.filter(c => c !== flightClass)
+        : [...prev, flightClass]
+    );
+  };
+
+  // Helper function to parse duration string
+  const parseDuration = (duration: string): number => {
+    const hours = duration.match(/(\d+)h/);
+    const minutes = duration.match(/(\d+)min/);
+    return (hours ? parseInt(hours[1]) * 60 : 0) + (minutes ? parseInt(minutes[1]) : 0);
+  };
+
+  // Helper function to parse time string
+  const parseTime = (time: string): number => {
+    const [hours, minutes] = time.split(':').map(s => parseInt(s.replace(/\D/g, '')));
+    return hours * 60 + minutes;
+  };
+
+  // Apply filters and sorting
+  const filteredAndSortedFlights = useMemo(() => {
+    let result = apiFlights.length > 0 ? [...apiFlights] : [...mockFlights];
+
+    // Apply origin filter
+    if (filterOrigin.trim()) {
+      result = result.filter(f => 
+        f.from.toLowerCase().includes(filterOrigin.toLowerCase())
+      );
+    }
+
+    // Apply destination filter
+    if (filterDestination.trim()) {
+      result = result.filter(f => 
+        f.to.toLowerCase().includes(filterDestination.toLowerCase())
+      );
+    }
+
+    // Apply stops filter
+    if (filterStops !== "all") {
+      if (filterStops === "direct") {
+        result = result.filter(f => f.stops === "Direct");
+      } else if (filterStops === "1stop") {
+        result = result.filter(f => f.stops === "1 escale");
+      } else if (filterStops === "2plus") {
+        result = result.filter(f => {
+          const match = f.stops.match(/(\d+)/);
+          return match && parseInt(match[1]) >= 2;
+        });
+      }
+    }
+
+    // Apply price range filter
+    result = result.filter(f => 
+      f.price >= priceRange[0] && f.price <= priceRange[1]
+    );
+
+    // Apply airline filter
+    if (selectedAirlines.length > 0) {
+      result = result.filter(f => selectedAirlines.includes(f.airline));
+    }
+
+    // Apply class filter
+    if (selectedClasses.length > 0) {
+      result = result.filter(f => selectedClasses.includes(f.class));
+    }
+
+    // Apply sorting
+    switch (sortBy) {
+      case "cheapest":
+        result.sort((a, b) => a.price - b.price);
+        break;
+      case "fastest":
+        result.sort((a, b) => {
+          const durationA = parseDuration(a.duration);
+          const durationB = parseDuration(b.duration);
+          return durationA - durationB;
+        });
+        break;
+      case "earliest":
+        result.sort((a, b) => {
+          const timeA = parseTime(a.departure);
+          const timeB = parseTime(b.departure);
+          return timeA - timeB;
+        });
+        break;
+      case "latest":
+        result.sort((a, b) => {
+          const timeA = parseTime(a.departure);
+          const timeB = parseTime(b.departure);
+          return timeB - timeA;
+        });
+        break;
+    }
+
+    return result;
+  }, [apiFlights, filterOrigin, filterDestination, filterStops, priceRange, selectedAirlines, selectedClasses, sortBy]);
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
@@ -223,17 +343,25 @@ const Flights = () => {
               <div className="space-y-6">
                 <div>
                   <label className="text-sm font-medium mb-2 block">Départ</label>
-                  <Input placeholder="Ville ou aéroport..." />
+                  <Input 
+                    placeholder="Ville ou aéroport..." 
+                    value={filterOrigin}
+                    onChange={(e) => setFilterOrigin(e.target.value)}
+                  />
                 </div>
 
                 <div>
                   <label className="text-sm font-medium mb-2 block">Arrivée</label>
-                  <Input placeholder="Ville ou aéroport..." />
+                  <Input 
+                    placeholder="Ville ou aéroport..." 
+                    value={filterDestination}
+                    onChange={(e) => setFilterDestination(e.target.value)}
+                  />
                 </div>
 
                 <div>
                   <label className="text-sm font-medium mb-2 block">Escales</label>
-                  <Select>
+                  <Select value={filterStops} onValueChange={setFilterStops}>
                     <SelectTrigger>
                       <SelectValue placeholder="Toutes" />
                     </SelectTrigger>
@@ -261,50 +389,62 @@ const Flights = () => {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Compagnies</label>
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      <span className="text-sm">Air Côte d'Ivoire</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      <span className="text-sm">Air France</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      <span className="text-sm">Ethiopian Airlines</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      <span className="text-sm">Brussels Airlines</span>
-                    </label>
+                  <label className="text-sm font-medium mb-2 block">
+                    Compagnies ({selectedAirlines.length > 0 ? selectedAirlines.length : 'Toutes'})
+                  </label>
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {availableAirlines.map((airline) => (
+                      <label key={airline} className="flex items-center gap-2 cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          className="rounded" 
+                          checked={selectedAirlines.includes(airline)}
+                          onChange={() => toggleAirline(airline)}
+                        />
+                        <span className="text-sm">{airline}</span>
+                      </label>
+                    ))}
                   </div>
+                  {selectedAirlines.length > 0 && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="mt-2 w-full"
+                      onClick={() => setSelectedAirlines([])}
+                    >
+                      Réinitialiser
+                    </Button>
+                  )}
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Classe</label>
+                  <label className="text-sm font-medium mb-2 block">
+                    Classe ({selectedClasses.length > 0 ? selectedClasses.length : 'Toutes'})
+                  </label>
                   <div className="space-y-2">
-                    <label className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      <span className="text-sm">Économique</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      <span className="text-sm">Premium Éco</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      <span className="text-sm">Affaires</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      <span className="text-sm">Première</span>
-                    </label>
+                    {['Économique', 'Premium Éco', 'Affaires', 'Première'].map((flightClass) => (
+                      <label key={flightClass} className="flex items-center gap-2 cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          className="rounded"
+                          checked={selectedClasses.includes(flightClass)}
+                          onChange={() => toggleClass(flightClass)}
+                        />
+                        <span className="text-sm">{flightClass}</span>
+                      </label>
+                    ))}
                   </div>
+                  {selectedClasses.length > 0 && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="mt-2 w-full"
+                      onClick={() => setSelectedClasses([])}
+                    >
+                      Réinitialiser
+                    </Button>
+                  )}
                 </div>
-
-                <Button className="w-full">Appliquer les filtres</Button>
               </div>
             </Card>
           </aside>
@@ -319,9 +459,9 @@ const Flights = () => {
             )}
             <div className="flex justify-between items-center">
               <p className="text-muted-foreground">
-                {apiFlights.length > 0 ? apiFlights.length : flights.length} vols trouvés
+                {filteredAndSortedFlights.length} vol{filteredAndSortedFlights.length > 1 ? 's' : ''} trouvé{filteredAndSortedFlights.length > 1 ? 's' : ''}
               </p>
-              <Select defaultValue="cheapest">
+              <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger className="w-[200px]">
                   <SelectValue />
                 </SelectTrigger>
@@ -334,8 +474,14 @@ const Flights = () => {
               </Select>
             </div>
 
-            <div className="space-y-4">
-              {(apiFlights.length > 0 ? apiFlights : flights).map((flight, index) => (
+            {filteredAndSortedFlights.length === 0 ? (
+              <Card className="p-12 text-center">
+                <p className="text-muted-foreground text-lg mb-2">Aucun vol trouvé</p>
+                <p className="text-sm text-muted-foreground">Essayez de modifier vos filtres de recherche</p>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {filteredAndSortedFlights.map((flight, index) => (
                 <Card key={flight.id || index} className="hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row justify-between gap-6">
@@ -401,7 +547,8 @@ const Flights = () => {
                   </CardContent>
                 </Card>
               ))}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </main>
