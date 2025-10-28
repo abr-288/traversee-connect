@@ -92,6 +92,69 @@ const Hotels = () => {
     }
   };
 
+  const hotels = [
+    {
+      id: 1,
+      name: "Hôtel Ivoire",
+      location: "Abidjan, Cocody",
+      price: 45000,
+      rating: 4.8,
+      reviews: 234,
+      image: "/placeholder.svg",
+      amenities: ["Wifi", "Restaurant", "Parking", "Piscine"]
+    },
+    {
+      id: 2,
+      name: "Sofitel Abidjan",
+      location: "Abidjan, Plateau",
+      price: 85000,
+      rating: 4.9,
+      reviews: 189,
+      image: "/placeholder.svg",
+      amenities: ["Wifi", "Restaurant", "Parking", "Spa"]
+    },
+    {
+      id: 3,
+      name: "Azalaï Hôtel",
+      location: "Abidjan, Marcory",
+      price: 35000,
+      rating: 4.5,
+      reviews: 156,
+      image: "/placeholder.svg",
+      amenities: ["Wifi", "Restaurant", "Bar"]
+    },
+    {
+      id: 4,
+      name: "Pullman Abidjan",
+      location: "Abidjan, Plateau",
+      price: 75000,
+      rating: 4.7,
+      reviews: 203,
+      image: "/placeholder.svg",
+      amenities: ["Wifi", "Restaurant", "Parking", "Gym"]
+    },
+    {
+      id: 5,
+      name: "Seen Hotel",
+      location: "Abidjan, Zone 4",
+      price: 55000,
+      rating: 4.6,
+      reviews: 142,
+      image: "/placeholder.svg",
+      amenities: ["Wifi", "Restaurant", "Piscine"]
+    },
+    {
+      id: 6,
+      name: "Onomo Hotel",
+      location: "Abidjan, Aéroport",
+      price: 28000,
+      rating: 4.3,
+      reviews: 98,
+      image: "/placeholder.svg",
+      amenities: ["Wifi", "Restaurant", "Navette"]
+    }
+  ];
+
   // Get unique amenities from hotels for filter
   const availableAmenities = useMemo(() => {
     const displayHotels = apiHotels.length > 0 ? apiHotels : hotels;
@@ -155,69 +218,6 @@ const Hotels = () => {
 
     return result;
   }, [apiHotels, filterDestination, filterStars, priceRange, selectedAmenities, sortBy]);
-
-  const hotels = [
-    {
-      id: 1,
-      name: "Hôtel Ivoire",
-      location: "Abidjan, Cocody",
-      price: 45000,
-      rating: 4.8,
-      reviews: 234,
-      image: "/placeholder.svg",
-      amenities: ["Wifi", "Restaurant", "Parking", "Piscine"]
-    },
-    {
-      id: 2,
-      name: "Sofitel Abidjan",
-      location: "Abidjan, Plateau",
-      price: 85000,
-      rating: 4.9,
-      reviews: 189,
-      image: "/placeholder.svg",
-      amenities: ["Wifi", "Restaurant", "Parking", "Spa"]
-    },
-    {
-      id: 3,
-      name: "Azalaï Hôtel",
-      location: "Abidjan, Marcory",
-      price: 35000,
-      rating: 4.5,
-      reviews: 156,
-      image: "/placeholder.svg",
-      amenities: ["Wifi", "Restaurant", "Bar"]
-    },
-    {
-      id: 4,
-      name: "Pullman Abidjan",
-      location: "Abidjan, Plateau",
-      price: 75000,
-      rating: 4.7,
-      reviews: 203,
-      image: "/placeholder.svg",
-      amenities: ["Wifi", "Restaurant", "Parking", "Gym"]
-    },
-    {
-      id: 5,
-      name: "Seen Hotel",
-      location: "Abidjan, Zone 4",
-      price: 55000,
-      rating: 4.6,
-      reviews: 142,
-      image: "/placeholder.svg",
-      amenities: ["Wifi", "Restaurant", "Piscine"]
-    },
-    {
-      id: 6,
-      name: "Onomo Hotel",
-      location: "Abidjan, Aéroport",
-      price: 28000,
-      rating: 4.3,
-      reviews: 98,
-      image: "/placeholder.svg",
-      amenities: ["Wifi", "Restaurant", "Navette"]
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

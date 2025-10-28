@@ -81,80 +81,6 @@ const Cars = () => {
     }
   };
 
-  // Filter and sort cars
-  const filteredAndSortedCars = useMemo(() => {
-    let result = apiCars.length > 0 ? [...apiCars] : [...cars];
-
-    // Apply location filter
-    if (filterLocation) {
-      result = result.filter(car => 
-        car.name.toLowerCase().includes(filterLocation.toLowerCase()) ||
-        car.category.toLowerCase().includes(filterLocation.toLowerCase())
-      );
-    }
-
-    // Apply category filter
-    if (filterCategory !== "all") {
-      result = result.filter(car => {
-        const category = car.category.toLowerCase();
-        switch (filterCategory) {
-          case "economy":
-            return category.includes("économique") || category.includes("citadine");
-          case "sedan":
-            return category.includes("berline");
-          case "suv":
-            return category.includes("suv");
-          case "luxury":
-            return category.includes("luxe");
-          default:
-            return true;
-        }
-      });
-    }
-
-    // Apply price filter
-    result = result.filter(car => 
-      car.price >= priceRange[0] && car.price <= priceRange[1]
-    );
-
-    // Apply transmission filter
-    if (selectedTransmissions.length > 0) {
-      result = result.filter(car => 
-        selectedTransmissions.some(trans => 
-          car.transmission.toLowerCase().includes(trans.toLowerCase())
-        )
-      );
-    }
-
-    // Apply fuel type filter
-    if (selectedFuelTypes.length > 0) {
-      result = result.filter(car => 
-        selectedFuelTypes.some(fuel => 
-          car.fuel.toLowerCase().includes(fuel.toLowerCase())
-        )
-      );
-    }
-
-    // Apply sorting
-    switch (sortBy) {
-      case "price-asc":
-        result.sort((a, b) => a.price - b.price);
-        break;
-      case "price-desc":
-        result.sort((a, b) => b.price - a.price);
-        break;
-      case "rating":
-        result.sort((a, b) => b.rating - a.rating);
-        break;
-      case "popular":
-      default:
-        result.sort((a, b) => b.reviews - a.reviews);
-        break;
-    }
-
-    return result;
-  }, [apiCars, filterLocation, filterCategory, priceRange, selectedTransmissions, selectedFuelTypes, sortBy]);
-
   const cars = [
     {
       id: 1,
@@ -235,6 +161,80 @@ const Cars = () => {
       luggage: 2
     }
   ];
+
+  // Filter and sort cars
+  const filteredAndSortedCars = useMemo(() => {
+    let result = apiCars.length > 0 ? [...apiCars] : [...cars];
+
+    // Apply location filter
+    if (filterLocation) {
+      result = result.filter(car => 
+        car.name.toLowerCase().includes(filterLocation.toLowerCase()) ||
+        car.category.toLowerCase().includes(filterLocation.toLowerCase())
+      );
+    }
+
+    // Apply category filter
+    if (filterCategory !== "all") {
+      result = result.filter(car => {
+        const category = car.category.toLowerCase();
+        switch (filterCategory) {
+          case "economy":
+            return category.includes("économique") || category.includes("citadine");
+          case "sedan":
+            return category.includes("berline");
+          case "suv":
+            return category.includes("suv");
+          case "luxury":
+            return category.includes("luxe");
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Apply price filter
+    result = result.filter(car => 
+      car.price >= priceRange[0] && car.price <= priceRange[1]
+    );
+
+    // Apply transmission filter
+    if (selectedTransmissions.length > 0) {
+      result = result.filter(car => 
+        selectedTransmissions.some(trans => 
+          car.transmission.toLowerCase().includes(trans.toLowerCase())
+        )
+      );
+    }
+
+    // Apply fuel type filter
+    if (selectedFuelTypes.length > 0) {
+      result = result.filter(car => 
+        selectedFuelTypes.some(fuel => 
+          car.fuel.toLowerCase().includes(fuel.toLowerCase())
+        )
+      );
+    }
+
+    // Apply sorting
+    switch (sortBy) {
+      case "price-asc":
+        result.sort((a, b) => a.price - b.price);
+        break;
+      case "price-desc":
+        result.sort((a, b) => b.price - a.price);
+        break;
+      case "rating":
+        result.sort((a, b) => b.rating - a.rating);
+        break;
+      case "popular":
+      default:
+        result.sort((a, b) => b.reviews - a.reviews);
+        break;
+    }
+
+    return result;
+  }, [apiCars, filterLocation, filterCategory, priceRange, selectedTransmissions, selectedFuelTypes, sortBy]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
