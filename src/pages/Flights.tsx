@@ -326,7 +326,7 @@ const Flights = () => {
           alt="Flights" 
           className="absolute inset-0 w-full h-full object-cover opacity-40"
         />
-        <div className="relative z-10 container mx-auto px-4 h-full flex flex-col justify-center">
+        <div className="relative z-10 container mx-auto px-4 h-full flex flex-col justify-center items-center text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Recherche de vols</h1>
           <p className="text-xl text-white/90">Trouvez les meilleurs vols au meilleur prix</p>
         </div>

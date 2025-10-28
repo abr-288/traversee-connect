@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -19,6 +19,13 @@ const Cars = () => {
   const [selectedCar, setSelectedCar] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [apiCars, setApiCars] = useState<any[]>([]);
+  
+  // Filter states
+  const [filterLocation, setFilterLocation] = useState("");
+  const [filterCategory, setFilterCategory] = useState("all");
+  const [selectedTransmissions, setSelectedTransmissions] = useState<string[]>([]);
+  const [selectedFuelTypes, setSelectedFuelTypes] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState("popular");
 
   useEffect(() => {
     const location = searchParams.get("location");
@@ -73,6 +80,80 @@ const Cars = () => {
       toast.error("Erreur lors de la recherche de voitures");
     }
   };
+
+  // Filter and sort cars
+  const filteredAndSortedCars = useMemo(() => {
+    let result = apiCars.length > 0 ? [...apiCars] : [...cars];
+
+    // Apply location filter
+    if (filterLocation) {
+      result = result.filter(car => 
+        car.name.toLowerCase().includes(filterLocation.toLowerCase()) ||
+        car.category.toLowerCase().includes(filterLocation.toLowerCase())
+      );
+    }
+
+    // Apply category filter
+    if (filterCategory !== "all") {
+      result = result.filter(car => {
+        const category = car.category.toLowerCase();
+        switch (filterCategory) {
+          case "economy":
+            return category.includes("économique") || category.includes("citadine");
+          case "sedan":
+            return category.includes("berline");
+          case "suv":
+            return category.includes("suv");
+          case "luxury":
+            return category.includes("luxe");
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Apply price filter
+    result = result.filter(car => 
+      car.price >= priceRange[0] && car.price <= priceRange[1]
+    );
+
+    // Apply transmission filter
+    if (selectedTransmissions.length > 0) {
+      result = result.filter(car => 
+        selectedTransmissions.some(trans => 
+          car.transmission.toLowerCase().includes(trans.toLowerCase())
+        )
+      );
+    }
+
+    // Apply fuel type filter
+    if (selectedFuelTypes.length > 0) {
+      result = result.filter(car => 
+        selectedFuelTypes.some(fuel => 
+          car.fuel.toLowerCase().includes(fuel.toLowerCase())
+        )
+      );
+    }
+
+    // Apply sorting
+    switch (sortBy) {
+      case "price-asc":
+        result.sort((a, b) => a.price - b.price);
+        break;
+      case "price-desc":
+        result.sort((a, b) => b.price - a.price);
+        break;
+      case "rating":
+        result.sort((a, b) => b.rating - a.rating);
+        break;
+      case "popular":
+      default:
+        result.sort((a, b) => b.reviews - a.reviews);
+        break;
+    }
+
+    return result;
+  }, [apiCars, filterLocation, filterCategory, priceRange, selectedTransmissions, selectedFuelTypes, sortBy]);
 
   const cars = [
     {
@@ -166,7 +247,7 @@ const Cars = () => {
           alt="Car Rental" 
           className="absolute inset-0 w-full h-full object-cover opacity-40"
         />
-        <div className="relative z-10 container mx-auto px-4 h-full flex flex-col justify-center">
+        <div className="relative z-10 container mx-auto px-4 h-full flex flex-col justify-center items-center text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Location de voitures</h1>
           <p className="text-xl text-white/90">Louez une voiture adaptée à vos besoins</p>
         </div>
@@ -183,12 +264,16 @@ const Cars = () => {
               <div className="space-y-6">
                 <div>
                   <label className="text-sm font-medium mb-2 block">Lieu de prise en charge</label>
-                  <Input placeholder="Ville ou aéroport..." />
+                  <Input 
+                    placeholder="Ville ou aéroport..." 
+                    value={filterLocation}
+                    onChange={(e) => setFilterLocation(e.target.value)}
+                  />
                 </div>
 
                 <div>
                   <label className="text-sm font-medium mb-2 block">Catégorie</label>
-                  <Select>
+                  <Select value={filterCategory} onValueChange={setFilterCategory}>
                     <SelectTrigger>
                       <SelectValue placeholder="Toutes" />
                     </SelectTrigger>
@@ -217,34 +302,94 @@ const Cars = () => {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Transmission</label>
+                  <label className="text-sm font-medium mb-2 block">
+                    Transmission ({selectedTransmissions.length > 0 ? selectedTransmissions.length : 'Toutes'})
+                  </label>
                   <div className="space-y-2">
-                    <label className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        className="rounded"
+                        checked={selectedTransmissions.includes("Automatique")}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedTransmissions([...selectedTransmissions, "Automatique"]);
+                          } else {
+                            setSelectedTransmissions(selectedTransmissions.filter(t => t !== "Automatique"));
+                          }
+                        }}
+                      />
                       <span className="text-sm">Automatique</span>
                     </label>
-                    <label className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        className="rounded"
+                        checked={selectedTransmissions.includes("Manuelle")}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedTransmissions([...selectedTransmissions, "Manuelle"]);
+                          } else {
+                            setSelectedTransmissions(selectedTransmissions.filter(t => t !== "Manuelle"));
+                          }
+                        }}
+                      />
                       <span className="text-sm">Manuelle</span>
                     </label>
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Carburant</label>
+                  <label className="text-sm font-medium mb-2 block">
+                    Carburant ({selectedFuelTypes.length > 0 ? selectedFuelTypes.length : 'Tous'})
+                  </label>
                   <div className="space-y-2">
-                    <label className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        className="rounded"
+                        checked={selectedFuelTypes.includes("Essence")}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedFuelTypes([...selectedFuelTypes, "Essence"]);
+                          } else {
+                            setSelectedFuelTypes(selectedFuelTypes.filter(f => f !== "Essence"));
+                          }
+                        }}
+                      />
                       <span className="text-sm">Essence</span>
                     </label>
-                    <label className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        className="rounded"
+                        checked={selectedFuelTypes.includes("Diesel")}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedFuelTypes([...selectedFuelTypes, "Diesel"]);
+                          } else {
+                            setSelectedFuelTypes(selectedFuelTypes.filter(f => f !== "Diesel"));
+                          }
+                        }}
+                      />
                       <span className="text-sm">Diesel</span>
                     </label>
                   </div>
                 </div>
 
-                <Button className="w-full">Appliquer les filtres</Button>
+                <Button 
+                  className="w-full" 
+                  variant="outline"
+                  onClick={() => {
+                    setFilterLocation("");
+                    setFilterCategory("all");
+                    setPriceRange([0, 150000]);
+                    setSelectedTransmissions([]);
+                    setSelectedFuelTypes([]);
+                  }}
+                >
+                  Réinitialiser les filtres
+                </Button>
               </div>
             </Card>
           </aside>
@@ -259,9 +404,9 @@ const Cars = () => {
             )}
             <div className="flex justify-between items-center">
               <p className="text-muted-foreground">
-                {apiCars.length > 0 ? apiCars.length : cars.length} véhicules disponibles
+                {filteredAndSortedCars.length} véhicule{filteredAndSortedCars.length > 1 ? 's' : ''} disponible{filteredAndSortedCars.length > 1 ? 's' : ''}
               </p>
-              <Select defaultValue="popular">
+              <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger className="w-[200px]">
                   <SelectValue />
                 </SelectTrigger>
@@ -274,8 +419,13 @@ const Cars = () => {
               </Select>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              {(apiCars.length > 0 ? apiCars : cars).map((car, index) => (
+            {filteredAndSortedCars.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-lg text-muted-foreground">Aucun véhicule ne correspond à vos critères</p>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 gap-6">
+                {filteredAndSortedCars.map((car, index) => (
                 <Card key={car.id || index} className="overflow-hidden hover:shadow-lg transition-shadow">
                   <img
                     src={car.image}
@@ -353,7 +503,8 @@ const Cars = () => {
                   </CardContent>
                 </Card>
               ))}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </main>

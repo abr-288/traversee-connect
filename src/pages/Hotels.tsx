@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -19,6 +19,12 @@ const Hotels = () => {
   const [selectedHotel, setSelectedHotel] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [apiHotels, setApiHotels] = useState<any[]>([]);
+  
+  // Filter states
+  const [filterDestination, setFilterDestination] = useState("");
+  const [filterStars, setFilterStars] = useState("all");
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState("popular");
 
   useEffect(() => {
     const destination = searchParams.get("destination");
@@ -85,6 +91,70 @@ const Hotels = () => {
       toast.error("Erreur lors de la recherche d'hôtels");
     }
   };
+
+  // Get unique amenities from hotels for filter
+  const availableAmenities = useMemo(() => {
+    const displayHotels = apiHotels.length > 0 ? apiHotels : hotels;
+    const amenitiesSet = new Set<string>();
+    displayHotels.forEach(hotel => {
+      hotel.amenities.forEach((amenity: string) => amenitiesSet.add(amenity));
+    });
+    return Array.from(amenitiesSet).sort();
+  }, [apiHotels]);
+
+  // Filter and sort hotels
+  const filteredAndSortedHotels = useMemo(() => {
+    let result = apiHotels.length > 0 ? [...apiHotels] : [...hotels];
+
+    // Apply destination filter
+    if (filterDestination) {
+      result = result.filter(hotel => 
+        hotel.name.toLowerCase().includes(filterDestination.toLowerCase()) ||
+        hotel.location.toLowerCase().includes(filterDestination.toLowerCase())
+      );
+    }
+
+    // Apply star filter
+    if (filterStars !== "all") {
+      const starRating = parseInt(filterStars);
+      result = result.filter(hotel => Math.floor(hotel.rating) >= starRating);
+    }
+
+    // Apply price filter
+    result = result.filter(hotel => 
+      hotel.price >= priceRange[0] && hotel.price <= priceRange[1]
+    );
+
+    // Apply amenities filter
+    if (selectedAmenities.length > 0) {
+      result = result.filter(hotel => 
+        selectedAmenities.some(amenity => 
+          hotel.amenities.some((hotelAmenity: string) => 
+            hotelAmenity.toLowerCase().includes(amenity.toLowerCase())
+          )
+        )
+      );
+    }
+
+    // Apply sorting
+    switch (sortBy) {
+      case "price-asc":
+        result.sort((a, b) => a.price - b.price);
+        break;
+      case "price-desc":
+        result.sort((a, b) => b.price - a.price);
+        break;
+      case "rating":
+        result.sort((a, b) => b.rating - a.rating);
+        break;
+      case "popular":
+      default:
+        result.sort((a, b) => b.reviews - a.reviews);
+        break;
+    }
+
+    return result;
+  }, [apiHotels, filterDestination, filterStars, priceRange, selectedAmenities, sortBy]);
 
   const hotels = [
     {
@@ -160,7 +230,7 @@ const Hotels = () => {
           alt="Hotels" 
           className="absolute inset-0 w-full h-full object-cover opacity-40"
         />
-        <div className="relative z-10 container mx-auto px-4 h-full flex flex-col justify-center">
+        <div className="relative z-10 container mx-auto px-4 h-full flex flex-col justify-center items-center text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Hôtels & Hébergements</h1>
           <p className="text-xl text-white/90">Des hébergements de qualité partout dans le monde</p>
         </div>
@@ -177,12 +247,16 @@ const Hotels = () => {
               <div className="space-y-6">
                 <div>
                   <label className="text-sm font-medium mb-2 block">Destination</label>
-                  <Input placeholder="Rechercher une ville..." />
+                  <Input 
+                    placeholder="Rechercher une ville..." 
+                    value={filterDestination}
+                    onChange={(e) => setFilterDestination(e.target.value)}
+                  />
                 </div>
 
                 <div>
                   <label className="text-sm font-medium mb-2 block">Étoiles</label>
-                  <Select>
+                  <Select value={filterStars} onValueChange={setFilterStars}>
                     <SelectTrigger>
                       <SelectValue placeholder="Toutes" />
                     </SelectTrigger>
@@ -210,28 +284,42 @@ const Hotels = () => {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Équipements</label>
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      <span className="text-sm">Wifi gratuit</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      <span className="text-sm">Restaurant</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      <span className="text-sm">Parking</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      <span className="text-sm">Piscine</span>
-                    </label>
+                  <label className="text-sm font-medium mb-2 block">
+                    Équipements ({selectedAmenities.length > 0 ? selectedAmenities.length : 'Tous'})
+                  </label>
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {availableAmenities.map((amenity) => (
+                      <label key={amenity} className="flex items-center gap-2 cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          className="rounded"
+                          checked={selectedAmenities.includes(amenity)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedAmenities([...selectedAmenities, amenity]);
+                            } else {
+                              setSelectedAmenities(selectedAmenities.filter(a => a !== amenity));
+                            }
+                          }}
+                        />
+                        <span className="text-sm">{amenity}</span>
+                      </label>
+                    ))}
                   </div>
                 </div>
 
-                <Button className="w-full">Appliquer les filtres</Button>
+                <Button 
+                  className="w-full" 
+                  variant="outline"
+                  onClick={() => {
+                    setFilterDestination("");
+                    setFilterStars("all");
+                    setPriceRange([0, 500000]);
+                    setSelectedAmenities([]);
+                  }}
+                >
+                  Réinitialiser les filtres
+                </Button>
               </div>
             </Card>
           </aside>
@@ -246,9 +334,9 @@ const Hotels = () => {
             )}
             <div className="flex justify-between items-center">
               <p className="text-muted-foreground">
-                {apiHotels.length > 0 ? apiHotels.length : hotels.length} hôtels trouvés
+                {filteredAndSortedHotels.length} hôtel{filteredAndSortedHotels.length > 1 ? 's' : ''} trouvé{filteredAndSortedHotels.length > 1 ? 's' : ''}
               </p>
-              <Select defaultValue="popular">
+              <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger className="w-[200px]">
                   <SelectValue />
                 </SelectTrigger>
@@ -261,8 +349,13 @@ const Hotels = () => {
               </Select>
             </div>
 
-            <div className="grid gap-6">
-              {(apiHotels.length > 0 ? apiHotels : hotels).map((hotel, index) => (
+            {filteredAndSortedHotels.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-lg text-muted-foreground">Aucun hôtel ne correspond à vos critères</p>
+              </div>
+            ) : (
+              <div className="grid gap-6">
+                {filteredAndSortedHotels.map((hotel, index) => (
                 <Card key={hotel.id || index} className="overflow-hidden hover:shadow-lg transition-shadow">
                   <div className="grid md:grid-cols-3 gap-6">
                     <div className="md:col-span-1">
@@ -335,7 +428,8 @@ const Hotels = () => {
                   </div>
                 </Card>
               ))}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </main>
