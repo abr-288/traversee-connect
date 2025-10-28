@@ -11,3 +11,15 @@ verify_jwt = true
 
 [functions.generate-invoice]
 verify_jwt = true
+
+[functions.get-weather]
+verify_jwt = false
+
+[functions.currency-exchange]
+verify_jwt = false
+
+[functions.travel-recommendations]
+verify_jwt = false
+
+[functions.airport-info]
+verify_jwt = false

@@ -3,6 +3,8 @@ import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MapPin, Calendar, Users, Star, Sparkles } from "lucide-react";
+import { WeatherWidget } from "@/components/WeatherWidget";
+import { CurrencyConverter } from "@/components/CurrencyConverter";
 
 const Stays = () => {
   const stays = [
@@ -90,6 +92,12 @@ const Stays = () => {
           <p className="text-muted-foreground text-lg">
             Découvrez nos forfaits séjours tout compris pour des vacances inoubliables
           </p>
+        </div>
+
+        {/* Weather and Currency Widgets */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <WeatherWidget city="Abidjan" />
+          <CurrencyConverter />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
