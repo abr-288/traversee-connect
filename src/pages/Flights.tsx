@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Plane, Clock, Calendar, Briefcase, Loader2 } from "lucide-react";
-import { BookingDialog } from "@/components/BookingDialog";
+import { FlightBookingDialog } from "@/components/FlightBookingDialog";
 import { useFlightSearch } from "@/hooks/useFlightSearch";
 import { toast } from "sonner";
 
@@ -194,8 +194,20 @@ const Flights = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       
+      {/* Hero Banner */}
+      <div className="relative h-64 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
+        <img 
+          src="/src/assets/hero-slide-1.jpg" 
+          alt="Flights" 
+          className="absolute inset-0 w-full h-full object-cover opacity-40"
+        />
+        <div className="relative z-10 container mx-auto px-4 h-full flex flex-col justify-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Recherche de vols</h1>
+          <p className="text-xl text-white/90">Trouvez les meilleurs vols au meilleur prix</p>
+        </div>
+      </div>
+      
       <main className="flex-1 container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold mb-8">Recherche de Vols</h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Filtres */}
@@ -374,13 +386,7 @@ const Flights = () => {
                           <p className="text-sm text-muted-foreground">FCFA</p>
                         </div>
                         <Button size="lg" className="w-full" onClick={() => {
-                          setSelectedFlight({
-                            id: flight.id.toString(),
-                            name: `${flight.airline} - ${flight.from} → ${flight.to}`,
-                            price_per_unit: flight.price,
-                            currency: "FCFA",
-                            type: "flight"
-                          });
+                          setSelectedFlight(flight);
                           setDialogOpen(true);
                         }}>
                           Sélectionner
@@ -396,10 +402,10 @@ const Flights = () => {
       </main>
 
       {selectedFlight && (
-        <BookingDialog 
+        <FlightBookingDialog 
           open={dialogOpen} 
           onOpenChange={setDialogOpen}
-          service={selectedFlight}
+          flight={selectedFlight}
         />
       )}
 

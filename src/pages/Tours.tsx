@@ -87,8 +87,20 @@ const Tours = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       
+      {/* Hero Banner */}
+      <div className="relative h-64 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
+        <img 
+          src="/src/assets/destination-safari.jpg" 
+          alt="Tours" 
+          className="absolute inset-0 w-full h-full object-cover opacity-40"
+        />
+        <div className="relative z-10 container mx-auto px-4 h-full flex flex-col justify-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Circuits & Tours</h1>
+          <p className="text-xl text-white/90">Découvrez des expériences inoubliables</p>
+        </div>
+      </div>
+      
       <main className="flex-1 container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold mb-8">Circuits & Tours en Côte d'Ivoire</h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Filtres */}

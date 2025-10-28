@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Star, MapPin, Users, Wifi, UtensilsCrossed, Car, Loader2 } from "lucide-react";
-import { BookingDialog } from "@/components/BookingDialog";
+import { HotelBookingDialog } from "@/components/HotelBookingDialog";
 import { useHotelSearch } from "@/hooks/useHotelSearch";
 import { toast } from "sonner";
 
@@ -153,8 +153,20 @@ const Hotels = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       
+      {/* Hero Banner */}
+      <div className="relative h-64 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
+        <img 
+          src="/src/assets/destination-hotel.jpg" 
+          alt="Hotels" 
+          className="absolute inset-0 w-full h-full object-cover opacity-40"
+        />
+        <div className="relative z-10 container mx-auto px-4 h-full flex flex-col justify-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Hôtels & Hébergements</h1>
+          <p className="text-xl text-white/90">Des hébergements de qualité partout dans le monde</p>
+        </div>
+      </div>
+      
       <main className="flex-1 container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold mb-8">Hôtels en Côte d'Ivoire</h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Filtres */}
@@ -311,9 +323,8 @@ const Hotels = () => {
                           setSelectedHotel({
                             id: hotel.id.toString(),
                             name: hotel.name,
-                            price_per_unit: hotel.price,
-                            currency: "FCFA",
-                            type: "hotel"
+                            location: hotel.location,
+                            price: hotel.price
                           });
                           setDialogOpen(true);
                         }}>
@@ -330,10 +341,10 @@ const Hotels = () => {
       </main>
 
       {selectedHotel && (
-        <BookingDialog 
+        <HotelBookingDialog 
           open={dialogOpen} 
           onOpenChange={setDialogOpen}
-          service={selectedHotel}
+          hotel={selectedHotel}
         />
       )}
 
