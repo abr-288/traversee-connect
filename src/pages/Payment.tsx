@@ -26,6 +26,45 @@ const Payment = () => {
   const [cardExpiry, setCardExpiry] = useState("");
   const [cardCvv, setCardCvv] = useState("");
 
+  // Formatage automatique du numéro de carte
+  const formatCardNumber = (value: string) => {
+    const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
+    const matches = v.match(/\d{4,16}/g);
+    const match = (matches && matches[0]) || "";
+    const parts = [];
+
+    for (let i = 0, len = match.length; i < len; i += 4) {
+      parts.push(match.substring(i, i + 4));
+    }
+
+    if (parts.length) {
+      return parts.join(" ");
+    } else {
+      return value;
+    }
+  };
+
+  // Formatage automatique de la date d'expiration
+  const formatCardExpiry = (value: string) => {
+    const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
+    
+    if (v.length >= 2) {
+      return v.slice(0, 2) + "/" + v.slice(2, 4);
+    }
+    
+    return v;
+  };
+
+  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatCardNumber(e.target.value);
+    setCardNumber(formatted);
+  };
+
+  const handleCardExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatCardExpiry(e.target.value);
+    setCardExpiry(formatted);
+  };
+
   const bookingId = searchParams.get("bookingId");
 
   useEffect(() => {
@@ -75,18 +114,43 @@ const Payment = () => {
       return;
     }
 
-    if (paymentMethod === "card" && (!cardNumber || !cardExpiry || !cardCvv)) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez remplir tous les champs de la carte",
-        variant: "destructive",
-      });
-      return;
+    if (paymentMethod === "card") {
+      const cleanCardNumber = cardNumber.replace(/\s+/g, "");
+      
+      if (!cardNumber || cleanCardNumber.length < 16) {
+        toast({
+          title: "Erreur",
+          description: "Veuillez entrer un numéro de carte valide (16 chiffres)",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      if (!cardExpiry || cardExpiry.length !== 5) {
+        toast({
+          title: "Erreur",
+          description: "Veuillez entrer une date d'expiration valide (MM/AA)",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      if (!cardCvv || cardCvv.length !== 3) {
+        toast({
+          title: "Erreur",
+          description: "Veuillez entrer un CVV valide (3 chiffres)",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     setLoading(true);
     try {
       const fullPhoneNumber = paymentMethod === "mobile_money" ? `${countryCode}${phoneNumber}` : booking.customer_phone;
+      
+      // Nettoyer le numéro de carte (enlever les espaces)
+      const cleanCardNumber = cardNumber.replace(/\s+/g, "");
       
       const { data, error } = await supabase.functions.invoke("process-payment", {
         body: {
@@ -100,7 +164,7 @@ const Payment = () => {
             phone: fullPhoneNumber,
           },
           paymentDetails: paymentMethod === "card" ? {
-            cardNumber,
+            cardNumber: cleanCardNumber,
             cardExpiry,
             cardCvv
           } : {
@@ -247,7 +311,7 @@ const Payment = () => {
                           id="cardNumber"
                           placeholder="1234 5678 9012 3456"
                           value={cardNumber}
-                          onChange={(e) => setCardNumber(e.target.value)}
+                          onChange={handleCardNumberChange}
                           maxLength={19}
                         />
                       </div>
@@ -258,7 +322,7 @@ const Payment = () => {
                             id="expiry"
                             placeholder="MM/AA"
                             value={cardExpiry}
-                            onChange={(e) => setCardExpiry(e.target.value)}
+                            onChange={handleCardExpiryChange}
                             maxLength={5}
                           />
                         </div>

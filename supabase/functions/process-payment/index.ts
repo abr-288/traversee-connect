@@ -44,6 +44,13 @@ serve(async (req) => {
 
     let paymentData;
     try {
+      console.log('Calling Lygos API with:', {
+        amount,
+        currency,
+        payment_method: paymentMethod,
+        customer: customerInfo.name,
+      });
+      
       const lygosResponse = await fetch('https://api.lygos.co/v1/payments', {
         method: 'POST',
         headers: {
@@ -66,6 +73,8 @@ serve(async (req) => {
         }),
       });
 
+      console.log('Lygos response status:', lygosResponse.status);
+      
       if (!lygosResponse.ok) {
         const errorData = await lygosResponse.json();
         console.error('Lygos API error:', errorData);
@@ -77,14 +86,16 @@ serve(async (req) => {
 
       paymentData = {
         transaction_id: lygosData.transaction_id || `TXN-${Date.now()}`,
-        status: lygosData.status === 'success' || lygosData.status === 'completed' ? 'success' : 'pending',
+        status: lygosData.status === 'success' || lygosData.status === 'completed' || lygosData.status === 'approved' ? 'success' : 'pending',
         payment_url: lygosData.payment_url || null,
         message: lygosData.message || 'Payment processed',
         raw_response: lygosData,
       };
+      
+      console.log('Payment data processed:', paymentData);
     } catch (error) {
       console.error('Error calling Lygos API:', error);
-      throw new Error('Failed to process payment with Lygos');
+      throw new Error(`Failed to process payment: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 
 
