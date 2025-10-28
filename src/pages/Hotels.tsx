@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -6,13 +7,64 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Star, MapPin, Users, Wifi, UtensilsCrossed, Car } from "lucide-react";
+import { Star, MapPin, Users, Wifi, UtensilsCrossed, Car, Loader2 } from "lucide-react";
 import { BookingDialog } from "@/components/BookingDialog";
+import { useHotelSearch } from "@/hooks/useHotelSearch";
+import { toast } from "sonner";
 
 const Hotels = () => {
+  const [searchParams] = useSearchParams();
+  const { searchHotels, loading } = useHotelSearch();
   const [priceRange, setPriceRange] = useState([0, 500000]);
   const [selectedHotel, setSelectedHotel] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [apiHotels, setApiHotels] = useState<any[]>([]);
+
+  useEffect(() => {
+    const destination = searchParams.get("destination");
+    const checkIn = searchParams.get("checkIn");
+    const checkOut = searchParams.get("checkOut");
+    const adults = searchParams.get("adults");
+    const children = searchParams.get("children");
+    const rooms = searchParams.get("rooms");
+
+    if (destination && checkIn && checkOut && adults) {
+      handleSearch(
+        destination,
+        checkIn,
+        checkOut,
+        parseInt(adults),
+        children ? parseInt(children) : 0,
+        rooms ? parseInt(rooms) : 1
+      );
+    }
+  }, [searchParams]);
+
+  const handleSearch = async (
+    location: string,
+    checkIn: string,
+    checkOut: string,
+    adults: number,
+    children: number = 0,
+    rooms: number = 1
+  ) => {
+    const result = await searchHotels({
+      location,
+      checkIn,
+      checkOut,
+      adults,
+      children,
+      rooms
+    });
+
+    if (result?.success) {
+      const allHotels = [...(result.data?.booking || []), ...(result.data?.airbnb || [])];
+      setApiHotels(allHotels);
+      toast.success(`${result.count} hébergements trouvés`);
+    } else {
+      toast.error("Erreur lors de la recherche d'hôtels");
+    }
+  };
 
   const hotels = [
     {
@@ -154,8 +206,16 @@ const Hotels = () => {
 
           {/* Liste des hôtels */}
           <div className="lg:col-span-3 space-y-6">
+            {loading && (
+              <div className="flex justify-center items-center py-12">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <span className="ml-3 text-lg">Recherche en cours...</span>
+              </div>
+            )}
             <div className="flex justify-between items-center">
-              <p className="text-muted-foreground">{hotels.length} hôtels trouvés</p>
+              <p className="text-muted-foreground">
+                {apiHotels.length > 0 ? apiHotels.length : hotels.length} hôtels trouvés
+              </p>
               <Select defaultValue="popular">
                 <SelectTrigger className="w-[200px]">
                   <SelectValue />
@@ -170,8 +230,8 @@ const Hotels = () => {
             </div>
 
             <div className="grid gap-6">
-              {hotels.map((hotel) => (
-                <Card key={hotel.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+              {(apiHotels.length > 0 ? apiHotels : hotels).map((hotel, index) => (
+                <Card key={hotel.id || index} className="overflow-hidden hover:shadow-lg transition-shadow">
                   <div className="grid md:grid-cols-3 gap-6">
                     <div className="md:col-span-1">
                       <img

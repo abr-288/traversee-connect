@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,16 +8,30 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Hotel, Map, Car, Plane, Calendar as CalendarIcon, Search, ArrowRightLeft, ArrowRight } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import heroImage from "@/assets/hero-beach.jpg";
+import heroSlide1 from "@/assets/hero-slide-1.jpg";
+import heroSlide2 from "@/assets/hero-slide-2.jpg";
+import heroSlide3 from "@/assets/hero-slide-3.jpg";
+import heroSlide4 from "@/assets/hero-slide-4.jpg";
+import heroSlide5 from "@/assets/hero-slide-5.jpg";
 import { TravelersSelector } from "./TravelersSelector";
 import { CityAutocomplete } from "./CityAutocomplete";
 
+const HERO_SLIDES = [heroSlide1, heroSlide2, heroSlide3, heroSlide4, heroSlide5];
+
 const HeroSection = () => {
   const navigate = useNavigate();
+  const [currentSlide, setCurrentSlide] = useState(0);
   const [checkIn, setCheckIn] = useState<Date>();
   const [checkOut, setCheckOut] = useState<Date>();
   const [activeTab, setActiveTab] = useState("hotel");
   const [tripType, setTripType] = useState<"round-trip" | "one-way">("round-trip");
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Hotel state
   const [hotelDestination, setHotelDestination] = useState("");
@@ -88,13 +102,22 @@ const HeroSection = () => {
 
   return (
     <section className="relative min-h-[700px] flex items-center pt-20">
-      {/* Background Image with Overlay */}
+      {/* Background Image Carousel with Overlay */}
       <div className="absolute inset-0 z-0">
-        <img
-          src={heroImage}
-          alt="Beautiful beaches of Ivory Coast"
-          className="w-full h-full object-cover"
-        />
+        {HERO_SLIDES.map((slide, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 transition-opacity duration-1000 ${
+              index === currentSlide ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <img
+              src={slide}
+              alt={`Travel destination ${index + 1}`}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        ))}
         <div className="absolute inset-0 gradient-hero" />
       </div>
 

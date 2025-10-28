@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,13 +7,54 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Plane, Clock, Calendar, Briefcase } from "lucide-react";
+import { Plane, Clock, Calendar, Briefcase, Loader2 } from "lucide-react";
 import { BookingDialog } from "@/components/BookingDialog";
+import { useFlightSearch } from "@/hooks/useFlightSearch";
+import { toast } from "sonner";
 
 const Flights = () => {
+  const [searchParams] = useSearchParams();
+  const { searchFlights, loading } = useFlightSearch();
   const [priceRange, setPriceRange] = useState([0, 2000000]);
   const [selectedFlight, setSelectedFlight] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [apiFlights, setApiFlights] = useState<any[]>([]);
+
+  useEffect(() => {
+    const from = searchParams.get("from");
+    const to = searchParams.get("to");
+    const date = searchParams.get("date");
+    const returnDate = searchParams.get("returnDate");
+    const adults = searchParams.get("adults");
+
+    if (from && to && date && adults) {
+      handleSearch(from, to, date, returnDate || undefined, parseInt(adults));
+    }
+  }, [searchParams]);
+
+  const handleSearch = async (
+    origin: string,
+    destination: string,
+    departureDate: string,
+    returnDate?: string,
+    adults: number = 1
+  ) => {
+    const result = await searchFlights({
+      origin,
+      destination,
+      departureDate,
+      returnDate,
+      adults,
+      travelClass: "ECONOMY"
+    });
+
+    if (result?.success && result?.data) {
+      setApiFlights(result.data);
+      toast.success(`${result.data.length} vols trouvés`);
+    } else {
+      toast.error("Erreur lors de la recherche de vols");
+    }
+  };
 
   const flights = [
     {
@@ -199,8 +241,16 @@ const Flights = () => {
 
           {/* Liste des vols */}
           <div className="lg:col-span-3 space-y-6">
+            {loading && (
+              <div className="flex justify-center items-center py-12">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <span className="ml-3 text-lg">Recherche en cours...</span>
+              </div>
+            )}
             <div className="flex justify-between items-center">
-              <p className="text-muted-foreground">{flights.length} vols trouvés</p>
+              <p className="text-muted-foreground">
+                {apiFlights.length > 0 ? apiFlights.length : flights.length} vols trouvés
+              </p>
               <Select defaultValue="cheapest">
                 <SelectTrigger className="w-[200px]">
                   <SelectValue />
@@ -215,8 +265,8 @@ const Flights = () => {
             </div>
 
             <div className="space-y-4">
-              {flights.map((flight) => (
-                <Card key={flight.id} className="hover:shadow-lg transition-shadow">
+              {(apiFlights.length > 0 ? apiFlights : flights).map((flight, index) => (
+                <Card key={flight.id || index} className="hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row justify-between gap-6">
                       <div className="flex-1">
