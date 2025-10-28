@@ -12,27 +12,70 @@ serve(async (req) => {
   }
 
   try {
-    const url = new URL(req.url);
-    const status = url.searchParams.get('status');
-    const bookingId = url.searchParams.get('booking_id');
+    // CinetPay envoie les données en POST
+    const body = await req.json();
+    
+    console.log('CinetPay callback received:', body);
 
-    if (!bookingId) {
-      throw new Error('Missing booking_id parameter');
+    const cinetpayApiKey = Deno.env.get('CINETPAY_API_KEY');
+    const cinetpaySiteId = Deno.env.get('CINETPAY_SITE_ID');
+
+    if (!cinetpayApiKey || !cinetpaySiteId) {
+      throw new Error('CinetPay credentials not configured');
     }
 
-    console.log('Payment callback received:', { status, bookingId });
+    // Vérifier le statut du paiement auprès de CinetPay
+    const checkResponse = await fetch('https://api-checkout.cinetpay.com/v2/payment/check', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        apikey: cinetpayApiKey,
+        site_id: cinetpaySiteId,
+        transaction_id: body.cpm_trans_id,
+      }),
+    });
+
+    const checkData = await checkResponse.json();
+    console.log('CinetPay check response:', checkData);
+
+    if (checkData.code !== '00') {
+      throw new Error('Payment verification failed');
+    }
+
+    // Extraire le booking_id des metadata
+    let bookingId;
+    try {
+      const metadata = JSON.parse(checkData.data.metadata || '{}');
+      bookingId = metadata.booking_id;
+    } catch (e) {
+      // Fallback: extraire du transaction_id si le format est TXN-{bookingId}-{timestamp}
+      const transactionId = checkData.data.transaction_id;
+      const match = transactionId.match(/TXN-([a-f0-9-]+)-\d+/);
+      bookingId = match ? match[1] : null;
+    }
+
+    if (!bookingId) {
+      throw new Error('Unable to extract booking_id from payment data');
+    }
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    if (status === 'success') {
-      // Mettre à jour le statut du paiement et de la réservation
+    const paymentStatus = checkData.data.payment_status;
+
+    if (paymentStatus === 'ACCEPTED' || paymentStatus === 'SUCCESSFUL') {
+      // Mettre à jour le statut du paiement
       const { error: paymentError } = await supabase
         .from('payments')
-        .update({ status: 'completed' })
-        .eq('booking_id', bookingId);
+        .update({ 
+          status: 'completed',
+          payment_data: checkData.data
+        })
+        .eq('transaction_id', checkData.data.transaction_id);
 
       if (paymentError) {
         console.error('Error updating payment:', paymentError);
@@ -52,33 +95,42 @@ serve(async (req) => {
         body: { bookingId },
       });
 
-      // Rediriger vers la page de succès
-      return new Response(null, {
-        status: 302,
-        headers: {
-          ...corsHeaders,
-          'Location': `${Deno.env.get('SITE_URL') || 'https://lovableproject.com'}/dashboard?tab=bookings&payment=success`,
-        },
-      });
+      // Retourner une réponse de succès pour CinetPay
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: 'Payment processed successfully',
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     } else {
       // Mettre à jour le statut du paiement comme échoué
       const { error: paymentError } = await supabase
         .from('payments')
-        .update({ status: 'failed' })
-        .eq('booking_id', bookingId);
+        .update({ 
+          status: 'failed',
+          payment_data: checkData.data
+        })
+        .eq('transaction_id', checkData.data.transaction_id);
 
       if (paymentError) {
         console.error('Error updating payment:', paymentError);
       }
 
-      // Rediriger vers la page d'échec
-      return new Response(null, {
-        status: 302,
-        headers: {
-          ...corsHeaders,
-          'Location': `${Deno.env.get('SITE_URL') || 'https://lovableproject.com'}/payment?bookingId=${bookingId}&payment=failed`,
-        },
-      });
+      // Retourner une réponse d'échec pour CinetPay
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: 'Payment failed',
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     }
   } catch (error) {
     console.error('Error in payment-callback:', error);

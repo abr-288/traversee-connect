@@ -36,59 +36,75 @@ serve(async (req) => {
 
     console.log('Processing payment for booking:', bookingId, 'Amount:', amount, currency);
 
-    // Appel à l'API Lygos pour traiter le paiement
-    const lygosApiKey = Deno.env.get('LYGOS_API_KEY');
-    if (!lygosApiKey) {
-      throw new Error('LYGOS_API_KEY not configured');
+    // Appel à l'API CinetPay pour traiter le paiement
+    const cinetpayApiKey = Deno.env.get('CINETPAY_API_KEY');
+    const cinetpaySiteId = Deno.env.get('CINETPAY_SITE_ID');
+    
+    if (!cinetpayApiKey || !cinetpaySiteId) {
+      throw new Error('CinetPay credentials not configured');
     }
 
     let paymentData;
     try {
-      console.log('Calling Lygos API with:', {
+      const transactionId = `TXN-${bookingId}-${Date.now()}`;
+      
+      console.log('Calling CinetPay API with:', {
+        transaction_id: transactionId,
         amount,
         currency,
-        payment_method: paymentMethod,
         customer: customerInfo.name,
       });
       
-      const lygosResponse = await fetch('https://api.lygosapp.com/v1/gateway', {
+      const cinetpayResponse = await fetch('https://api-checkout.cinetpay.com/v2/payment', {
         method: 'POST',
         headers: {
-          'api-key': lygosApiKey,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          apikey: cinetpayApiKey,
+          site_id: cinetpaySiteId,
+          transaction_id: transactionId,
           amount: amount,
-          shop_name: 'Booking Payment',
-          message: `Payment for booking ${bookingId}`,
-          order_id: bookingId,
-          success_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/payment-callback?status=success&booking_id=${bookingId}`,
-          failure_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/payment-callback?status=failed&booking_id=${bookingId}`,
+          currency: currency === 'FCFA' ? 'XOF' : currency,
+          description: `Payment for booking ${bookingId}`,
+          customer_name: customerInfo.name,
+          customer_surname: customerInfo.name,
+          customer_email: customerInfo.email,
+          customer_phone_number: customerInfo.phone || '',
+          customer_address: customerInfo.address || '',
+          customer_city: customerInfo.city || 'Abidjan',
+          customer_country: 'CI',
+          customer_state: 'CI',
+          customer_zip_code: '00225',
+          notify_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/payment-callback`,
+          return_url: `${Deno.env.get('SITE_URL') || 'https://lovableproject.com'}/dashboard?tab=bookings`,
+          channels: 'ALL',
+          metadata: JSON.stringify({ booking_id: bookingId }),
         }),
       });
 
-      console.log('Lygos response status:', lygosResponse.status);
+      console.log('CinetPay response status:', cinetpayResponse.status);
       
-      if (!lygosResponse.ok) {
-        const errorData = await lygosResponse.json();
-        console.error('Lygos API error:', errorData);
-        throw new Error(errorData.message || 'Payment processing failed');
+      const cinetpayData = await cinetpayResponse.json();
+      console.log('CinetPay response:', cinetpayData);
+      
+      if (cinetpayData.code !== '201') {
+        console.error('CinetPay API error:', cinetpayData);
+        throw new Error(cinetpayData.message || 'Payment processing failed');
       }
 
-      const lygosData = await lygosResponse.json();
-      console.log('Lygos response:', lygosData);
-
       paymentData = {
-        transaction_id: lygosData.id || `TXN-${Date.now()}`,
+        transaction_id: transactionId,
         status: 'pending',
-        payment_url: lygosData.link || null,
+        payment_url: cinetpayData.data?.payment_url || null,
+        payment_token: cinetpayData.data?.payment_token || null,
         message: 'Payment gateway created. Please complete payment at the provided URL.',
-        raw_response: lygosData,
+        raw_response: cinetpayData,
       };
       
-      console.log('Payment gateway created:', paymentData);
+      console.log('CinetPay payment gateway created:', paymentData);
     } catch (error) {
-      console.error('Error calling Lygos API:', error);
+      console.error('Error calling CinetPay API:', error);
       throw new Error(`Failed to process payment: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 
@@ -100,11 +116,11 @@ serve(async (req) => {
         booking_id: bookingId,
         user_id: user.id,
         amount: amount,
-        currency: currency || 'XOF',
+        currency: currency === 'FCFA' ? 'XOF' : currency || 'XOF',
         payment_method: paymentMethod,
-        payment_provider: 'lygos',
+        payment_provider: 'cinetpay',
         transaction_id: paymentData.transaction_id,
-        status: paymentData.status === 'success' ? 'completed' : 'pending',
+        status: 'pending',
         payment_data: paymentData,
       })
       .select()
@@ -121,8 +137,9 @@ serve(async (req) => {
       JSON.stringify({
         success: true,
         payment: payment,
-        lygos_data: {
+        cinetpay_data: {
           payment_url: paymentData.payment_url,
+          payment_token: paymentData.payment_token,
           transaction_id: paymentData.transaction_id,
           status: paymentData.status,
         },

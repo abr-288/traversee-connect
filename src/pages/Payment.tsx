@@ -176,20 +176,15 @@ const Payment = () => {
       if (error) throw error;
 
       if (data.success) {
-        // Si Lygos retourne une URL de paiement, rediriger l'utilisateur
-        if (data.lygos_data?.payment_url) {
+        // Si CinetPay retourne une URL de paiement, rediriger l'utilisateur
+        if (data.cinetpay_data?.payment_url) {
           toast({
             title: "Redirection vers le paiement",
-            description: "Vous allez être redirigé vers la page de paiement sécurisée...",
+            description: "Vous allez être redirigé vers la page de paiement CinetPay...",
           });
           
-          // Ouvrir le lien de paiement Lygos dans un nouvel onglet
-          window.open(data.lygos_data.payment_url, '_blank');
-          
-          // Rediriger vers le dashboard après un court délai
-          setTimeout(() => {
-            navigate(`/dashboard?tab=bookings`);
-          }, 2000);
+          // Rediriger directement vers la page de paiement CinetPay
+          window.location.href = data.cinetpay_data.payment_url;
         } else {
           toast({
             title: "Succès",
