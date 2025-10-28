@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, CreditCard, Smartphone, Building2, CheckCircle2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { cn } from "@/lib/utils";
 
 const Payment = () => {
   const [searchParams] = useSearchParams();
@@ -17,6 +19,10 @@ const Payment = () => {
   const [loading, setLoading] = useState(false);
   const [booking, setBooking] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState("mobile_money");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardExpiry, setCardExpiry] = useState("");
+  const [cardCvv, setCardCvv] = useState("");
 
   const bookingId = searchParams.get("bookingId");
 
@@ -57,19 +63,43 @@ const Payment = () => {
   const handlePayment = async () => {
     if (!booking) return;
 
+    // Validation
+    if (paymentMethod === "mobile_money" && !phoneNumber) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez entrer votre numéro de téléphone",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (paymentMethod === "card" && (!cardNumber || !cardExpiry || !cardCvv)) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez remplir tous les champs de la carte",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("process-payment", {
         body: {
           bookingId: booking.id,
-          amount: booking.total_amount,
-          currency: booking.currency,
+          amount: booking.total_price,
+          currency: booking.currency || "FCFA",
           paymentMethod: paymentMethod,
           customerInfo: {
             name: booking.customer_name,
             email: booking.customer_email,
-            phone: booking.customer_phone,
+            phone: phoneNumber || booking.customer_phone,
           },
+          paymentDetails: paymentMethod === "card" ? {
+            cardNumber,
+            cardExpiry,
+            cardCvv
+          } : undefined,
         },
       });
 
@@ -123,49 +153,160 @@ const Payment = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="bg-muted p-4 rounded-lg space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Montant:</span>
-                  <span className="font-semibold">
-                    {booking.total_amount} {booking.currency}
-                  </span>
+              <div className="bg-gradient-to-br from-primary/10 to-primary/5 p-6 rounded-xl border-2 border-primary/20 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground font-medium">Montant total</span>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-primary" />
+                    <span className="text-2xl font-bold text-primary">
+                      {booking.total_price} {booking.currency || "FCFA"}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Type:</span>
-                  <span className="capitalize">{booking.booking_type}</span>
+                <div className="flex justify-between pt-2 border-t border-primary/10">
+                  <span className="text-sm text-muted-foreground">Client:</span>
+                  <span className="text-sm font-medium">{booking.customer_name}</span>
                 </div>
               </div>
 
               <div className="space-y-4">
-                <Label>Méthode de paiement</Label>
-                <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="mobile_money" id="mobile_money" />
-                    <Label htmlFor="mobile_money">Mobile Money</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="bank_transfer" id="bank_transfer" />
-                    <Label htmlFor="bank_transfer">Virement bancaire</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="card" id="card" />
-                    <Label htmlFor="card">Carte bancaire</Label>
-                  </div>
-                </RadioGroup>
+                <Label className="text-base font-semibold">Méthode de paiement</Label>
+                <div className="grid gap-3">
+                  <Card 
+                    className={cn(
+                      "cursor-pointer transition-all hover:shadow-md",
+                      paymentMethod === "mobile_money" && "border-primary shadow-md bg-primary/5"
+                    )}
+                    onClick={() => setPaymentMethod("mobile_money")}
+                  >
+                    <CardContent className="flex items-center gap-4 p-4">
+                      <div className={cn(
+                        "p-3 rounded-full",
+                        paymentMethod === "mobile_money" ? "bg-primary text-primary-foreground" : "bg-muted"
+                      )}>
+                        <Smartphone className="h-5 w-5" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold">Mobile Money</h4>
+                        <p className="text-sm text-muted-foreground">Orange Money, MTN, Moov</p>
+                      </div>
+                      <RadioGroupItem value="mobile_money" id="mobile_money" />
+                    </CardContent>
+                  </Card>
+
+                  {paymentMethod === "mobile_money" && (
+                    <div className="ml-4 space-y-2 animate-in slide-in-from-top-2">
+                      <Label htmlFor="phone">Numéro de téléphone</Label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        placeholder="+225 XX XX XX XX XX"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                      />
+                    </div>
+                  )}
+
+                  <Card 
+                    className={cn(
+                      "cursor-pointer transition-all hover:shadow-md",
+                      paymentMethod === "card" && "border-primary shadow-md bg-primary/5"
+                    )}
+                    onClick={() => setPaymentMethod("card")}
+                  >
+                    <CardContent className="flex items-center gap-4 p-4">
+                      <div className={cn(
+                        "p-3 rounded-full",
+                        paymentMethod === "card" ? "bg-primary text-primary-foreground" : "bg-muted"
+                      )}>
+                        <CreditCard className="h-5 w-5" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold">Carte bancaire</h4>
+                        <p className="text-sm text-muted-foreground">Visa, Mastercard</p>
+                      </div>
+                      <RadioGroupItem value="card" id="card" />
+                    </CardContent>
+                  </Card>
+
+                  {paymentMethod === "card" && (
+                    <div className="ml-4 space-y-4 animate-in slide-in-from-top-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="cardNumber">Numéro de carte</Label>
+                        <Input
+                          id="cardNumber"
+                          placeholder="1234 5678 9012 3456"
+                          value={cardNumber}
+                          onChange={(e) => setCardNumber(e.target.value)}
+                          maxLength={19}
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="expiry">Expiration</Label>
+                          <Input
+                            id="expiry"
+                            placeholder="MM/AA"
+                            value={cardExpiry}
+                            onChange={(e) => setCardExpiry(e.target.value)}
+                            maxLength={5}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="cvv">CVV</Label>
+                          <Input
+                            id="cvv"
+                            type="password"
+                            placeholder="123"
+                            value={cardCvv}
+                            onChange={(e) => setCardCvv(e.target.value)}
+                            maxLength={3}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <Card 
+                    className={cn(
+                      "cursor-pointer transition-all hover:shadow-md",
+                      paymentMethod === "bank_transfer" && "border-primary shadow-md bg-primary/5"
+                    )}
+                    onClick={() => setPaymentMethod("bank_transfer")}
+                  >
+                    <CardContent className="flex items-center gap-4 p-4">
+                      <div className={cn(
+                        "p-3 rounded-full",
+                        paymentMethod === "bank_transfer" ? "bg-primary text-primary-foreground" : "bg-muted"
+                      )}>
+                        <Building2 className="h-5 w-5" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold">Virement bancaire</h4>
+                        <p className="text-sm text-muted-foreground">Transfert bancaire</p>
+                      </div>
+                      <RadioGroupItem value="bank_transfer" id="bank_transfer" />
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
 
               <Button
-                className="w-full"
+                className="w-full h-12 text-lg font-semibold"
                 onClick={handlePayment}
                 disabled={loading}
+                size="lg"
               >
                 {loading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Traitement...
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Traitement en cours...
                   </>
                 ) : (
-                  `Payer ${booking.total_amount} ${booking.currency}`
+                  <>
+                    <CheckCircle2 className="mr-2 h-5 w-5" />
+                    Payer {booking.total_price} {booking.currency || "FCFA"}
+                  </>
                 )}
               </Button>
             </CardContent>

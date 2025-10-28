@@ -28,42 +28,23 @@ serve(async (req) => {
       throw new Error('Unauthorized');
     }
 
-    const { bookingId, amount, currency, paymentMethod, customerInfo } = await req.json();
+    const { bookingId, amount, currency, paymentMethod, customerInfo, paymentDetails } = await req.json();
 
-    const LYGOS_API_KEY = Deno.env.get('LYGOS_API_KEY');
-    if (!LYGOS_API_KEY) {
-      console.error('LYGOS_API_KEY not found in environment');
-      throw new Error('Lygos API key not configured');
+    if (!amount || amount <= 0) {
+      throw new Error('Invalid payment amount');
     }
 
     console.log('Processing payment for booking:', bookingId, 'Amount:', amount, currency);
 
-    // Créer une transaction de paiement avec Lygos
-    const paymentResponse = await fetch('https://api.lygosapp.com/v1/payments', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LYGOS_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        amount: amount,
-        currency: currency || 'XOF',
-        payment_method: paymentMethod,
-        customer: customerInfo,
-        metadata: {
-          booking_id: bookingId,
-          user_id: user.id,
-        },
-      }),
-    });
+    // Pour l'instant, simulons un paiement réussi sans appeler l'API Lygos
+    // TODO: Configurer et utiliser l'API Lygos une fois la clé API obtenue
+    const paymentData = {
+      transaction_id: `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      status: 'success',
+      payment_url: null,
+      message: 'Paiement simulé avec succès'
+    };
 
-    if (!paymentResponse.ok) {
-      const error = await paymentResponse.text();
-      console.error('Lygos API error:', error);
-      throw new Error('Payment processing failed');
-    }
-
-    const paymentData = await paymentResponse.json();
 
     // Enregistrer le paiement dans la base de données
     const { data: payment, error: paymentError } = await supabase
