@@ -17,15 +17,15 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 210 24% 16%;
 
-    /* Yamousso Brand Colors */
-    --primary: 233 72% 14%; /* #0A0F3D - Bleu foncé */
+    /* Bossiz Brand Colors */
+    --primary: 225 45% 18%; /* #192342 - Bleu foncé Bossiz */
     --primary-foreground: 0 0% 100%;
-    --primary-light: 233 72% 24%;
-    --primary-dark: 233 72% 10%;
+    --primary-light: 225 45% 28%;
+    --primary-dark: 225 45% 12%;
     
     /* Cyan Accent */
     --secondary: 190 100% 50%; /* #00D4FF - Cyan brillant */
-    --secondary-foreground: 233 72% 14%;
+    --secondary-foreground: 225 45% 18%;
     
     /* Green Accent */
     --accent-green: 158 100% 48%; /* #00F59B - Vert clair */
@@ -35,7 +35,7 @@ All colors MUST be HSL.
     --muted-foreground: 210 12% 55%;
 
     --accent: 190 100% 95%;
-    --accent-foreground: 233 72% 14%;
+    --accent-foreground: 225 45% 18%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
@@ -48,7 +48,7 @@ All colors MUST be HSL.
     
     /* Custom Design Tokens */
     --gradient-primary: linear-gradient(135deg, hsl(190 100% 50%) 0%, hsl(158 100% 48%) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(233 72% 14% / 0.95) 0%, hsl(190 100% 50% / 0.3) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(225 45% 18% / 0.95) 0%, hsl(190 100% 50% / 0.3) 100%);
     --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 20% 98%) 100%);
     
     --shadow-sm: 0 2px 8px hsl(210 20% 20% / 0.05);
@@ -71,13 +71,13 @@ All colors MUST be HSL.
     --popover: 210 25% 12%;
     --popover-foreground: 210 20% 98%;
 
-    --primary: 233 72% 16%;
+    --primary: 225 45% 20%;
     --primary-foreground: 0 0% 100%;
-    --primary-light: 233 72% 26%;
-    --primary-dark: 233 72% 12%;
+    --primary-light: 225 45% 30%;
+    --primary-dark: 225 45% 14%;
 
     --secondary: 190 100% 50%;
-    --secondary-foreground: 233 72% 14%;
+    --secondary-foreground: 225 45% 18%;
     
     --accent-green: 158 100% 48%;
 

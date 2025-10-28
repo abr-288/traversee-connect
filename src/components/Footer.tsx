@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plane, Facebook, Twitter, Instagram, Youtube, Mail } from "lucide-react";
+import { Facebook, Twitter, Instagram, Youtube, Mail } from "lucide-react";
+import logoDark from "@/assets/logo-dark.png";
+import logoLight from "@/assets/logo-light.png";
 
 const Footer = () => {
   return (
@@ -10,13 +12,10 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           {/* Brand Section */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <Plane className="w-6 h-6 text-primary-foreground" />
-              </div>
-            <span className="text-2xl font-bold text-foreground">
-                Yamou<span className="text-secondary">sso</span>
-              </span>
+            <div className="flex items-center gap-3">
+              <img src={logoLight} alt="Bossiz Logo" className="h-12 w-auto dark:hidden" />
+              <img src={logoDark} alt="Bossiz Logo" className="h-12 w-auto hidden dark:block" />
+              <span className="text-2xl font-bold text-foreground">Bossiz</span>
             </div>
             <p className="text-muted-foreground text-sm">
               Votre partenaire de confiance pour des voyages inoubliables à travers le monde.
@@ -124,7 +123,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-muted-foreground text-sm">
-            © 2025 Yamousso. Tous droits réservés.
+            © 2025 Bossiz. Tous droits réservés.
           </p>
           <div className="flex gap-6 text-sm">
             <Link to="/support" className="text-muted-foreground hover:text-primary transition-smooth">

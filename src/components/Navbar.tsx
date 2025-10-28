@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Plane, User, LogOut, LayoutDashboard } from "lucide-react";
+import { Menu, X, User, LogOut, LayoutDashboard } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
 import { toast } from "sonner";
+import logoDark from "@/assets/logo-dark.png";
+import logoLight from "@/assets/logo-light.png";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -35,11 +37,10 @@ const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center transition-smooth group-hover:shadow-primary">
-              <Plane className="w-6 h-6 text-primary-foreground" />
-            </div>
-            <span className="text-2xl font-bold text-foreground">Yamou<span className="text-secondary">sso</span></span>
+          <Link to="/" className="flex items-center gap-3 group">
+            <img src={logoLight} alt="Bossiz Logo" className="h-12 w-auto dark:hidden transition-smooth" />
+            <img src={logoDark} alt="Bossiz Logo" className="h-12 w-auto hidden dark:block transition-smooth" />
+            <span className="text-2xl font-bold text-foreground">Bossiz</span>
           </Link>
 
           {/* Desktop Navigation */}
