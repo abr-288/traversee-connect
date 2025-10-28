@@ -55,6 +55,16 @@ serve(async (req) => {
         customer: customerInfo.name,
       });
       
+      // Déterminer les canaux de paiement en fonction de la méthode choisie
+      let channels = 'ALL';
+      if (paymentMethod === 'card') {
+        channels = 'CREDIT_CARD';
+      } else if (paymentMethod === 'mobile_money') {
+        channels = 'MOBILE_MONEY';
+      } else if (paymentMethod === 'bank_transfer') {
+        channels = 'BANK_TRANSFER';
+      }
+      
       const cinetpayResponse = await fetch('https://api-checkout.cinetpay.com/v2/payment', {
         method: 'POST',
         headers: {
@@ -78,7 +88,7 @@ serve(async (req) => {
           customer_zip_code: '00225',
           notify_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/payment-callback`,
           return_url: `${Deno.env.get('SITE_URL') || 'https://lovableproject.com'}/dashboard?tab=bookings`,
-          channels: 'ALL',
+          channels: channels,
           metadata: JSON.stringify({ booking_id: bookingId }),
         }),
       });
