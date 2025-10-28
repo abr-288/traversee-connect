@@ -25,6 +25,8 @@ const Payment = () => {
   const [cardNumber, setCardNumber] = useState("");
   const [cardExpiry, setCardExpiry] = useState("");
   const [cardCvv, setCardCvv] = useState("");
+  const [billingAddress, setBillingAddress] = useState("");
+  const [billingCity, setBillingCity] = useState("");
 
   // Formatage automatique du numéro de carte
   const formatCardNumber = (value: string) => {
@@ -143,6 +145,24 @@ const Payment = () => {
         });
         return;
       }
+
+      if (!billingAddress || billingAddress.trim().length === 0) {
+        toast({
+          title: "Erreur",
+          description: "Veuillez entrer votre adresse de facturation",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!billingCity || billingCity.trim().length === 0) {
+        toast({
+          title: "Erreur",
+          description: "Veuillez entrer votre ville",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     setLoading(true);
@@ -162,6 +182,8 @@ const Payment = () => {
             name: booking.customer_name,
             email: booking.customer_email,
             phone: fullPhoneNumber,
+            address: paymentMethod === "card" ? billingAddress : "",
+            city: paymentMethod === "card" ? billingCity : "",
           },
           paymentDetails: paymentMethod === "card" ? {
             cardNumber: cleanCardNumber,
@@ -348,6 +370,24 @@ const Payment = () => {
                             maxLength={3}
                           />
                         </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="billingAddress">Adresse de facturation</Label>
+                        <Input
+                          id="billingAddress"
+                          placeholder="123 Rue de la Paix"
+                          value={billingAddress}
+                          onChange={(e) => setBillingAddress(e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="billingCity">Ville</Label>
+                        <Input
+                          id="billingCity"
+                          placeholder="Abidjan"
+                          value={billingCity}
+                          onChange={(e) => setBillingCity(e.target.value)}
+                        />
                       </div>
                     </div>
                   )}
