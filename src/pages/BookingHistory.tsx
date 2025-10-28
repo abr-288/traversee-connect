@@ -119,6 +119,34 @@ const BookingHistory = () => {
     return bookings.filter(b => b.services.type === filter);
   };
 
+  const handleDownloadTicket = async (bookingId: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-ticket", {
+        body: { bookingId },
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        // Créer un blob à partir du HTML
+        const blob = new Blob([data.ticket.html], { type: 'text/html' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `billet-${bookingId.substring(0, 8)}.html`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        
+        toast.success("Billet téléchargé avec succès");
+      }
+    } catch (error) {
+      console.error("Error downloading ticket:", error);
+      toast.error("Erreur lors du téléchargement du billet");
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
@@ -246,7 +274,12 @@ const BookingHistory = () => {
                       )}
 
                       <div className="flex flex-wrap gap-3">
-                        <Button variant="outline" className="gap-2">
+                        <Button 
+                          variant="outline" 
+                          className="gap-2"
+                          onClick={() => handleDownloadTicket(booking.id)}
+                          disabled={booking.payment_status !== 'paid'}
+                        >
                           <Download className="w-4 h-4" />
                           Télécharger le billet
                         </Button>

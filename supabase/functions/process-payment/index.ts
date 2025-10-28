@@ -36,14 +36,56 @@ serve(async (req) => {
 
     console.log('Processing payment for booking:', bookingId, 'Amount:', amount, currency);
 
-    // Pour l'instant, simulons un paiement réussi sans appeler l'API Lygos
-    // TODO: Configurer et utiliser l'API Lygos une fois la clé API obtenue
-    const paymentData = {
-      transaction_id: `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      status: 'success',
-      payment_url: null,
-      message: 'Paiement simulé avec succès'
-    };
+    // Appel à l'API Lygos pour traiter le paiement
+    const lygosApiKey = Deno.env.get('LYGOS_API_KEY');
+    if (!lygosApiKey) {
+      throw new Error('LYGOS_API_KEY not configured');
+    }
+
+    let paymentData;
+    try {
+      const lygosResponse = await fetch('https://api.lygos.co/v1/payments', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${lygosApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: amount,
+          currency: currency,
+          payment_method: paymentMethod,
+          customer: {
+            name: customerInfo.name,
+            email: customerInfo.email,
+            phone: customerInfo.phone,
+          },
+          payment_details: paymentDetails,
+          metadata: {
+            booking_id: bookingId,
+          },
+        }),
+      });
+
+      if (!lygosResponse.ok) {
+        const errorData = await lygosResponse.json();
+        console.error('Lygos API error:', errorData);
+        throw new Error(errorData.message || 'Payment processing failed');
+      }
+
+      const lygosData = await lygosResponse.json();
+      console.log('Lygos response:', lygosData);
+
+      paymentData = {
+        transaction_id: lygosData.transaction_id || `TXN-${Date.now()}`,
+        status: lygosData.status === 'success' || lygosData.status === 'completed' ? 'success' : 'pending',
+        payment_url: lygosData.payment_url || null,
+        message: lygosData.message || 'Payment processed',
+        raw_response: lygosData,
+      };
+    } catch (error) {
+      console.error('Error calling Lygos API:', error);
+      throw new Error('Failed to process payment with Lygos');
+    }
 
 
     // Enregistrer le paiement dans la base de données

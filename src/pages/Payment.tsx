@@ -11,6 +11,7 @@ import { Loader2, CreditCard, Smartphone, Building2, CheckCircle2 } from "lucide
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { cn } from "@/lib/utils";
+import { CountryCodeSelect } from "@/components/CountryCodeSelect";
 
 const Payment = () => {
   const [searchParams] = useSearchParams();
@@ -19,6 +20,7 @@ const Payment = () => {
   const [loading, setLoading] = useState(false);
   const [booking, setBooking] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState("mobile_money");
+  const [countryCode, setCountryCode] = useState("+225");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [cardNumber, setCardNumber] = useState("");
   const [cardExpiry, setCardExpiry] = useState("");
@@ -84,6 +86,8 @@ const Payment = () => {
 
     setLoading(true);
     try {
+      const fullPhoneNumber = paymentMethod === "mobile_money" ? `${countryCode}${phoneNumber}` : booking.customer_phone;
+      
       const { data, error } = await supabase.functions.invoke("process-payment", {
         body: {
           bookingId: booking.id,
@@ -93,13 +97,15 @@ const Payment = () => {
           customerInfo: {
             name: booking.customer_name,
             email: booking.customer_email,
-            phone: phoneNumber || booking.customer_phone,
+            phone: fullPhoneNumber,
           },
           paymentDetails: paymentMethod === "card" ? {
             cardNumber,
             cardExpiry,
             cardCvv
-          } : undefined,
+          } : {
+            phone: fullPhoneNumber
+          },
         },
       });
 
@@ -197,13 +203,17 @@ const Payment = () => {
                   {paymentMethod === "mobile_money" && (
                     <div className="ml-4 space-y-2 animate-in slide-in-from-top-2">
                       <Label htmlFor="phone">Numéro de téléphone</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        placeholder="+225 XX XX XX XX XX"
-                        value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value)}
-                      />
+                      <div className="flex gap-2">
+                        <CountryCodeSelect value={countryCode} onValueChange={setCountryCode} />
+                        <Input
+                          id="phone"
+                          type="tel"
+                          placeholder="XX XX XX XX XX"
+                          value={phoneNumber}
+                          onChange={(e) => setPhoneNumber(e.target.value)}
+                          className="flex-1"
+                        />
+                      </div>
                     </div>
                   )}
 
