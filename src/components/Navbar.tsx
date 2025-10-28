@@ -43,24 +43,27 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
-            <Link to="/" className="text-foreground hover:text-primary transition-smooth font-medium">
-              Accueil
+          <div className="hidden md:flex items-center gap-6">
+            <Link to="/flights" className="text-foreground hover:text-primary transition-smooth font-medium">
+              Vols
             </Link>
             <Link to="/hotels" className="text-foreground hover:text-primary transition-smooth font-medium">
               Hôtels
             </Link>
-            <Link to="/tours" className="text-foreground hover:text-primary transition-smooth font-medium">
-              Circuits
+            <Link to="/flight-hotel" className="text-foreground hover:text-primary transition-smooth font-medium">
+              Vol + Hôtel
             </Link>
             <Link to="/cars" className="text-foreground hover:text-primary transition-smooth font-medium">
               Voitures
             </Link>
-            <Link to="/flights" className="text-foreground hover:text-primary transition-smooth font-medium">
-              Vols
+            <Link to="/stays" className="text-foreground hover:text-primary transition-smooth font-medium">
+              Séjours
             </Link>
-            <Link to="/events" className="text-foreground hover:text-primary transition-smooth font-medium">
-              Événements
+            <Link to="/activities" className="text-foreground hover:text-primary transition-smooth font-medium">
+              Activités
+            </Link>
+            <Link to="/support" className="text-foreground hover:text-primary transition-smooth font-medium">
+              Assistance
             </Link>
           </div>
 
@@ -118,11 +121,11 @@ const Navbar = () => {
           <div className="md:hidden py-4 border-t border-border">
             <div className="flex flex-col gap-4">
               <Link
-                to="/"
+                to="/flights"
                 className="text-foreground hover:text-primary transition-smooth font-medium px-4 py-2"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Accueil
+                Vols
               </Link>
               <Link
                 to="/hotels"
@@ -132,11 +135,11 @@ const Navbar = () => {
                 Hôtels
               </Link>
               <Link
-                to="/tours"
+                to="/flight-hotel"
                 className="text-foreground hover:text-primary transition-smooth font-medium px-4 py-2"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Circuits
+                Vol + Hôtel
               </Link>
               <Link
                 to="/cars"
@@ -146,18 +149,25 @@ const Navbar = () => {
                 Voitures
               </Link>
               <Link
-                to="/flights"
+                to="/stays"
                 className="text-foreground hover:text-primary transition-smooth font-medium px-4 py-2"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Vols
+                Séjours
               </Link>
               <Link
-                to="/events"
+                to="/activities"
                 className="text-foreground hover:text-primary transition-smooth font-medium px-4 py-2"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Événements
+                Activités
+              </Link>
+              <Link
+                to="/support"
+                className="text-foreground hover:text-primary transition-smooth font-medium px-4 py-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Assistance
               </Link>
               <div className="flex flex-col gap-2 px-4 pt-4 border-t border-border">
                 {isLoggedIn ? (

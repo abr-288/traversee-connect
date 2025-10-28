@@ -14,12 +14,12 @@ const Footer = () => {
               <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
                 <Plane className="w-6 h-6 text-primary-foreground" />
               </div>
-              <span className="text-2xl font-bold text-foreground">
-                Voyage<span className="text-primary">CI</span>
+            <span className="text-2xl font-bold text-foreground">
+                Yamou<span className="text-secondary">sso</span>
               </span>
             </div>
             <p className="text-muted-foreground text-sm">
-              Votre partenaire de confiance pour des voyages inoubliables en Côte d'Ivoire et dans toute l'Afrique de l'Ouest.
+              Votre partenaire de confiance pour des voyages inoubliables à travers le monde.
             </p>
             <div className="flex gap-3">
               <Button size="icon" variant="outline" className="rounded-full">
@@ -42,28 +42,33 @@ const Footer = () => {
             <h3 className="font-bold text-foreground mb-4">Nos Services</h3>
             <ul className="space-y-3">
               <li>
-                <Link to="/hotels" className="text-muted-foreground hover:text-primary transition-smooth">
-                  Réservation d'Hôtels
+                <Link to="/flights" className="text-muted-foreground hover:text-primary transition-smooth">
+                  Vols
                 </Link>
               </li>
               <li>
-                <Link to="/tours" className="text-muted-foreground hover:text-primary transition-smooth">
-                  Circuits Touristiques
+                <Link to="/hotels" className="text-muted-foreground hover:text-primary transition-smooth">
+                  Hôtels
+                </Link>
+              </li>
+              <li>
+                <Link to="/flight-hotel" className="text-muted-foreground hover:text-primary transition-smooth">
+                  Vol + Hôtel
                 </Link>
               </li>
               <li>
                 <Link to="/cars" className="text-muted-foreground hover:text-primary transition-smooth">
-                  Location de Voitures
+                  Voitures
                 </Link>
               </li>
               <li>
-                <Link to="/flights" className="text-muted-foreground hover:text-primary transition-smooth">
-                  Réservation de Vols
+                <Link to="/stays" className="text-muted-foreground hover:text-primary transition-smooth">
+                  Séjours
                 </Link>
               </li>
               <li>
-                <Link to="/events" className="text-muted-foreground hover:text-primary transition-smooth">
-                  Événements
+                <Link to="/activities" className="text-muted-foreground hover:text-primary transition-smooth">
+                  Activités
                 </Link>
               </li>
             </ul>
@@ -71,31 +76,26 @@ const Footer = () => {
 
           {/* Support */}
           <div>
-            <h3 className="font-bold text-foreground mb-4">Support</h3>
+            <h3 className="font-bold text-foreground mb-4">Assistance</h3>
             <ul className="space-y-3">
               <li>
-                <Link to="/about" className="text-muted-foreground hover:text-primary transition-smooth">
-                  À Propos
+                <Link to="/support" className="text-muted-foreground hover:text-primary transition-smooth">
+                  Centre d'aide
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-muted-foreground hover:text-primary transition-smooth">
-                  Nous Contacter
-                </Link>
-              </li>
-              <li>
-                <Link to="/faq" className="text-muted-foreground hover:text-primary transition-smooth">
+                <Link to="/support" className="text-muted-foreground hover:text-primary transition-smooth">
                   FAQ
                 </Link>
               </li>
               <li>
-                <Link to="/terms" className="text-muted-foreground hover:text-primary transition-smooth">
-                  Conditions d'Utilisation
+                <Link to="/support" className="text-muted-foreground hover:text-primary transition-smooth">
+                  Nous Contacter
                 </Link>
               </li>
               <li>
-                <Link to="/privacy" className="text-muted-foreground hover:text-primary transition-smooth">
-                  Politique de Confidentialité
+                <Link to="/dashboard" className="text-muted-foreground hover:text-primary transition-smooth">
+                  Mes Réservations
                 </Link>
               </li>
             </ul>
@@ -124,17 +124,20 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-muted-foreground text-sm">
-            © 2024 VoyageCI. Tous droits réservés.
+            © 2025 Yamousso. Tous droits réservés.
           </p>
           <div className="flex gap-6 text-sm">
-            <Link to="/privacy" className="text-muted-foreground hover:text-primary transition-smooth">
+            <Link to="/support" className="text-muted-foreground hover:text-primary transition-smooth">
+              À propos
+            </Link>
+            <Link to="/support" className="text-muted-foreground hover:text-primary transition-smooth">
+              Conditions générales
+            </Link>
+            <Link to="/support" className="text-muted-foreground hover:text-primary transition-smooth">
               Confidentialité
             </Link>
-            <Link to="/terms" className="text-muted-foreground hover:text-primary transition-smooth">
-              Conditions
-            </Link>
-            <Link to="/sitemap" className="text-muted-foreground hover:text-primary transition-smooth">
-              Plan du Site
+            <Link to="/support" className="text-muted-foreground hover:text-primary transition-smooth">
+              Aide
             </Link>
           </div>
         </div>

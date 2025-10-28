@@ -8,6 +8,10 @@ import Hotels from "./pages/Hotels";
 import Tours from "./pages/Tours";
 import Cars from "./pages/Cars";
 import Flights from "./pages/Flights";
+import FlightHotel from "./pages/FlightHotel";
+import Stays from "./pages/Stays";
+import Activities from "./pages/Activities";
+import Support from "./pages/Support";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -28,6 +32,10 @@ const App = () => (
           <Route path="/tours" element={<Tours />} />
           <Route path="/cars" element={<Cars />} />
           <Route path="/flights" element={<Flights />} />
+          <Route path="/flight-hotel" element={<FlightHotel />} />
+          <Route path="/stays" element={<Stays />} />
+          <Route path="/activities" element={<Activities />} />
+          <Route path="/support" element={<Support />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/admin" element={<AdminDashboard />} />
