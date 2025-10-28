@@ -43,7 +43,17 @@ const Cars = () => {
     });
 
     if (result?.success && result?.data) {
-      setApiCars(Array.isArray(result.data) ? result.data : [result.data]);
+      const carsArray = Array.isArray(result.data) ? result.data : [result.data];
+      // Transform API data to ensure price is a number
+      const transformedCars = carsArray.map((car: any) => ({
+        ...car,
+        price: typeof car.price === 'object' && car.price?.grandTotal 
+          ? parseFloat(car.price.grandTotal) 
+          : typeof car.price === 'number' 
+          ? car.price 
+          : parseFloat(car.price?.total || car.price || 0)
+      }));
+      setApiCars(transformedCars);
       toast.success("Recherche de voitures effectuée");
     } else {
       toast.error("Erreur lors de la recherche de voitures");

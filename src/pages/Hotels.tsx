@@ -59,8 +59,17 @@ const Hotels = () => {
 
     if (result?.success) {
       const allHotels = [...(result.data?.booking || []), ...(result.data?.airbnb || [])];
-      setApiHotels(allHotels);
-      toast.success(`${result.count} hébergements trouvés`);
+      // Transform API data to ensure price is a number
+      const transformedHotels = allHotels.map((hotel: any) => ({
+        ...hotel,
+        price: typeof hotel.price === 'object' && hotel.price?.grandTotal 
+          ? parseFloat(hotel.price.grandTotal) 
+          : typeof hotel.price === 'number' 
+          ? hotel.price 
+          : parseFloat(hotel.price?.total || hotel.price || 0)
+      }));
+      setApiHotels(transformedHotels);
+      toast.success(`${transformedHotels.length} hébergements trouvés`);
     } else {
       toast.error("Erreur lors de la recherche d'hôtels");
     }

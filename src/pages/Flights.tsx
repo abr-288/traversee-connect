@@ -55,8 +55,17 @@ const Flights = () => {
     });
 
     if (result?.success && result?.data) {
-      setApiFlights(result.data);
-      toast.success(`${result.data.length} vols trouvés`);
+      // Transform API data to ensure price is a number
+      const transformedFlights = result.data.map((flight: any) => ({
+        ...flight,
+        price: typeof flight.price === 'object' && flight.price?.grandTotal 
+          ? parseFloat(flight.price.grandTotal) 
+          : typeof flight.price === 'number' 
+          ? flight.price 
+          : parseFloat(flight.price?.total || 0)
+      }));
+      setApiFlights(transformedFlights);
+      toast.success(`${transformedFlights.length} vols trouvés`);
     } else {
       toast.error("Erreur lors de la recherche de vols");
     }
