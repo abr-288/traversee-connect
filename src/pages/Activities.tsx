@@ -3,8 +3,13 @@ import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MapPin, Clock, Users, Star, Tag } from "lucide-react";
+import { useState } from "react";
+import { BookingDialog } from "@/components/BookingDialog";
 
 const Activities = () => {
+  const [selectedActivity, setSelectedActivity] = useState<any>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
   const activities = [
     {
       id: 1,
@@ -185,7 +190,20 @@ const Activities = () => {
                       {activity.price.toLocaleString()} <span className="text-sm">FCFA</span>
                     </p>
                   </div>
-                  <Button className="gradient-primary shadow-primary">
+                  <Button 
+                    className="gradient-primary shadow-primary"
+                    onClick={() => {
+                      setSelectedActivity({
+                        id: activity.id.toString(),
+                        name: activity.name,
+                        price_per_unit: activity.price,
+                        currency: "FCFA",
+                        type: "activity",
+                        location: activity.location
+                      });
+                      setDialogOpen(true);
+                    }}
+                  >
                     Réserver
                   </Button>
                 </div>
@@ -194,6 +212,14 @@ const Activities = () => {
           ))}
         </div>
       </main>
+
+      {selectedActivity && (
+        <BookingDialog 
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          service={selectedActivity}
+        />
+      )}
 
       <Footer />
     </div>

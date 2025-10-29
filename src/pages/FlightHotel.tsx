@@ -3,8 +3,13 @@ import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plane, Hotel, MapPin, Calendar, Users, Check } from "lucide-react";
+import { useState } from "react";
+import { BookingDialog } from "@/components/BookingDialog";
 
 const FlightHotel = () => {
+  const [selectedPackage, setSelectedPackage] = useState<any>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
   const packages = [
     {
       id: 1,
@@ -124,7 +129,21 @@ const FlightHotel = () => {
                       {pkg.price.toLocaleString()} <span className="text-base">FCFA</span>
                     </p>
                   </div>
-                  <Button size="lg" className="gradient-primary shadow-primary">
+                  <Button 
+                    size="lg" 
+                    className="gradient-primary shadow-primary"
+                    onClick={() => {
+                      setSelectedPackage({
+                        id: pkg.id.toString(),
+                        name: `Vol + Hôtel ${pkg.destination}`,
+                        price_per_unit: pkg.price,
+                        currency: "FCFA",
+                        type: "package",
+                        location: pkg.destination
+                      });
+                      setDialogOpen(true);
+                    }}
+                  >
                     Réserver
                   </Button>
                 </div>
@@ -133,6 +152,14 @@ const FlightHotel = () => {
           ))}
         </div>
       </main>
+
+      {selectedPackage && (
+        <BookingDialog 
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          service={selectedPackage}
+        />
+      )}
 
       <Footer />
     </div>

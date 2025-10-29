@@ -4,6 +4,9 @@ import { MapPin, Star } from "lucide-react";
 import hotelImg from "@/assets/destination-hotel.jpg";
 import safariImg from "@/assets/destination-safari.jpg";
 import cityImg from "@/assets/destination-city.jpg";
+import { useState } from "react";
+import { BookingDialog } from "@/components/BookingDialog";
+import { useNavigate } from "react-router-dom";
 
 const destinations = [
   {
@@ -39,7 +42,17 @@ const destinations = [
 ];
 
 const DestinationsSection = () => {
+  const [selectedDestination, setSelectedDestination] = useState<any>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const navigate = useNavigate();
+
   return (
+    <>
+    <BookingDialog 
+      open={dialogOpen}
+      onOpenChange={setDialogOpen}
+      service={selectedDestination}
+    />
     <section className="py-20 bg-muted/30">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
@@ -89,7 +102,20 @@ const DestinationsSection = () => {
 
                 <p className="text-muted-foreground text-sm mb-4">{destination.description}</p>
 
-                <Button className="w-full gradient-primary shadow-primary">
+                <Button 
+                  className="w-full gradient-primary shadow-primary"
+                  onClick={() => {
+                    setSelectedDestination({
+                      id: destination.id.toString(),
+                      name: destination.title,
+                      price_per_unit: parseInt(destination.price.replace(/\s/g, '')),
+                      currency: "FCFA",
+                      type: "stay",
+                      location: destination.location
+                    });
+                    setDialogOpen(true);
+                  }}
+                >
                   Réserver Maintenant
                 </Button>
               </CardContent>
@@ -98,12 +124,18 @@ const DestinationsSection = () => {
         </div>
 
         <div className="text-center mt-12">
-          <Button variant="outline" size="lg" className="gap-2">
+          <Button 
+            variant="outline" 
+            size="lg" 
+            className="gap-2"
+            onClick={() => navigate('/stays')}
+          >
             Voir Toutes les Destinations
           </Button>
         </div>
       </div>
     </section>
+    </>
   );
 };
 

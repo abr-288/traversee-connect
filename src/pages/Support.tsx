@@ -6,8 +6,56 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Phone, Mail, MessageCircle, Clock, HelpCircle, Search } from "lucide-react";
+import { useSupportMessage } from "@/hooks/useSupportMessage";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { useNewsletterSubscribe } from "@/hooks/useNewsletterSubscribe";
 
 const Support = () => {
+  const { sendMessage, loading: sendingMessage } = useSupportMessage();
+  const { subscribe, loading: subscribing } = useNewsletterSubscribe();
+  const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    bookingReference: "",
+    subject: "",
+    message: ""
+  });
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const success = await sendMessage(formData);
+    if (success) {
+      setFormData({
+        name: "",
+        email: "",
+        bookingReference: "",
+        subject: "",
+        message: ""
+      });
+    }
+  };
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const result = await subscribe(newsletterEmail);
+    if (result) {
+      toast({
+        title: "Inscription réussie",
+        description: result.message,
+      });
+      setNewsletterEmail("");
+    }
+  };
+
+  const handleChatClick = () => {
+    toast({
+      title: "Chat en direct",
+      description: "Le chat sera bientôt disponible. En attendant, envoyez-nous un message via le formulaire.",
+    });
+  };
   const faqs = [
     {
       question: "Comment puis-je modifier ma réservation ?",
@@ -71,7 +119,7 @@ const Support = () => {
               <p className="text-muted-foreground text-sm mb-4">
                 Réponse sous 24h
               </p>
-              <p className="font-bold text-secondary">support@yamousso.ci</p>
+              <p className="font-bold text-secondary">support@bossiz.com</p>
             </CardContent>
           </Card>
 
@@ -84,7 +132,7 @@ const Support = () => {
               <p className="text-muted-foreground text-sm mb-4">
                 Réponse instantanée
               </p>
-              <Button className="gradient-primary shadow-primary">
+              <Button className="gradient-primary shadow-primary" onClick={handleChatClick}>
                 Démarrer le chat
               </Button>
             </CardContent>
@@ -125,32 +173,60 @@ const Support = () => {
                 <CardTitle>Envoyez-nous un message</CardTitle>
               </CardHeader>
               <CardContent>
-                <form className="space-y-4">
+                <form className="space-y-4" onSubmit={handleSubmit}>
                   <div>
                     <label className="text-sm font-medium mb-2 block">Nom complet</label>
-                    <Input placeholder="Votre nom" />
+                    <Input 
+                      placeholder="Votre nom" 
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      required
+                    />
                   </div>
                   <div>
                     <label className="text-sm font-medium mb-2 block">Email</label>
-                    <Input type="email" placeholder="votre@email.com" />
+                    <Input 
+                      type="email" 
+                      placeholder="votre@email.com"
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      required
+                    />
                   </div>
                   <div>
                     <label className="text-sm font-medium mb-2 block">Numéro de réservation (optionnel)</label>
-                    <Input placeholder="Ex: BK123456" />
+                    <Input 
+                      placeholder="Ex: BK123456"
+                      value={formData.bookingReference}
+                      onChange={(e) => setFormData({...formData, bookingReference: e.target.value})}
+                    />
                   </div>
                   <div>
                     <label className="text-sm font-medium mb-2 block">Sujet</label>
-                    <Input placeholder="Objet de votre demande" />
+                    <Input 
+                      placeholder="Objet de votre demande"
+                      value={formData.subject}
+                      onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                      required
+                    />
                   </div>
                   <div>
                     <label className="text-sm font-medium mb-2 block">Message</label>
                     <Textarea 
                       placeholder="Décrivez votre problème ou votre question..." 
                       rows={5}
+                      value={formData.message}
+                      onChange={(e) => setFormData({...formData, message: e.target.value})}
+                      required
                     />
                   </div>
-                  <Button className="w-full gradient-primary shadow-primary" size="lg">
-                    Envoyer le message
+                  <Button 
+                    className="w-full gradient-primary shadow-primary" 
+                    size="lg"
+                    type="submit"
+                    disabled={sendingMessage}
+                  >
+                    {sendingMessage ? "Envoi..." : "Envoyer le message"}
                   </Button>
                 </form>
               </CardContent>
@@ -175,6 +251,37 @@ const Support = () => {
               </CardContent>
             </Card>
           </div>
+        </div>
+
+        {/* Newsletter Section */}
+        <div className="mt-12">
+          <Card>
+            <CardContent className="p-8">
+              <div className="max-w-2xl mx-auto text-center">
+                <h3 className="text-2xl font-bold mb-4">Inscrivez-vous à notre newsletter</h3>
+                <p className="text-muted-foreground mb-6">
+                  Recevez nos meilleures offres et conseils de voyage directement dans votre boîte mail
+                </p>
+                <form onSubmit={handleNewsletterSubmit} className="flex gap-4">
+                  <Input 
+                    type="email" 
+                    placeholder="Votre adresse email"
+                    value={newsletterEmail}
+                    onChange={(e) => setNewsletterEmail(e.target.value)}
+                    required
+                    className="flex-1"
+                  />
+                  <Button 
+                    type="submit" 
+                    className="gradient-primary shadow-primary"
+                    disabled={subscribing}
+                  >
+                    {subscribing ? "Inscription..." : "S'inscrire"}
+                  </Button>
+                </form>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </main>
 
