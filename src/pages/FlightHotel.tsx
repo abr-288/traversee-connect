@@ -2,56 +2,31 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plane, Hotel, MapPin, Calendar, Users, Check } from "lucide-react";
+import { Plane, Hotel, MapPin, Calendar, Users, Check, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { BookingDialog } from "@/components/BookingDialog";
+import { FlightHotelSearchForm } from "@/components/FlightHotelSearchForm";
+import { useFlightHotelSearch } from "@/hooks/useFlightHotelSearch";
+import { toast } from "sonner";
 
 const FlightHotel = () => {
   const [selectedPackage, setSelectedPackage] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [packages, setPackages] = useState<any[]>([]);
+  const { searchPackages, loading } = useFlightHotelSearch();
 
-  const packages = [
-    {
-      id: 1,
-      destination: "Paris, France",
-      image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34",
-      duration: "5 jours / 4 nuits",
-      flight: "Aller-retour depuis Abidjan",
-      hotel: "Hôtel 4* centre-ville",
-      price: 1250000,
-      includes: ["Vol aller-retour", "Hôtel 4 étoiles", "Petit-déjeuner", "Transferts aéroport"]
-    },
-    {
-      id: 2,
-      destination: "Dubaï, EAU",
-      image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c",
-      duration: "7 jours / 6 nuits",
-      flight: "Aller-retour depuis Abidjan",
-      hotel: "Hôtel 5* Palm Jumeirah",
-      price: 2100000,
-      includes: ["Vol aller-retour", "Hôtel 5 étoiles", "Demi-pension", "Transferts", "Visa"]
-    },
-    {
-      id: 3,
-      destination: "Dakar, Sénégal",
-      image: "https://images.unsplash.com/photo-1609137144813-7d9921338f24",
-      duration: "3 jours / 2 nuits",
-      flight: "Aller-retour depuis Abidjan",
-      hotel: "Hôtel 3* bord de mer",
-      price: 380000,
-      includes: ["Vol aller-retour", "Hôtel 3 étoiles", "Petit-déjeuner", "Transferts aéroport"]
-    },
-    {
-      id: 4,
-      destination: "Istanbul, Turquie",
-      image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200",
-      duration: "6 jours / 5 nuits",
-      flight: "Aller-retour depuis Abidjan",
-      hotel: "Hôtel 4* Sultanahmet",
-      price: 1450000,
-      includes: ["Vol aller-retour", "Hôtel 4 étoiles", "Petit-déjeuner", "Visite guidée", "Transferts"]
+  const handleSearch = async (params: any) => {
+    const results = await searchPackages(params);
+    
+    if (results && results.packages) {
+      setPackages(results.packages);
+      if (results.packages.length === 0) {
+        toast.info("Aucun forfait trouvé pour cette recherche");
+      }
+    } else {
+      toast.error("Erreur lors de la recherche des forfaits");
     }
-  ];
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -72,17 +47,33 @@ const FlightHotel = () => {
           </div>
         </div>
 
+        <FlightHotelSearchForm onSearch={handleSearch} />
+
+        {loading && (
+          <div className="flex justify-center items-center py-20">
+            <Loader2 className="w-12 h-12 animate-spin text-primary" />
+          </div>
+        )}
+
+        {!loading && packages.length === 0 && (
+          <div className="text-center py-20">
+            <p className="text-xl text-muted-foreground">
+              Utilisez le formulaire ci-dessus pour rechercher des forfaits Vol + Hôtel
+            </p>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {packages.map((pkg) => (
             <Card key={pkg.id} className="overflow-hidden hover:shadow-lg transition-all">
               <div className="relative h-64">
                 <img 
-                  src={pkg.image} 
+                  src={pkg.hotel.image} 
                   alt={pkg.destination}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute top-4 right-4 bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm font-semibold">
-                  Économisez 30%
+                  Économisez {pkg.savings?.toLocaleString()} FCFA
                 </div>
               </div>
               
@@ -104,15 +95,22 @@ const FlightHotel = () => {
                   <div className="flex items-start gap-2">
                     <Plane className="w-5 h-5 text-primary mt-0.5" />
                     <div>
-                      <p className="font-medium">Vol</p>
-                      <p className="text-sm text-muted-foreground">{pkg.flight}</p>
+                      <p className="font-medium">Vol - {pkg.flight.airline}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {pkg.flight.origin} → {pkg.flight.destination}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Durée: {pkg.flight.duration}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
                     <Hotel className="w-5 h-5 text-primary mt-0.5" />
                     <div>
-                      <p className="font-medium">Hébergement</p>
-                      <p className="text-sm text-muted-foreground">{pkg.hotel}</p>
+                      <p className="font-medium">{pkg.hotel.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {'⭐'.repeat(pkg.hotel.stars)} - {pkg.hotel.address}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -131,9 +129,11 @@ const FlightHotel = () => {
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">À partir de</p>
+                    <p className="text-sm text-muted-foreground line-through">
+                      {pkg.originalPrice?.toLocaleString()} FCFA
+                    </p>
                     <p className="text-3xl font-bold text-primary">
-                      {pkg.price.toLocaleString()} <span className="text-base">FCFA</span>
+                      {pkg.discountedPrice?.toLocaleString()} <span className="text-base">FCFA</span>
                     </p>
                   </div>
                   <Button 
@@ -143,7 +143,7 @@ const FlightHotel = () => {
                       setSelectedPackage({
                         id: pkg.id.toString(),
                         name: `Vol + Hôtel ${pkg.destination}`,
-                        price_per_unit: pkg.price,
+                        price_per_unit: pkg.discountedPrice,
                         currency: "FCFA",
                         type: "package",
                         location: pkg.destination
