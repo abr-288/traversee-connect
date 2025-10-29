@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Clock, Users, Star, Tag } from "lucide-react";
 import { useState } from "react";
 import { BookingDialog } from "@/components/BookingDialog";
+import { ActivitySearchForm } from "@/components/ActivitySearchForm";
 
 const Activities = () => {
   const [selectedActivity, setSelectedActivity] = useState<any>(null);
@@ -134,13 +135,23 @@ const Activities = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       
-      <main className="flex-1 container mx-auto px-4 py-8 mt-20">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-4">Activités & Expériences</h1>
-          <p className="text-muted-foreground text-lg">
-            Vivez des moments uniques avec nos activités sélectionnées
-          </p>
+      {/* Hero Banner */}
+      <div className="relative py-16 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
+        <img 
+          src="/src/assets/destination-city.jpg" 
+          alt="Activities" 
+          className="absolute inset-0 w-full h-full object-cover opacity-40"
+        />
+        <div className="relative z-10 container mx-auto px-4">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Activités & Expériences</h1>
+            <p className="text-xl text-white/90">Vivez des moments uniques avec nos activités sélectionnées</p>
+          </div>
+          <ActivitySearchForm />
         </div>
+      </div>
+      
+      <main className="flex-1 container mx-auto px-4 py-8">
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {activities.map((activity) => (

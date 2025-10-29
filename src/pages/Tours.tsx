@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Star, MapPin, Clock, Users } from "lucide-react";
 import { BookingDialog } from "@/components/BookingDialog";
+import { TourSearchForm } from "@/components/TourSearchForm";
 import { Pagination } from "@/components/Pagination";
 
 const Tours = () => {
@@ -318,15 +319,18 @@ const Tours = () => {
       <Navbar />
       
       {/* Hero Banner */}
-      <div className="relative h-64 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
+      <div className="relative py-16 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
         <img 
           src="/src/assets/destination-safari.jpg" 
           alt="Tours" 
           className="absolute inset-0 w-full h-full object-cover opacity-40"
         />
-        <div className="relative z-10 container mx-auto px-4 h-full flex flex-col justify-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Circuits & Tours</h1>
-          <p className="text-xl text-white/90">Découvrez des expériences inoubliables</p>
+        <div className="relative z-10 container mx-auto px-4">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Circuits & Tours</h1>
+            <p className="text-xl text-white/90">Découvrez des expériences inoubliables</p>
+          </div>
+          <TourSearchForm />
         </div>
       </div>
       

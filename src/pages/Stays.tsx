@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Calendar, Users, Star, Sparkles } from "lucide-react";
 import { WeatherWidget } from "@/components/WeatherWidget";
 import { CurrencyConverter } from "@/components/CurrencyConverter";
+import { StaySearchForm } from "@/components/StaySearchForm";
 
 const Stays = () => {
   const stays = [
@@ -86,13 +87,23 @@ const Stays = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       
-      <main className="flex-1 container mx-auto px-4 py-8 mt-20">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-4">Séjours et Escapades</h1>
-          <p className="text-muted-foreground text-lg">
-            Découvrez nos forfaits séjours tout compris pour des vacances inoubliables
-          </p>
+      {/* Hero Banner */}
+      <div className="relative py-16 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
+        <img 
+          src="/src/assets/hero-beach.jpg" 
+          alt="Stays" 
+          className="absolute inset-0 w-full h-full object-cover opacity-40"
+        />
+        <div className="relative z-10 container mx-auto px-4">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Séjours et Escapades</h1>
+            <p className="text-xl text-white/90">Découvrez nos forfaits séjours tout compris</p>
+          </div>
+          <StaySearchForm />
         </div>
+      </div>
+      
+      <main className="flex-1 container mx-auto px-4 py-8">
 
         {/* Weather and Currency Widgets */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">

@@ -320,15 +320,17 @@ const Flights = () => {
       <Navbar />
       
       {/* Hero Banner */}
-      <div className="relative h-64 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
+      <div className="relative py-16 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
         <img 
           src="/src/assets/hero-slide-1.jpg" 
           alt="Flights" 
           className="absolute inset-0 w-full h-full object-cover opacity-40"
         />
-        <div className="relative z-10 container mx-auto px-4 h-full flex flex-col justify-center items-center text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Recherche de vols</h1>
-          <p className="text-xl text-white/90">Trouvez les meilleurs vols au meilleur prix</p>
+        <div className="relative z-10 container mx-auto px-4">
+          <div className="text-center mb-2">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Recherche de vols</h1>
+            <p className="text-xl text-white/90 mb-6">Trouvez les meilleurs vols au meilleur prix</p>
+          </div>
         </div>
       </div>
       
