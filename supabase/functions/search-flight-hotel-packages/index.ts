@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -15,15 +16,20 @@ serve(async (req) => {
 
     console.log('Searching flight + hotel packages:', { origin, destination, departureDate, returnDate, adults, children, rooms, travelClass });
 
-    // Fetch flights
-    const flightsResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/search-flights`, {
-      method: 'POST',
-      headers: {
-        'Authorization': req.headers.get('Authorization') || '',
-        'apikey': Deno.env.get('SUPABASE_ANON_KEY') || '',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+    // Create Supabase client
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: {
+          headers: { Authorization: req.headers.get('Authorization')! },
+        },
+      }
+    );
+
+    // Fetch flights using Supabase client
+    const { data: flightsData, error: flightsError } = await supabaseClient.functions.invoke('search-flights', {
+      body: {
         origin,
         destination,
         departureDate,
@@ -31,30 +37,28 @@ serve(async (req) => {
         adults,
         children,
         travelClass,
-      }),
+      },
     });
 
-    const flightsData = await flightsResponse.json();
+    if (flightsError) {
+      console.error('Error fetching flights:', flightsError);
+    }
 
-    // Fetch hotels
-    const hotelsResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/search-hotels`, {
-      method: 'POST',
-      headers: {
-        'Authorization': req.headers.get('Authorization') || '',
-        'apikey': Deno.env.get('SUPABASE_ANON_KEY') || '',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+    // Fetch hotels using Supabase client
+    const { data: hotelsData, error: hotelsError } = await supabaseClient.functions.invoke('search-hotels', {
+      body: {
         location: destination,
         checkIn: departureDate,
         checkOut: returnDate,
         adults,
         children,
         rooms,
-      }),
+      },
     });
 
-    const hotelsData = await hotelsResponse.json();
+    if (hotelsError) {
+      console.error('Error fetching hotels:', hotelsError);
+    }
 
     // Combine flights and hotels into packages
     const packages = [];
@@ -120,8 +124,9 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in search-flight-hotel-packages:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
