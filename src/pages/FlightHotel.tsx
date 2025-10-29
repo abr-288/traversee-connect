@@ -1,8 +1,8 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plane, Hotel, MapPin, Calendar, Users, Check, Loader2 } from "lucide-react";
+import { Plane, Hotel, MapPin, Calendar, Users, Check, Loader2, Star } from "lucide-react";
 import { useState } from "react";
 import { BookingDialog } from "@/components/BookingDialog";
 import { FlightHotelSearchForm } from "@/components/FlightHotelSearchForm";
@@ -10,21 +10,40 @@ import { useFlightHotelSearch } from "@/hooks/useFlightHotelSearch";
 import { toast } from "sonner";
 
 const FlightHotel = () => {
-  const [selectedPackage, setSelectedPackage] = useState<any>(null);
+  const [selectedFlight, setSelectedFlight] = useState<any>(null);
+  const [selectedHotel, setSelectedHotel] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [packages, setPackages] = useState<any[]>([]);
+  const [flights, setFlights] = useState<any[]>([]);
+  const [hotels, setHotels] = useState<any[]>([]);
   const { searchPackages, loading } = useFlightHotelSearch();
 
   const handleSearch = async (params: any) => {
     const results = await searchPackages(params);
     
-    if (results && results.packages) {
-      setPackages(results.packages);
-      if (results.packages.length === 0) {
-        toast.info("Aucun forfait trouvé pour cette recherche");
-      }
+    if (results && results.flights && results.hotels) {
+      setFlights(results.flights);
+      setHotels(results.hotels);
+      setSelectedFlight(null);
+      setSelectedHotel(null);
+      toast.success(`${results.flights.length} vol(s) et ${results.hotels.length} hôtel(s) trouvé(s)`);
     } else {
-      toast.error("Erreur lors de la recherche des forfaits");
+      toast.error("Erreur lors de la recherche");
+    }
+  };
+
+  const calculateTotal = () => {
+    if (!selectedFlight || !selectedHotel) return { original: 0, discounted: 0, savings: 0 };
+    const original = selectedFlight.price + selectedHotel.price;
+    const discounted = original * 0.7; // 30% discount
+    const savings = original - discounted;
+    return { original, discounted, savings };
+  };
+
+  const handleBooking = () => {
+    if (selectedFlight && selectedHotel) {
+      setDialogOpen(true);
+    } else {
+      toast.error("Veuillez sélectionner un vol et un hôtel");
     }
   };
 
@@ -55,116 +74,228 @@ const FlightHotel = () => {
           </div>
         )}
 
-        {!loading && packages.length === 0 && (
+        {!loading && flights.length === 0 && hotels.length === 0 && (
           <div className="text-center py-20">
             <p className="text-xl text-muted-foreground">
-              Utilisez le formulaire ci-dessus pour rechercher des forfaits Vol + Hôtel
+              Utilisez le formulaire ci-dessus pour rechercher des vols et hôtels
             </p>
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {packages.map((pkg) => (
-            <Card key={pkg.id} className="overflow-hidden hover:shadow-lg transition-all">
-              <div className="relative h-64">
-                <img 
-                  src={pkg.hotel.image} 
-                  alt={pkg.destination}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute top-4 right-4 bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm font-semibold">
-                  Économisez {pkg.savings?.toLocaleString()} FCFA
+        {!loading && (flights.length > 0 || hotels.length > 0) && (
+          <div className="space-y-8">
+            {/* Flights Section */}
+            {flights.length > 0 && (
+              <div>
+                <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                  <Plane className="h-6 w-6 text-primary" />
+                  Vols disponibles
+                </h2>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {flights.map((flight) => (
+                    <Card 
+                      key={flight.id} 
+                      className={`cursor-pointer transition-all ${
+                        selectedFlight?.id === flight.id 
+                          ? 'ring-2 ring-primary shadow-lg' 
+                          : 'hover:shadow-md'
+                      }`}
+                      onClick={() => setSelectedFlight(flight)}
+                    >
+                      <CardHeader>
+                        <CardTitle className="flex items-center justify-between">
+                          <span className="text-lg">{flight.airline}</span>
+                          {selectedFlight?.id === flight.id && (
+                            <div className="h-6 w-6 rounded-full bg-primary flex items-center justify-center">
+                              <Check className="text-white h-4 w-4" />
+                            </div>
+                          )}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Départ:</span>
+                            <span className="font-medium">{new Date(flight.departure).toLocaleDateString()}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Retour:</span>
+                            <span className="font-medium">{new Date(flight.return).toLocaleDateString()}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Durée:</span>
+                            <span className="font-medium">{flight.duration}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Escales:</span>
+                            <span className="font-medium">
+                              {flight.stops === 0 ? 'Direct' : `${flight.stops} escale(s)`}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="pt-3 border-t">
+                          <div className="text-2xl font-bold text-primary">
+                            {flight.price.toLocaleString()} FCFA
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               </div>
-              
-              <CardContent className="p-6">
-                <div className="mb-4">
-                  <h3 className="text-2xl font-bold mb-2 flex items-center gap-2">
-                    <MapPin className="w-5 h-5 text-primary" />
-                    {pkg.destination}
-                  </h3>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
-                      {pkg.duration}
-                    </span>
-                  </div>
-                </div>
+            )}
 
-                <div className="space-y-3 mb-6">
-                  <div className="flex items-start gap-2">
-                    <Plane className="w-5 h-5 text-primary mt-0.5" />
-                    <div>
-                      <p className="font-medium">Vol - {pkg.flight.airline}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {pkg.flight.origin} → {pkg.flight.destination}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        Durée: {pkg.flight.duration}
-                      </p>
+            {/* Hotels Section */}
+            {hotels.length > 0 && (
+              <div>
+                <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                  <Hotel className="h-6 w-6 text-primary" />
+                  Hôtels disponibles
+                </h2>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {hotels.map((hotel) => (
+                    <Card 
+                      key={hotel.id}
+                      className={`cursor-pointer transition-all overflow-hidden ${
+                        selectedHotel?.id === hotel.id 
+                          ? 'ring-2 ring-primary shadow-lg' 
+                          : 'hover:shadow-md'
+                      }`}
+                      onClick={() => setSelectedHotel(hotel)}
+                    >
+                      <div className="relative h-40">
+                        <img 
+                          src={hotel.image} 
+                          alt={hotel.name}
+                          className="w-full h-full object-cover"
+                        />
+                        {selectedHotel?.id === hotel.id && (
+                          <div className="absolute top-2 right-2 h-6 w-6 rounded-full bg-primary flex items-center justify-center">
+                            <Check className="text-white h-4 w-4" />
+                          </div>
+                        )}
+                      </div>
+                      <CardHeader>
+                        <CardTitle className="text-lg">{hotel.name}</CardTitle>
+                        <div className="flex items-center gap-1">
+                          {[...Array(hotel.rating)].map((_, i) => (
+                            <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                          ))}
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {hotel.description}
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {hotel.amenities?.slice(0, 3).map((amenity: string, idx: number) => (
+                            <span key={idx} className="text-xs bg-secondary px-2 py-1 rounded">
+                              {amenity}
+                            </span>
+                          ))}
+                        </div>
+                        <div className="pt-3 border-t">
+                          <div className="text-2xl font-bold text-primary">
+                            {hotel.price.toLocaleString()} FCFA
+                          </div>
+                          <p className="text-xs text-muted-foreground">par nuit</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Summary and Booking */}
+            {(selectedFlight || selectedHotel) && (
+              <Card className="sticky bottom-4 shadow-xl border-2">
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span>Votre sélection</span>
+                    {selectedFlight && selectedHotel && (
+                      <span className="text-sm font-normal text-green-600">
+                        Économisez {calculateTotal().savings.toLocaleString()} FCFA (30%)
+                      </span>
+                    )}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <h3 className="font-semibold flex items-center gap-2">
+                        <Plane className="h-4 w-4" />
+                        Vol sélectionné
+                      </h3>
+                      {selectedFlight ? (
+                        <div className="text-sm">
+                          <p className="font-medium">{selectedFlight.airline}</p>
+                          <p className="text-muted-foreground">{selectedFlight.price.toLocaleString()} FCFA</p>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">Aucun vol sélectionné</p>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <h3 className="font-semibold flex items-center gap-2">
+                        <Hotel className="h-4 w-4" />
+                        Hôtel sélectionné
+                      </h3>
+                      {selectedHotel ? (
+                        <div className="text-sm">
+                          <p className="font-medium">{selectedHotel.name}</p>
+                          <p className="text-muted-foreground">{selectedHotel.price.toLocaleString()} FCFA</p>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">Aucun hôtel sélectionné</p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <h3 className="font-semibold">Total</h3>
+                      {selectedFlight && selectedHotel ? (
+                        <div>
+                          <p className="text-2xl font-bold text-primary">
+                            {calculateTotal().discounted.toLocaleString()} FCFA
+                          </p>
+                          <p className="text-sm text-muted-foreground line-through">
+                            {calculateTotal().original.toLocaleString()} FCFA
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">Sélectionnez un vol et un hôtel</p>
+                      )}
                     </div>
                   </div>
-                  <div className="flex items-start gap-2">
-                    <Hotel className="w-5 h-5 text-primary mt-0.5" />
-                    <div>
-                      <p className="font-medium">{pkg.hotel.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {'⭐'.repeat(pkg.hotel.stars)} - {pkg.hotel.address}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-muted/50 rounded-lg p-4 mb-6">
-                  <p className="font-semibold mb-2">Inclus dans le forfait :</p>
-                  <ul className="space-y-1">
-                    {pkg.includes.map((item, idx) => (
-                      <li key={idx} className="flex items-center gap-2 text-sm">
-                        <Check className="w-4 h-4 text-primary" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground line-through">
-                      {pkg.originalPrice?.toLocaleString()} FCFA
-                    </p>
-                    <p className="text-3xl font-bold text-primary">
-                      {pkg.discountedPrice?.toLocaleString()} <span className="text-base">FCFA</span>
-                    </p>
-                  </div>
+                </CardContent>
+                <CardFooter>
                   <Button 
-                    size="lg" 
-                    className="gradient-primary shadow-primary"
-                    onClick={() => {
-                      setSelectedPackage({
-                        id: pkg.id.toString(),
-                        name: `Vol + Hôtel ${pkg.destination}`,
-                        price_per_unit: pkg.discountedPrice,
-                        currency: "FCFA",
-                        type: "package",
-                        location: pkg.destination
-                      });
-                      setDialogOpen(true);
-                    }}
+                    className="w-full" 
+                    size="lg"
+                    onClick={handleBooking}
+                    disabled={!selectedFlight || !selectedHotel}
                   >
-                    Réserver
+                    Réserver maintenant
                   </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                </CardFooter>
+              </Card>
+            )}
+          </div>
+        )}
       </main>
 
-      {selectedPackage && (
+      {selectedFlight && selectedHotel && (
         <BookingDialog 
           open={dialogOpen}
           onOpenChange={setDialogOpen}
-          service={selectedPackage}
+          service={{
+            id: `${selectedFlight.id}-${selectedHotel.id}`,
+            name: `Vol + Hôtel`,
+            price_per_unit: calculateTotal().discounted,
+            currency: "FCFA",
+            type: "package"
+          }}
         />
       )}
 

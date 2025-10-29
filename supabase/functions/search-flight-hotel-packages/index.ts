@@ -163,74 +163,21 @@ serve(async (req) => {
       }));
     }
 
-    // If RapidAPI fails or returns no data, fall back to existing edge functions
+    // If RapidAPI fails or returns no data, fall back to mock data
     if (flights.length === 0 || hotels.length === 0) {
-      console.log('Falling back to existing edge functions');
-      // Use existing implementation as fallback
-      const packages = getMockPackages(origin, destination, departureDate, returnDate);
+      console.log('Falling back to mock data');
+      const mockData = getMockData(origin, destination, departureDate, returnDate);
       return new Response(
-        JSON.stringify({ packages }),
+        JSON.stringify(mockData),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Combine flights and hotels into packages
-    const packages = [];
-
-    // Create packages by combining each flight with each hotel
-    for (let i = 0; i < Math.min(flights.length, 3); i++) {
-      for (let j = 0; j < Math.min(hotels.length, 2); j++) {
-        const flight = flights[i];
-        const hotel = hotels[j];
-        
-        const flightPrice = flight.price || 0;
-        const hotelPrice = hotel.price || 0;
-        const totalPrice = flightPrice + hotelPrice;
-        const discountedPrice = totalPrice * 0.7; // 30% discount
-        const savings = totalPrice - discountedPrice;
-
-        packages.push({
-          id: `${i}-${j}`,
-          destination: destination,
-          flight: {
-            airline: flight.airline || 'Compagnie aérienne',
-            departure: flight.departure || departureDate,
-            return: flight.return || returnDate,
-            price: flightPrice,
-            origin: origin,
-            destination: destination,
-            duration: flight.duration || '2h 30min',
-            stops: flight.stops || 0,
-          },
-          hotel: {
-            name: hotel.name || 'Hôtel',
-            stars: hotel.rating || 4,
-            address: hotel.address || destination,
-            price: hotelPrice,
-            image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945',
-            amenities: hotel.amenities || ['WiFi', 'Piscine', 'Climatisation'],
-            description: hotel.description || 'Hôtel confortable avec toutes les commodités',
-          },
-          originalPrice: totalPrice,
-          discountedPrice: discountedPrice,
-          savings: savings,
-          currency: 'FCFA',
-          duration: calculateNights(departureDate, returnDate),
-          includes: [
-            'Vol aller-retour',
-            `Hôtel ${hotel.rating || 4} étoiles`,
-            'Petit-déjeuner',
-            'Transferts aéroport',
-            'Taxes et frais inclus'
-          ],
-        });
-      }
-    }
-
-    console.log(`Created ${packages.length} packages`);
+    // Return flights and hotels separately
+    console.log(`Returning ${flights.length} flights and ${hotels.length} hotels`);
 
     return new Response(
-      JSON.stringify({ packages }),
+      JSON.stringify({ flights, hotels }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
@@ -251,42 +198,68 @@ function calculateNights(checkIn: string, checkOut: string): string {
   return `${nights} nuit${nights > 1 ? 's' : ''}`;
 }
 
-function getMockPackages(origin: string, destination: string, departureDate: string, returnDate: string) {
-  return [
-    {
-      id: '1',
-      destination: destination,
-      flight: {
+function getMockData(origin: string, destination: string, departureDate: string, returnDate: string) {
+  return {
+    flights: [
+      {
+        id: 'flight-1',
         airline: 'Air France',
+        price: 450000,
         departure: departureDate,
         return: returnDate,
-        price: 450000,
-        origin: origin,
-        destination: destination,
         duration: '2h 30min',
         stops: 0,
       },
-      hotel: {
+      {
+        id: 'flight-2',
+        airline: 'Brussels Airlines',
+        price: 380000,
+        departure: departureDate,
+        return: returnDate,
+        duration: '3h 15min',
+        stops: 1,
+      },
+      {
+        id: 'flight-3',
+        airline: 'Air Côte d\'Ivoire',
+        price: 420000,
+        departure: departureDate,
+        return: returnDate,
+        duration: '2h 45min',
+        stops: 0,
+      }
+    ],
+    hotels: [
+      {
+        id: 'hotel-1',
         name: 'Hôtel Sofitel Abidjan',
-        stars: 5,
-        address: destination,
+        rating: 5,
         price: 180000,
         image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945',
+        address: destination,
         amenities: ['WiFi', 'Piscine', 'Spa', 'Restaurant', 'Bar'],
         description: 'Hôtel de luxe avec vue sur la lagune',
       },
-      originalPrice: 630000,
-      discountedPrice: 441000,
-      savings: 189000,
-      currency: 'FCFA',
-      duration: calculateNights(departureDate, returnDate),
-      includes: [
-        'Vol aller-retour',
-        'Hôtel 5 étoiles',
-        'Petit-déjeuner',
-        'Transferts aéroport',
-        'Taxes et frais inclus'
-      ],
-    }
-  ];
+      {
+        id: 'hotel-2',
+        name: 'Hôtel Pullman',
+        rating: 4,
+        price: 120000,
+        image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa',
+        address: destination,
+        amenities: ['WiFi', 'Piscine', 'Climatisation', 'Restaurant'],
+        description: 'Hôtel moderne au cœur de la ville',
+      },
+      {
+        id: 'hotel-3',
+        name: 'Hôtel Azalaï',
+        rating: 4,
+        price: 95000,
+        image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b',
+        address: destination,
+        amenities: ['WiFi', 'Piscine', 'Climatisation'],
+        description: 'Hôtel confortable avec excellent rapport qualité-prix',
+      }
+    ]
+  };
 }
