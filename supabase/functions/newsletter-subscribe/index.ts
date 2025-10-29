@@ -1,8 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { Resend } from "npm:resend@2.0.0";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -44,7 +41,7 @@ const handler = async (req: Request): Promise<Response> => {
       .from('newsletter_subscribers')
       .select('email')
       .eq('email', email)
-      .single();
+      .maybeSingle();
 
     if (existing) {
       return new Response(
@@ -62,18 +59,6 @@ const handler = async (req: Request): Promise<Response> => {
       .insert([{ email }]);
 
     if (insertError) throw insertError;
-
-    // Send confirmation email
-    await resend.emails.send({
-      from: "Bossiz Travel <info@bossiz.com>",
-      to: [email],
-      subject: "Bienvenue dans notre newsletter !",
-      html: `
-        <h2>Merci de vous être inscrit à notre newsletter !</h2>
-        <p>Vous recevrez désormais nos meilleures offres et conseils de voyage.</p>
-        <p>À bientôt,<br>L'équipe Bossiz</p>
-      `,
-    });
 
     console.log("Newsletter subscription successful:", email);
 

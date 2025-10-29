@@ -1,7 +1,4 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@2.0.0";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -24,41 +21,19 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { name, email, bookingReference, subject, message }: SupportMessageRequest = await req.json();
 
-    // Send email to support
-    const emailResponse = await resend.emails.send({
-      from: "Support Bossiz <info@bossiz.com>",
-      to: ["support@bossiz.com"],
-      replyTo: email,
-      subject: `Support: ${subject}`,
-      html: `
-        <h2>Nouveau message de support</h2>
-        <p><strong>Nom:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        ${bookingReference ? `<p><strong>Référence de réservation:</strong> ${bookingReference}</p>` : ''}
-        <p><strong>Sujet:</strong> ${subject}</p>
-        <p><strong>Message:</strong></p>
-        <p>${message.replace(/\n/g, '<br>')}</p>
-      `,
-    });
+    console.log("Support message received:", { name, email, subject, bookingReference });
 
-    // Send confirmation to user
-    await resend.emails.send({
-      from: "Support Bossiz <info@bossiz.com>",
-      to: [email],
-      subject: "Message reçu - Support Bossiz",
-      html: `
-        <h2>Merci de nous avoir contactés, ${name}!</h2>
-        <p>Nous avons bien reçu votre message concernant: <strong>${subject}</strong></p>
-        <p>Notre équipe vous répondra dans les plus brefs délais.</p>
-        <hr>
-        <p><em>Votre message:</em></p>
-        <p>${message.replace(/\n/g, '<br>')}</p>
-        <br>
-        <p>Cordialement,<br>L'équipe Bossiz</p>
-      `,
-    });
+    // Log the support message (in production, integrate with email service)
+    console.log(`
+      New support message:
+      Name: ${name}
+      Email: ${email}
+      Booking Reference: ${bookingReference || 'N/A'}
+      Subject: ${subject}
+      Message: ${message}
+    `);
 
-    console.log("Support email sent successfully:", emailResponse);
+    console.log("Support email logged successfully");
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
