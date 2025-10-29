@@ -11,11 +11,13 @@ import { Star, Users, Briefcase, Fuel, Settings, Loader2 } from "lucide-react";
 import { CarBookingDialog } from "@/components/CarBookingDialog";
 import { CarSearchForm } from "@/components/CarSearchForm";
 import { useCarRental } from "@/hooks/useCarRental";
+import { useCarServices } from "@/hooks/useCarServices";
 import { toast } from "sonner";
 
 const Cars = () => {
   const [searchParams] = useSearchParams();
   const { searchCarRentals, loading } = useCarRental();
+  const { cars: dbCars, loading: dbLoading } = useCarServices();
   const [priceRange, setPriceRange] = useState([0, 150000]);
   const [selectedCar, setSelectedCar] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -167,7 +169,14 @@ const Cars = () => {
 
   // Filter and sort cars
   const filteredAndSortedCars = useMemo(() => {
-    let result = apiCars.length > 0 ? [...apiCars] : [...cars];
+    // Combine all car sources: API results, database services, and static fallback
+    const allCars = [
+      ...apiCars,
+      ...dbCars,
+      ...(apiCars.length === 0 && dbCars.length === 0 ? cars : [])
+    ];
+    
+    let result = [...allCars];
 
     // Apply location filter
     if (filterLocation) {
@@ -237,7 +246,7 @@ const Cars = () => {
     }
 
     return result;
-  }, [apiCars, filterLocation, filterCategory, priceRange, selectedTransmissions, selectedFuelTypes, sortBy]);
+  }, [apiCars, dbCars, cars, filterLocation, filterCategory, priceRange, selectedTransmissions, selectedFuelTypes, sortBy]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -402,10 +411,10 @@ const Cars = () => {
 
           {/* Liste des voitures */}
           <div className="lg:col-span-3 space-y-6">
-            {loading && (
+            {(loading || dbLoading) && (
               <div className="flex justify-center items-center py-12">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                <span className="ml-3 text-lg">Recherche en cours...</span>
+                <span className="ml-3 text-lg">Chargement...</span>
               </div>
             )}
             <div className="flex justify-between items-center">
