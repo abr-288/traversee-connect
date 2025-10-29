@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Star, MapPin, Users, Wifi, UtensilsCrossed, Car, Loader2 } from "lucide-react";
 import { HotelBookingDialog } from "@/components/HotelBookingDialog";
+import { Pagination } from "@/components/Pagination";
 import { useHotelSearch } from "@/hooks/useHotelSearch";
 import { toast } from "sonner";
 
@@ -25,6 +26,8 @@ const Hotels = () => {
   const [filterStars, setFilterStars] = useState("all");
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("popular");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
   useEffect(() => {
     const destination = searchParams.get("destination");
@@ -219,6 +222,13 @@ const Hotels = () => {
     return result;
   }, [apiHotels, filterDestination, filterStars, priceRange, selectedAmenities, sortBy]);
 
+  // Pagination
+  const totalPages = Math.ceil(filteredAndSortedHotels.length / itemsPerPage);
+  const paginatedHotels = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredAndSortedHotels.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredAndSortedHotels, currentPage, itemsPerPage]);
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
@@ -354,8 +364,9 @@ const Hotels = () => {
                 <p className="text-lg text-muted-foreground">Aucun hôtel ne correspond à vos critères</p>
               </div>
             ) : (
+              <>
               <div className="grid gap-6">
-                {filteredAndSortedHotels.map((hotel, index) => (
+                {paginatedHotels.map((hotel, index) => (
                 <Card key={hotel.id || index} className="overflow-hidden hover:shadow-lg transition-shadow">
                   <div className="grid md:grid-cols-3 gap-6">
                     <div className="md:col-span-1">
@@ -427,8 +438,16 @@ const Hotels = () => {
                     </CardContent>
                   </div>
                 </Card>
-              ))}
+                ))}
               </div>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                itemsPerPage={itemsPerPage}
+                totalItems={filteredAndSortedHotels.length}
+              />
+              </>
             )}
           </div>
         </div>

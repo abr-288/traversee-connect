@@ -10,6 +10,7 @@ import { Slider } from "@/components/ui/slider";
 import { Star, Users, Briefcase, Fuel, Settings, Loader2 } from "lucide-react";
 import { CarBookingDialog } from "@/components/CarBookingDialog";
 import { CarSearchForm } from "@/components/CarSearchForm";
+import { Pagination } from "@/components/Pagination";
 import { useCarRental } from "@/hooks/useCarRental";
 import { useCarServices } from "@/hooks/useCarServices";
 import { toast } from "sonner";
@@ -29,6 +30,8 @@ const Cars = () => {
   const [selectedTransmissions, setSelectedTransmissions] = useState<string[]>([]);
   const [selectedFuelTypes, setSelectedFuelTypes] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("popular");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
   useEffect(() => {
     const location = searchParams.get("location");
@@ -248,6 +251,13 @@ const Cars = () => {
     return result;
   }, [apiCars, dbCars, cars, filterLocation, filterCategory, priceRange, selectedTransmissions, selectedFuelTypes, sortBy]);
 
+  // Pagination
+  const totalPages = Math.ceil(filteredAndSortedCars.length / itemsPerPage);
+  const paginatedCars = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredAndSortedCars.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredAndSortedCars, currentPage, itemsPerPage]);
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
@@ -439,8 +449,9 @@ const Cars = () => {
                 <p className="text-lg text-muted-foreground">Aucun véhicule ne correspond à vos critères</p>
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 gap-6">
-                {filteredAndSortedCars.map((car, index) => (
+              <>
+                <div className="grid md:grid-cols-2 gap-6">
+                  {paginatedCars.map((car, index) => (
                 <Card key={car.id || index} className="overflow-hidden hover:shadow-lg transition-shadow">
                   <img
                     src={car.image}
@@ -516,9 +527,17 @@ const Cars = () => {
                       </Button>
                     </div>
                   </CardContent>
-                </Card>
-              ))}
-              </div>
+                  </Card>
+                ))}
+                </div>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                  itemsPerPage={itemsPerPage}
+                  totalItems={filteredAndSortedCars.length}
+                />
+              </>
             )}
           </div>
         </div>

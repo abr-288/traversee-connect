@@ -8,11 +8,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Star, MapPin, Clock, Users } from "lucide-react";
 import { BookingDialog } from "@/components/BookingDialog";
+import { Pagination } from "@/components/Pagination";
 
 const Tours = () => {
   const [priceRange, setPriceRange] = useState([0, 1000000]);
   const [selectedTour, setSelectedTour] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
   const tours = [
     // Afrique
@@ -298,6 +301,18 @@ const Tours = () => {
     }
   ];
 
+  // Filter tours by price
+  const filteredTours = tours.filter(tour => 
+    tour.price >= priceRange[0] && tour.price <= priceRange[1]
+  );
+
+  // Pagination
+  const totalPages = Math.ceil(filteredTours.length / itemsPerPage);
+  const paginatedTours = filteredTours.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
@@ -388,7 +403,7 @@ const Tours = () => {
           {/* Liste des tours */}
           <div className="lg:col-span-3 space-y-6">
             <div className="flex justify-between items-center">
-              <p className="text-muted-foreground">{tours.length} circuits trouvés</p>
+              <p className="text-muted-foreground">{filteredTours.length} circuits trouvés</p>
               <Select defaultValue="popular">
                 <SelectTrigger className="w-[200px]">
                   <SelectValue />
@@ -403,7 +418,7 @@ const Tours = () => {
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
-              {tours.map((tour) => (
+              {paginatedTours.map((tour) => (
                 <Card key={tour.id} className="overflow-hidden hover:shadow-lg transition-shadow">
                   <img
                     src={tour.image}
@@ -471,6 +486,14 @@ const Tours = () => {
                 </Card>
               ))}
             </div>
+            
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              itemsPerPage={itemsPerPage}
+              totalItems={filteredTours.length}
+            />
           </div>
         </div>
       </main>
