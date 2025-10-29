@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 import { Calendar } from "lucide-react";
+import { bookingSchema } from "@/lib/validation";
 
 interface BookingDialogProps {
   open: boolean;
@@ -35,6 +36,24 @@ export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProp
     const customerEmail = formData.get("customerEmail") as string;
     const customerPhone = formData.get("customerPhone") as string;
     const notes = formData.get("notes") as string;
+
+    // Validate input
+    try {
+      bookingSchema.parse({
+        customerName,
+        customerEmail,
+        customerPhone,
+        notes: notes || null,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erreur de validation",
+        description: error.errors?.[0]?.message || "Veuillez vérifier vos informations",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
 
     const { data: { user } } = await supabase.auth.getUser();
 

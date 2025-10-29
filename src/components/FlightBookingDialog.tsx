@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Plane, Calendar, User } from "lucide-react";
+import { bookingSchema } from "@/lib/validation";
 
 interface FlightBookingDialogProps {
   open: boolean;
@@ -51,6 +52,20 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams }
     const passportIssueDate = formData.get("passportIssueDate") as string;
     const passportExpiryDate = formData.get("passportExpiryDate") as string;
     const notes = formData.get("notes") as string;
+
+    // Validate input
+    try {
+      bookingSchema.parse({
+        customerName,
+        customerEmail,
+        customerPhone,
+        notes: notes || null,
+      });
+    } catch (error: any) {
+      toast.error(error.errors?.[0]?.message || "Veuillez vérifier vos informations");
+      setLoading(false);
+      return;
+    }
 
     const { data: { user } } = await supabase.auth.getUser();
 

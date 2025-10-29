@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { validateSupportMessage, sanitizeString } from "../_shared/validation.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -19,18 +20,51 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { name, email, bookingReference, subject, message }: SupportMessageRequest = await req.json();
+    const requestData: SupportMessageRequest = await req.json();
+    const { name, email, bookingReference, subject, message } = requestData;
 
-    console.log("Support message received:", { name, email, subject, bookingReference });
+    // Validate input
+    const validationErrors = validateSupportMessage({
+      name,
+      email,
+      subject,
+      message,
+      bookingReference,
+    });
+
+    if (validationErrors.length > 0) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Validation failed",
+          details: validationErrors,
+        }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    // Sanitize inputs
+    const sanitizedData = {
+      name: sanitizeString(name, 100),
+      email: sanitizeString(email, 255),
+      bookingReference: bookingReference ? sanitizeString(bookingReference, 50) : undefined,
+      subject: sanitizeString(subject, 200),
+      message: sanitizeString(message, 2000),
+    };
+
+    console.log("Support message received from:", sanitizedData.name, sanitizedData.email);
 
     // Log the support message (in production, integrate with email service)
     console.log(`
       New support message:
-      Name: ${name}
-      Email: ${email}
-      Booking Reference: ${bookingReference || 'N/A'}
-      Subject: ${subject}
-      Message: ${message}
+      Name: ${sanitizedData.name}
+      Email: ${sanitizedData.email}
+      Booking Reference: ${sanitizedData.bookingReference || 'N/A'}
+      Subject: ${sanitizedData.subject}
+      Message: ${sanitizedData.message}
     `);
 
     console.log("Support email logged successfully");

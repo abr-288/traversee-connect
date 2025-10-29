@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { validatePaymentInput, sanitizeString } from "../_shared/validation.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -28,11 +29,40 @@ serve(async (req) => {
       throw new Error('Unauthorized');
     }
 
-    const { bookingId, amount, currency, paymentMethod, customerInfo, paymentDetails } = await req.json();
+    const requestData = await req.json();
+    const { bookingId, amount, currency, paymentMethod, customerInfo, paymentDetails } = requestData;
 
-    if (!amount || amount <= 0) {
-      throw new Error('Invalid payment amount');
+    // Validate input
+    const validationErrors = validatePaymentInput({
+      bookingId,
+      amount,
+      currency,
+      paymentMethod,
+      customerInfo,
+    });
+
+    if (validationErrors.length > 0) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Validation failed",
+          details: validationErrors,
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     }
+
+    // Sanitize customer info
+    const sanitizedCustomerInfo = {
+      name: sanitizeString(customerInfo.name, 100),
+      email: sanitizeString(customerInfo.email, 255),
+      phone: customerInfo.phone ? sanitizeString(customerInfo.phone, 20) : '0000000000',
+      address: customerInfo.address ? sanitizeString(customerInfo.address, 200) : 'N/A',
+      city: customerInfo.city ? sanitizeString(customerInfo.city, 100) : 'Abidjan',
+    };
 
     console.log('Processing payment for booking:', bookingId, 'Amount:', amount, currency);
 
@@ -77,12 +107,12 @@ serve(async (req) => {
           amount: amount,
           currency: currency === 'FCFA' ? 'XOF' : currency,
           description: `Payment for booking ${bookingId}`,
-          customer_name: customerInfo.name.split(' ')[0] || customerInfo.name,
-          customer_surname: customerInfo.name.split(' ').slice(1).join(' ') || customerInfo.name,
-          customer_email: customerInfo.email,
-          customer_phone_number: customerInfo.phone || '0000000000',
-          customer_address: customerInfo.address || 'N/A',
-          customer_city: customerInfo.city || 'Abidjan',
+          customer_name: sanitizedCustomerInfo.name.split(' ')[0] || sanitizedCustomerInfo.name,
+          customer_surname: sanitizedCustomerInfo.name.split(' ').slice(1).join(' ') || sanitizedCustomerInfo.name,
+          customer_email: sanitizedCustomerInfo.email,
+          customer_phone_number: sanitizedCustomerInfo.phone,
+          customer_address: sanitizedCustomerInfo.address,
+          customer_city: sanitizedCustomerInfo.city,
           customer_country: 'CI',
           customer_state: 'CI',
           customer_zip_code: '00225',

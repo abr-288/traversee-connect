@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Hotel, Calendar } from "lucide-react";
+import { bookingSchema } from "@/lib/validation";
 
 interface HotelBookingDialogProps {
   open: boolean;
@@ -38,6 +39,20 @@ export const HotelBookingDialog = ({ open, onOpenChange, hotel }: HotelBookingDi
     const customerEmail = formData.get("customerEmail") as string;
     const customerPhone = formData.get("customerPhone") as string;
     const notes = formData.get("notes") as string;
+
+    // Validate input
+    try {
+      bookingSchema.parse({
+        customerName,
+        customerEmail,
+        customerPhone,
+        notes: notes || null,
+      });
+    } catch (error: any) {
+      toast.error(error.errors?.[0]?.message || "Veuillez vérifier vos informations");
+      setLoading(false);
+      return;
+    }
 
     const { data: { user } } = await supabase.auth.getUser();
 

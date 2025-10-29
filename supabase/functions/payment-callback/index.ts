@@ -6,22 +6,46 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// In-memory store for processed transactions (simple idempotency check)
+// In production, this should be a database table
+const processedTransactions = new Set<string>();
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // CinetPay envoie les données en POST
     const body = await req.json();
     
-    console.log('CinetPay callback received:', body);
+    console.log('CinetPay callback received:', {
+      transaction_id: body.cpm_trans_id,
+      timestamp: new Date().toISOString(),
+      ip: req.headers.get('x-forwarded-for') || req.headers.get('cf-connecting-ip') || 'unknown'
+    });
 
     const cinetpayApiKey = Deno.env.get('CINETPAY_API_KEY');
     const cinetpaySiteId = Deno.env.get('CINETPAY_SITE_ID');
 
     if (!cinetpayApiKey || !cinetpaySiteId) {
+      console.error('CinetPay credentials not configured');
       throw new Error('CinetPay credentials not configured');
+    }
+
+    // Idempotency check - prevent duplicate processing
+    const transactionKey = `${body.cpm_trans_id}-${body.cpm_site_id}`;
+    if (processedTransactions.has(transactionKey)) {
+      console.log('Transaction already processed (idempotency check):', transactionKey);
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: 'Transaction already processed',
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     // Vérifier le statut du paiement auprès de CinetPay
@@ -68,6 +92,9 @@ serve(async (req) => {
     const paymentStatus = checkData.data.payment_status;
 
     if (paymentStatus === 'ACCEPTED' || paymentStatus === 'SUCCESSFUL') {
+      // Mark transaction as processed
+      processedTransactions.add(transactionKey);
+      
       // Mettre à jour le statut du paiement
       const { error: paymentError } = await supabase
         .from('payments')
@@ -95,6 +122,8 @@ serve(async (req) => {
         body: { bookingId },
       });
 
+      console.log('Payment processed successfully for booking:', bookingId);
+
       // Retourner une réponse de succès pour CinetPay
       return new Response(
         JSON.stringify({
@@ -107,6 +136,9 @@ serve(async (req) => {
         }
       );
     } else {
+      // Mark transaction as processed even if failed
+      processedTransactions.add(transactionKey);
+      
       // Mettre à jour le statut du paiement comme échoué
       const { error: paymentError } = await supabase
         .from('payments')
@@ -119,6 +151,8 @@ serve(async (req) => {
       if (paymentError) {
         console.error('Error updating payment:', paymentError);
       }
+
+      console.log('Payment failed for booking:', bookingId);
 
       // Retourner une réponse d'échec pour CinetPay
       return new Response(

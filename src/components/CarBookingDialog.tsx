@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Car, Calendar } from "lucide-react";
+import { carBookingSchema } from "@/lib/validation";
 
 interface CarBookingDialogProps {
   open: boolean;
@@ -42,6 +43,23 @@ export const CarBookingDialog = ({ open, onOpenChange, car }: CarBookingDialogPr
     const customerEmail = formData.get("customerEmail") as string;
     const customerPhone = formData.get("customerPhone") as string;
     const notes = formData.get("notes") as string;
+
+    // Validate input
+    try {
+      carBookingSchema.parse({
+        customerName,
+        customerEmail,
+        customerPhone,
+        driverLicense,
+        pickupLocation,
+        dropoffLocation,
+        notes: notes || null,
+      });
+    } catch (error: any) {
+      toast.error(error.errors?.[0]?.message || "Veuillez vérifier vos informations");
+      setLoading(false);
+      return;
+    }
 
     const { data: { user } } = await supabase.auth.getUser();
 
