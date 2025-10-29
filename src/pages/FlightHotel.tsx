@@ -58,11 +58,18 @@ const FlightHotel = () => {
       <Navbar />
       
       <main className="flex-1 container mx-auto px-4 py-8 mt-20">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-4">Forfaits Vol + Hôtel</h1>
-          <p className="text-muted-foreground text-lg">
-            Réservez votre vol et votre hébergement en un seul forfait et économisez jusqu'à 30%
-          </p>
+        <div className="relative py-32 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden rounded-3xl mb-12">
+          <img 
+            src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05" 
+            alt="Vol + Hotel" 
+            className="absolute inset-0 w-full h-full object-cover opacity-40 rounded-3xl"
+          />
+          <div className="relative z-10 text-center px-4">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">Forfaits Vol + Hôtel</h1>
+            <p className="text-2xl md:text-3xl text-white/95 font-medium">
+              Réservez votre vol et votre hébergement en un seul forfait et économisez jusqu'à 30%
+            </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

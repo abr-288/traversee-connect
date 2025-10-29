@@ -6,8 +6,13 @@ import { MapPin, Calendar, Users, Star, Sparkles } from "lucide-react";
 import { WeatherWidget } from "@/components/WeatherWidget";
 import { CurrencyConverter } from "@/components/CurrencyConverter";
 import { StaySearchForm } from "@/components/StaySearchForm";
+import { BookingDialog } from "@/components/BookingDialog";
+import { useState } from "react";
 
 const Stays = () => {
+  const [selectedStay, setSelectedStay] = useState<any>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  
   const stays = [
     {
       id: 1,
@@ -88,16 +93,16 @@ const Stays = () => {
       <Navbar />
       
       {/* Hero Banner */}
-      <div className="relative py-16 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
+      <div className="relative py-32 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
         <img 
           src="/src/assets/hero-beach.jpg" 
           alt="Stays" 
           className="absolute inset-0 w-full h-full object-cover opacity-40"
         />
         <div className="relative z-10 container mx-auto px-4">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Séjours et Escapades</h1>
-            <p className="text-xl text-white/90">Découvrez nos forfaits séjours tout compris</p>
+          <div className="text-center mb-10">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">Séjours et Escapades</h1>
+            <p className="text-2xl md:text-3xl text-white/95 font-medium">Découvrez nos forfaits séjours tout compris</p>
           </div>
           <StaySearchForm />
         </div>
@@ -164,7 +169,20 @@ const Stays = () => {
                       {stay.price.toLocaleString()} <span className="text-sm">FCFA</span>
                     </p>
                   </div>
-                  <Button className="gradient-primary shadow-primary">
+                  <Button 
+                    className="gradient-primary shadow-primary"
+                    onClick={() => {
+                      setSelectedStay({
+                        id: stay.id.toString(),
+                        name: stay.name,
+                        price_per_unit: stay.price,
+                        currency: "FCFA",
+                        type: "stay",
+                        location: stay.location
+                      });
+                      setDialogOpen(true);
+                    }}
+                  >
                     Réserver
                   </Button>
                 </div>
@@ -173,6 +191,14 @@ const Stays = () => {
           ))}
         </div>
       </main>
+
+      {selectedStay && (
+        <BookingDialog 
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          service={selectedStay}
+        />
+      )}
 
       <Footer />
     </div>

@@ -136,16 +136,16 @@ const Activities = () => {
       <Navbar />
       
       {/* Hero Banner */}
-      <div className="relative py-16 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
+      <div className="relative py-32 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
         <img 
           src="/src/assets/destination-city.jpg" 
           alt="Activities" 
           className="absolute inset-0 w-full h-full object-cover opacity-40"
         />
         <div className="relative z-10 container mx-auto px-4">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Activités & Expériences</h1>
-            <p className="text-xl text-white/90">Vivez des moments uniques avec nos activités sélectionnées</p>
+          <div className="text-center mb-10">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">Activités & Expériences</h1>
+            <p className="text-2xl md:text-3xl text-white/95 font-medium">Vivez des moments uniques avec nos activités sélectionnées</p>
           </div>
           <ActivitySearchForm />
         </div>

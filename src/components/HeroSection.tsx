@@ -102,7 +102,7 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="relative min-h-[700px] flex items-center pt-20">
+    <section className="relative min-h-[850px] flex items-center pt-20">
       {/* Background Image Carousel with Overlay */}
       <div className="absolute inset-0 z-0">
         {HERO_SLIDES.map((slide, index) => (
@@ -124,11 +124,11 @@ const HeroSection = () => {
 
       {/* Content */}
       <div className="container relative z-10 mx-auto px-4 py-16">
-        <div className="max-w-4xl mx-auto text-center mb-12">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="max-w-4xl mx-auto text-center mb-14">
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             Explorez le Monde Ensemble !
           </h1>
-          <p className="text-xl text-white/90 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
+          <p className="text-2xl md:text-3xl text-white/95 mb-10 font-medium animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
             Découvrez des hôtels magnifiques, des circuits uniques et des expériences inoubliables en Côte d'Ivoire
           </p>
         </div>
