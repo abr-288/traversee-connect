@@ -35,7 +35,17 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Car Rental API error:', response.status, errorText);
-      throw new Error(`Car Rental API error: ${response.status}`);
+      
+      // Return empty result instead of throwing error
+      // This allows the frontend to fallback to static data
+      return new Response(
+        JSON.stringify({
+          success: false,
+          data: [],
+          message: 'API service unavailable, showing local results'
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const data = await response.json();
