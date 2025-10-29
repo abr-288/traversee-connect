@@ -7,6 +7,7 @@ export interface FlightSearchParams {
   departureDate: string;
   returnDate?: string;
   adults: number;
+  children?: number;
   travelClass?: string;
 }
 

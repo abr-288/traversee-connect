@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Plane, Clock, Calendar, Briefcase, Loader2 } from "lucide-react";
 import { FlightBookingDialog } from "@/components/FlightBookingDialog";
+import { FlightSearchForm } from "@/components/FlightSearchForm";
 import { useFlightSearch } from "@/hooks/useFlightSearch";
 import { toast } from "sonner";
 import { getAirlineName } from "@/utils/airlineNames";
@@ -327,10 +328,11 @@ const Flights = () => {
           className="absolute inset-0 w-full h-full object-cover opacity-40"
         />
         <div className="relative z-10 container mx-auto px-4">
-          <div className="text-center mb-2">
+          <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Recherche de vols</h1>
-            <p className="text-xl text-white/90 mb-6">Trouvez les meilleurs vols au meilleur prix</p>
+            <p className="text-xl text-white/90">Trouvez les meilleurs vols au meilleur prix</p>
           </div>
+          <FlightSearchForm />
         </div>
       </div>
       
