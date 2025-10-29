@@ -5,93 +5,64 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Mock hotel data with detailed descriptions and images
+// Transform Booking.com data to our format
+const transformBookingData = (hotels: any[]) => {
+  return hotels.map(hotel => ({
+    id: hotel.hotel_id || hotel.id,
+    name: hotel.hotel_name || hotel.name,
+    location: hotel.city || hotel.address || '',
+    price: { 
+      grandTotal: hotel.min_total_price || hotel.price_breakdown?.gross_price?.value || 50000 
+    },
+    rating: hotel.review_score || hotel.rating || 4.0,
+    reviews: hotel.review_nr || hotel.reviews_count || 0,
+    image: hotel.main_photo_url || hotel.photo_main_url || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
+    images: hotel.photo_urls || [hotel.main_photo_url] || [],
+    description: hotel.hotel_description || hotel.description || `${hotel.hotel_name || hotel.name} est un établissement de qualité offrant confort et services exceptionnels.`,
+    amenities: hotel.hotel_facilities || hotel.facilities || ['Wifi', 'Restaurant', 'Service de Chambre']
+  }));
+};
+
+// Transform Airbnb data to our format
+const transformAirbnbData = (listings: any[]) => {
+  return listings.map(listing => ({
+    id: listing.id,
+    name: listing.name || listing.title,
+    location: listing.city || listing.localized_city || '',
+    price: { 
+      grandTotal: listing.price?.rate || listing.pricing?.rate || 40000 
+    },
+    rating: listing.star_rating || listing.avg_rating || 4.0,
+    reviews: listing.reviews_count || listing.review_count || 0,
+    image: listing.xl_picture_url || listing.picture_url || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
+    images: listing.picture_urls || [listing.xl_picture_url] || [],
+    description: listing.description || listing.summary || `${listing.name} offre un hébergement confortable et bien situé.`,
+    amenities: listing.amenities || ['Wifi', 'Cuisine', 'Espace de Travail']
+  }));
+};
+
+// Fallback mock data only if APIs completely fail
 const getMockHotels = (location: string) => {
   const hotelImages = [
     'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
     'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800',
     'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800',
-    'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800',
-    'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800',
-    'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800'
   ];
 
-  const baseHotels = [
+  return [
     {
       id: `${location}-1`,
-      name: `Grand Hotel ${location}`,
+      name: `Hôtel Premium ${location}`,
       location: location,
-      price: { grandTotal: 45000 + Math.random() * 20000 },
-      rating: 4.5 + Math.random() * 0.4,
-      reviews: Math.floor(Math.random() * 200) + 50,
+      price: { grandTotal: 50000 },
+      rating: 4.5,
+      reviews: 120,
       image: hotelImages[0],
-      images: [hotelImages[0], hotelImages[1], hotelImages[2]],
-      description: `Le Grand Hotel ${location} est un établissement de luxe situé au cœur de la ville. Avec ses chambres élégantes et son service impeccable, cet hôtel offre une expérience inoubliable. Profitez de notre piscine sur le toit, de notre restaurant gastronomique et de notre spa moderne.`,
-      amenities: ['Wifi Gratuit', 'Restaurant Gastronomique', 'Parking Sécurisé', 'Piscine sur Toit', 'Spa', 'Salle de Sport', 'Service de Chambre 24h/24', 'Conciergerie']
-    },
-    {
-      id: `${location}-2`,
-      name: `Luxury Resort ${location}`,
-      location: location,
-      price: { grandTotal: 75000 + Math.random() * 30000 },
-      rating: 4.7 + Math.random() * 0.2,
-      reviews: Math.floor(Math.random() * 150) + 80,
-      image: hotelImages[1],
-      images: [hotelImages[1], hotelImages[3], hotelImages[4]],
-      description: `Le Luxury Resort ${location} combine élégance et confort dans un cadre exceptionnel. Nos suites spacieuses offrent une vue imprenable. Détendez-vous dans notre spa de classe mondiale, savourez une cuisine raffinée dans nos restaurants primés, et profitez de notre plage privée.`,
-      amenities: ['Wifi Gratuit', 'Restaurant Étoilé', 'Spa Premium', 'Bar Lounge', 'Plage Privée', 'Tennis', 'Service Majordome', 'Transfert Aéroport']
-    },
-    {
-      id: `${location}-3`,
-      name: `Budget Inn ${location}`,
-      location: location,
-      price: { grandTotal: 25000 + Math.random() * 10000 },
-      rating: 4.2 + Math.random() * 0.3,
-      reviews: Math.floor(Math.random() * 100) + 30,
-      image: hotelImages[2],
-      images: [hotelImages[2], hotelImages[5], hotelImages[0]],
-      description: `Le Budget Inn ${location} offre un excellent rapport qualité-prix pour les voyageurs avisés. Nos chambres confortables et propres sont parfaites pour un séjour économique. Profitez de notre petit-déjeuner continental gratuit et de notre emplacement central pratique.`,
-      amenities: ['Wifi Gratuit', 'Restaurant', 'Petit-déjeuner Inclus', 'Parking', 'Réception 24h/24']
-    },
-    {
-      id: `${location}-4`,
-      name: `Business Hotel ${location}`,
-      location: location,
-      price: { grandTotal: 55000 + Math.random() * 15000 },
-      rating: 4.4 + Math.random() * 0.3,
-      reviews: Math.floor(Math.random() * 180) + 60,
-      image: hotelImages[3],
-      images: [hotelImages[3], hotelImages[2], hotelImages[1]],
-      description: `Le Business Hotel ${location} est conçu pour les voyageurs d'affaires modernes. Nos chambres équipées de bureaux ergonomiques, notre centre d'affaires ultramoderne et nos salles de réunion high-tech garantissent votre productivité. Détendez-vous après le travail dans notre gym ou notre bar lounge.`,
-      amenities: ['Wifi Haut Débit', 'Restaurant', 'Salle de Sport', 'Parking', 'Centre d\'Affaires', 'Salles de Réunion', 'Blanchisserie Express', 'Bar']
-    },
-    {
-      id: `${location}-5`,
-      name: `Boutique Hotel ${location}`,
-      location: location,
-      price: { grandTotal: 60000 + Math.random() * 25000 },
-      rating: 4.6 + Math.random() * 0.3,
-      reviews: Math.floor(Math.random() * 120) + 40,
-      image: hotelImages[4],
-      images: [hotelImages[4], hotelImages[0], hotelImages[3]],
-      description: `Le Boutique Hotel ${location} allie charme authentique et design contemporain. Chaque chambre est unique, décorée avec goût et attention aux détails. Découvrez notre bar à cocktails signature, notre restaurant fusion et notre galerie d'art intégrée.`,
-      amenities: ['Wifi Gratuit', 'Restaurant Fusion', 'Bar à Cocktails', 'Galerie d\'Art', 'Terrasse Panoramique', 'Service Personnalisé', 'Petit-déjeuner Gourmet']
-    },
-    {
-      id: `${location}-6`,
-      name: `Seaside Resort ${location}`,
-      location: location,
-      price: { grandTotal: 85000 + Math.random() * 35000 },
-      rating: 4.8 + Math.random() * 0.15,
-      reviews: Math.floor(Math.random() * 250) + 100,
-      image: hotelImages[5],
-      images: [hotelImages[5], hotelImages[4], hotelImages[2]],
-      description: `Le Seaside Resort ${location} est un paradis tropical en bord de mer. Profitez de nos villas avec piscine privée, de nos sports nautiques, et de nos restaurants en bord de plage. Notre spa en plein air et nos excursions organisées font de chaque séjour une aventure mémorable.`,
-      amenities: ['Wifi Gratuit', 'Restaurants', 'Spa en Plein Air', 'Plage Privée', 'Piscines Multiples', 'Sports Nautiques', 'Kids Club', 'Animations', 'Excursions']
+      images: hotelImages,
+      description: `Un établissement moderne situé au cœur de ${location}, offrant confort et services de qualité.`,
+      amenities: ['Wifi Gratuit', 'Restaurant', 'Piscine', 'Parking']
     }
   ];
-  
-  return baseHotels;
 };
 
 serve(async (req) => {
@@ -120,14 +91,22 @@ serve(async (req) => {
     if (BOOKING_API_KEY) {
       try {
         const bookingParams = new URLSearchParams({
-          location: location,
-          checkin: checkIn,
-          checkout: checkOut,
-          adults: adults.toString(),
-          children: children?.toString() || '0',
-          room_qty: rooms?.toString() || '1',
+          dest_id: '-1', // Will be resolved by API
+          dest_type: 'city',
+          search_query: location,
+          arrival_date: checkIn,
+          departure_date: checkOut,
+          adults_number: adults.toString(),
+          children_number: children?.toString() || '0',
+          room_number: rooms?.toString() || '1',
+          units: 'metric',
+          temperature_unit: 'c',
+          languagecode: 'fr',
+          currency_code: 'XOF',
         });
 
+        console.log('Calling Booking.com API with params:', Object.fromEntries(bookingParams));
+        
         const bookingResponse = await fetch(
           `https://booking-com.p.rapidapi.com/v1/hotels/search?${bookingParams}`,
           {
@@ -140,15 +119,22 @@ serve(async (req) => {
 
         if (bookingResponse.ok) {
           const bookingData = await bookingResponse.json();
-          results.booking = bookingData.result || [];
-          apiSuccess = true;
-          console.log('Booking.com results:', results.booking.length);
+          console.log('Booking.com raw response:', JSON.stringify(bookingData).substring(0, 500));
+          
+          if (bookingData.result && bookingData.result.length > 0) {
+            results.booking = transformBookingData(bookingData.result);
+            apiSuccess = true;
+            console.log('Booking.com results transformed:', results.booking.length);
+          }
         } else {
-          console.error('Booking.com API failed:', bookingResponse.status);
+          const errorText = await bookingResponse.text();
+          console.error('Booking.com API failed:', bookingResponse.status, errorText);
         }
       } catch (error) {
         console.error('Booking.com API error:', error);
       }
+    } else {
+      console.log('BOOKING_API_KEY not configured');
     }
 
     // Search Airbnb
@@ -159,7 +145,10 @@ serve(async (req) => {
           checkIn: checkIn,
           checkOut: checkOut,
           adults: adults.toString(),
+          currency: 'XOF',
         });
+
+        console.log('Calling Airbnb API with params:', Object.fromEntries(airbnbParams));
 
         const airbnbResponse = await fetch(
           `https://airbnb13.p.rapidapi.com/search-location?${airbnbParams}`,
@@ -173,15 +162,22 @@ serve(async (req) => {
 
         if (airbnbResponse.ok) {
           const airbnbData = await airbnbResponse.json();
-          results.airbnb = airbnbData.results || [];
-          apiSuccess = true;
-          console.log('Airbnb results:', results.airbnb.length);
+          console.log('Airbnb raw response:', JSON.stringify(airbnbData).substring(0, 500));
+          
+          if (airbnbData.results && airbnbData.results.length > 0) {
+            results.airbnb = transformAirbnbData(airbnbData.results);
+            apiSuccess = true;
+            console.log('Airbnb results transformed:', results.airbnb.length);
+          }
         } else {
-          console.error('Airbnb API failed:', airbnbResponse.status);
+          const errorText = await airbnbResponse.text();
+          console.error('Airbnb API failed:', airbnbResponse.status, errorText);
         }
       } catch (error) {
         console.error('Airbnb API error:', error);
       }
+    } else {
+      console.log('AIRBNB_API_KEY not configured');
     }
 
     // If no API results, use mock data
