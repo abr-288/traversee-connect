@@ -8,6 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Star, MapPin, Users, Wifi, UtensilsCrossed, Car, Loader2 } from "lucide-react";
+import hotelIvoire from "@/assets/hotel-ivoire.jpg";
+import hotelSofitel from "@/assets/hotel-sofitel.jpg";
+import hotelAzalai from "@/assets/hotel-azalai.jpg";
+import hotelPullman from "@/assets/hotel-pullman.jpg";
+import hotelSeen from "@/assets/hotel-seen.jpg";
+import hotelOnomo from "@/assets/hotel-onomo.jpg";
 import { HotelBookingDialog } from "@/components/HotelBookingDialog";
 import { HotelSearchForm } from "@/components/HotelSearchForm";
 import { Pagination } from "@/components/Pagination";
@@ -104,7 +110,7 @@ const Hotels = () => {
       price: 45000,
       rating: 4.8,
       reviews: 234,
-      image: "/placeholder.svg",
+      image: hotelIvoire,
       amenities: ["Wifi", "Restaurant", "Parking", "Piscine"]
     },
     {
@@ -114,7 +120,7 @@ const Hotels = () => {
       price: 85000,
       rating: 4.9,
       reviews: 189,
-      image: "/placeholder.svg",
+      image: hotelSofitel,
       amenities: ["Wifi", "Restaurant", "Parking", "Spa"]
     },
     {
@@ -124,7 +130,7 @@ const Hotels = () => {
       price: 35000,
       rating: 4.5,
       reviews: 156,
-      image: "/placeholder.svg",
+      image: hotelAzalai,
       amenities: ["Wifi", "Restaurant", "Bar"]
     },
     {
@@ -134,7 +140,7 @@ const Hotels = () => {
       price: 75000,
       rating: 4.7,
       reviews: 203,
-      image: "/placeholder.svg",
+      image: hotelPullman,
       amenities: ["Wifi", "Restaurant", "Parking", "Gym"]
     },
     {
@@ -144,7 +150,7 @@ const Hotels = () => {
       price: 55000,
       rating: 4.6,
       reviews: 142,
-      image: "/placeholder.svg",
+      image: hotelSeen,
       amenities: ["Wifi", "Restaurant", "Piscine"]
     },
     {
@@ -154,7 +160,7 @@ const Hotels = () => {
       price: 28000,
       rating: 4.3,
       reviews: 98,
-      image: "/placeholder.svg",
+      image: hotelOnomo,
       amenities: ["Wifi", "Restaurant", "Navette"]
     }
   ];
