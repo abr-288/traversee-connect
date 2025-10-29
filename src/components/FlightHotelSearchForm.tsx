@@ -207,9 +207,9 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
             <label className="text-sm font-medium mb-2 block opacity-0">
               Rechercher
             </label>
-            <Button type="submit" className="w-full">
-              <Search className="w-4 h-4 mr-2" />
-              Rechercher
+            <Button type="submit" className="w-full h-10">
+              <Search className="w-4 h-4 md:mr-2" />
+              <span className="hidden md:inline">Rechercher</span>
             </Button>
           </div>
         </div>

@@ -54,22 +54,22 @@ export const CarSearchForm = () => {
 
           <div className="md:col-span-1">
             <label className="text-sm font-medium text-gray-700 mb-2 block">
-              Date de prise en charge
+              Prise en charge
             </label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full justify-start text-left font-normal",
+                    "w-full justify-start text-left font-normal h-10",
                     !pickupDate && "text-muted-foreground"
                   )}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {pickupDate ? format(pickupDate, "dd MMM yyyy", { locale: fr }) : "Choisir"}
+                  <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0" />
+                  <span className="truncate">{pickupDate ? format(pickupDate, "dd MMM", { locale: fr }) : "Date"}</span>
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0 z-50" align="start">
                 <Calendar
                   mode="single"
                   selected={pickupDate}
@@ -84,22 +84,22 @@ export const CarSearchForm = () => {
 
           <div className="md:col-span-1">
             <label className="text-sm font-medium text-gray-700 mb-2 block">
-              Date de retour
+              Retour
             </label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full justify-start text-left font-normal",
+                    "w-full justify-start text-left font-normal h-10",
                     !returnDate && "text-muted-foreground"
                   )}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {returnDate ? format(returnDate, "dd MMM yyyy", { locale: fr }) : "Choisir"}
+                  <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0" />
+                  <span className="truncate">{returnDate ? format(returnDate, "dd MMM", { locale: fr }) : "Date"}</span>
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0 z-50" align="start">
                 <Calendar
                   mode="single"
                   selected={returnDate}
@@ -113,9 +113,9 @@ export const CarSearchForm = () => {
           </div>
 
           <div className="md:col-span-1 flex items-end">
-            <Button type="submit" className="w-full">
-              <Search className="w-4 h-4 mr-2" />
-              Rechercher
+            <Button type="submit" className="w-full h-10">
+              <Search className="w-4 h-4 md:mr-2" />
+              <span className="hidden md:inline">Rechercher</span>
             </Button>
           </div>
         </div>

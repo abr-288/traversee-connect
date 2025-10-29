@@ -116,10 +116,10 @@ export const MultiCityFlightForm = ({ onSearch }: MultiCityFlightFormProps) => {
       
       <Button 
         onClick={() => onSearch(legs)}
-        className="w-full md:w-auto px-8 h-12 gradient-primary shadow-primary text-lg"
+        className="w-full md:w-auto px-4 md:px-8 h-12 gradient-primary shadow-primary text-base md:text-lg"
         disabled={legs.some(leg => !leg.from || !leg.to || !leg.date)}
       >
-        Rechercher vols multi-destinations
+        <span className="truncate">Rechercher vols multi-destinations</span>
       </Button>
     </div>
   );
