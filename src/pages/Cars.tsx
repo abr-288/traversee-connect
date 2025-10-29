@@ -78,7 +78,9 @@ const Cars = () => {
       setApiCars(transformedCars);
       toast.success(`${transformedCars.length} voitures trouvées`);
     } else {
-      toast.error("Erreur lors de la recherche de voitures");
+      // Reset to empty array to show static cars
+      setApiCars([]);
+      toast.info("Affichage des voitures disponibles localement");
     }
   };
 

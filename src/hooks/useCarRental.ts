@@ -21,14 +21,18 @@ export const useCarRental = () => {
         body: params
       });
 
-      if (functionError) throw functionError;
+      if (functionError) {
+        console.error('Car rental API error:', functionError);
+        setError('Service de recherche temporairement indisponible');
+        return { success: false, error: functionError.message };
+      }
       
       return data;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Une erreur est survenue';
       setError(errorMessage);
       console.error('Car rental search error:', err);
-      return null;
+      return { success: false, error: errorMessage };
     } finally {
       setLoading(false);
     }
