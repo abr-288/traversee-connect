@@ -5,8 +5,17 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Mock hotel data for different cities
+// Mock hotel data with detailed descriptions and images
 const getMockHotels = (location: string) => {
+  const hotelImages = [
+    'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
+    'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800',
+    'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800',
+    'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800',
+    'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800',
+    'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800'
+  ];
+
   const baseHotels = [
     {
       id: `${location}-1`,
@@ -15,8 +24,10 @@ const getMockHotels = (location: string) => {
       price: { grandTotal: 45000 + Math.random() * 20000 },
       rating: 4.5 + Math.random() * 0.4,
       reviews: Math.floor(Math.random() * 200) + 50,
-      image: '/placeholder.svg',
-      amenities: ['Wifi', 'Restaurant', 'Parking', 'Piscine']
+      image: hotelImages[0],
+      images: [hotelImages[0], hotelImages[1], hotelImages[2]],
+      description: `Le Grand Hotel ${location} est un établissement de luxe situé au cœur de la ville. Avec ses chambres élégantes et son service impeccable, cet hôtel offre une expérience inoubliable. Profitez de notre piscine sur le toit, de notre restaurant gastronomique et de notre spa moderne.`,
+      amenities: ['Wifi Gratuit', 'Restaurant Gastronomique', 'Parking Sécurisé', 'Piscine sur Toit', 'Spa', 'Salle de Sport', 'Service de Chambre 24h/24', 'Conciergerie']
     },
     {
       id: `${location}-2`,
@@ -25,8 +36,10 @@ const getMockHotels = (location: string) => {
       price: { grandTotal: 75000 + Math.random() * 30000 },
       rating: 4.7 + Math.random() * 0.2,
       reviews: Math.floor(Math.random() * 150) + 80,
-      image: '/placeholder.svg',
-      amenities: ['Wifi', 'Restaurant', 'Spa', 'Bar']
+      image: hotelImages[1],
+      images: [hotelImages[1], hotelImages[3], hotelImages[4]],
+      description: `Le Luxury Resort ${location} combine élégance et confort dans un cadre exceptionnel. Nos suites spacieuses offrent une vue imprenable. Détendez-vous dans notre spa de classe mondiale, savourez une cuisine raffinée dans nos restaurants primés, et profitez de notre plage privée.`,
+      amenities: ['Wifi Gratuit', 'Restaurant Étoilé', 'Spa Premium', 'Bar Lounge', 'Plage Privée', 'Tennis', 'Service Majordome', 'Transfert Aéroport']
     },
     {
       id: `${location}-3`,
@@ -35,8 +48,10 @@ const getMockHotels = (location: string) => {
       price: { grandTotal: 25000 + Math.random() * 10000 },
       rating: 4.2 + Math.random() * 0.3,
       reviews: Math.floor(Math.random() * 100) + 30,
-      image: '/placeholder.svg',
-      amenities: ['Wifi', 'Restaurant']
+      image: hotelImages[2],
+      images: [hotelImages[2], hotelImages[5], hotelImages[0]],
+      description: `Le Budget Inn ${location} offre un excellent rapport qualité-prix pour les voyageurs avisés. Nos chambres confortables et propres sont parfaites pour un séjour économique. Profitez de notre petit-déjeuner continental gratuit et de notre emplacement central pratique.`,
+      amenities: ['Wifi Gratuit', 'Restaurant', 'Petit-déjeuner Inclus', 'Parking', 'Réception 24h/24']
     },
     {
       id: `${location}-4`,
@@ -45,8 +60,34 @@ const getMockHotels = (location: string) => {
       price: { grandTotal: 55000 + Math.random() * 15000 },
       rating: 4.4 + Math.random() * 0.3,
       reviews: Math.floor(Math.random() * 180) + 60,
-      image: '/placeholder.svg',
-      amenities: ['Wifi', 'Restaurant', 'Gym', 'Parking']
+      image: hotelImages[3],
+      images: [hotelImages[3], hotelImages[2], hotelImages[1]],
+      description: `Le Business Hotel ${location} est conçu pour les voyageurs d'affaires modernes. Nos chambres équipées de bureaux ergonomiques, notre centre d'affaires ultramoderne et nos salles de réunion high-tech garantissent votre productivité. Détendez-vous après le travail dans notre gym ou notre bar lounge.`,
+      amenities: ['Wifi Haut Débit', 'Restaurant', 'Salle de Sport', 'Parking', 'Centre d\'Affaires', 'Salles de Réunion', 'Blanchisserie Express', 'Bar']
+    },
+    {
+      id: `${location}-5`,
+      name: `Boutique Hotel ${location}`,
+      location: location,
+      price: { grandTotal: 60000 + Math.random() * 25000 },
+      rating: 4.6 + Math.random() * 0.3,
+      reviews: Math.floor(Math.random() * 120) + 40,
+      image: hotelImages[4],
+      images: [hotelImages[4], hotelImages[0], hotelImages[3]],
+      description: `Le Boutique Hotel ${location} allie charme authentique et design contemporain. Chaque chambre est unique, décorée avec goût et attention aux détails. Découvrez notre bar à cocktails signature, notre restaurant fusion et notre galerie d'art intégrée.`,
+      amenities: ['Wifi Gratuit', 'Restaurant Fusion', 'Bar à Cocktails', 'Galerie d\'Art', 'Terrasse Panoramique', 'Service Personnalisé', 'Petit-déjeuner Gourmet']
+    },
+    {
+      id: `${location}-6`,
+      name: `Seaside Resort ${location}`,
+      location: location,
+      price: { grandTotal: 85000 + Math.random() * 35000 },
+      rating: 4.8 + Math.random() * 0.15,
+      reviews: Math.floor(Math.random() * 250) + 100,
+      image: hotelImages[5],
+      images: [hotelImages[5], hotelImages[4], hotelImages[2]],
+      description: `Le Seaside Resort ${location} est un paradis tropical en bord de mer. Profitez de nos villas avec piscine privée, de nos sports nautiques, et de nos restaurants en bord de plage. Notre spa en plein air et nos excursions organisées font de chaque séjour une aventure mémorable.`,
+      amenities: ['Wifi Gratuit', 'Restaurants', 'Spa en Plein Air', 'Plage Privée', 'Piscines Multiples', 'Sports Nautiques', 'Kids Club', 'Animations', 'Excursions']
     }
   ];
   
