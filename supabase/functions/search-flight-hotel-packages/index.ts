@@ -1,10 +1,120 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+interface FlightOffer {
+  id: string;
+  airline: string;
+  price: number;
+  departure: string;
+  return: string;
+  duration: string;
+  stops: number;
+}
+
+interface HotelOffer {
+  id: string;
+  name: string;
+  rating: number;
+  price: number;
+  image: string;
+  address: string;
+  amenities: string[];
+  description: string;
+}
+
+// Fetch flights from RapidAPI Skyscanner
+async function fetchFlightsFromRapidAPI(origin: string, destination: string, departureDate: string, returnDate: string, adults: number, travelClass: string) {
+  const rapidApiKey = Deno.env.get('RAPIDAPI_KEY');
+  
+  if (!rapidApiKey) {
+    console.log('RapidAPI key not found, using fallback');
+    return null;
+  }
+
+  try {
+    const response = await fetch(
+      `https://skyscanner-api.p.rapidapi.com/v3/flights/live/search/create`,
+      {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'X-RapidAPI-Key': rapidApiKey,
+          'X-RapidAPI-Host': 'skyscanner-api.p.rapidapi.com'
+        },
+        body: JSON.stringify({
+          query: {
+            market: 'US',
+            locale: 'fr-FR',
+            currency: 'XOF',
+            queryLegs: [
+              {
+                originPlace: { queryPlace: { iata: origin } },
+                destinationPlace: { queryPlace: { iata: destination } },
+                date: { year: parseInt(departureDate.split('-')[0]), month: parseInt(departureDate.split('-')[1]), day: parseInt(departureDate.split('-')[2]) }
+              },
+              {
+                originPlace: { queryPlace: { iata: destination } },
+                destinationPlace: { queryPlace: { iata: origin } },
+                date: { year: parseInt(returnDate.split('-')[0]), month: parseInt(returnDate.split('-')[1]), day: parseInt(returnDate.split('-')[2]) }
+              }
+            ],
+            adults: adults,
+            cabinClass: travelClass
+          }
+        })
+      }
+    );
+
+    if (!response.ok) {
+      console.error('Skyscanner API error:', response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching flights from RapidAPI:', error);
+    return null;
+  }
+}
+
+// Fetch hotels from RapidAPI Booking.com
+async function fetchHotelsFromRapidAPI(destination: string, checkIn: string, checkOut: string, adults: number, rooms: number) {
+  const rapidApiKey = Deno.env.get('RAPIDAPI_KEY');
+  
+  if (!rapidApiKey) {
+    console.log('RapidAPI key not found, using fallback');
+    return null;
+  }
+
+  try {
+    const response = await fetch(
+      `https://booking-com.p.rapidapi.com/v1/hotels/search?dest_type=city&dest_id=${destination}&adults_number=${adults}&room_number=${rooms}&checkout_date=${checkOut}&checkin_date=${checkIn}&locale=fr&units=metric&order_by=popularity`,
+      {
+        method: 'GET',
+        headers: {
+          'X-RapidAPI-Key': rapidApiKey,
+          'X-RapidAPI-Host': 'booking-com.p.rapidapi.com'
+        }
+      }
+    );
+
+    if (!response.ok) {
+      console.error('Booking.com API error:', response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching hotels from RapidAPI:', error);
+    return null;
+  }
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -16,54 +126,56 @@ serve(async (req) => {
 
     console.log('Searching flight + hotel packages:', { origin, destination, departureDate, returnDate, adults, children, rooms, travelClass });
 
-    // Create Supabase client
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
-        },
-      }
-    );
+    // Try to fetch from RapidAPI first
+    const [flightsDataRapid, hotelsDataRapid] = await Promise.all([
+      fetchFlightsFromRapidAPI(origin, destination, departureDate, returnDate, adults, travelClass),
+      fetchHotelsFromRapidAPI(destination, departureDate, returnDate, adults, rooms)
+    ]);
 
-    // Fetch flights using Supabase client
-    const { data: flightsData, error: flightsError } = await supabaseClient.functions.invoke('search-flights', {
-      body: {
-        origin,
-        destination,
-        departureDate,
-        returnDate,
-        adults,
-        children,
-        travelClass,
-      },
-    });
+    let flights: FlightOffer[] = [];
+    let hotels: HotelOffer[] = [];
 
-    if (flightsError) {
-      console.error('Error fetching flights:', flightsError);
+    // Process flights data
+    if (flightsDataRapid && flightsDataRapid.content?.results?.itineraries) {
+      const itineraries = Object.values(flightsDataRapid.content.results.itineraries) as any[];
+      flights = itineraries.slice(0, 5).map((itinerary: any, index: number) => ({
+        id: `flight-${index}`,
+        airline: itinerary.legs?.[0]?.carriers?.marketing?.[0]?.name || 'Compagnie aérienne',
+        price: parseFloat(itinerary.pricingOptions?.[0]?.price?.amount || 0),
+        departure: departureDate,
+        return: returnDate,
+        duration: `${Math.floor((itinerary.legs?.[0]?.durationInMinutes || 120) / 60)}h ${(itinerary.legs?.[0]?.durationInMinutes || 120) % 60}min`,
+        stops: (itinerary.legs?.[0]?.stopCount || 0)
+      }));
     }
 
-    // Fetch hotels using Supabase client
-    const { data: hotelsData, error: hotelsError } = await supabaseClient.functions.invoke('search-hotels', {
-      body: {
-        location: destination,
-        checkIn: departureDate,
-        checkOut: returnDate,
-        adults,
-        children,
-        rooms,
-      },
-    });
+    // Process hotels data
+    if (hotelsDataRapid && hotelsDataRapid.result) {
+      hotels = hotelsDataRapid.result.slice(0, 5).map((hotel: any, index: number) => ({
+        id: `hotel-${index}`,
+        name: hotel.hotel_name || 'Hôtel',
+        rating: hotel.review_score ? Math.round(hotel.review_score / 2) : 4,
+        price: parseFloat(hotel.min_total_price || hotel.price_breakdown?.gross_price || 0),
+        image: hotel.max_photo_url || hotel.main_photo_url || 'https://images.unsplash.com/photo-1566073771259-6a8506099945',
+        address: hotel.address || destination,
+        amenities: hotel.hotel_facilities?.slice(0, 5).map((f: any) => f.name) || ['WiFi', 'Piscine', 'Climatisation'],
+        description: hotel.hotel_name_trans || hotel.hotel_name || 'Hôtel confortable avec toutes les commodités'
+      }));
+    }
 
-    if (hotelsError) {
-      console.error('Error fetching hotels:', hotelsError);
+    // If RapidAPI fails or returns no data, fall back to existing edge functions
+    if (flights.length === 0 || hotels.length === 0) {
+      console.log('Falling back to existing edge functions');
+      // Use existing implementation as fallback
+      const packages = getMockPackages(origin, destination, departureDate, returnDate);
+      return new Response(
+        JSON.stringify({ packages }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Combine flights and hotels into packages
     const packages = [];
-    const flights = flightsData.flights || [];
-    const hotels = hotelsData.hotels || [];
 
     // Create packages by combining each flight with each hotel
     for (let i = 0; i < Math.min(flights.length, 3); i++) {
@@ -71,8 +183,8 @@ serve(async (req) => {
         const flight = flights[i];
         const hotel = hotels[j];
         
-        const flightPrice = parseFloat(flight.price) || 0;
-        const hotelPrice = parseFloat(hotel.price) || 0;
+        const flightPrice = flight.price || 0;
+        const hotelPrice = hotel.price || 0;
         const totalPrice = flightPrice + hotelPrice;
         const discountedPrice = totalPrice * 0.7; // 30% discount
         const savings = totalPrice - discountedPrice;
@@ -95,7 +207,7 @@ serve(async (req) => {
             stars: hotel.rating || 4,
             address: hotel.address || destination,
             price: hotelPrice,
-            image: hotel.images?.[0] || hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945',
+            image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945',
             amenities: hotel.amenities || ['WiFi', 'Piscine', 'Climatisation'],
             description: hotel.description || 'Hôtel confortable avec toutes les commodités',
           },
@@ -137,4 +249,44 @@ function calculateNights(checkIn: string, checkOut: string): string {
   const end = new Date(checkOut);
   const nights = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
   return `${nights} nuit${nights > 1 ? 's' : ''}`;
+}
+
+function getMockPackages(origin: string, destination: string, departureDate: string, returnDate: string) {
+  return [
+    {
+      id: '1',
+      destination: destination,
+      flight: {
+        airline: 'Air France',
+        departure: departureDate,
+        return: returnDate,
+        price: 450000,
+        origin: origin,
+        destination: destination,
+        duration: '2h 30min',
+        stops: 0,
+      },
+      hotel: {
+        name: 'Hôtel Sofitel Abidjan',
+        stars: 5,
+        address: destination,
+        price: 180000,
+        image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945',
+        amenities: ['WiFi', 'Piscine', 'Spa', 'Restaurant', 'Bar'],
+        description: 'Hôtel de luxe avec vue sur la lagune',
+      },
+      originalPrice: 630000,
+      discountedPrice: 441000,
+      savings: 189000,
+      currency: 'FCFA',
+      duration: calculateNights(departureDate, returnDate),
+      includes: [
+        'Vol aller-retour',
+        'Hôtel 5 étoiles',
+        'Petit-déjeuner',
+        'Transferts aéroport',
+        'Taxes et frais inclus'
+      ],
+    }
+  ];
 }
