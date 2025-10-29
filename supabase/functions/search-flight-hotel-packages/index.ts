@@ -82,6 +82,45 @@ async function fetchFlightsFromRapidAPI(origin: string, destination: string, dep
   }
 }
 
+// Get destination ID from Booking.com based on IATA code or city name
+async function getDestinationId(destination: string) {
+  const rapidApiKey = Deno.env.get('RAPIDAPI_KEY');
+  
+  if (!rapidApiKey) {
+    return null;
+  }
+
+  try {
+    const response = await fetch(
+      `https://booking-com.p.rapidapi.com/v1/hotels/locations?locale=fr&name=${destination}`,
+      {
+        method: 'GET',
+        headers: {
+          'X-RapidAPI-Key': rapidApiKey,
+          'X-RapidAPI-Host': 'booking-com.p.rapidapi.com'
+        }
+      }
+    );
+
+    if (!response.ok) {
+      console.error('Booking.com locations API error:', response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    // Return the first destination ID (city)
+    if (data && data.length > 0) {
+      const cityLocation = data.find((loc: any) => loc.dest_type === 'city') || data[0];
+      console.log('Found destination:', cityLocation.dest_id, cityLocation.name);
+      return cityLocation.dest_id;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error fetching destination ID:', error);
+    return null;
+  }
+}
+
 // Fetch hotels from RapidAPI Booking.com
 async function fetchHotelsFromRapidAPI(destination: string, checkIn: string, checkOut: string, adults: number, rooms: number) {
   const rapidApiKey = Deno.env.get('RAPIDAPI_KEY');
@@ -92,8 +131,16 @@ async function fetchHotelsFromRapidAPI(destination: string, checkIn: string, che
   }
 
   try {
+    // First, get the destination ID for the city
+    const destId = await getDestinationId(destination);
+    
+    if (!destId) {
+      console.error('Could not find destination ID for:', destination);
+      return null;
+    }
+
     const response = await fetch(
-      `https://booking-com.p.rapidapi.com/v1/hotels/search?dest_type=city&dest_id=${destination}&adults_number=${adults}&room_number=${rooms}&checkout_date=${checkOut}&checkin_date=${checkIn}&locale=fr&units=metric&order_by=popularity`,
+      `https://booking-com.p.rapidapi.com/v1/hotels/search?dest_type=city&dest_id=${destId}&adults_number=${adults}&room_number=${rooms}&checkout_date=${checkOut}&checkin_date=${checkIn}&locale=fr&units=metric&order_by=popularity`,
       {
         method: 'GET',
         headers: {
