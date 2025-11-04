@@ -9,8 +9,8 @@ import Tours from "./pages/Tours";
 import Cars from "./pages/Cars";
 import Flights from "./pages/Flights";
 import FlightHotel from "./pages/FlightHotel";
-import Stays from "./pages/Stays";
-import Activities from "./pages/Activities";
+import Trains from "./pages/Trains";
+import Events from "./pages/Events";
 import Support from "./pages/Support";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -35,8 +35,8 @@ const App = () => (
           <Route path="/cars" element={<Cars />} />
           <Route path="/flights" element={<Flights />} />
           <Route path="/flight-hotel" element={<FlightHotel />} />
-          <Route path="/stays" element={<Stays />} />
-          <Route path="/activities" element={<Activities />} />
+          <Route path="/trains" element={<Trains />} />
+          <Route path="/events" element={<Events />} />
           <Route path="/support" element={<Support />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<Dashboard />} />

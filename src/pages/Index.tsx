@@ -5,6 +5,7 @@ import FeaturesSection from "@/components/FeaturesSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import Footer from "@/components/Footer";
 import { AITravelAdvisor } from "@/components/AITravelAdvisor";
+import { Boss } from "@/components/Boss";
 
 const Index = () => {
   return (
@@ -33,6 +34,7 @@ const Index = () => {
         <TestimonialsSection />
       </main>
       <Footer />
+      <Boss />
     </div>
   );
 };

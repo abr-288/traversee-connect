@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, User, LogOut, LayoutDashboard } from "lucide-react";
+import { Menu, X, User, LogOut, LayoutDashboard, Plane, Hotel, PlaneTakeoff, Train, Calendar, Car, HelpCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
 import { toast } from "sonner";
@@ -44,25 +44,32 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
-            <Link to="/flights" className="text-white hover:text-secondary transition-smooth font-medium">
+            <Link to="/flights" className="text-white hover:text-secondary transition-smooth font-medium flex items-center gap-2">
+              <Plane className="w-4 h-4" />
               Vols
             </Link>
-            <Link to="/hotels" className="text-white hover:text-secondary transition-smooth font-medium">
+            <Link to="/hotels" className="text-white hover:text-secondary transition-smooth font-medium flex items-center gap-2">
+              <Hotel className="w-4 h-4" />
               Hôtels
             </Link>
-            <Link to="/flight-hotel" className="text-white hover:text-secondary transition-smooth font-medium">
+            <Link to="/flight-hotel" className="text-white hover:text-secondary transition-smooth font-medium flex items-center gap-2">
+              <PlaneTakeoff className="w-4 h-4" />
               Vol + Hôtel
             </Link>
-            <Link to="/cars" className="text-white hover:text-secondary transition-smooth font-medium">
-              Voitures
+            <Link to="/trains" className="text-white hover:text-secondary transition-smooth font-medium flex items-center gap-2">
+              <Train className="w-4 h-4" />
+              Trains
             </Link>
-            <Link to="/stays" className="text-white hover:text-secondary transition-smooth font-medium">
-              Séjours
+            <Link to="/events" className="text-white hover:text-secondary transition-smooth font-medium flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Événements
             </Link>
-            <Link to="/activities" className="text-white hover:text-secondary transition-smooth font-medium">
-              Activités
+            <Link to="/cars" className="text-white hover:text-secondary transition-smooth font-medium flex items-center gap-2">
+              <Car className="w-4 h-4" />
+              Location de voiture
             </Link>
-            <Link to="/support" className="text-white hover:text-secondary transition-smooth font-medium">
+            <Link to="/support" className="text-white hover:text-secondary transition-smooth font-medium flex items-center gap-2">
+              <HelpCircle className="w-4 h-4" />
               Assistance
             </Link>
           </div>
@@ -122,51 +129,58 @@ const Navbar = () => {
             <div className="flex flex-col gap-4">
               <Link
                 to="/flights"
-                className="text-white hover:text-secondary transition-smooth font-medium px-4 py-2"
+                className="text-white hover:text-secondary transition-smooth font-medium px-4 py-2 flex items-center gap-2"
                 onClick={() => setIsMenuOpen(false)}
               >
+                <Plane className="w-4 h-4" />
                 Vols
               </Link>
               <Link
                 to="/hotels"
-                className="text-white hover:text-secondary transition-smooth font-medium px-4 py-2"
+                className="text-white hover:text-secondary transition-smooth font-medium px-4 py-2 flex items-center gap-2"
                 onClick={() => setIsMenuOpen(false)}
               >
+                <Hotel className="w-4 h-4" />
                 Hôtels
               </Link>
               <Link
                 to="/flight-hotel"
-                className="text-white hover:text-secondary transition-smooth font-medium px-4 py-2"
+                className="text-white hover:text-secondary transition-smooth font-medium px-4 py-2 flex items-center gap-2"
                 onClick={() => setIsMenuOpen(false)}
               >
+                <PlaneTakeoff className="w-4 h-4" />
                 Vol + Hôtel
               </Link>
               <Link
+                to="/trains"
+                className="text-white hover:text-secondary transition-smooth font-medium px-4 py-2 flex items-center gap-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Train className="w-4 h-4" />
+                Trains
+              </Link>
+              <Link
+                to="/events"
+                className="text-white hover:text-secondary transition-smooth font-medium px-4 py-2 flex items-center gap-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Calendar className="w-4 h-4" />
+                Événements
+              </Link>
+              <Link
                 to="/cars"
-                className="text-white hover:text-secondary transition-smooth font-medium px-4 py-2"
+                className="text-white hover:text-secondary transition-smooth font-medium px-4 py-2 flex items-center gap-2"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Voitures
-              </Link>
-              <Link
-                to="/stays"
-                className="text-white hover:text-secondary transition-smooth font-medium px-4 py-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Séjours
-              </Link>
-              <Link
-                to="/activities"
-                className="text-white hover:text-secondary transition-smooth font-medium px-4 py-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Activités
+                <Car className="w-4 h-4" />
+                Location de voiture
               </Link>
               <Link
                 to="/support"
-                className="text-white hover:text-secondary transition-smooth font-medium px-4 py-2"
+                className="text-white hover:text-secondary transition-smooth font-medium px-4 py-2 flex items-center gap-2"
                 onClick={() => setIsMenuOpen(false)}
               >
+                <HelpCircle className="w-4 h-4" />
                 Assistance
               </Link>
               <div className="flex flex-col gap-2 px-4 pt-4 border-t border-primary-light">
