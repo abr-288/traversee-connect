@@ -1,0 +1,86 @@
+{
+  "nav": {
+    "flights": "Flights",
+    "hotels": "Hotels",
+    "flightHotel": "Flight + Hotel",
+    "trains": "Trains",
+    "events": "Events",
+    "carRental": "Car Rental",
+    "support": "Support",
+    "login": "Login",
+    "signup": "Sign Up",
+    "myAccount": "My Account",
+    "admin": "Admin",
+    "logout": "Logout",
+    "logoutSuccess": "Logout successful"
+  },
+  "hero": {
+    "title": "Your Journey Starts Here",
+    "subtitle": "Discover the best deals on flights, hotels and more",
+    "search": "Search"
+  },
+  "search": {
+    "from": "From",
+    "to": "To",
+    "departure": "Departure",
+    "return": "Return",
+    "passengers": "Passengers",
+    "adults": "Adults",
+    "children": "Children",
+    "infants": "Infants",
+    "oneWay": "One Way",
+    "roundTrip": "Round Trip",
+    "multiCity": "Multi-City",
+    "class": {
+      "economy": "Economy",
+      "premium": "Premium",
+      "business": "Business",
+      "first": "First"
+    },
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "rooms": "Rooms",
+    "pickup": "Pickup",
+    "dropoff": "Drop-off",
+    "search": "Search"
+  },
+  "features": {
+    "title": "Why Choose Bossiz?",
+    "bestPrices": "Best Prices",
+    "bestPricesDesc": "Guaranteed lowest prices",
+    "support": "24/7 Support",
+    "supportDesc": "Assistance available anytime",
+    "easyBooking": "Easy Booking",
+    "easyBookingDesc": "Simple booking process",
+    "securePayment": "Secure Payment",
+    "securePaymentDesc": "100% secure transactions"
+  },
+  "destinations": {
+    "title": "Popular Destinations",
+    "explore": "Explore"
+  },
+  "testimonials": {
+    "title": "What Our Customers Say",
+    "readMore": "Read more"
+  },
+  "footer": {
+    "description": "Your trusted partner for all your travel needs",
+    "company": "Company",
+    "about": "About",
+    "careers": "Careers",
+    "press": "Press",
+    "support": "Support",
+    "help": "Help Center",
+    "contact": "Contact",
+    "legal": "Legal",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "rights": "All rights reserved"
+  },
+  "boss": {
+    "title": "Boss - Travel Assistant",
+    "welcome": "Hello! I'm Boss, your travel assistant. How can I help you?",
+    "placeholder": "Ask your question...",
+    "response": "I'm here to help you with your flight, hotel, train and event bookings. How can I assist you?"
+  }
+}

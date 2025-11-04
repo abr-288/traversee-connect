@@ -4,11 +4,13 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Bot, Send, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export const Boss = () => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Array<{ role: string; content: string }>>([
-    { role: "assistant", content: "Bonjour ! Je suis Boss, votre assistant de voyage. Comment puis-je vous aider ?" }
+    { role: "assistant", content: t("boss.welcome") }
   ]);
   const [input, setInput] = useState("");
 
@@ -21,7 +23,7 @@ export const Boss = () => {
     setTimeout(() => {
       setMessages(prev => [...prev, {
         role: "assistant",
-        content: "Je suis là pour vous aider avec vos réservations de vols, hôtels, trains et événements. Comment puis-je vous assister ?"
+        content: t("boss.response")
       }]);
     }, 1000);
 
@@ -46,7 +48,7 @@ export const Boss = () => {
           <div className="flex items-center justify-between p-4 border-b bg-primary text-white rounded-t-lg">
             <div className="flex items-center gap-2">
               <Bot className="h-5 w-5" />
-              <h3 className="font-semibold">Boss - Assistant de voyage</h3>
+              <h3 className="font-semibold">{t("boss.title")}</h3>
             </div>
             <Button
               variant="ghost"
@@ -87,7 +89,7 @@ export const Boss = () => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && handleSend()}
-                placeholder="Posez votre question..."
+                placeholder={t("boss.placeholder")}
                 className="flex-1"
               />
               <Button onClick={handleSend} size="icon">

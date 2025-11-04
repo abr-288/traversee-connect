@@ -1,0 +1,86 @@
+{
+  "nav": {
+    "flights": "Vols",
+    "hotels": "Hôtels",
+    "flightHotel": "Vol + Hôtel",
+    "trains": "Trains",
+    "events": "Événements",
+    "carRental": "Location de voiture",
+    "support": "Assistance",
+    "login": "Connexion",
+    "signup": "S'inscrire",
+    "myAccount": "Mon Compte",
+    "admin": "Admin",
+    "logout": "Déconnexion",
+    "logoutSuccess": "Déconnexion réussie"
+  },
+  "hero": {
+    "title": "Votre Voyage Commence Ici",
+    "subtitle": "Découvrez les meilleures offres de vols, d'hôtels et plus encore",
+    "search": "Rechercher"
+  },
+  "search": {
+    "from": "De",
+    "to": "Vers",
+    "departure": "Départ",
+    "return": "Retour",
+    "passengers": "Passagers",
+    "adults": "Adultes",
+    "children": "Enfants",
+    "infants": "Bébés",
+    "oneWay": "Aller simple",
+    "roundTrip": "Aller-retour",
+    "multiCity": "Multi-destinations",
+    "class": {
+      "economy": "Économique",
+      "premium": "Premium",
+      "business": "Affaires",
+      "first": "Première"
+    },
+    "checkIn": "Arrivée",
+    "checkOut": "Départ",
+    "rooms": "Chambres",
+    "pickup": "Prise en charge",
+    "dropoff": "Retour",
+    "search": "Rechercher"
+  },
+  "features": {
+    "title": "Pourquoi Choisir Bossiz?",
+    "bestPrices": "Meilleurs Prix",
+    "bestPricesDesc": "Prix garantis les plus bas",
+    "support": "Support 24/7",
+    "supportDesc": "Assistance disponible à tout moment",
+    "easyBooking": "Réservation Facile",
+    "easyBookingDesc": "Processus de réservation simple",
+    "securePayment": "Paiement Sécurisé",
+    "securePaymentDesc": "Transactions 100% sécurisées"
+  },
+  "destinations": {
+    "title": "Destinations Populaires",
+    "explore": "Explorer"
+  },
+  "testimonials": {
+    "title": "Ce Que Nos Clients Disent",
+    "readMore": "Lire plus"
+  },
+  "footer": {
+    "description": "Votre partenaire de confiance pour tous vos besoins de voyage",
+    "company": "Entreprise",
+    "about": "À propos",
+    "careers": "Carrières",
+    "press": "Presse",
+    "support": "Support",
+    "help": "Centre d'aide",
+    "contact": "Contact",
+    "legal": "Légal",
+    "privacy": "Confidentialité",
+    "terms": "Conditions",
+    "rights": "Tous droits réservés"
+  },
+  "boss": {
+    "title": "Boss - Assistant de voyage",
+    "welcome": "Bonjour ! Je suis Boss, votre assistant de voyage. Comment puis-je vous aider ?",
+    "placeholder": "Posez votre question...",
+    "response": "Je suis là pour vous aider avec vos réservations de vols, hôtels, trains et événements. Comment puis-je vous assister ?"
+  }
+}
