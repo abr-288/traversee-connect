@@ -6,6 +6,9 @@ verify_jwt = false
 [functions.search-hotels]
 verify_jwt = false
 
+[functions.search-trains]
+verify_jwt = false
+
 [functions.process-payment]
 verify_jwt = true
 

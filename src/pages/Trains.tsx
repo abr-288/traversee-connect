@@ -1,8 +1,12 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { TrainSearchForm } from "@/components/TrainSearchForm";
 import { Train } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const Trains = () => {
+  const { t } = useTranslation();
+  
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -13,17 +17,15 @@ const Trains = () => {
               <Train className="w-16 h-16 text-primary" />
             </div>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Réservez vos billets de train
+              {t('nav.trains')}
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Trouvez les meilleurs trajets en train pour vos voyages
+              Trouvez les meilleurs trajets en train pour vos voyages à travers le monde
             </p>
           </div>
 
-          <div className="bg-card rounded-lg shadow-lg p-8 max-w-4xl mx-auto">
-            <p className="text-center text-muted-foreground">
-              Service de réservation de trains disponible prochainement
-            </p>
+          <div className="max-w-6xl mx-auto">
+            <TrainSearchForm />
           </div>
         </div>
       </main>
