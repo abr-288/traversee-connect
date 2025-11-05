@@ -1,11 +1,14 @@
+import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { TrainSearchForm } from "@/components/TrainSearchForm";
+import { TrainResults } from "@/components/TrainResults";
 import { Train } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const Trains = () => {
   const { t } = useTranslation();
+  const [searchResults, setSearchResults] = useState<any>(null);
   
   return (
     <div className="min-h-screen bg-background">
@@ -25,7 +28,8 @@ const Trains = () => {
           </div>
 
           <div className="max-w-6xl mx-auto">
-            <TrainSearchForm />
+            <TrainSearchForm onResults={setSearchResults} />
+            {searchResults && <TrainResults trains={searchResults.trains} />}
           </div>
         </div>
       </main>

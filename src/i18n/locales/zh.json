@@ -42,7 +42,13 @@
     "rooms": "房间",
     "pickup": "取车",
     "dropoff": "还车",
-    "search": "搜索"
+    "search": "搜索",
+    "results": "个结果",
+    "book": "预订",
+    "seatsAvailable": "个座位可用",
+    "class": {
+      "title": "座位等级"
+    }
   },
   "features": {
     "title": "为什么选择Bossiz？",

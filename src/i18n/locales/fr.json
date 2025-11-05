@@ -42,7 +42,13 @@
     "rooms": "Chambres",
     "pickup": "Prise en charge",
     "dropoff": "Retour",
-    "search": "Rechercher"
+    "search": "Rechercher",
+    "results": "résultats trouvés",
+    "book": "Réserver",
+    "seatsAvailable": "places disponibles",
+    "class": {
+      "title": "Classe"
+    }
   },
   "features": {
     "title": "Pourquoi Choisir Bossiz?",

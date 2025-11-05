@@ -42,7 +42,13 @@
     "rooms": "Rooms",
     "pickup": "Pickup",
     "dropoff": "Drop-off",
-    "search": "Search"
+    "search": "Search",
+    "results": "results found",
+    "book": "Book",
+    "seatsAvailable": "seats available",
+    "class": {
+      "title": "Class"
+    }
   },
   "features": {
     "title": "Why Choose Bossiz?",

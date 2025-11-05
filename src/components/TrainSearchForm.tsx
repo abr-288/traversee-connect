@@ -12,7 +12,11 @@ import { useTrainSearch } from "@/hooks/useTrainSearch";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 
-export const TrainSearchForm = () => {
+interface TrainSearchFormProps {
+  onResults?: (results: any) => void;
+}
+
+export const TrainSearchForm = ({ onResults }: TrainSearchFormProps) => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const { searchTrains, loading } = useTrainSearch();
@@ -50,7 +54,7 @@ export const TrainSearchForm = () => {
         title: "Recherche effectuée",
         description: `${results.trains?.length || 0} trains trouvés`,
       });
-      console.log("Train results:", results);
+      onResults?.(results);
     }
   };
 
