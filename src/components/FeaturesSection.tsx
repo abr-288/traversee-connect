@@ -25,25 +25,16 @@ const features = [
 
 const FeaturesSection = () => {
   return (
-    <section className="py-20 bg-background">
+    <section className="py-16 bg-background">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Pourquoi Nous Choisir ?
-          </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Profitez d'une expérience de réservation simple, sécurisée et avantageuse
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {features.map((feature, index) => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-5xl mx-auto">
+          {features.slice(0, 3).map((feature, index) => (
             <div
               key={index}
-              className="group text-center p-8 rounded-2xl border border-border hover:border-primary transition-smooth hover:shadow-lg"
+              className="text-center"
             >
-              <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-accent flex items-center justify-center group-hover:bg-primary transition-smooth">
-                <feature.icon className="w-8 h-8 text-primary group-hover:text-primary-foreground transition-smooth" />
+              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-secondary/10 flex items-center justify-center">
+                <feature.icon className="w-10 h-10 text-secondary" />
               </div>
               <h3 className="text-xl font-bold text-foreground mb-3">{feature.title}</h3>
               <p className="text-muted-foreground">{feature.description}</p>

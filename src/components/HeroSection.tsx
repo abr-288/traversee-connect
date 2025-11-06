@@ -125,11 +125,11 @@ const HeroSection = () => {
       {/* Content */}
       <div className="container relative z-10 mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto text-center mb-14">
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            Explorez le Monde Ensemble !
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            Voyagez partout, réservez en un clic
           </h1>
-          <p className="text-2xl md:text-3xl text-white/95 mb-10 font-medium animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
-            Découvrez des hôtels magnifiques, des circuits uniques et des expériences inoubliables en Côte d'Ivoire
+          <p className="text-xl md:text-2xl text-white/95 mb-10 font-normal animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
+            Trouvez les meilleures offres pour vos vols, hôtels, trains et bien plus encore
           </p>
         </div>
 
