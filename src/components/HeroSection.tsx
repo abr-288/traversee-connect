@@ -24,7 +24,7 @@ const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [checkIn, setCheckIn] = useState<Date>();
   const [checkOut, setCheckOut] = useState<Date>();
-  const [activeTab, setActiveTab] = useState("hotel");
+  const [activeTab, setActiveTab] = useState("flight");
   const [tripType, setTripType] = useState<"round-trip" | "one-way" | "multi-city">("round-trip");
 
   useEffect(() => {
@@ -47,12 +47,6 @@ const HeroSection = () => {
   const [flightReturnDate, setFlightReturnDate] = useState<Date>();
   const [flightAdults, setFlightAdults] = useState(1);
   const [flightChildren, setFlightChildren] = useState(0);
-
-  // Tour state
-  const [tourDestination, setTourDestination] = useState("");
-  const [tourDate, setTourDate] = useState<Date>();
-  const [tourAdults, setTourAdults] = useState(2);
-  const [tourChildren, setTourChildren] = useState(0);
 
   // Car state
   const [carLocation, setCarLocation] = useState("");
@@ -82,15 +76,6 @@ const HeroSection = () => {
     params.set("children", flightChildren.toString());
     params.set("tripType", tripType);
     navigate(`/flights?${params.toString()}`);
-  };
-
-  const handleTourSearch = () => {
-    const params = new URLSearchParams();
-    if (tourDestination) params.set("destination", tourDestination);
-    if (tourDate) params.set("date", format(tourDate, "yyyy-MM-dd"));
-    params.set("adults", tourAdults.toString());
-    params.set("children", tourChildren.toString());
-    navigate(`/tours?${params.toString()}`);
   };
 
   const handleCarSearch = () => {
@@ -133,224 +118,63 @@ const HeroSection = () => {
           </p>
         </div>
 
-        {/* Search Card */}
-        <div className="max-w-5xl mx-auto bg-background rounded-2xl shadow-2xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+        {/* Search Card - Opodo Style */}
+        <div className="max-w-6xl mx-auto bg-background rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-5 mb-6 h-auto p-1 bg-muted">
-              <TabsTrigger value="hotel" className="gap-2 py-3">
-                <Hotel className="w-4 h-4" />
-                <span className="hidden sm:inline">Hôtels</span>
+            <TabsList className="w-full h-auto p-0 bg-background border-b flex justify-start rounded-none gap-0">
+              <TabsTrigger value="flight" className="gap-2 py-4 px-6 rounded-none data-[state=active]:bg-background data-[state=active]:border-b-2 data-[state=active]:border-secondary">
+                <Plane className="w-5 h-5" />
+                <span>Vols</span>
               </TabsTrigger>
-              <TabsTrigger value="flight" className="gap-2 py-3">
+              <TabsTrigger value="hotel" className="gap-2 py-4 px-6 rounded-none data-[state=active]:bg-background data-[state=active]:border-b-2 data-[state=active]:border-secondary">
+                <Hotel className="w-5 h-5" />
+                <span>Hôtels</span>
+              </TabsTrigger>
+              <TabsTrigger value="flight-hotel" className="gap-2 py-4 px-6 rounded-none data-[state=active]:bg-background data-[state=active]:border-b-2 data-[state=active]:border-secondary">
                 <Plane className="w-4 h-4" />
-                <span className="hidden sm:inline">Vols</span>
-              </TabsTrigger>
-              <TabsTrigger value="flight-hotel" className="gap-2 py-3">
-                <Plane className="w-4 h-4" />
                 <Hotel className="w-4 h-4" />
-                <span className="hidden sm:inline">Vol+Hôtel</span>
+                <span>Vol+Hôtel</span>
               </TabsTrigger>
-              <TabsTrigger value="tour" className="gap-2 py-3">
-                <Map className="w-4 h-4" />
-                <span className="hidden sm:inline">Circuits</span>
-              </TabsTrigger>
-              <TabsTrigger value="car" className="gap-2 py-3">
-                <Car className="w-4 h-4" />
-                <span className="hidden sm:inline">Voitures</span>
+              <TabsTrigger value="car" className="gap-2 py-4 px-6 rounded-none data-[state=active]:bg-background data-[state=active]:border-b-2 data-[state=active]:border-secondary">
+                <Car className="w-5 h-5" />
+                <span>Voitures</span>
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="hotel" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Destination</label>
-                  <Input 
-                    placeholder="Où allez-vous ?" 
-                    className="h-12"
-                    value={hotelDestination}
-                    onChange={(e) => setHotelDestination(e.target.value)}
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Check-in</label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className="w-full h-12 justify-start text-left font-normal">
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {checkIn ? format(checkIn, "PPP", { locale: fr }) : "Date d'arrivée"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar mode="single" selected={checkIn} onSelect={setCheckIn} initialFocus />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Check-out</label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className="w-full h-12 justify-start text-left font-normal">
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {checkOut ? format(checkOut, "PPP", { locale: fr }) : "Date de départ"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar mode="single" selected={checkOut} onSelect={setCheckOut} initialFocus />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Voyageurs</label>
-                  <TravelersSelector
-                    adults={hotelAdults}
-                    children={hotelChildren}
-                    rooms={hotelRooms}
-                    onAdultsChange={setHotelAdults}
-                    onChildrenChange={setHotelChildren}
-                    onRoomsChange={setHotelRooms}
-                    showRooms
-                  />
-                </div>
-              </div>
-
-              <Button 
-                onClick={handleHotelSearch}
-                className="w-full md:w-auto px-8 h-12 gradient-primary shadow-primary text-lg gap-2"
-              >
-                <Search className="w-5 h-5" />
-                Rechercher
-              </Button>
-            </TabsContent>
-
-            <TabsContent value="tour" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Destination</label>
-                  <Input 
-                    placeholder="Où souhaitez-vous aller ?" 
-                    className="h-12"
-                    value={tourDestination}
-                    onChange={(e) => setTourDestination(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Date</label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className="w-full h-12 justify-start text-left font-normal">
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {tourDate ? format(tourDate, "PPP", { locale: fr }) : "Choisir une date"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar mode="single" selected={tourDate} onSelect={setTourDate} />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Participants</label>
-                  <TravelersSelector
-                    adults={tourAdults}
-                    children={tourChildren}
-                    onAdultsChange={setTourAdults}
-                    onChildrenChange={setTourChildren}
-                  />
-                </div>
-              </div>
-              <Button 
-                onClick={handleTourSearch}
-                className="w-full md:w-auto px-8 h-12 gradient-primary shadow-primary text-lg gap-2"
-              >
-                <Search className="w-5 h-5" />
-                Rechercher des circuits
-              </Button>
-            </TabsContent>
-
-            <TabsContent value="car" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Lieu de prise en charge</label>
-                  <Input 
-                    placeholder="Ville ou aéroport" 
-                    className="h-12"
-                    value={carLocation}
-                    onChange={(e) => setCarLocation(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Date de début</label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className="w-full h-12 justify-start text-left font-normal">
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {carPickupDate ? format(carPickupDate, "PPP", { locale: fr }) : "Date de prise en charge"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar mode="single" selected={carPickupDate} onSelect={setCarPickupDate} />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Date de fin</label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className="w-full h-12 justify-start text-left font-normal">
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {carReturnDate ? format(carReturnDate, "PPP", { locale: fr }) : "Date de retour"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar mode="single" selected={carReturnDate} onSelect={setCarReturnDate} />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </div>
-              <Button 
-                onClick={handleCarSearch}
-                className="w-full md:w-auto px-8 h-12 gradient-primary shadow-primary text-lg gap-2"
-              >
-                <Search className="w-5 h-5" />
-                Rechercher des voitures
-              </Button>
-            </TabsContent>
-
-            <TabsContent value="flight" className="space-y-4">
-              <div className="flex gap-4 mb-4">
+            {/* Flight Tab */}
+            <TabsContent value="flight" className="p-6">
+              <div className="mb-4 flex gap-3">
                 <button
                   onClick={() => setTripType("round-trip")}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-smooth ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm transition-smooth ${
                     tripType === "round-trip"
-                      ? "bg-secondary text-secondary-foreground"
+                      ? "bg-secondary text-primary font-medium"
                       : "bg-muted text-muted-foreground hover:bg-muted/80"
                   }`}
                 >
-                  <ArrowRightLeft className="w-4 h-4" />
+                  <ArrowRightLeft className="w-3 h-3" />
                   Aller-retour
                 </button>
                 <button
                   onClick={() => setTripType("one-way")}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-smooth ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm transition-smooth ${
                     tripType === "one-way"
-                      ? "bg-secondary text-secondary-foreground"
+                      ? "bg-secondary text-primary font-medium"
                       : "bg-muted text-muted-foreground hover:bg-muted/80"
                   }`}
                 >
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-3 h-3" />
                   Aller simple
                 </button>
                 <button
                   onClick={() => setTripType("multi-city")}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-smooth ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm transition-smooth ${
                     tripType === "multi-city"
-                      ? "bg-secondary text-secondary-foreground"
+                      ? "bg-secondary text-primary font-medium"
                       : "bg-muted text-muted-foreground hover:bg-muted/80"
                   }`}
                 >
-                  <MapPin className="w-4 h-4" />
+                  <MapPin className="w-3 h-3" />
                   Multi-destinations
                 </button>
               </div>
@@ -365,58 +189,61 @@ const HeroSection = () => {
                   navigate(`/flights?${params.toString()}`);
                 }} />
               ) : (
-              <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Départ</label>
+              <div className="flex flex-col lg:flex-row lg:items-end gap-0 lg:gap-0 bg-background rounded-lg overflow-hidden">
+                <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">Départ de</label>
                   <CityAutocomplete
-                    placeholder="Ville de départ"
+                    placeholder="Ville ou aéroport"
                     value={flightFrom}
                     onChange={setFlightFrom}
-                    className="h-12"
+                    className="h-10 border-0 px-0 focus-visible:ring-0"
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Arrivée</label>
+                
+                <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">Arrivée à</label>
                   <CityAutocomplete
-                    placeholder="Destination"
+                    placeholder="Ville ou aéroport"
                     value={flightTo}
                     onChange={setFlightTo}
-                    className="h-12"
+                    className="h-10 border-0 px-0 focus-visible:ring-0"
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Date de départ</label>
+
+                <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">Date de départ</label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="outline" className="w-full h-12 justify-start text-left font-normal">
+                      <Button variant="ghost" className="w-full h-10 justify-start text-left font-normal px-0 hover:bg-transparent">
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {flightDate ? format(flightDate, "PPP", { locale: fr }) : "Date"}
+                        {flightDate ? format(flightDate, "dd/MM/yyyy") : "Sélectionner"}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar mode="single" selected={flightDate} onSelect={setFlightDate} />
+                    <PopoverContent className="w-auto p-0 z-50 bg-popover" align="start">
+                      <Calendar mode="single" selected={flightDate} onSelect={setFlightDate} initialFocus className="pointer-events-auto" />
                     </PopoverContent>
                   </Popover>
                 </div>
+
                 {tripType === "round-trip" && (
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-muted-foreground">Date de retour</label>
+                  <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Date de retour</label>
                     <Popover>
                       <PopoverTrigger asChild>
-                        <Button variant="outline" className="w-full h-12 justify-start text-left font-normal">
+                        <Button variant="ghost" className="w-full h-10 justify-start text-left font-normal px-0 hover:bg-transparent">
                           <CalendarIcon className="mr-2 h-4 w-4" />
-                          {flightReturnDate ? format(flightReturnDate, "PPP", { locale: fr }) : "Date"}
+                          {flightReturnDate ? format(flightReturnDate, "dd/MM/yyyy") : "Sélectionner"}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
-                        <Calendar mode="single" selected={flightReturnDate} onSelect={setFlightReturnDate} />
+                      <PopoverContent className="w-auto p-0 z-50 bg-popover" align="start">
+                        <Calendar mode="single" selected={flightReturnDate} onSelect={setFlightReturnDate} initialFocus className="pointer-events-auto" />
                       </PopoverContent>
                     </Popover>
                   </div>
                 )}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Passagers</label>
+
+                <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">Passagers</label>
                   <TravelersSelector
                     adults={flightAdults}
                     children={flightChildren}
@@ -424,94 +251,63 @@ const HeroSection = () => {
                     onChildrenChange={setFlightChildren}
                   />
                 </div>
+
+                <Button 
+                  onClick={handleFlightSearch}
+                  className="lg:w-auto w-full h-14 lg:h-16 px-8 bg-secondary text-primary hover:bg-secondary/90 text-base font-semibold gap-2 rounded-none lg:rounded-r-lg"
+                >
+                  <Search className="w-5 h-5" />
+                  Rechercher
+                </Button>
               </div>
-              <Button 
-                onClick={handleFlightSearch}
-                className="w-full md:w-auto px-8 h-12 gradient-primary shadow-primary text-lg gap-2"
-              >
-                <Search className="w-5 h-5" />
-                Rechercher des vols
-              </Button>
-              </>
               )}
             </TabsContent>
 
-            <TabsContent value="flight-hotel" className="space-y-4">
-              <div className="flex gap-4 mb-4">
-                <button
-                  onClick={() => setTripType("round-trip")}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-smooth ${
-                    tripType === "round-trip"
-                      ? "bg-secondary text-secondary-foreground"
-                      : "bg-muted text-muted-foreground hover:bg-muted/80"
-                  }`}
-                >
-                  <ArrowRightLeft className="w-4 h-4" />
-                  Aller-retour
-                </button>
-                <button
-                  onClick={() => setTripType("one-way")}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-smooth ${
-                    tripType === "one-way"
-                      ? "bg-secondary text-secondary-foreground"
-                      : "bg-muted text-muted-foreground hover:bg-muted/80"
-                  }`}
-                >
-                  <ArrowRight className="w-4 h-4" />
-                  Aller simple
-                </button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Départ</label>
-                  <CityAutocomplete
-                    placeholder="Ville de départ"
-                    value={flightFrom}
-                    onChange={setFlightFrom}
-                    className="h-12"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Destination</label>
+            {/* Hotel Tab */}
+            <TabsContent value="hotel" className="p-6">
+              <div className="flex flex-col lg:flex-row lg:items-end gap-0 lg:gap-0 bg-background rounded-lg overflow-hidden">
+                <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">Destination</label>
                   <Input 
                     placeholder="Où allez-vous ?" 
-                    className="h-12"
+                    className="h-10 border-0 px-0 focus-visible:ring-0 text-base"
                     value={hotelDestination}
                     onChange={(e) => setHotelDestination(e.target.value)}
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Date de départ</label>
+                
+                <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">Check-in</label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="outline" className="w-full h-12 justify-start text-left font-normal">
+                      <Button variant="ghost" className="w-full h-10 justify-start text-left font-normal px-0 hover:bg-transparent">
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {flightDate ? format(flightDate, "PPP", { locale: fr }) : "Date"}
+                        {checkIn ? format(checkIn, "dd/MM/yyyy") : "Sélectionner"}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar mode="single" selected={flightDate} onSelect={setFlightDate} />
+                    <PopoverContent className="w-auto p-0 z-50 bg-popover" align="start">
+                      <Calendar mode="single" selected={checkIn} onSelect={setCheckIn} initialFocus className="pointer-events-auto" />
                     </PopoverContent>
                   </Popover>
                 </div>
-                {tripType === "round-trip" && (
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-muted-foreground">Date de retour</label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" className="w-full h-12 justify-start text-left font-normal">
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {flightReturnDate ? format(flightReturnDate, "PPP", { locale: fr }) : "Date"}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
-                        <Calendar mode="single" selected={flightReturnDate} onSelect={setFlightReturnDate} />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                )}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Passagers & Chambres</label>
+
+                <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">Check-out</label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" className="w-full h-10 justify-start text-left font-normal px-0 hover:bg-transparent">
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {checkOut ? format(checkOut, "dd/MM/yyyy") : "Sélectionner"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 z-50 bg-popover" align="start">
+                      <Calendar mode="single" selected={checkOut} onSelect={setCheckOut} initialFocus className="pointer-events-auto" />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">Voyageurs</label>
                   <TravelersSelector
                     adults={hotelAdults}
                     children={hotelChildren}
@@ -522,17 +318,181 @@ const HeroSection = () => {
                     showRooms
                   />
                 </div>
+
+                <Button 
+                  onClick={handleHotelSearch}
+                  className="lg:w-auto w-full h-14 lg:h-16 px-8 bg-secondary text-primary hover:bg-secondary/90 text-base font-semibold gap-2 rounded-none lg:rounded-r-lg"
+                >
+                  <Search className="w-5 h-5" />
+                  Rechercher
+                </Button>
               </div>
-              <Button 
-                onClick={() => {
-                  handleFlightSearch();
-                  handleHotelSearch();
-                }}
-                className="w-full md:w-auto px-8 h-12 gradient-primary shadow-primary text-lg gap-2"
-              >
-                <Search className="w-5 h-5" />
-                Rechercher Vol + Hôtel
-              </Button>
+            </TabsContent>
+
+            {/* Flight + Hotel Tab */}
+            <TabsContent value="flight-hotel" className="p-6">
+              <div className="mb-4 flex gap-3">
+                <button
+                  onClick={() => setTripType("round-trip")}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm transition-smooth ${
+                    tripType === "round-trip"
+                      ? "bg-secondary text-primary font-medium"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  }`}
+                >
+                  <ArrowRightLeft className="w-3 h-3" />
+                  Aller-retour
+                </button>
+                <button
+                  onClick={() => setTripType("one-way")}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm transition-smooth ${
+                    tripType === "one-way"
+                      ? "bg-secondary text-primary font-medium"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  }`}
+                >
+                  <ArrowRight className="w-3 h-3" />
+                  Aller simple
+                </button>
+              </div>
+
+              <div className="flex flex-col lg:flex-row lg:items-end gap-0 lg:gap-0 bg-background rounded-lg overflow-hidden">
+                <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">Départ</label>
+                  <CityAutocomplete
+                    placeholder="Ville de départ"
+                    value={flightFrom}
+                    onChange={setFlightFrom}
+                    className="h-10 border-0 px-0 focus-visible:ring-0"
+                  />
+                </div>
+
+                <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">Destination</label>
+                  <Input 
+                    placeholder="Où allez-vous ?" 
+                    className="h-10 border-0 px-0 focus-visible:ring-0"
+                    value={hotelDestination}
+                    onChange={(e) => setHotelDestination(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">Date de départ</label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" className="w-full h-10 justify-start text-left font-normal px-0 hover:bg-transparent">
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {flightDate ? format(flightDate, "dd/MM/yyyy") : "Sélectionner"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 z-50 bg-popover" align="start">
+                      <Calendar mode="single" selected={flightDate} onSelect={setFlightDate} initialFocus className="pointer-events-auto" />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                {tripType === "round-trip" && (
+                  <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Date de retour</label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="ghost" className="w-full h-10 justify-start text-left font-normal px-0 hover:bg-transparent">
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {flightReturnDate ? format(flightReturnDate, "dd/MM/yyyy") : "Sélectionner"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0 z-50 bg-popover" align="start">
+                        <Calendar mode="single" selected={flightReturnDate} onSelect={setFlightReturnDate} initialFocus className="pointer-events-auto" />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                )}
+
+                <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">Passagers & Chambres</label>
+                  <TravelersSelector
+                    adults={hotelAdults}
+                    children={hotelChildren}
+                    rooms={hotelRooms}
+                    onAdultsChange={setHotelAdults}
+                    onChildrenChange={setHotelChildren}
+                    onRoomsChange={setHotelRooms}
+                    showRooms
+                  />
+                </div>
+
+                <Button 
+                  onClick={() => {
+                    const params = new URLSearchParams();
+                    if (flightFrom) params.set("from", flightFrom);
+                    if (hotelDestination) params.set("to", hotelDestination);
+                    if (flightDate) params.set("checkIn", format(flightDate, "yyyy-MM-dd"));
+                    if (flightReturnDate) params.set("checkOut", format(flightReturnDate, "yyyy-MM-dd"));
+                    params.set("adults", hotelAdults.toString());
+                    params.set("children", hotelChildren.toString());
+                    params.set("rooms", hotelRooms.toString());
+                    navigate(`/flight-hotel?${params.toString()}`);
+                  }}
+                  className="lg:w-auto w-full h-14 lg:h-16 px-8 bg-secondary text-primary hover:bg-secondary/90 text-base font-semibold gap-2 rounded-none lg:rounded-r-lg"
+                >
+                  <Search className="w-5 h-5" />
+                  Rechercher
+                </Button>
+              </div>
+            </TabsContent>
+
+            {/* Car Tab */}
+            <TabsContent value="car" className="p-6">
+              <div className="flex flex-col lg:flex-row lg:items-end gap-0 lg:gap-0 bg-background rounded-lg overflow-hidden">
+                <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">Lieu de prise en charge</label>
+                  <Input 
+                    placeholder="Ville ou aéroport" 
+                    className="h-10 border-0 px-0 focus-visible:ring-0"
+                    value={carLocation}
+                    onChange={(e) => setCarLocation(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">Date de prise en charge</label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" className="w-full h-10 justify-start text-left font-normal px-0 hover:bg-transparent">
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {carPickupDate ? format(carPickupDate, "dd/MM/yyyy") : "Sélectionner"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 z-50 bg-popover" align="start">
+                      <Calendar mode="single" selected={carPickupDate} onSelect={setCarPickupDate} initialFocus className="pointer-events-auto" />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">Date de retour</label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" className="w-full h-10 justify-start text-left font-normal px-0 hover:bg-transparent">
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {carReturnDate ? format(carReturnDate, "dd/MM/yyyy") : "Sélectionner"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 z-50 bg-popover" align="start">
+                      <Calendar mode="single" selected={carReturnDate} onSelect={setCarReturnDate} initialFocus className="pointer-events-auto" />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <Button 
+                  onClick={handleCarSearch}
+                  className="lg:w-auto w-full h-14 lg:h-16 px-8 bg-secondary text-primary hover:bg-secondary/90 text-base font-semibold gap-2 rounded-none lg:rounded-r-lg"
+                >
+                  <Search className="w-5 h-5" />
+                  Rechercher
+                </Button>
+              </div>
             </TabsContent>
           </Tabs>
         </div>
