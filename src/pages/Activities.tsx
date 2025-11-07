@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Clock, Users, Star, Tag } from "lucide-react";
 import { useState } from "react";
 import { BookingDialog } from "@/components/BookingDialog";
-import { ActivitySearchForm } from "@/components/ActivitySearchForm";
+import { ActivityBanner } from "@/components/ActivityBanner";
 
 const Activities = () => {
   const [selectedActivity, setSelectedActivity] = useState<any>(null);
@@ -136,19 +136,8 @@ const Activities = () => {
       <Navbar />
       
       {/* Hero Banner */}
-      <div className="relative py-32 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
-        <img 
-          src="/src/assets/destination-city.jpg" 
-          alt="Activities" 
-          className="absolute inset-0 w-full h-full object-cover opacity-40"
-        />
-        <div className="relative z-10 container mx-auto px-4">
-          <div className="text-center mb-10">
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">Activités & Expériences</h1>
-            <p className="text-2xl md:text-3xl text-white/95 font-medium">Vivez des moments uniques avec nos activités sélectionnées</p>
-          </div>
-          <ActivitySearchForm />
-        </div>
+      <div className="container mx-auto px-4 py-8">
+        <ActivityBanner />
       </div>
       
       <main className="flex-1 container mx-auto px-4 py-8">
