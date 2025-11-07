@@ -15,7 +15,7 @@ import hotelPullman from "@/assets/hotel-pullman.jpg";
 import hotelSeen from "@/assets/hotel-seen.jpg";
 import hotelOnomo from "@/assets/hotel-onomo.jpg";
 import { HotelBookingDialog } from "@/components/HotelBookingDialog";
-import { HotelBanner } from "@/components/HotelBanner";
+import { HotelSearchForm } from "@/components/HotelSearchForm";
 import { Pagination } from "@/components/Pagination";
 import { useHotelSearch } from "@/hooks/useHotelSearch";
 import { toast } from "sonner";
@@ -241,8 +241,19 @@ const Hotels = () => {
       <Navbar />
       
       {/* Hero Banner */}
-      <div className="container mx-auto px-4 py-8">
-        <HotelBanner />
+      <div className="relative py-32 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
+        <img 
+          src="/src/assets/destination-hotel.jpg" 
+          alt="Hotels" 
+          className="absolute inset-0 w-full h-full object-cover opacity-40"
+        />
+        <div className="relative z-10 container mx-auto px-4">
+          <div className="text-center mb-10">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">Hôtels & Hébergements</h1>
+            <p className="text-2xl md:text-3xl text-white/95 font-medium">Des hébergements de qualité partout dans le monde</p>
+          </div>
+          <HotelSearchForm />
+        </div>
       </div>
       
       <main className="flex-1 container mx-auto px-4 py-8">
