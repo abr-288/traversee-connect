@@ -646,7 +646,7 @@ const Flights = () => {
                         </div>
 
                         <div className="flex items-center gap-2 mt-4 text-sm text-muted-foreground">
-                          <Calendar className="w-4 h-4" />
+                          <CalendarIcon className="w-4 h-4" />
                           <span>{new Date(flight.date).toLocaleDateString('fr-FR', { 
                             weekday: 'long', 
                             year: 'numeric', 
