@@ -7,12 +7,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Plane, Clock, Calendar, Briefcase, Loader2 } from "lucide-react";
+import { Plane, Clock, Calendar as CalendarIcon, Briefcase, Loader2, ArrowRightLeft, ArrowRight, MapPin, Search } from "lucide-react";
 import { FlightBookingDialog } from "@/components/FlightBookingDialog";
-import { FlightSearchForm } from "@/components/FlightSearchForm";
 import { useFlightSearch } from "@/hooks/useFlightSearch";
 import { toast } from "sonner";
 import { getAirlineName } from "@/utils/airlineNames";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { CityAutocomplete } from "@/components/CityAutocomplete";
+import { TravelersSelector } from "@/components/TravelersSelector";
 
 const Flights = () => {
   const [searchParams] = useSearchParams();
@@ -22,6 +26,15 @@ const Flights = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [apiFlights, setApiFlights] = useState<any[]>([]);
   const [flightSearchParams, setFlightSearchParams] = useState<{ departureDate: string; returnDate?: string } | undefined>();
+  
+  // Search form state
+  const [tripType, setTripType] = useState<"round-trip" | "one-way">("round-trip");
+  const [flightFrom, setFlightFrom] = useState("");
+  const [flightTo, setFlightTo] = useState("");
+  const [flightDate, setFlightDate] = useState<Date>();
+  const [flightReturnDate, setFlightReturnDate] = useState<Date>();
+  const [flightAdults, setFlightAdults] = useState(1);
+  const [flightChildren, setFlightChildren] = useState(0);
   
   // Filter states
   const [filterOrigin, setFilterOrigin] = useState("");
@@ -332,7 +345,118 @@ const Flights = () => {
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">Recherche de vols</h1>
             <p className="text-2xl md:text-3xl text-white/95 font-medium">Trouvez les meilleurs vols au meilleur prix</p>
           </div>
-          <FlightSearchForm />
+          
+          {/* Search Form - Opodo Style */}
+          <div className="max-w-6xl mx-auto bg-background rounded-xl shadow-2xl overflow-hidden p-6">
+            <div className="mb-4 flex gap-3">
+              <button
+                onClick={() => setTripType("round-trip")}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm transition-smooth ${
+                  tripType === "round-trip"
+                    ? "bg-secondary text-primary font-medium"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                }`}
+              >
+                <ArrowRightLeft className="w-3 h-3" />
+                Aller-retour
+              </button>
+              <button
+                onClick={() => setTripType("one-way")}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm transition-smooth ${
+                  tripType === "one-way"
+                    ? "bg-secondary text-primary font-medium"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                }`}
+              >
+                <ArrowRight className="w-3 h-3" />
+                Aller simple
+              </button>
+            </div>
+            
+            <div className="flex flex-col lg:flex-row lg:items-end gap-0 lg:gap-0 bg-background rounded-lg overflow-hidden">
+              <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">Départ de</label>
+                <CityAutocomplete
+                  placeholder="Ville ou aéroport"
+                  value={flightFrom}
+                  onChange={setFlightFrom}
+                  className="h-10 border-0 px-0 focus-visible:ring-0"
+                />
+              </div>
+              
+              <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">Arrivée à</label>
+                <CityAutocomplete
+                  placeholder="Ville ou aéroport"
+                  value={flightTo}
+                  onChange={setFlightTo}
+                  className="h-10 border-0 px-0 focus-visible:ring-0"
+                />
+              </div>
+
+              <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">Date de départ</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" className="w-full h-10 justify-start text-left font-normal px-0 hover:bg-transparent">
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {flightDate ? format(flightDate, "dd/MM/yyyy") : "Sélectionner"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 z-50 bg-popover" align="start">
+                    <Calendar mode="single" selected={flightDate} onSelect={setFlightDate} initialFocus className="pointer-events-auto" />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {tripType === "round-trip" && (
+                <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">Date de retour</label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" className="w-full h-10 justify-start text-left font-normal px-0 hover:bg-transparent">
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {flightReturnDate ? format(flightReturnDate, "dd/MM/yyyy") : "Sélectionner"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 z-50 bg-popover" align="start">
+                      <Calendar mode="single" selected={flightReturnDate} onSelect={setFlightReturnDate} initialFocus className="pointer-events-auto" />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              )}
+
+              <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">Passagers</label>
+                <TravelersSelector
+                  adults={flightAdults}
+                  children={flightChildren}
+                  onAdultsChange={setFlightAdults}
+                  onChildrenChange={setFlightChildren}
+                />
+              </div>
+
+              <Button 
+                onClick={() => {
+                  if (flightFrom && flightTo && flightDate) {
+                    handleSearch(
+                      flightFrom,
+                      flightTo,
+                      format(flightDate, "yyyy-MM-dd"),
+                      tripType === "round-trip" && flightReturnDate ? format(flightReturnDate, "yyyy-MM-dd") : undefined,
+                      flightAdults + flightChildren
+                    );
+                  } else {
+                    toast.error("Veuillez remplir tous les champs requis");
+                  }
+                }}
+                className="lg:w-auto w-full h-14 lg:h-16 px-8 bg-secondary text-primary hover:bg-secondary/90 text-base font-semibold gap-2 rounded-none lg:rounded-r-lg"
+              >
+                <Search className="w-5 h-5" />
+                Rechercher
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
       
@@ -522,7 +646,7 @@ const Flights = () => {
                         </div>
 
                         <div className="flex items-center gap-2 mt-4 text-sm text-muted-foreground">
-                          <Calendar className="w-4 h-4" />
+                          <CalendarIcon className="w-4 h-4" />
                           <span>{new Date(flight.date).toLocaleDateString('fr-FR', { 
                             weekday: 'long', 
                             year: 'numeric', 
