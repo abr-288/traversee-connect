@@ -29,8 +29,7 @@ const LanguageSwitcher = () => {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm" className="gap-2 text-white hover:bg-white/10">
           <Languages className="w-4 h-4" />
-          <span className="hidden md:inline">{currentLanguage.flag} {currentLanguage.label}</span>
-          <span className="md:hidden">{currentLanguage.flag}</span>
+          <span className="text-xs">{currentLanguage.code.toUpperCase()}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -40,7 +39,7 @@ const LanguageSwitcher = () => {
             onClick={() => changeLanguage(lang.code)}
             className="cursor-pointer"
           >
-            {lang.flag} {lang.label}
+            {lang.flag} {lang.code.toUpperCase()}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
