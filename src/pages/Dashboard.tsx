@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, CreditCard, Package, MapPin } from "lucide-react";
+import { Calendar, CreditCard, Package, MapPin, TrendingUp, Clock, CheckCircle2, Sparkles } from "lucide-react";
 
 interface Booking {
   id: string;
@@ -92,31 +92,31 @@ const Dashboard = () => {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
     switch (status) {
       case "confirmed":
-        return "bg-green-500";
+        return "default";
       case "pending":
-        return "bg-yellow-500";
+        return "secondary";
       case "completed":
-        return "bg-blue-500";
+        return "outline";
       case "cancelled":
-        return "bg-red-500";
+        return "destructive";
       default:
-        return "bg-gray-500";
+        return "outline";
     }
   };
 
-  const getPaymentStatusColor = (status: string) => {
+  const getPaymentStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
     switch (status) {
       case "paid":
-        return "bg-green-500";
+        return "default";
       case "pending":
-        return "bg-yellow-500";
+        return "secondary";
       case "failed":
-        return "bg-red-500";
+        return "destructive";
       default:
-        return "bg-gray-500";
+        return "outline";
     }
   };
 
@@ -138,116 +138,165 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-background via-background to-muted/20">
       <Navbar />
       <main className="flex-1 container mx-auto px-4 py-8 mt-20">
-        <h1 className="text-3xl font-bold mb-8">Mon Tableau de Bord</h1>
-        
-        <div className="flex gap-4 mb-6">
-          <Button onClick={() => navigate("/booking-history")} className="gradient-primary shadow-primary">
-            Voir toutes mes réservations
+        <div className="flex items-center justify-between mb-12">
+          <div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              Mon Tableau de Bord
+            </h1>
+            <p className="text-muted-foreground mt-2">Gérez vos réservations et suivez vos voyages</p>
+          </div>
+          <Button onClick={() => navigate("/booking-history")} size="lg" className="gap-2">
+            <Sparkles className="w-4 h-4" />
+            Historique complet
           </Button>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Réservations</CardTitle>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-12">
+          <Card className="border-primary/20 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Total Réservations</CardTitle>
+                <Package className="w-5 h-5 text-primary" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.total}</div>
+              <div className="text-3xl font-bold text-primary">{stats.total}</div>
+              <p className="text-xs text-muted-foreground mt-1">Toutes vos réservations</p>
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">En Attente</CardTitle>
+          
+          <Card className="border-secondary/30 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium text-muted-foreground">En Attente</CardTitle>
+                <Clock className="w-5 h-5 text-secondary" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
+              <div className="text-3xl font-bold text-secondary">{stats.pending}</div>
+              <p className="text-xs text-muted-foreground mt-1">En cours de traitement</p>
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Confirmées</CardTitle>
+          
+          <Card className="border-primary/20 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Confirmées</CardTitle>
+                <CheckCircle2 className="w-5 h-5 text-primary" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{stats.confirmed}</div>
+              <div className="text-3xl font-bold text-primary">{stats.confirmed}</div>
+              <p className="text-xs text-muted-foreground mt-1">Prêtes à partir</p>
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Complétées</CardTitle>
+          
+          <Card className="border-accent/30 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Complétées</CardTitle>
+                <CheckCircle2 className="w-5 h-5 text-accent-foreground" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{stats.completed}</div>
+              <div className="text-3xl font-bold text-foreground">{stats.completed}</div>
+              <p className="text-xs text-muted-foreground mt-1">Voyages terminés</p>
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Dépensé</CardTitle>
+          
+          <Card className="border-primary/30 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-primary/5 to-primary/10">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Total Dépensé</CardTitle>
+                <TrendingUp className="w-5 h-5 text-primary" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalSpent.toLocaleString()} FCFA</div>
+              <div className="text-3xl font-bold text-primary">{stats.totalSpent.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground mt-1">FCFA dépensés</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Bookings Tabs */}
         <Tabs defaultValue="all" className="w-full">
-          <TabsList>
-            <TabsTrigger value="all">Toutes</TabsTrigger>
-            <TabsTrigger value="hotel">Hôtels</TabsTrigger>
-            <TabsTrigger value="flight">Vols</TabsTrigger>
-            <TabsTrigger value="car">Voitures</TabsTrigger>
-            <TabsTrigger value="tour">Tours</TabsTrigger>
-            <TabsTrigger value="event">Événements</TabsTrigger>
+          <TabsList className="grid w-full md:w-auto md:inline-grid grid-cols-3 md:grid-cols-6 gap-2 bg-muted/50 p-1 rounded-lg">
+            <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Toutes</TabsTrigger>
+            <TabsTrigger value="hotel" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Hôtels</TabsTrigger>
+            <TabsTrigger value="flight" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Vols</TabsTrigger>
+            <TabsTrigger value="car" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Voitures</TabsTrigger>
+            <TabsTrigger value="tour" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Tours</TabsTrigger>
+            <TabsTrigger value="event" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Événements</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="all" className="space-y-4 mt-6">
+          <TabsContent value="all" className="space-y-4 mt-8">
             {bookings.length === 0 ? (
-              <Card>
-                <CardContent className="py-8 text-center text-muted-foreground">
-                  Aucune réservation pour le moment
+              <Card className="border-dashed">
+                <CardContent className="py-16 text-center">
+                  <Package className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
+                  <p className="text-muted-foreground text-lg">Aucune réservation pour le moment</p>
+                  <p className="text-sm text-muted-foreground/70 mt-2">Commencez à explorer et réserver vos voyages</p>
                 </CardContent>
               </Card>
             ) : (
               bookings.map((booking) => (
-                <Card key={booking.id}>
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="flex items-center gap-2">
-                          <Package className="w-5 h-5" />
+                <Card key={booking.id} className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-primary/50 hover:border-l-primary">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-start justify-between flex-wrap gap-4">
+                      <div className="flex-1 min-w-[200px]">
+                        <CardTitle className="flex items-center gap-3 text-xl">
+                          <div className="p-2 rounded-lg bg-primary/10">
+                            <Package className="w-5 h-5 text-primary" />
+                          </div>
                           {booking.services?.name}
                         </CardTitle>
-                        <CardDescription className="flex items-center gap-2 mt-1">
-                          <MapPin className="w-4 h-4" />
+                        <CardDescription className="flex items-center gap-2 mt-2 text-base">
+                          <MapPin className="w-4 h-4 text-primary" />
                           {booking.services?.location}
                         </CardDescription>
                       </div>
-                      <div className="flex gap-2">
-                        <Badge className={getStatusColor(booking.status)}>
+                      <div className="flex gap-2 flex-wrap">
+                        <Badge variant={getStatusVariant(booking.status)} className="capitalize">
                           {booking.status}
                         </Badge>
-                        <Badge className={getPaymentStatusColor(booking.payment_status)}>
+                        <Badge variant={getPaymentStatusVariant(booking.payment_status)} className="capitalize">
                           {booking.payment_status}
                         </Badge>
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Calendar className="w-4 h-4" />
-                      {new Date(booking.start_date).toLocaleDateString("fr-FR")}
-                      {booking.end_date && ` - ${new Date(booking.end_date).toLocaleDateString("fr-FR")}`}
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <CreditCard className="w-4 h-4" />
-                      {Number(booking.total_price).toLocaleString()} {booking.currency}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      Passagers: {booking.guests}
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                      <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                        <Calendar className="w-5 h-5 text-primary flex-shrink-0" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">Dates</p>
+                          <p className="text-sm font-medium">
+                            {new Date(booking.start_date).toLocaleDateString("fr-FR", { day: 'numeric', month: 'short' })}
+                            {booking.end_date && ` - ${new Date(booking.end_date).toLocaleDateString("fr-FR", { day: 'numeric', month: 'short' })}`}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                        <CreditCard className="w-5 h-5 text-primary flex-shrink-0" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">Prix Total</p>
+                          <p className="text-sm font-bold text-primary">
+                            {Number(booking.total_price).toLocaleString()} {booking.currency}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                        <Package className="w-5 h-5 text-primary flex-shrink-0" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">Passagers</p>
+                          <p className="text-sm font-medium">{booking.guests} personne{booking.guests > 1 ? 's' : ''}</p>
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -256,43 +305,61 @@ const Dashboard = () => {
           </TabsContent>
 
           {Object.entries(bookingsByService).map(([serviceType, serviceBookings]) => (
-            <TabsContent key={serviceType} value={serviceType} className="space-y-4 mt-6">
+            <TabsContent key={serviceType} value={serviceType} className="space-y-4 mt-8">
               {serviceBookings.map((booking) => (
-                <Card key={booking.id}>
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="flex items-center gap-2">
-                          <Package className="w-5 h-5" />
+                <Card key={booking.id} className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-primary/50 hover:border-l-primary">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-start justify-between flex-wrap gap-4">
+                      <div className="flex-1 min-w-[200px]">
+                        <CardTitle className="flex items-center gap-3 text-xl">
+                          <div className="p-2 rounded-lg bg-primary/10">
+                            <Package className="w-5 h-5 text-primary" />
+                          </div>
                           {booking.services?.name}
                         </CardTitle>
-                        <CardDescription className="flex items-center gap-2 mt-1">
-                          <MapPin className="w-4 h-4" />
+                        <CardDescription className="flex items-center gap-2 mt-2 text-base">
+                          <MapPin className="w-4 h-4 text-primary" />
                           {booking.services?.location}
                         </CardDescription>
                       </div>
-                      <div className="flex gap-2">
-                        <Badge className={getStatusColor(booking.status)}>
+                      <div className="flex gap-2 flex-wrap">
+                        <Badge variant={getStatusVariant(booking.status)} className="capitalize">
                           {booking.status}
                         </Badge>
-                        <Badge className={getPaymentStatusColor(booking.payment_status)}>
+                        <Badge variant={getPaymentStatusVariant(booking.payment_status)} className="capitalize">
                           {booking.payment_status}
                         </Badge>
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Calendar className="w-4 h-4" />
-                      {new Date(booking.start_date).toLocaleDateString("fr-FR")}
-                      {booking.end_date && ` - ${new Date(booking.end_date).toLocaleDateString("fr-FR")}`}
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <CreditCard className="w-4 h-4" />
-                      {Number(booking.total_price).toLocaleString()} {booking.currency}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      Passagers: {booking.guests}
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                      <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                        <Calendar className="w-5 h-5 text-primary flex-shrink-0" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">Dates</p>
+                          <p className="text-sm font-medium">
+                            {new Date(booking.start_date).toLocaleDateString("fr-FR", { day: 'numeric', month: 'short' })}
+                            {booking.end_date && ` - ${new Date(booking.end_date).toLocaleDateString("fr-FR", { day: 'numeric', month: 'short' })}`}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                        <CreditCard className="w-5 h-5 text-primary flex-shrink-0" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">Prix Total</p>
+                          <p className="text-sm font-bold text-primary">
+                            {Number(booking.total_price).toLocaleString()} {booking.currency}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                        <Package className="w-5 h-5 text-primary flex-shrink-0" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">Passagers</p>
+                          <p className="text-sm font-medium">{booking.guests} personne{booking.guests > 1 ? 's' : ''}</p>
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
