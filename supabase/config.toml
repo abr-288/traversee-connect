@@ -9,6 +9,9 @@ verify_jwt = false
 [functions.search-trains]
 verify_jwt = false
 
+[functions.search-events]
+verify_jwt = false
+
 [functions.process-payment]
 verify_jwt = true
 
@@ -37,4 +40,13 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.ai-travel-advisor]
+verify_jwt = false
+
+[functions.search-flight-hotel-packages]
+verify_jwt = false
+
+[functions.newsletter-subscribe]
+verify_jwt = false
+
+[functions.send-support-email]
 verify_jwt = false

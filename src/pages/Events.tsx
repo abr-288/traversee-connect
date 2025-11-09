@@ -1,8 +1,13 @@
+import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { EventSearchForm } from "@/components/EventSearchForm";
+import { EventResults } from "@/components/EventResults";
 import { Calendar } from "lucide-react";
 
 const Events = () => {
+  const [searchResults, setSearchResults] = useState<any>(null);
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -20,10 +25,9 @@ const Events = () => {
             </p>
           </div>
 
-          <div className="bg-card rounded-lg shadow-lg p-8 max-w-4xl mx-auto">
-            <p className="text-center text-muted-foreground">
-              Service de réservation d'événements disponible prochainement
-            </p>
+          <div className="max-w-6xl mx-auto">
+            <EventSearchForm onResults={setSearchResults} />
+            {searchResults && <EventResults events={searchResults.events} />}
           </div>
         </div>
       </main>
