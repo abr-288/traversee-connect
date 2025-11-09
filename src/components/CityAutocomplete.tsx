@@ -133,13 +133,13 @@ export const CityAutocomplete = ({
         className={className}
       />
       {isOpen && filteredCities.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-background border rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-popover text-popover-foreground border border-border rounded-lg shadow-xl z-[100] max-h-[300px] overflow-y-auto">
           {filteredCities.map((city, index) => (
             <button
               key={index}
               type="button"
               onClick={() => handleSelectCity(city)}
-              className="w-full px-4 py-3 text-left hover:bg-muted flex items-start gap-3 transition-colors"
+              className="w-full px-4 py-3 text-left hover:bg-accent hover:text-accent-foreground flex items-start gap-3 transition-all duration-200 first:rounded-t-lg last:rounded-b-lg border-b border-border last:border-b-0"
             >
               <MapPin className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
               <div className="flex-1 min-w-0">
