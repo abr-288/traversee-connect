@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Plane, Search, Users, Hotel } from "lucide-react";
+import { CalendarIcon, Plane, Search, Users, Hotel, ArrowRightLeft } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -33,6 +33,12 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
   const [rooms, setRooms] = useState("1");
   const [travelClass, setTravelClass] = useState("ECONOMY");
 
+  const handleSwap = () => {
+    const temp = origin;
+    setOrigin(destination);
+    setDestination(temp);
+  };
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -54,15 +60,15 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
 
   return (
     <form onSubmit={handleSearch} className="w-full max-w-6xl mx-auto mb-8">
-      <div className="bg-card/95 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6">
+      <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
           {/* Origin */}
           <div className="md:col-span-3">
-            <label className="text-sm font-medium mb-2 block">
+            <label className="text-sm font-medium text-gray-700 mb-2 block">
               Départ
             </label>
             <div className="relative">
-              <Plane className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Plane className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <CityAutocomplete
                 value={origin}
                 onChange={setOrigin}
@@ -72,13 +78,26 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
             </div>
           </div>
 
+          {/* Swap Button */}
+          <div className="md:col-span-1 flex items-end justify-center">
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={handleSwap}
+              className="mb-0"
+            >
+              <ArrowRightLeft className="h-4 w-4" />
+            </Button>
+          </div>
+
           {/* Destination */}
           <div className="md:col-span-3">
-            <label className="text-sm font-medium mb-2 block">
+            <label className="text-sm font-medium text-gray-700 mb-2 block">
               Destination
             </label>
             <div className="relative">
-              <Hotel className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Hotel className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <CityAutocomplete
                 value={destination}
                 onChange={setDestination}
@@ -90,7 +109,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
 
           {/* Departure Date */}
           <div className="md:col-span-2">
-            <label className="text-sm font-medium mb-2 block">
+            <label className="text-sm font-medium text-gray-700 mb-2 block">
               Départ
             </label>
             <Popover>
@@ -121,7 +140,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
 
           {/* Return Date */}
           <div className="md:col-span-2">
-            <label className="text-sm font-medium mb-2 block">
+            <label className="text-sm font-medium text-gray-700 mb-2 block">
               Retour
             </label>
             <Popover>
@@ -152,7 +171,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
 
           {/* Passengers and Rooms */}
           <div className="md:col-span-1">
-            <label className="text-sm font-medium mb-2 block">
+            <label className="text-sm font-medium text-gray-700 mb-2 block">
               Voyageurs
             </label>
             <Popover>
@@ -204,8 +223,8 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
 
           {/* Search Button */}
           <div className="md:col-span-1">
-            <label className="text-sm font-medium mb-2 block opacity-0">
-              Rechercher
+            <label className="text-sm font-medium text-gray-700 mb-2 block opacity-0">
+              Search
             </label>
             <Button type="submit" className="w-full h-10">
               <Search className="w-4 h-4 md:mr-2" />
