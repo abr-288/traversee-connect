@@ -5,32 +5,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface AmadeusAuthResponse {
-  access_token: string;
-  expires_in: number;
-}
-
-async function getAmadeusToken(apiKey: string, apiSecret: string): Promise<string> {
-  const response = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: new URLSearchParams({
-      grant_type: 'client_credentials',
-      client_id: apiKey,
-      client_secret: apiSecret,
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Amadeus auth failed: ${response.status}`);
-  }
-
-  const data: AmadeusAuthResponse = await response.json();
-  return data.access_token;
-}
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -39,62 +13,95 @@ serve(async (req) => {
   try {
     const { origin, destination, departureDate, returnDate, adults, children = 0, travelClass = 'ECONOMY' } = await req.json();
 
-    const AMADEUS_API_KEY = Deno.env.get('AMADEUS_API_KEY');
-    const AMADEUS_API_SECRET = Deno.env.get('AMADEUS_API_SECRET');
-
-    if (!AMADEUS_API_KEY || !AMADEUS_API_SECRET) {
-      console.log('Amadeus credentials not configured, returning mock data');
-      return getMockFlights(origin, destination, departureDate, returnDate, adults, travelClass);
-    }
-
     console.log('Searching flights:', { origin, destination, departureDate, returnDate, adults, children, travelClass });
 
-    // Get Amadeus access token
-    const token = await getAmadeusToken(AMADEUS_API_KEY, AMADEUS_API_SECRET);
-
-    // Build Amadeus Flight Offers Search request
-    const searchParams = new URLSearchParams({
-      originLocationCode: origin,
-      destinationLocationCode: destination,
-      departureDate,
-      adults: adults.toString(),
-      travelClass,
-      currencyCode: 'EUR',
-      max: '50',
-    });
-
-    if (returnDate) {
-      searchParams.append('returnDate', returnDate);
-    }
-
-    if (children > 0) {
-      searchParams.append('children', children.toString());
-    }
-
-    const flightsResponse = await fetch(
-      `https://test.api.amadeus.com/v2/shopping/flight-offers?${searchParams}`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      }
-    );
-
-    if (!flightsResponse.ok) {
-      const errorText = await flightsResponse.text();
-      console.error('Amadeus API error:', flightsResponse.status, errorText);
-      
-      // Return mock data if API fails
+    const rapidApiKey = Deno.env.get('RAPIDAPI_KEY');
+    if (!rapidApiKey) {
+      console.log('RapidAPI key not configured, returning mock data');
       return getMockFlights(origin, destination, departureDate, returnDate, adults, travelClass);
     }
 
-    const data = await flightsResponse.json();
-    console.log('Flight search successful, found:', data.data?.length || 0, 'offers');
+    const results = [];
+
+    // Try Kiwi.com API for cheap flights
+    try {
+      const cabinClass = travelClass === 'BUSINESS' ? 'BUSINESS' : 'ECONOMY';
+      const kiwiParams = new URLSearchParams({
+        source: `City:${origin.toLowerCase()}`,
+        destination: `City:${destination.toLowerCase()}`,
+        currency: 'xof',
+        locale: 'fr',
+        adults: adults.toString(),
+        children: children.toString(),
+        cabinClass,
+        sortBy: 'QUALITY',
+        limit: '10',
+      });
+
+      if (returnDate) {
+        kiwiParams.append('return', returnDate);
+      }
+
+      const kiwiResponse = await fetch(
+        `https://kiwi-com-cheap-flights.p.rapidapi.com/round-trip?${kiwiParams}`,
+        {
+          headers: {
+            'X-RapidAPI-Key': rapidApiKey,
+            'X-RapidAPI-Host': 'kiwi-com-cheap-flights.p.rapidapi.com',
+          },
+        }
+      );
+
+      if (kiwiResponse.ok) {
+        const kiwiData = await kiwiResponse.json();
+        if (kiwiData.data && Array.isArray(kiwiData.data)) {
+          const transformed = kiwiData.data.slice(0, 10).map((flight: any) => ({
+            id: flight.id,
+            itineraries: [{
+              segments: [{
+                departure: {
+                  iataCode: flight.cityFrom || origin,
+                  at: flight.local_departure || departureDate,
+                },
+                arrival: {
+                  iataCode: flight.cityTo || destination,
+                  at: flight.local_arrival || departureDate,
+                },
+                carrierCode: flight.airlines?.[0] || 'XX',
+                number: flight.route?.[0]?.flight_no || '0000',
+                duration: `PT${Math.floor(flight.duration?.total / 3600)}H${Math.floor((flight.duration?.total % 3600) / 60)}M`,
+              }],
+              duration: `PT${Math.floor(flight.duration?.total / 3600)}H${Math.floor((flight.duration?.total % 3600) / 60)}M`,
+            }],
+            price: {
+              grandTotal: flight.price || flight.conversion?.XOF || '0',
+              currency: 'XOF',
+            },
+            validatingAirlineCodes: flight.airlines || ['XX'],
+            travelerPricings: [{
+              fareDetailsBySegment: [{
+                cabin: cabinClass,
+              }],
+            }],
+          }));
+          results.push(...transformed);
+          console.log(`Found ${transformed.length} flights from Kiwi.com`);
+        }
+      }
+    } catch (error) {
+      console.error('Kiwi.com API error:', error);
+    }
+
+    // If no results, return mock data
+    if (results.length === 0) {
+      console.log('No results from APIs, returning mock data');
+      return getMockFlights(origin, destination, departureDate, returnDate, adults, travelClass);
+    }
 
     return new Response(
       JSON.stringify({
         success: true,
-        data: data.data || [],
+        data: results,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -102,25 +109,17 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error('Error in search-flights:', error);
-    
-    // Return mock data on error
-    try {
-      const body = await req.json();
-      const { origin, destination, departureDate, returnDate, adults, travelClass } = body;
-      return getMockFlights(origin, destination, departureDate, returnDate, adults, travelClass);
-    } catch {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          error: error instanceof Error ? error.message : 'Unknown error',
-          data: [],
-        }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      );
-    }
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        data: [],
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   }
 });
 
