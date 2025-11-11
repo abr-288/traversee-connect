@@ -17,6 +17,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { CityAutocomplete } from "@/components/CityAutocomplete";
 import { TravelersSelector } from "@/components/TravelersSelector";
+import { Pagination } from "@/components/Pagination";
 
 const Flights = () => {
   const [searchParams] = useSearchParams();
@@ -43,6 +44,8 @@ const Flights = () => {
   const [selectedAirlines, setSelectedAirlines] = useState<string[]>([]);
   const [selectedClasses, setSelectedClasses] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("cheapest");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     const from = searchParams.get("from");
@@ -329,6 +332,17 @@ const Flights = () => {
     return result;
   }, [apiFlights, filterOrigin, filterDestination, filterStops, priceRange, selectedAirlines, selectedClasses, sortBy]);
 
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterOrigin, filterDestination, filterStops, priceRange, selectedAirlines, selectedClasses, sortBy]);
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredAndSortedFlights.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedFlights = filteredAndSortedFlights.slice(startIndex, endIndex);
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
@@ -608,8 +622,9 @@ const Flights = () => {
                 <p className="text-sm text-muted-foreground">Essayez de modifier vos filtres de recherche</p>
               </Card>
             ) : (
-              <div className="space-y-4">
-                {filteredAndSortedFlights.map((flight, index) => (
+              <>
+                <div className="space-y-4">
+                  {paginatedFlights.map((flight, index) => (
                 <Card key={flight.id || index} className="hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row justify-between gap-6">
@@ -674,8 +689,17 @@ const Flights = () => {
                     </div>
                   </CardContent>
                 </Card>
-              ))}
-              </div>
+                  ))}
+                </div>
+                
+                <Pagination 
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                  itemsPerPage={itemsPerPage}
+                  totalItems={filteredAndSortedFlights.length}
+                />
+              </>
             )}
           </div>
         </div>
