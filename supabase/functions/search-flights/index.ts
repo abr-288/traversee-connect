@@ -54,6 +54,9 @@ serve(async (req) => {
 
       if (kiwiResponse.ok) {
         const kiwiData = await kiwiResponse.json();
+        console.log('Kiwi.com API response status:', kiwiResponse.status);
+        console.log('Kiwi.com API response sample:', JSON.stringify(kiwiData).substring(0, 500));
+        
         if (kiwiData.data && Array.isArray(kiwiData.data)) {
           const transformed = kiwiData.data.slice(0, 10).map((flight: any) => ({
             id: flight.id,
@@ -86,10 +89,15 @@ serve(async (req) => {
           }));
           results.push(...transformed);
           console.log(`Found ${transformed.length} flights from Kiwi.com`);
+        } else {
+          console.log('Kiwi.com API returned no data array');
         }
+      } else {
+        const errorText = await kiwiResponse.text();
+        console.error('Kiwi.com API failed with status:', kiwiResponse.status, 'Error:', errorText.substring(0, 500));
       }
     } catch (error) {
-      console.error('Kiwi.com API error:', error);
+      console.error('Kiwi.com API exception:', error instanceof Error ? error.message : String(error));
     }
 
     // If no results, return mock data

@@ -109,19 +109,23 @@ serve(async (req) => {
 
         if (bookingResponse.ok) {
           const bookingData = await bookingResponse.json();
+          console.log('Booking.com API status:', bookingResponse.status);
           console.log('Booking.com raw response:', JSON.stringify(bookingData).substring(0, 500));
           
           if (bookingData.data && Array.isArray(bookingData.data)) {
             results.booking = transformBookingData(bookingData.data.slice(0, 10));
             apiSuccess = true;
             console.log('Booking.com results transformed:', results.booking.length);
+          } else {
+            console.log('Booking.com API returned unexpected structure:', Object.keys(bookingData));
           }
         } else {
           const errorText = await bookingResponse.text();
-          console.error('Booking.com API failed:', bookingResponse.status, errorText);
+          console.error('Booking.com API failed with status:', bookingResponse.status);
+          console.error('Booking.com error details:', errorText.substring(0, 500));
         }
       } catch (error) {
-        console.error('Booking.com API error:', error);
+        console.error('Booking.com API exception:', error instanceof Error ? error.message : String(error));
       }
     }
 
@@ -152,19 +156,23 @@ serve(async (req) => {
 
         if (airbnbResponse.ok) {
           const airbnbData = await airbnbResponse.json();
+          console.log('Airbnb API status:', airbnbResponse.status);
           console.log('Airbnb raw response:', JSON.stringify(airbnbData).substring(0, 500));
           
           if (airbnbData.data && Array.isArray(airbnbData.data)) {
             results.airbnb = transformAirbnbData(airbnbData.data.slice(0, 10));
             apiSuccess = true;
             console.log('Airbnb results transformed:', results.airbnb.length);
+          } else {
+            console.log('Airbnb API returned unexpected structure:', Object.keys(airbnbData));
           }
         } else {
           const errorText = await airbnbResponse.text();
-          console.error('Airbnb API failed:', airbnbResponse.status, errorText);
+          console.error('Airbnb API failed with status:', airbnbResponse.status);
+          console.error('Airbnb error details:', errorText.substring(0, 500));
         }
       } catch (error) {
-        console.error('Airbnb API error:', error);
+        console.error('Airbnb API exception:', error instanceof Error ? error.message : String(error));
       }
     }
 
@@ -195,19 +203,23 @@ serve(async (req) => {
 
         if (worldwideResponse.ok) {
           const worldwideData = await worldwideResponse.json();
+          console.log('Worldwide Hotels API status:', worldwideResponse.status);
           console.log('Worldwide Hotels raw response:', JSON.stringify(worldwideData).substring(0, 500));
           
           if (worldwideData.hotels && Array.isArray(worldwideData.hotels)) {
             results.worldwide = transformBookingData(worldwideData.hotels.slice(0, 10));
             apiSuccess = true;
             console.log('Worldwide Hotels results transformed:', results.worldwide.length);
+          } else {
+            console.log('Worldwide Hotels API returned unexpected structure:', Object.keys(worldwideData));
           }
         } else {
           const errorText = await worldwideResponse.text();
-          console.error('Worldwide Hotels API failed:', worldwideResponse.status, errorText);
+          console.error('Worldwide Hotels API failed with status:', worldwideResponse.status);
+          console.error('Worldwide Hotels error details:', errorText.substring(0, 500));
         }
       } catch (error) {
-        console.error('Worldwide Hotels API error:', error);
+        console.error('Worldwide Hotels API exception:', error instanceof Error ? error.message : String(error));
       }
     }
 
