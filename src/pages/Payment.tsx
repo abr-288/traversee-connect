@@ -176,7 +176,7 @@ const Payment = () => {
         body: {
           bookingId: booking.id,
           amount: booking.total_price,
-          currency: booking.currency || "FCFA",
+          currency: booking.currency === "FCFA" || !booking.currency ? "XOF" : booking.currency,
           paymentMethod: paymentMethod,
           customerInfo: {
             name: booking.customer_name,
