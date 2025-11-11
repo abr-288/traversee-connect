@@ -16,7 +16,54 @@ serve(async (req) => {
 
     console.log('Converting currency:', { from, to, amount });
 
-    // Using ExchangeRate-API (free, no API key required)
+    const rapidApiKey = Deno.env.get('RAPIDAPI_KEY');
+    
+    // Try RapidAPI TripAdvisor first (tripadvisor16.p.rapidapi.com)
+    if (rapidApiKey) {
+      try {
+        const response = await fetch(
+          `https://tripadvisor16.p.rapidapi.com/api/v1/getCurrency`,
+          {
+            headers: {
+              'X-RapidAPI-Key': rapidApiKey,
+              'X-RapidAPI-Host': 'tripadvisor16.p.rapidapi.com',
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('TripAdvisor Currency API response:', data);
+          
+          // Process the response and calculate conversion
+          // Note: Adapt this based on actual API response structure
+          if (data && data.rates) {
+            const rate = data.rates[to] / data.rates[from];
+            const converted = amount * rate;
+            
+            console.log('Currency conversion successful (TripAdvisor):', { rate, converted });
+            
+            return new Response(
+              JSON.stringify({
+                success: true,
+                data: {
+                  from,
+                  to,
+                  amount,
+                  converted: parseFloat(converted.toFixed(2)),
+                  rate: parseFloat(rate.toFixed(6)),
+                }
+              }),
+              { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+        }
+      } catch (error) {
+        console.error('TripAdvisor API error, falling back:', error);
+      }
+    }
+
+    // Fallback to ExchangeRate-API (free, no API key required)
     const response = await fetch(
       `https://api.exchangerate-api.com/v4/latest/${from}`
     );
@@ -36,7 +83,7 @@ serve(async (req) => {
     const rate = data.rates[to];
     const converted = amount * rate;
 
-    console.log('Currency conversion successful:', { rate, converted });
+    console.log('Currency conversion successful (ExchangeRate-API):', { rate, converted });
 
     return new Response(
       JSON.stringify({

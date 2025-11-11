@@ -26,7 +26,7 @@ interface HotelOffer {
   description: string;
 }
 
-// Fetch flights from RapidAPI Skyscanner
+// Fetch flights from RapidAPI Sky Scrapper
 async function fetchFlightsFromRapidAPI(origin: string, destination: string, departureDate: string, returnDate: string, adults: number, travelClass: string) {
   const rapidApiKey = Deno.env.get('RAPIDAPI_KEY');
   
@@ -36,41 +36,30 @@ async function fetchFlightsFromRapidAPI(origin: string, destination: string, dep
   }
 
   try {
+    // Using sky-scrapper3.p.rapidapi.com for flight search
     const response = await fetch(
-      `https://skyscanner-api.p.rapidapi.com/v3/flights/live/search/create`,
+      `https://sky-scrapper3.p.rapidapi.com/find/selector`,
       {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
           'X-RapidAPI-Key': rapidApiKey,
-          'X-RapidAPI-Host': 'skyscanner-api.p.rapidapi.com'
+          'X-RapidAPI-Host': 'sky-scrapper3.p.rapidapi.com'
         },
         body: JSON.stringify({
-          query: {
-            market: 'US',
-            locale: 'fr-FR',
-            currency: 'XOF',
-            queryLegs: [
-              {
-                originPlace: { queryPlace: { iata: origin } },
-                destinationPlace: { queryPlace: { iata: destination } },
-                date: { year: parseInt(departureDate.split('-')[0]), month: parseInt(departureDate.split('-')[1]), day: parseInt(departureDate.split('-')[2]) }
-              },
-              {
-                originPlace: { queryPlace: { iata: destination } },
-                destinationPlace: { queryPlace: { iata: origin } },
-                date: { year: parseInt(returnDate.split('-')[0]), month: parseInt(returnDate.split('-')[1]), day: parseInt(returnDate.split('-')[2]) }
-              }
-            ],
-            adults: adults,
-            cabinClass: travelClass
-          }
+          origin: origin,
+          destination: destination,
+          departureDate: departureDate,
+          returnDate: returnDate,
+          adults: adults,
+          cabinClass: travelClass,
+          currency: 'XOF',
         })
       }
     );
 
     if (!response.ok) {
-      console.error('Skyscanner API error:', response.status);
+      console.error('Sky Scrapper API error:', response.status);
       return null;
     }
 

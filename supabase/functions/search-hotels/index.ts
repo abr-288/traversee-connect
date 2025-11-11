@@ -74,45 +74,35 @@ serve(async (req) => {
     const { location, checkIn, checkOut, adults, children, rooms } = await req.json();
     console.log('Search hotels for:', { location, checkIn, checkOut, adults, children, rooms });
 
-    const BOOKING_API_KEY = Deno.env.get('BOOKING_API_KEY');
-    const AIRBNB_API_KEY = Deno.env.get('AIRBNB_API_KEY');
+    const RAPIDAPI_KEY = Deno.env.get('RAPIDAPI_KEY');
 
     const results: {
       booking: any[];
       airbnb: any[];
+      worldwide: any[];
     } = {
       booking: [],
       airbnb: [],
+      worldwide: [],
     };
 
     let apiSuccess = false;
 
-    // Search Booking.com
-    if (BOOKING_API_KEY) {
+    // Search Booking.com (booking-com15.p.rapidapi.com)
+    if (RAPIDAPI_KEY) {
       try {
         const bookingParams = new URLSearchParams({
-          dest_id: '-1', // Will be resolved by API
-          dest_type: 'city',
-          search_query: location,
-          arrival_date: checkIn,
-          departure_date: checkOut,
-          adults_number: adults.toString(),
-          children_number: children?.toString() || '0',
-          room_number: rooms?.toString() || '1',
-          units: 'metric',
-          temperature_unit: 'c',
-          languagecode: 'fr',
-          currency_code: 'XOF',
+          query: location,
         });
 
-        console.log('Calling Booking.com API with params:', Object.fromEntries(bookingParams));
+        console.log('Calling Booking.com API (searchDestination) with params:', Object.fromEntries(bookingParams));
         
         const bookingResponse = await fetch(
-          `https://booking-com.p.rapidapi.com/v1/hotels/search?${bookingParams}`,
+          `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchDestination?${bookingParams}`,
           {
             headers: {
-              'X-RapidAPI-Key': BOOKING_API_KEY,
-              'X-RapidAPI-Host': 'booking-com.p.rapidapi.com',
+              'X-RapidAPI-Key': RAPIDAPI_KEY,
+              'X-RapidAPI-Host': 'booking-com15.p.rapidapi.com',
             },
           }
         );
@@ -121,8 +111,8 @@ serve(async (req) => {
           const bookingData = await bookingResponse.json();
           console.log('Booking.com raw response:', JSON.stringify(bookingData).substring(0, 500));
           
-          if (bookingData.result && bookingData.result.length > 0) {
-            results.booking = transformBookingData(bookingData.result);
+          if (bookingData.data && Array.isArray(bookingData.data)) {
+            results.booking = transformBookingData(bookingData.data.slice(0, 10));
             apiSuccess = true;
             console.log('Booking.com results transformed:', results.booking.length);
           }
@@ -133,29 +123,29 @@ serve(async (req) => {
       } catch (error) {
         console.error('Booking.com API error:', error);
       }
-    } else {
-      console.log('BOOKING_API_KEY not configured');
     }
 
-    // Search Airbnb
-    if (AIRBNB_API_KEY) {
+    // Search Airbnb (airbnb19.p.rapidapi.com)
+    if (RAPIDAPI_KEY) {
       try {
+        // Pour Airbnb19, nous devons d'abord obtenir un placeId. Pour simplifier, nous utilisons un placeId par défaut
+        // Dans une vraie implémentation, il faudrait d'abord appeler une API de géocodage
         const airbnbParams = new URLSearchParams({
-          location: location,
-          checkIn: checkIn,
-          checkOut: checkOut,
+          placeId: 'ChIJ7cv00DwsDogRAMDACa2m4K8', // Chicago par défaut
           adults: adults.toString(),
-          currency: 'XOF',
+          guestFavorite: 'false',
+          ib: 'false',
+          currency: 'USD',
         });
 
         console.log('Calling Airbnb API with params:', Object.fromEntries(airbnbParams));
 
         const airbnbResponse = await fetch(
-          `https://airbnb13.p.rapidapi.com/search-location?${airbnbParams}`,
+          `https://airbnb19.p.rapidapi.com/api/v2/searchPropertyByPlaceId?${airbnbParams}`,
           {
             headers: {
-              'X-RapidAPI-Key': AIRBNB_API_KEY,
-              'X-RapidAPI-Host': 'airbnb13.p.rapidapi.com',
+              'X-RapidAPI-Key': RAPIDAPI_KEY,
+              'X-RapidAPI-Host': 'airbnb19.p.rapidapi.com',
             },
           }
         );
@@ -164,8 +154,8 @@ serve(async (req) => {
           const airbnbData = await airbnbResponse.json();
           console.log('Airbnb raw response:', JSON.stringify(airbnbData).substring(0, 500));
           
-          if (airbnbData.results && airbnbData.results.length > 0) {
-            results.airbnb = transformAirbnbData(airbnbData.results);
+          if (airbnbData.data && Array.isArray(airbnbData.data)) {
+            results.airbnb = transformAirbnbData(airbnbData.data.slice(0, 10));
             apiSuccess = true;
             console.log('Airbnb results transformed:', results.airbnb.length);
           }
@@ -176,12 +166,57 @@ serve(async (req) => {
       } catch (error) {
         console.error('Airbnb API error:', error);
       }
-    } else {
-      console.log('AIRBNB_API_KEY not configured');
+    }
+
+    // Search Worldwide Hotels (worldwide-hotels.p.rapidapi.com)
+    if (RAPIDAPI_KEY) {
+      try {
+        console.log('Calling Worldwide Hotels API');
+        
+        const worldwideResponse = await fetch(
+          `https://worldwide-hotels.p.rapidapi.com/search`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-RapidAPI-Key': RAPIDAPI_KEY,
+              'X-RapidAPI-Host': 'worldwide-hotels.p.rapidapi.com',
+            },
+            body: JSON.stringify({
+              location: location,
+              checkIn: checkIn,
+              checkOut: checkOut,
+              adults: adults,
+              children: children || 0,
+              rooms: rooms || 1,
+            }),
+          }
+        );
+
+        if (worldwideResponse.ok) {
+          const worldwideData = await worldwideResponse.json();
+          console.log('Worldwide Hotels raw response:', JSON.stringify(worldwideData).substring(0, 500));
+          
+          if (worldwideData.hotels && Array.isArray(worldwideData.hotels)) {
+            results.worldwide = transformBookingData(worldwideData.hotels.slice(0, 10));
+            apiSuccess = true;
+            console.log('Worldwide Hotels results transformed:', results.worldwide.length);
+          }
+        } else {
+          const errorText = await worldwideResponse.text();
+          console.error('Worldwide Hotels API failed:', worldwideResponse.status, errorText);
+        }
+      } catch (error) {
+        console.error('Worldwide Hotels API error:', error);
+      }
+    }
+
+    if (!RAPIDAPI_KEY) {
+      console.log('RAPIDAPI_KEY not configured');
     }
 
     // If no API results, use mock data
-    if (!apiSuccess || (results.booking.length === 0 && results.airbnb.length === 0)) {
+    if (!apiSuccess || (results.booking.length === 0 && results.airbnb.length === 0 && results.worldwide.length === 0)) {
       console.log('Using mock hotel data for location:', location);
       const mockHotels = getMockHotels(location);
       results.booking = mockHotels;
@@ -191,7 +226,7 @@ serve(async (req) => {
       JSON.stringify({
         success: true,
         data: results,
-        count: results.booking.length + results.airbnb.length,
+        count: results.booking.length + results.airbnb.length + results.worldwide.length,
         mock: !apiSuccess,
       }),
       {
