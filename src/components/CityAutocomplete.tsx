@@ -133,17 +133,17 @@ export const CityAutocomplete = ({
         className={className}
       />
       {isOpen && filteredCities.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-popover text-popover-foreground border border-border rounded-lg shadow-xl z-[100] max-h-[300px] overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-popover border-2 border-primary/20 rounded-lg shadow-2xl z-[9999] max-h-[300px] overflow-y-auto">
           {filteredCities.map((city, index) => (
             <button
               key={index}
               type="button"
               onClick={() => handleSelectCity(city)}
-              className="w-full px-4 py-3 text-left hover:bg-accent hover:text-accent-foreground flex items-start gap-3 transition-all duration-200 first:rounded-t-lg last:rounded-b-lg border-b border-border last:border-b-0"
+              className="w-full px-4 py-3 text-left hover:bg-secondary/10 hover:border-l-4 hover:border-l-secondary flex items-start gap-3 transition-all duration-200 first:rounded-t-lg last:rounded-b-lg border-b border-border/50 last:border-b-0 group"
             >
-              <MapPin className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
+              <MapPin className="w-4 h-4 mt-0.5 text-secondary flex-shrink-0 group-hover:scale-110 transition-transform" />
               <div className="flex-1 min-w-0">
-                <p className="font-medium truncate">
+                <p className="font-medium truncate text-popover-foreground group-hover:text-secondary">
                   {city.name} {city.code && `(${city.code})`}
                 </p>
                 <p className="text-sm text-muted-foreground">{city.country}</p>
