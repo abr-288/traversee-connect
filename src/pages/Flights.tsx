@@ -21,7 +21,7 @@ import { TravelersSelector } from "@/components/TravelersSelector";
 const Flights = () => {
   const [searchParams] = useSearchParams();
   const { searchFlights, loading } = useFlightSearch();
-  const [priceRange, setPriceRange] = useState([0, 2000000]);
+  const [priceRange, setPriceRange] = useState([0, 5000000]);
   const [selectedFlight, setSelectedFlight] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [apiFlights, setApiFlights] = useState<any[]>([]);
@@ -100,12 +100,12 @@ const Flights = () => {
         // Get airline code and convert to name
         const airlineCode = flight.validatingAirlineCodes?.[0] || firstSegment?.carrierCode || '';
         
-        // Extract price
+        // Extract price (already in XOF from Amadeus API)
         const price = typeof flight.price === 'object' && flight.price?.grandTotal 
-          ? parseFloat(flight.price.grandTotal) * 655 // Convert EUR to FCFA
+          ? parseFloat(flight.price.grandTotal)
           : typeof flight.price === 'number' 
           ? flight.price 
-          : parseFloat(flight.price?.total || 0) * 655;
+          : parseFloat(flight.price?.total || 0);
         
         return {
           id: flight.id,
@@ -508,7 +508,7 @@ const Flights = () => {
                   </label>
                   <Slider
                     min={0}
-                    max={2000000}
+                    max={5000000}
                     step={50000}
                     value={priceRange}
                     onValueChange={setPriceRange}
