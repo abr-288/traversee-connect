@@ -37,7 +37,7 @@ export const EventSearchForm = ({ onResults }: EventSearchFormProps) => {
     const results = await searchEvents({
       location: location.trim(),
       date: date ? format(date, "yyyy-MM-dd") : undefined,
-      category: category || undefined,
+      category: category && category !== "all" ? category : undefined,
     });
 
     if (results?.success) {
@@ -100,7 +100,7 @@ export const EventSearchForm = ({ onResults }: EventSearchFormProps) => {
                   <SelectValue placeholder="Toutes catégories" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Toutes catégories</SelectItem>
+                  <SelectItem value="all">Toutes catégories</SelectItem>
                   <SelectItem value="music">Musique</SelectItem>
                   <SelectItem value="sports">Sport</SelectItem>
                   <SelectItem value="theater">Théâtre</SelectItem>
