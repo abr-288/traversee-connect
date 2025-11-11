@@ -15,94 +15,85 @@ serve(async (req) => {
 
     console.log('Searching flights:', { origin, destination, departureDate, returnDate, adults, children, travelClass });
 
-    const rapidApiKey = Deno.env.get('RAPIDAPI_KEY');
-    if (!rapidApiKey) {
-      console.log('RapidAPI key not configured, returning mock data');
+    const amadeusKey = Deno.env.get('AMADEUS_API_KEY');
+    const amadeusSecret = Deno.env.get('AMADEUS_API_SECRET');
+    
+    if (!amadeusKey || !amadeusSecret) {
+      console.log('Amadeus API credentials not configured, returning mock data');
       return getMockFlights(origin, destination, departureDate, returnDate, adults, travelClass);
     }
 
     const results = [];
 
-    // Try Kiwi.com API for cheap flights
+    // Get Amadeus access token
     try {
-      const cabinClass = travelClass === 'BUSINESS' ? 'BUSINESS' : 'ECONOMY';
-      const kiwiParams = new URLSearchParams({
-        source: `City:${origin.toLowerCase()}`,
-        destination: `City:${destination.toLowerCase()}`,
-        currency: 'EUR',
-        locale: 'fr',
+      console.log('Getting Amadeus access token...');
+      const tokenResponse = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `grant_type=client_credentials&client_id=${amadeusKey}&client_secret=${amadeusSecret}`,
+      });
+
+      if (!tokenResponse.ok) {
+        const errorText = await tokenResponse.text();
+        console.error('Failed to get Amadeus token:', tokenResponse.status, errorText);
+        throw new Error('Failed to authenticate with Amadeus');
+      }
+
+      const tokenData = await tokenResponse.json();
+      const accessToken = tokenData.access_token;
+      console.log('Amadeus access token obtained successfully');
+
+      // Search for flights
+      const params = new URLSearchParams({
+        originLocationCode: origin,
+        destinationLocationCode: destination,
+        departureDate: departureDate,
         adults: adults.toString(),
         children: children.toString(),
-        cabinClass,
-        sortBy: 'QUALITY',
-        limit: '10',
+        travelClass: travelClass,
+        currencyCode: 'XOF',
+        max: '20',
       });
 
       if (returnDate) {
-        kiwiParams.append('return', returnDate);
+        params.append('returnDate', returnDate);
       }
 
-      const kiwiResponse = await fetch(
-        `https://kiwi-com-cheap-flights.p.rapidapi.com/round-trip?${kiwiParams}`,
+      console.log('Searching flights with Amadeus API...');
+      const flightResponse = await fetch(
+        `https://test.api.amadeus.com/v2/shopping/flight-offers?${params}`,
         {
           headers: {
-            'X-RapidAPI-Key': rapidApiKey,
-            'X-RapidAPI-Host': 'kiwi-com-cheap-flights.p.rapidapi.com',
+            'Authorization': `Bearer ${accessToken}`,
           },
         }
       );
 
-      if (kiwiResponse.ok) {
-        const kiwiData = await kiwiResponse.json();
-        console.log('Kiwi.com API response status:', kiwiResponse.status);
-        console.log('Kiwi.com API response sample:', JSON.stringify(kiwiData).substring(0, 500));
+      if (flightResponse.ok) {
+        const flightData = await flightResponse.json();
+        console.log('Amadeus API response status:', flightResponse.status);
+        console.log('Found flights:', flightData.data?.length || 0);
         
-        if (kiwiData.data && Array.isArray(kiwiData.data)) {
-          const transformed = kiwiData.data.slice(0, 10).map((flight: any) => ({
-            id: flight.id,
-            itineraries: [{
-              segments: [{
-                departure: {
-                  iataCode: flight.cityFrom || origin,
-                  at: flight.local_departure || departureDate,
-                },
-                arrival: {
-                  iataCode: flight.cityTo || destination,
-                  at: flight.local_arrival || departureDate,
-                },
-                carrierCode: flight.airlines?.[0] || 'XX',
-                number: flight.route?.[0]?.flight_no || '0000',
-                duration: `PT${Math.floor(flight.duration?.total / 3600)}H${Math.floor((flight.duration?.total % 3600) / 60)}M`,
-              }],
-              duration: `PT${Math.floor(flight.duration?.total / 3600)}H${Math.floor((flight.duration?.total % 3600) / 60)}M`,
-            }],
-            price: {
-              grandTotal: flight.price || flight.conversion?.XOF || '0',
-              currency: 'XOF',
-            },
-            validatingAirlineCodes: flight.airlines || ['XX'],
-            travelerPricings: [{
-              fareDetailsBySegment: [{
-                cabin: cabinClass,
-              }],
-            }],
-          }));
-          results.push(...transformed);
-          console.log(`Found ${transformed.length} flights from Kiwi.com`);
+        if (flightData.data && Array.isArray(flightData.data)) {
+          results.push(...flightData.data);
+          console.log(`Successfully retrieved ${flightData.data.length} flights from Amadeus`);
         } else {
-          console.log('Kiwi.com API returned no data array');
+          console.log('Amadeus API returned no data array');
         }
       } else {
-        const errorText = await kiwiResponse.text();
-        console.error('Kiwi.com API failed with status:', kiwiResponse.status, 'Error:', errorText.substring(0, 500));
+        const errorText = await flightResponse.text();
+        console.error('Amadeus API failed with status:', flightResponse.status, 'Error:', errorText.substring(0, 500));
       }
     } catch (error) {
-      console.error('Kiwi.com API exception:', error instanceof Error ? error.message : String(error));
+      console.error('Amadeus API exception:', error instanceof Error ? error.message : String(error));
     }
 
     // If no results, return mock data
     if (results.length === 0) {
-      console.log('No results from APIs, returning mock data');
+      console.log('No results from API, returning mock data');
       return getMockFlights(origin, destination, departureDate, returnDate, adults, travelClass);
     }
 
