@@ -29,7 +29,7 @@ serve(async (req) => {
       const kiwiParams = new URLSearchParams({
         source: `City:${origin.toLowerCase()}`,
         destination: `City:${destination.toLowerCase()}`,
-        currency: 'xof',
+        currency: 'EUR',
         locale: 'fr',
         adults: adults.toString(),
         children: children.toString(),
