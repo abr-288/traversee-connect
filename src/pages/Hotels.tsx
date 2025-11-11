@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Star, MapPin, Users, Wifi, UtensilsCrossed, Car, Loader2 } from "lucide-react";
+import { Star, MapPin, Users, Wifi, UtensilsCrossed, Car, Loader2, Globe } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import hotelIvoire from "@/assets/hotel-ivoire.jpg";
 import hotelSofitel from "@/assets/hotel-sofitel.jpg";
 import hotelAzalai from "@/assets/hotel-azalai.jpg";
@@ -74,9 +75,8 @@ const Hotels = () => {
     });
 
     if (result?.success) {
-      const allHotels = [...(result.data?.booking || []), ...(result.data?.airbnb || [])];
-      // Transform API data to match display structure
-      const transformedHotels = allHotels.map((hotel: any) => {
+      // Transform API data to match display structure with source tracking
+      const bookingHotels = (result.data?.booking || []).map((hotel: any) => {
         const price = typeof hotel.price === 'object' && hotel.price?.grandTotal 
           ? parseFloat(hotel.price.grandTotal) 
           : typeof hotel.price === 'number' 
@@ -91,9 +91,52 @@ const Hotels = () => {
           rating: hotel.rating || hotel.review_score || 4.0,
           reviews: hotel.reviews || hotel.review_count || 0,
           image: hotel.image || hotel.main_photo_url || '/placeholder.svg',
-          amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant']
+          amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
+          source: 'Booking.com'
         };
       });
+
+      const airbnbHotels = (result.data?.airbnb || []).map((hotel: any) => {
+        const price = typeof hotel.price === 'object' && hotel.price?.grandTotal 
+          ? parseFloat(hotel.price.grandTotal) 
+          : typeof hotel.price === 'number' 
+          ? hotel.price 
+          : parseFloat(hotel.price?.total || hotel.price || 0);
+        
+        return {
+          id: hotel.id || hotel.hotel_id || Math.random().toString(),
+          name: hotel.name || hotel.hotel_name || 'Hôtel',
+          location: hotel.location || hotel.address || location,
+          price: Math.round(price),
+          rating: hotel.rating || hotel.review_score || 4.0,
+          reviews: hotel.reviews || hotel.review_count || 0,
+          image: hotel.image || hotel.main_photo_url || '/placeholder.svg',
+          amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
+          source: 'Airbnb'
+        };
+      });
+
+      const worldwideHotels = (result.data?.worldwide || []).map((hotel: any) => {
+        const price = typeof hotel.price === 'object' && hotel.price?.grandTotal 
+          ? parseFloat(hotel.price.grandTotal) 
+          : typeof hotel.price === 'number' 
+          ? hotel.price 
+          : parseFloat(hotel.price?.total || hotel.price || 0);
+        
+        return {
+          id: hotel.id || hotel.hotel_id || Math.random().toString(),
+          name: hotel.name || hotel.hotel_name || 'Hôtel',
+          location: hotel.location || hotel.address || location,
+          price: Math.round(price),
+          rating: hotel.rating || hotel.review_score || 4.0,
+          reviews: hotel.reviews || hotel.review_count || 0,
+          image: hotel.image || hotel.main_photo_url || '/placeholder.svg',
+          amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
+          source: 'Worldwide Hotels'
+        };
+      });
+
+      const transformedHotels = [...bookingHotels, ...airbnbHotels, ...worldwideHotels];
       
       setApiHotels(transformedHotels);
       toast.success(`${transformedHotels.length} hébergements trouvés`);
@@ -389,7 +432,15 @@ const Hotels = () => {
                     <CardContent className="md:col-span-2 p-6">
                       <div className="flex justify-between items-start mb-4">
                         <div>
-                          <h3 className="text-2xl font-semibold mb-2">{hotel.name}</h3>
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="text-2xl font-semibold">{hotel.name}</h3>
+                            {(hotel as any).source && (
+                              <Badge variant="secondary" className="flex items-center gap-1">
+                                <Globe className="w-3 h-3" />
+                                {(hotel as any).source}
+                              </Badge>
+                            )}
+                          </div>
                           <div className="flex items-center gap-2 text-muted-foreground mb-2">
                             <MapPin className="w-4 h-4" />
                             <span>{hotel.location}</span>
