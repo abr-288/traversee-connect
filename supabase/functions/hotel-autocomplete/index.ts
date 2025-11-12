@@ -48,22 +48,42 @@ serve(async (req) => {
           console.log('Booking.com autocomplete response:', JSON.stringify(destData).substring(0, 300));
           
           if (destData.data && Array.isArray(destData.data)) {
-            const suggestions = destData.data.slice(0, 8).map((item: any) => ({
-              id: item.dest_id || item.id,
-              name: item.search_type === 'CITY' 
-                ? `${item.dest_name || item.name}`
-                : item.dest_name || item.name,
-              type: item.search_type || 'CITY',
-              country: item.country || '',
-              region: item.region || '',
-              description: item.search_type === 'CITY'
-                ? `Ville - ${item.nr_hotels || 0} hôtels disponibles`
-                : item.search_type === 'HOTEL'
-                ? `Hôtel`
-                : `Destination`,
-              image: item.image_url || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400',
-              hotels_count: item.nr_hotels || 0,
-            }));
+            const suggestions = destData.data.slice(0, 8).map((item: any) => {
+              // Estimate average price based on destination type and location
+              let avgPrice = 50000; // Default price in XOF
+              
+              if (item.search_type === 'CITY') {
+                // Estimate based on number of hotels (more hotels = more variety = potentially lower avg)
+                const hotelCount = item.nr_hotels || 100;
+                if (hotelCount > 500) avgPrice = 45000;
+                else if (hotelCount > 200) avgPrice = 55000;
+                else avgPrice = 65000;
+              } else if (item.search_type === 'HOTEL') {
+                avgPrice = 75000; // Hotels directly tend to be mid-range
+              }
+
+              return {
+                id: item.dest_id || item.id,
+                name: item.search_type === 'CITY' 
+                  ? `${item.dest_name || item.name}`
+                  : item.dest_name || item.name,
+                type: item.search_type || 'CITY',
+                country: item.country || '',
+                region: item.region || '',
+                description: item.search_type === 'CITY'
+                  ? `Ville - ${item.nr_hotels || 0} hôtels disponibles`
+                  : item.search_type === 'HOTEL'
+                  ? `Hôtel`
+                  : `Destination`,
+                image: item.image_url || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400',
+                hotels_count: item.nr_hotels || 0,
+                average_price: avgPrice,
+                price_range: {
+                  min: Math.round(avgPrice * 0.5),
+                  max: Math.round(avgPrice * 2)
+                }
+              };
+            });
             
             results.push(...suggestions);
             console.log('Found', suggestions.length, 'autocomplete suggestions');
@@ -88,6 +108,8 @@ serve(async (req) => {
           description: 'Ville - Capitale économique de la Côte d\'Ivoire',
           image: 'https://images.unsplash.com/photo-1548013146-72479768bada?w=400',
           hotels_count: 150,
+          average_price: 45000,
+          price_range: { min: 25000, max: 85000 }
         },
         {
           id: 'paris',
@@ -98,6 +120,8 @@ serve(async (req) => {
           description: 'Ville - Capitale de la France, Ville Lumière',
           image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400',
           hotels_count: 3500,
+          average_price: 95000,
+          price_range: { min: 40000, max: 200000 }
         },
         {
           id: 'london',
@@ -108,6 +132,8 @@ serve(async (req) => {
           description: 'Ville - Capitale du Royaume-Uni',
           image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400',
           hotels_count: 2800,
+          average_price: 85000,
+          price_range: { min: 35000, max: 180000 }
         },
         {
           id: 'dubai',
@@ -118,6 +144,8 @@ serve(async (req) => {
           description: 'Ville - Ville moderne aux gratte-ciels impressionnants',
           image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400',
           hotels_count: 1200,
+          average_price: 110000,
+          price_range: { min: 50000, max: 250000 }
         },
         {
           id: 'newyork',
@@ -128,6 +156,8 @@ serve(async (req) => {
           description: 'Ville - The Big Apple, ville qui ne dort jamais',
           image: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=400',
           hotels_count: 2500,
+          average_price: 120000,
+          price_range: { min: 55000, max: 280000 }
         },
         {
           id: 'tokyo',
@@ -138,6 +168,8 @@ serve(async (req) => {
           description: 'Ville - Capitale du Japon, mélange tradition et modernité',
           image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400',
           hotels_count: 1800,
+          average_price: 75000,
+          price_range: { min: 35000, max: 150000 }
         },
       ];
 

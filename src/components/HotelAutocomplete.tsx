@@ -13,6 +13,11 @@ interface Suggestion {
   description: string;
   image: string;
   hotels_count: number;
+  average_price?: number;
+  price_range?: {
+    min: number;
+    max: number;
+  };
 }
 
 interface HotelAutocompleteProps {
@@ -160,22 +165,41 @@ export const HotelAutocomplete = ({
                 />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  {suggestion.type === 'HOTEL' ? (
-                    <Hotel className="w-4 h-4 text-primary flex-shrink-0" />
-                  ) : (
-                    <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    {suggestion.type === 'HOTEL' ? (
+                      <Hotel className="w-4 h-4 text-primary flex-shrink-0" />
+                    ) : (
+                      <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
+                    )}
+                    <h4 className="font-semibold text-sm text-foreground truncate">
+                      {suggestion.name}
+                    </h4>
+                  </div>
+                  {suggestion.average_price && (
+                    <div className="flex flex-col items-end flex-shrink-0">
+                      <span className="text-xs font-semibold text-primary">
+                        {suggestion.average_price.toLocaleString('fr-FR')} F
+                      </span>
+                      <span className="text-[10px] text-muted-foreground">
+                        Prix moyen/nuit
+                      </span>
+                    </div>
                   )}
-                  <h4 className="font-semibold text-sm text-foreground truncate">
-                    {suggestion.name}
-                  </h4>
                 </div>
                 <p className="text-xs text-muted-foreground mb-1">
                   {suggestion.country} {suggestion.region && `• ${suggestion.region}`}
                 </p>
-                <p className="text-xs text-muted-foreground">
-                  {suggestion.description}
-                </p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-xs text-muted-foreground">
+                    {suggestion.description}
+                  </p>
+                  {suggestion.price_range && (
+                    <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                      {suggestion.price_range.min.toLocaleString('fr-FR')} - {suggestion.price_range.max.toLocaleString('fr-FR')} F
+                    </span>
+                  )}
+                </div>
               </div>
             </button>
           ))}
