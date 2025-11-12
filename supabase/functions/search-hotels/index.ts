@@ -92,13 +92,24 @@ serve(async (req) => {
     if (RAPIDAPI_KEY) {
       try {
         const bookingParams = new URLSearchParams({
-          query: location,
+          dest_id: '-1', // Will be replaced with actual dest_id
+          search_type: 'CITY',
+          arrival_date: checkIn,
+          departure_date: checkOut,
+          adults: adults.toString(),
+          children_age: children ? '0' : '',
+          room_qty: (rooms || 1).toString(),
+          page_number: '1',
+          units: 'metric',
+          temperature_unit: 'c',
+          languagecode: 'fr-fr',
+          currency_code: 'XOF',
         });
 
-        console.log('Calling Booking.com API (searchDestination) with params:', Object.fromEntries(bookingParams));
+        console.log('Calling Booking.com API (searchHotels) with params:', Object.fromEntries(bookingParams));
         
         const bookingResponse = await fetch(
-          `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchDestination?${bookingParams}`,
+          `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels?${bookingParams}`,
           {
             headers: {
               'X-RapidAPI-Key': RAPIDAPI_KEY,
@@ -112,8 +123,8 @@ serve(async (req) => {
           console.log('Booking.com API status:', bookingResponse.status);
           console.log('Booking.com raw response:', JSON.stringify(bookingData).substring(0, 500));
           
-          if (bookingData.data && Array.isArray(bookingData.data)) {
-            results.booking = transformBookingData(bookingData.data.slice(0, 10));
+          if (bookingData.data && bookingData.data.hotels && Array.isArray(bookingData.data.hotels)) {
+            results.booking = transformBookingData(bookingData.data.hotels.slice(0, 10));
             apiSuccess = true;
             console.log('Booking.com results transformed:', results.booking.length);
           } else {
@@ -132,20 +143,22 @@ serve(async (req) => {
     // Search Airbnb (airbnb19.p.rapidapi.com)
     if (RAPIDAPI_KEY) {
       try {
-        // Pour Airbnb19, nous devons d'abord obtenir un placeId. Pour simplifier, nous utilisons un placeId par défaut
-        // Dans une vraie implémentation, il faudrait d'abord appeler une API de géocodage
         const airbnbParams = new URLSearchParams({
-          placeId: 'ChIJ7cv00DwsDogRAMDACa2m4K8', // Chicago par défaut
+          location: location,
+          checkIn: checkIn,
+          checkOut: checkOut,
           adults: adults.toString(),
-          guestFavorite: 'false',
-          ib: 'false',
-          currency: 'USD',
+          children: (children || 0).toString(),
+          infants: '0',
+          pets: '0',
+          page: '1',
+          currency: 'XOF',
         });
 
         console.log('Calling Airbnb API with params:', Object.fromEntries(airbnbParams));
 
         const airbnbResponse = await fetch(
-          `https://airbnb19.p.rapidapi.com/api/v2/searchPropertyByPlaceId?${airbnbParams}`,
+          `https://airbnb19.p.rapidapi.com/api/v1/searchPropertyByLocation?${airbnbParams}`,
           {
             headers: {
               'X-RapidAPI-Key': RAPIDAPI_KEY,
