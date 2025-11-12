@@ -133,7 +133,7 @@ export const CityAutocomplete = ({
         className={className}
       />
       {isOpen && filteredCities.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-popover border-2 border-primary/20 rounded-lg shadow-2xl z-[9999] max-h-[300px] overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-popover/100 backdrop-blur-sm border-2 border-primary/20 rounded-lg shadow-2xl z-[9999] max-h-[300px] overflow-y-auto">
           {filteredCities.map((city, index) => (
             <button
               key={index}

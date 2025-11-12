@@ -142,7 +142,7 @@ export const HotelAutocomplete = ({
       {isOpen && suggestions.length > 0 && (
         <div
           ref={dropdownRef}
-          className="absolute z-50 w-full mt-1 bg-background border border-border rounded-lg shadow-lg max-h-[400px] overflow-y-auto"
+          className="absolute z-[9999] w-full mt-1 bg-popover/100 backdrop-blur-sm border-2 border-border rounded-lg shadow-2xl max-h-[400px] overflow-y-auto"
         >
           {suggestions.map((suggestion, index) => (
             <button

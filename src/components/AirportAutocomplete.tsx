@@ -94,7 +94,7 @@ export const AirportAutocomplete = ({
         className={className}
       />
       {isOpen && suggestions.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-background border border-border rounded-lg shadow-xl z-[9999] max-h-[400px] overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-popover/100 backdrop-blur-sm border-2 border-border rounded-lg shadow-2xl z-[9999] max-h-[400px] overflow-y-auto">
           {suggestions.map((suggestion, index) => (
             <button
               key={index}
