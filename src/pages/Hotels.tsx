@@ -205,8 +205,12 @@ const Hotels = () => {
         ...tripadvisorHotels
       ];
       
-      setApiHotels(transformedHotels);
-      toast.success(`${transformedHotels.length} hébergements trouvés`);
+      if (transformedHotels.length > 0) {
+        setApiHotels(transformedHotels);
+        toast.success(`${transformedHotels.length} hébergements trouvés avec prix réels`);
+      } else {
+        toast.error("Aucun hébergement trouvé pour cette recherche");
+      }
     } else {
       toast.error("Erreur lors de la recherche d'hôtels");
     }
@@ -482,6 +486,7 @@ const Hotels = () => {
             {filteredAndSortedHotels.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-lg text-muted-foreground">Aucun hôtel ne correspond à vos critères</p>
+                <p className="text-sm text-muted-foreground mt-2">Essayez de modifier vos filtres ou votre recherche</p>
               </div>
             ) : (
               <>
@@ -489,28 +494,31 @@ const Hotels = () => {
                 {paginatedHotels.map((hotel, index) => (
                 <Card key={hotel.id || index} className="overflow-hidden hover:shadow-lg transition-shadow">
                   <div className="grid md:grid-cols-3 gap-6">
-                    <div className="md:col-span-1">
+                    <div className="md:col-span-1 relative">
                       <img
                         src={hotel.image}
                         alt={hotel.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover min-h-[300px]"
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800';
+                        }}
                       />
+                      {(hotel as any).source && (
+                        <Badge className="absolute top-2 right-2 bg-background/90 text-foreground border">
+                          <Globe className="w-3 h-3 mr-1" />
+                          {(hotel as any).source}
+                        </Badge>
+                      )}
                     </div>
                     <CardContent className="md:col-span-2 p-6">
                       <div className="flex justify-between items-start mb-4">
                         <div>
                           <div className="flex items-center gap-3 mb-2">
                             <h3 className="text-2xl font-semibold">{hotel.name}</h3>
-                            {(hotel as any).source && (
-                              <Badge variant="secondary" className="flex items-center gap-1">
-                                <Globe className="w-3 h-3" />
-                                {(hotel as any).source}
-                              </Badge>
-                            )}
                           </div>
                           <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                            <MapPin className="w-4 h-4" />
-                            <span>{hotel.location}</span>
+                            <MapPin className="w-4 h-4 flex-shrink-0" />
+                            <span className="line-clamp-1">{hotel.location}</span>
                           </div>
                           <div className="flex items-center gap-2">
                             <div className="flex">
@@ -526,7 +534,7 @@ const Hotels = () => {
                               ))}
                             </div>
                             <span className="text-sm text-muted-foreground">
-                              {hotel.rating} ({hotel.reviews} avis)
+                              {hotel.rating.toFixed(1)} ({hotel.reviews} avis)
                             </span>
                           </div>
                         </div>
@@ -545,7 +553,7 @@ const Hotels = () => {
 
                       <div className="flex justify-between items-end mt-auto">
                         <div>
-                          <p className="text-sm text-muted-foreground">À partir de</p>
+                          <p className="text-sm text-muted-foreground">Prix réel</p>
                           <p className="text-3xl font-bold text-primary">
                             {hotel.price.toLocaleString()} <span className="text-lg">FCFA</span>
                           </p>

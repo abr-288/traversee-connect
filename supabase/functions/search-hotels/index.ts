@@ -7,20 +7,41 @@ const corsHeaders = {
 
 // Transform Booking.com data to our format
 const transformBookingData = (hotels: any[]) => {
-  return hotels.map(hotel => ({
-    id: hotel.hotel_id || hotel.id,
-    name: hotel.hotel_name || hotel.name,
-    location: hotel.city || hotel.address || '',
-    price: { 
-      grandTotal: hotel.min_total_price || hotel.price_breakdown?.gross_price?.value || 50000 
-    },
-    rating: hotel.review_score || hotel.rating || 4.0,
-    reviews: hotel.review_nr || hotel.reviews_count || 0,
-    image: hotel.main_photo_url || hotel.photo_main_url || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
-    images: hotel.photo_urls || [hotel.main_photo_url] || [],
-    description: hotel.hotel_description || hotel.description || `${hotel.hotel_name || hotel.name} est un établissement de qualité offrant confort et services exceptionnels.`,
-    amenities: hotel.hotel_facilities || hotel.facilities || ['Wifi', 'Restaurant', 'Service de Chambre']
-  }));
+  return hotels.map(hotel => {
+    // Extract complete address/location
+    const location = hotel.city || 
+                     hotel.address || 
+                     hotel.city_in_trans ||
+                     hotel.countrycode ||
+                     '';
+    
+    // Extract main image URL
+    const imageUrl = hotel.main_photo_url || 
+                     hotel.photo_main_url || 
+                     hotel.max_photo_url ||
+                     hotel.max_1280_photo_url ||
+                     'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800';
+    
+    // Extract exact price
+    const exactPrice = hotel.min_total_price || 
+                       hotel.composite_price_breakdown?.gross_amount_per_night?.value ||
+                       hotel.price_breakdown?.gross_price?.value ||
+                       hotel.price ||
+                       50000;
+    
+    return {
+      id: hotel.hotel_id || hotel.id,
+      name: hotel.hotel_name || hotel.name,
+      location: location,
+      price: { grandTotal: Math.round(exactPrice) },
+      rating: hotel.review_score || hotel.rating || 4.0,
+      reviews: hotel.review_nr || hotel.reviews_count || hotel.review_count || 0,
+      image: imageUrl,
+      images: hotel.photo_urls || [imageUrl] || [],
+      description: hotel.hotel_description || hotel.description || `${hotel.hotel_name || hotel.name} est un établissement de qualité offrant confort et services exceptionnels.`,
+      amenities: hotel.hotel_facilities || hotel.facilities || hotel.amenities || ['Wifi', 'Restaurant', 'Service de Chambre']
+    };
+  });
 };
 
 // Transform Airbnb data to our format
