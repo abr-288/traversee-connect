@@ -81,10 +81,16 @@ serve(async (req) => {
       booking: any[];
       airbnb: any[];
       worldwide: any[];
+      hotelscom: any[];
+      priceline: any[];
+      tripadvisor: any[];
     } = {
       booking: [],
       airbnb: [],
       worldwide: [],
+      hotelscom: [],
+      priceline: [],
+      tripadvisor: [],
     };
 
     let apiSuccess = false;
@@ -275,12 +281,191 @@ serve(async (req) => {
     }
     */
 
+    // Search Hotels.com Provider (hotels-com-provider.p.rapidapi.com)
+    if (RAPIDAPI_KEY) {
+      console.log('Starting Hotels.com Provider search');
+      try {
+        const hotelsDotComParams = new URLSearchParams({
+          q: location,
+          locale: 'en_US',
+          checkin: checkIn,
+          checkout: checkOut,
+          adults: adults.toString(),
+          children_ages: children ? '0' : '',
+          sort: 'RECOMMENDED',
+          currency: 'USD',
+        });
+
+        console.log('Calling Hotels.com Provider API with params:', Object.fromEntries(hotelsDotComParams));
+        
+        const hotelsDotComResponse = await fetch(
+          `https://hotels-com-provider.p.rapidapi.com/v2/hotels/search?${hotelsDotComParams}`,
+          {
+            headers: {
+              'X-RapidAPI-Key': RAPIDAPI_KEY,
+              'X-RapidAPI-Host': 'hotels-com-provider.p.rapidapi.com',
+            },
+          }
+        );
+
+        if (hotelsDotComResponse.ok) {
+          const hotelsDotComData = await hotelsDotComResponse.json();
+          console.log('Hotels.com Provider API status:', hotelsDotComResponse.status);
+          console.log('Hotels.com Provider raw response:', JSON.stringify(hotelsDotComData).substring(0, 500));
+          
+          if (hotelsDotComData.hotels && Array.isArray(hotelsDotComData.hotels)) {
+            results.hotelscom = transformBookingData(hotelsDotComData.hotels.slice(0, 10));
+            apiSuccess = true;
+            console.log('Hotels.com Provider results transformed:', results.hotelscom.length);
+          } else {
+            console.log('Hotels.com Provider API returned unexpected structure:', Object.keys(hotelsDotComData));
+          }
+        } else {
+          const errorText = await hotelsDotComResponse.text();
+          console.error('Hotels.com Provider API failed with status:', hotelsDotComResponse.status);
+          console.error('Hotels.com Provider error details:', errorText.substring(0, 500));
+        }
+      } catch (error) {
+        console.error('Hotels.com Provider API exception:', error instanceof Error ? error.message : String(error));
+      }
+    }
+
+    // Search Priceline (priceline-com-provider.p.rapidapi.com)
+    if (RAPIDAPI_KEY) {
+      console.log('Starting Priceline search');
+      try {
+        const pricelineParams = new URLSearchParams({
+          location: location,
+          check_in: checkIn,
+          check_out: checkOut,
+          adults: adults.toString(),
+          rooms: (rooms || 1).toString(),
+          currency: 'USD',
+        });
+
+        console.log('Calling Priceline API with params:', Object.fromEntries(pricelineParams));
+        
+        const pricelineResponse = await fetch(
+          `https://priceline-com-provider.p.rapidapi.com/v2/hotels/search?${pricelineParams}`,
+          {
+            headers: {
+              'X-RapidAPI-Key': RAPIDAPI_KEY,
+              'X-RapidAPI-Host': 'priceline-com-provider.p.rapidapi.com',
+            },
+          }
+        );
+
+        if (pricelineResponse.ok) {
+          const pricelineData = await pricelineResponse.json();
+          console.log('Priceline API status:', pricelineResponse.status);
+          console.log('Priceline raw response:', JSON.stringify(pricelineData).substring(0, 500));
+          
+          if (pricelineData.hotels && Array.isArray(pricelineData.hotels)) {
+            results.priceline = transformBookingData(pricelineData.hotels.slice(0, 10));
+            apiSuccess = true;
+            console.log('Priceline results transformed:', results.priceline.length);
+          } else {
+            console.log('Priceline API returned unexpected structure:', Object.keys(pricelineData));
+          }
+        } else {
+          const errorText = await pricelineResponse.text();
+          console.error('Priceline API failed with status:', pricelineResponse.status);
+          console.error('Priceline error details:', errorText.substring(0, 500));
+        }
+      } catch (error) {
+        console.error('Priceline API exception:', error instanceof Error ? error.message : String(error));
+      }
+    }
+
+    // Search TripAdvisor (tripadvisor1.p.rapidapi.com)
+    if (RAPIDAPI_KEY) {
+      console.log('Starting TripAdvisor search');
+      try {
+        // First search for location ID
+        const tripAdvisorSearchParams = new URLSearchParams({
+          query: location,
+          lang: 'en_US',
+        });
+
+        console.log('Step 1: Searching TripAdvisor location ID:', location);
+        
+        const tripAdvisorSearchResponse = await fetch(
+          `https://tripadvisor1.p.rapidapi.com/locations/search?${tripAdvisorSearchParams}`,
+          {
+            headers: {
+              'X-RapidAPI-Key': RAPIDAPI_KEY,
+              'X-RapidAPI-Host': 'tripadvisor1.p.rapidapi.com',
+            },
+          }
+        );
+
+        if (tripAdvisorSearchResponse.ok) {
+          const tripAdvisorSearchData = await tripAdvisorSearchResponse.json();
+          console.log('TripAdvisor location search response:', JSON.stringify(tripAdvisorSearchData).substring(0, 300));
+          
+          let locationId = null;
+          if (tripAdvisorSearchData.data && Array.isArray(tripAdvisorSearchData.data) && tripAdvisorSearchData.data.length > 0) {
+            locationId = tripAdvisorSearchData.data[0].result_object?.location_id;
+            console.log('Found TripAdvisor location_id:', locationId);
+          }
+
+          if (locationId) {
+            // Now search hotels for this location
+            const tripAdvisorHotelParams = new URLSearchParams({
+              location_id: locationId,
+              checkin: checkIn,
+              checkout: checkOut,
+              adults: adults.toString(),
+              rooms: (rooms || 1).toString(),
+              currency: 'USD',
+              lang: 'en_US',
+            });
+
+            console.log('Step 2: Searching TripAdvisor hotels with params:', Object.fromEntries(tripAdvisorHotelParams));
+            
+            const tripAdvisorHotelResponse = await fetch(
+              `https://tripadvisor1.p.rapidapi.com/hotels/list?${tripAdvisorHotelParams}`,
+              {
+                headers: {
+                  'X-RapidAPI-Key': RAPIDAPI_KEY,
+                  'X-RapidAPI-Host': 'tripadvisor1.p.rapidapi.com',
+                },
+              }
+            );
+
+            if (tripAdvisorHotelResponse.ok) {
+              const tripAdvisorHotelData = await tripAdvisorHotelResponse.json();
+              console.log('TripAdvisor hotels API status:', tripAdvisorHotelResponse.status);
+              console.log('TripAdvisor hotels raw response:', JSON.stringify(tripAdvisorHotelData).substring(0, 500));
+              
+              if (tripAdvisorHotelData.data && Array.isArray(tripAdvisorHotelData.data)) {
+                results.tripadvisor = transformBookingData(tripAdvisorHotelData.data.slice(0, 10));
+                apiSuccess = true;
+                console.log('TripAdvisor results transformed:', results.tripadvisor.length);
+              } else {
+                console.log('TripAdvisor hotels API returned unexpected structure:', Object.keys(tripAdvisorHotelData));
+              }
+            } else {
+              const errorText = await tripAdvisorHotelResponse.text();
+              console.error('TripAdvisor hotels API failed with status:', tripAdvisorHotelResponse.status);
+              console.error('TripAdvisor hotels error details:', errorText.substring(0, 500));
+            }
+          }
+        }
+      } catch (error) {
+        console.error('TripAdvisor API exception:', error instanceof Error ? error.message : String(error));
+      }
+    }
+
     if (!RAPIDAPI_KEY) {
       console.log('RAPIDAPI_KEY not configured');
     }
 
     // If no API results, use mock data
-    if (!apiSuccess || (results.booking.length === 0 && results.airbnb.length === 0 && results.worldwide.length === 0)) {
+    const totalResults = results.booking.length + results.airbnb.length + results.worldwide.length + 
+                         results.hotelscom.length + results.priceline.length + results.tripadvisor.length;
+    
+    if (!apiSuccess || totalResults === 0) {
       console.log('Using mock hotel data for location:', location);
       const mockHotels = getMockHotels(location);
       results.booking = mockHotels;
@@ -290,7 +475,8 @@ serve(async (req) => {
       JSON.stringify({
         success: true,
         data: results,
-        count: results.booking.length + results.airbnb.length + results.worldwide.length,
+        count: results.booking.length + results.airbnb.length + results.worldwide.length + 
+               results.hotelscom.length + results.priceline.length + results.tripadvisor.length,
         mock: !apiSuccess,
       }),
       {
