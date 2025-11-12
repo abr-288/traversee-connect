@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Star, MapPin, Users, Wifi, UtensilsCrossed, Car, Loader2, Globe } from "lucide-react";
+import { Star, MapPin, Users, Wifi, UtensilsCrossed, Car, Loader2, Globe, GitCompare } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import hotelIvoire from "@/assets/hotel-ivoire.jpg";
 import hotelSofitel from "@/assets/hotel-sofitel.jpg";
 import hotelAzalai from "@/assets/hotel-azalai.jpg";
@@ -17,6 +18,7 @@ import hotelSeen from "@/assets/hotel-seen.jpg";
 import hotelOnomo from "@/assets/hotel-onomo.jpg";
 import { HotelBookingDialog } from "@/components/HotelBookingDialog";
 import { HotelSearchForm } from "@/components/HotelSearchForm";
+import { HotelComparisonDialog } from "@/components/HotelComparisonDialog";
 import { Pagination } from "@/components/Pagination";
 import { useHotelSearch } from "@/hooks/useHotelSearch";
 import { toast } from "sonner";
@@ -36,6 +38,10 @@ const Hotels = () => {
   const [sortBy, setSortBy] = useState("popular");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
+  
+  // Comparison state
+  const [selectedHotels, setSelectedHotels] = useState<any[]>([]);
+  const [comparisonOpen, setComparisonOpen] = useState(false);
 
   useEffect(() => {
     const destination = searchParams.get("destination");
@@ -350,6 +356,26 @@ const Hotels = () => {
     return filteredAndSortedHotels.slice(startIndex, startIndex + itemsPerPage);
   }, [filteredAndSortedHotels, currentPage, itemsPerPage]);
 
+  // Toggle hotel selection for comparison
+  const toggleHotelSelection = (hotel: any) => {
+    setSelectedHotels((prev) => {
+      const isSelected = prev.some((h) => h.id === hotel.id);
+      if (isSelected) {
+        return prev.filter((h) => h.id !== hotel.id);
+      } else {
+        if (prev.length >= 4) {
+          toast.error("Vous ne pouvez comparer que 4 hôtels maximum");
+          return prev;
+        }
+        return [...prev, hotel];
+      }
+    });
+  };
+
+  const removeHotelFromComparison = (hotelId: string | number) => {
+    setSelectedHotels((prev) => prev.filter((h) => h.id !== hotelId));
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
@@ -491,8 +517,10 @@ const Hotels = () => {
             ) : (
               <>
               <div className="grid gap-6">
-                {paginatedHotels.map((hotel, index) => (
-                <Card key={hotel.id || index} className="overflow-hidden hover:shadow-lg transition-shadow">
+                {paginatedHotels.map((hotel, index) => {
+                  const isSelected = selectedHotels.some((h) => h.id === hotel.id);
+                  return (
+                <Card key={hotel.id || index} className={`overflow-hidden hover:shadow-lg transition-all ${isSelected ? 'ring-2 ring-primary' : ''}`}>
                   <div className="grid md:grid-cols-3 gap-6">
                     <div className="md:col-span-1 relative">
                       <img
@@ -503,6 +531,13 @@ const Hotels = () => {
                           e.currentTarget.src = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800';
                         }}
                       />
+                      <div className="absolute top-2 left-2">
+                        <Checkbox
+                          checked={isSelected}
+                          onCheckedChange={() => toggleHotelSelection(hotel)}
+                          className="bg-background/90 border-2"
+                        />
+                      </div>
                       {(hotel as any).source && (
                         <Badge className="absolute top-2 right-2 bg-background/90 text-foreground border">
                           <Globe className="w-3 h-3 mr-1" />
@@ -574,7 +609,8 @@ const Hotels = () => {
                     </CardContent>
                   </div>
                 </Card>
-                ))}
+                );
+                })}
               </div>
               <Pagination
                 currentPage={currentPage}
@@ -595,6 +631,36 @@ const Hotels = () => {
           onOpenChange={setDialogOpen}
           hotel={selectedHotel}
         />
+      )}
+
+      <HotelComparisonDialog
+        open={comparisonOpen}
+        onOpenChange={setComparisonOpen}
+        hotels={selectedHotels}
+        onRemoveHotel={removeHotelFromComparison}
+        onBookHotel={(hotel) => {
+          setSelectedHotel({
+            id: hotel.id.toString(),
+            name: hotel.name,
+            location: hotel.location,
+            price: hotel.price
+          });
+          setDialogOpen(true);
+        }}
+      />
+
+      {/* Floating comparison button */}
+      {selectedHotels.length > 0 && (
+        <div className="fixed bottom-6 right-6 z-50">
+          <Button
+            size="lg"
+            className="shadow-lg hover:shadow-xl transition-shadow"
+            onClick={() => setComparisonOpen(true)}
+          >
+            <GitCompare className="w-5 h-5 mr-2" />
+            Comparer ({selectedHotels.length})
+          </Button>
+        </div>
       )}
 
       <Footer />
