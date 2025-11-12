@@ -75,6 +75,7 @@ serve(async (req) => {
     console.log('Search hotels for:', { location, checkIn, checkOut, adults, children, rooms });
 
     const RAPIDAPI_KEY = Deno.env.get('RAPIDAPI_KEY');
+    console.log('RAPIDAPI_KEY configured:', RAPIDAPI_KEY ? 'YES' : 'NO');
 
     const results: {
       booking: any[];
@@ -90,9 +91,39 @@ serve(async (req) => {
 
     // Search Booking.com (booking-com15.p.rapidapi.com)
     if (RAPIDAPI_KEY) {
+      console.log('Starting Booking.com search with RAPIDAPI_KEY');
       try {
+        // First, get the destination ID
+        const destSearchParams = new URLSearchParams({
+          query: location,
+        });
+
+        console.log('Step 1: Searching for destination ID:', location);
+        
+        const destResponse = await fetch(
+          `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchDestination?${destSearchParams}`,
+          {
+            headers: {
+              'X-RapidAPI-Key': RAPIDAPI_KEY,
+              'X-RapidAPI-Host': 'booking-com15.p.rapidapi.com',
+            },
+          }
+        );
+
+        let destId = '-1';
+        if (destResponse.ok) {
+          const destData = await destResponse.json();
+          console.log('Destination search response:', JSON.stringify(destData).substring(0, 300));
+          
+          if (destData.data && Array.isArray(destData.data) && destData.data.length > 0) {
+            destId = destData.data[0].dest_id || destData.data[0].id || '-1';
+            console.log('Found dest_id:', destId);
+          }
+        }
+
+        // Now search hotels with the correct dest_id
         const bookingParams = new URLSearchParams({
-          dest_id: '-1', // Will be replaced with actual dest_id
+          dest_id: destId,
           search_type: 'CITY',
           arrival_date: checkIn,
           departure_date: checkOut,
@@ -102,8 +133,8 @@ serve(async (req) => {
           page_number: '1',
           units: 'metric',
           temperature_unit: 'c',
-          languagecode: 'fr-fr',
-          currency_code: 'XOF',
+          languagecode: 'en-gb',
+          currency_code: 'USD',
         });
 
         console.log('Calling Booking.com API (searchHotels) with params:', Object.fromEntries(bookingParams));
@@ -140,7 +171,9 @@ serve(async (req) => {
       }
     }
 
-    // Search Airbnb (airbnb19.p.rapidapi.com)
+    // Airbnb API skipped - current RapidAPI endpoint returns "app out of date" error
+    // Keeping this commented for future implementation with working API
+    /*
     if (RAPIDAPI_KEY) {
       try {
         const airbnbParams = new URLSearchParams({
@@ -152,7 +185,7 @@ serve(async (req) => {
           infants: '0',
           pets: '0',
           page: '1',
-          currency: 'XOF',
+          currency: 'USD',
         });
 
         console.log('Calling Airbnb API with params:', Object.fromEntries(airbnbParams));
@@ -188,8 +221,11 @@ serve(async (req) => {
         console.error('Airbnb API exception:', error instanceof Error ? error.message : String(error));
       }
     }
+    */
 
-    // Search Worldwide Hotels (worldwide-hotels.p.rapidapi.com)
+    // Search Worldwide Hotels (skipped - API requires location_id which needs geocoding)
+    // Keeping this commented for future implementation
+    /*
     if (RAPIDAPI_KEY) {
       try {
         console.log('Calling Worldwide Hotels API');
@@ -204,9 +240,11 @@ serve(async (req) => {
               'X-RapidAPI-Host': 'worldwide-hotels.p.rapidapi.com',
             },
             body: JSON.stringify({
-              location: location,
-              checkIn: checkIn,
-              checkOut: checkOut,
+              location_id: '123', // Requires geocoding first
+              language: 'en_US',
+              currency: 'USD',
+              checkin: checkIn,
+              checkout: checkOut,
               adults: adults,
               children: children || 0,
               rooms: rooms || 1,
@@ -235,6 +273,7 @@ serve(async (req) => {
         console.error('Worldwide Hotels API exception:', error instanceof Error ? error.message : String(error));
       }
     }
+    */
 
     if (!RAPIDAPI_KEY) {
       console.log('RAPIDAPI_KEY not configured');
