@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Plane, Clock, Calendar as CalendarIcon, Briefcase, Loader2, ArrowRightLeft, ArrowRight, MapPin, Search } from "lucide-react";
+import { Plane, Clock, Calendar as CalendarIcon, Briefcase, Loader2, ArrowRightLeft, ArrowRight, MapPin, Search, SlidersHorizontal } from "lucide-react";
 import { FlightBookingDialog } from "@/components/FlightBookingDialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useFlightSearch } from "@/hooks/useFlightSearch";
 import { toast } from "sonner";
 import { getAirlineName } from "@/utils/airlineNames";
@@ -348,24 +350,24 @@ const Flights = () => {
       <Navbar />
       
       {/* Hero Banner */}
-      <div className="relative py-32 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
+      <div className="relative py-16 md:py-32 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
         <img 
           src="/src/assets/hero-slide-1.jpg" 
           alt="Flights" 
           className="absolute inset-0 w-full h-full object-cover opacity-40"
         />
         <div className="relative z-10 container mx-auto px-4">
-          <div className="text-center mb-10">
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">Recherche de vols</h1>
-            <p className="text-2xl md:text-3xl text-white/95 font-medium">Trouvez les meilleurs vols au meilleur prix</p>
+          <div className="text-center mb-6 md:mb-10">
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-3 md:mb-6">Recherche de vols</h1>
+            <p className="text-lg md:text-2xl lg:text-3xl text-white/95 font-medium">Trouvez les meilleurs vols au meilleur prix</p>
           </div>
           
           {/* Search Form - Opodo Style */}
-          <div className="max-w-6xl mx-auto bg-background rounded-xl shadow-2xl overflow-hidden p-6">
-            <div className="mb-4 flex gap-3">
+          <div className="max-w-6xl mx-auto bg-background rounded-xl shadow-2xl overflow-hidden p-4 md:p-6">
+            <div className="mb-4 flex flex-wrap gap-2 md:gap-3">
               <button
                 onClick={() => setTripType("round-trip")}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm transition-smooth ${
+                className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-full text-xs md:text-sm transition-smooth ${
                   tripType === "round-trip"
                     ? "bg-secondary text-primary font-medium"
                     : "bg-muted text-muted-foreground hover:bg-muted/80"
@@ -376,7 +378,7 @@ const Flights = () => {
               </button>
               <button
                 onClick={() => setTripType("one-way")}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm transition-smooth ${
+                className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-full text-xs md:text-sm transition-smooth ${
                   tripType === "one-way"
                     ? "bg-secondary text-primary font-medium"
                     : "bg-muted text-muted-foreground hover:bg-muted/80"
@@ -388,7 +390,7 @@ const Flights = () => {
             </div>
             
             <div className="flex flex-col lg:flex-row lg:items-end gap-0 lg:gap-0 bg-background rounded-lg overflow-hidden">
-              <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+              <div className="flex-1 p-3 md:p-4 border-b lg:border-b-0 lg:border-r border-border">
                 <label className="text-xs font-medium text-muted-foreground mb-1 block">Départ de</label>
                 <CityAutocomplete
                   placeholder="Ville ou aéroport"
@@ -398,7 +400,7 @@ const Flights = () => {
                 />
               </div>
               
-              <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+              <div className="flex-1 p-3 md:p-4 border-b lg:border-b-0 lg:border-r border-border">
                 <label className="text-xs font-medium text-muted-foreground mb-1 block">Arrivée à</label>
                 <CityAutocomplete
                   placeholder="Ville ou aéroport"
@@ -408,7 +410,7 @@ const Flights = () => {
                 />
               </div>
 
-              <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+              <div className="flex-1 p-3 md:p-4 border-b lg:border-b-0 lg:border-r border-border">
                 <label className="text-xs font-medium text-muted-foreground mb-1 block">Date de départ</label>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -424,7 +426,7 @@ const Flights = () => {
               </div>
 
               {tripType === "round-trip" && (
-                <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+                <div className="flex-1 p-3 md:p-4 border-b lg:border-b-0 lg:border-r border-border">
                   <label className="text-xs font-medium text-muted-foreground mb-1 block">Date de retour</label>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -440,7 +442,7 @@ const Flights = () => {
                 </div>
               )}
 
-              <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+              <div className="flex-1 p-3 md:p-4 border-b lg:border-b-0 lg:border-r border-border">
                 <label className="text-xs font-medium text-muted-foreground mb-1 block">Passagers</label>
                 <TravelersSelector
                   adults={flightAdults}
@@ -458,15 +460,13 @@ const Flights = () => {
                       flightTo,
                       format(flightDate, "yyyy-MM-dd"),
                       tripType === "round-trip" && flightReturnDate ? format(flightReturnDate, "yyyy-MM-dd") : undefined,
-                      flightAdults + flightChildren
+                      flightAdults
                     );
-                  } else {
-                    toast.error("Veuillez remplir tous les champs requis");
                   }
                 }}
-                className="lg:w-auto w-full h-14 lg:h-16 px-8 bg-secondary text-primary hover:bg-secondary/90 text-base font-semibold gap-2 rounded-none lg:rounded-r-lg"
+                className="lg:w-auto w-full h-12 md:h-14 lg:h-16 px-6 md:px-8 bg-secondary text-primary hover:bg-secondary/90 text-sm md:text-base font-semibold gap-2 rounded-none lg:rounded-r-lg"
               >
-                <Search className="w-5 h-5" />
+                <Search className="w-4 h-4 md:w-5 md:h-5" />
                 Rechercher
               </Button>
             </div>
@@ -474,11 +474,10 @@ const Flights = () => {
         </div>
       </div>
       
-      <main className="flex-1 container mx-auto px-4 py-8">
-        
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Filtres */}
-          <aside className="lg:col-span-1 space-y-6">
+      <main className="flex-1 container mx-auto px-4 py-6 md:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 md:gap-8">
+          {/* Filtres Desktop */}
+          <aside className="hidden lg:block lg:col-span-1 space-y-6">
             <Card className="p-6">
               <h2 className="text-xl font-semibold mb-4">Filtres</h2>
               
@@ -592,14 +591,110 @@ const Flights = () => {
           </aside>
 
           {/* Liste des vols */}
-          <div className="lg:col-span-3 space-y-6">
+          <div className="lg:col-span-3 space-y-4 md:space-y-6">
+            {/* Mobile Filters Button */}
+            <div className="lg:hidden flex gap-3">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" className="flex-1">
+                    <SlidersHorizontal className="w-4 h-4 mr-2" />
+                    Filtres
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-full sm:w-[400px] overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle>Filtres</SheetTitle>
+                  </SheetHeader>
+                  <div className="space-y-6 mt-6">
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Origine</label>
+                      <Input 
+                        placeholder="Ville de départ..." 
+                        value={filterOrigin}
+                        onChange={(e) => setFilterOrigin(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Destination</label>
+                      <Input 
+                        placeholder="Ville d'arrivée..." 
+                        value={filterDestination}
+                        onChange={(e) => setFilterDestination(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Escales</label>
+                      <Select value={filterStops} onValueChange={setFilterStops}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Toutes" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Toutes</SelectItem>
+                          <SelectItem value="direct">Direct</SelectItem>
+                          <SelectItem value="1stop">1 escale</SelectItem>
+                          <SelectItem value="2plus">2+ escales</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">
+                        Prix: {priceRange[0].toLocaleString()} - {priceRange[1].toLocaleString()} FCFA
+                      </label>
+                      <Slider
+                        min={0}
+                        max={5000000}
+                        step={50000}
+                        value={priceRange}
+                        onValueChange={setPriceRange}
+                        className="mt-4"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Compagnies</label>
+                      <div className="space-y-2 max-h-60 overflow-y-auto">
+                        {availableAirlines.map(airline => (
+                          <div key={airline} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`mobile-${airline}`}
+                              checked={selectedAirlines.includes(airline)}
+                              onCheckedChange={() => toggleAirline(airline)}
+                            />
+                            <label htmlFor={`mobile-${airline}`} className="text-sm cursor-pointer">
+                              {airline}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="flex-1">
+                  <SelectValue placeholder="Trier" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cheapest">Moins cher</SelectItem>
+                  <SelectItem value="fastest">Plus rapide</SelectItem>
+                  <SelectItem value="earliest">Plus tôt</SelectItem>
+                  <SelectItem value="latest">Plus tard</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
             {loading && (
               <div className="flex justify-center items-center py-12">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
                 <span className="ml-3 text-lg">Recherche en cours...</span>
               </div>
             )}
-            <div className="flex justify-between items-center">
+            
+            {/* Desktop Header */}
+            <div className="hidden lg:flex justify-between items-center">
               <p className="text-muted-foreground">
                 {filteredAndSortedFlights.length} vol{filteredAndSortedFlights.length > 1 ? 's' : ''} trouvé{filteredAndSortedFlights.length > 1 ? 's' : ''}
               </p>
@@ -623,46 +718,46 @@ const Flights = () => {
               </Card>
             ) : (
               <>
-                <div className="space-y-4">
+                 <div className="space-y-4">
                   {paginatedFlights.map((flight, index) => (
                 <Card key={flight.id || index} className="hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex flex-col md:flex-row justify-between gap-6">
+                  <CardContent className="p-3 md:p-6">
+                    <div className="flex flex-col md:flex-row justify-between gap-4 md:gap-6">
                       <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-4">
-                          <Plane className="w-5 h-5 text-primary" />
-                          <span className="font-semibold text-lg">{flight.airline}</span>
-                          <span className="px-2 py-1 bg-muted rounded text-xs">
+                        <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+                          <Plane className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+                          <span className="font-semibold text-base md:text-lg line-clamp-1">{flight.airline}</span>
+                          <span className="px-2 py-1 bg-muted rounded text-xs shrink-0">
                             {flight.class}
                           </span>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                           <div>
-                            <p className="text-sm text-muted-foreground mb-1">Départ</p>
-                            <p className="text-2xl font-bold">{flight.departure}</p>
-                            <p className="text-sm text-muted-foreground">{flight.from}</p>
+                            <p className="text-xs md:text-sm text-muted-foreground mb-1">Départ</p>
+                            <p className="text-xl md:text-2xl font-bold">{flight.departure}</p>
+                            <p className="text-xs md:text-sm text-muted-foreground line-clamp-1">{flight.from}</p>
                           </div>
 
                           <div className="flex flex-col items-center justify-center">
                             <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                              <Clock className="w-4 h-4" />
-                              <span className="text-sm">{flight.duration}</span>
+                              <Clock className="w-3 h-3 md:w-4 md:h-4" />
+                              <span className="text-xs md:text-sm">{flight.duration}</span>
                             </div>
                             <div className="w-full h-0.5 bg-gradient-to-r from-primary via-accent to-secondary mb-2"></div>
-                            <span className="text-xs text-muted-foreground">{flight.stops}</span>
+                            <span className="text-[10px] md:text-xs text-muted-foreground">{flight.stops}</span>
                           </div>
 
                           <div className="text-right md:text-left">
-                            <p className="text-sm text-muted-foreground mb-1">Arrivée</p>
-                            <p className="text-2xl font-bold">{flight.arrival}</p>
-                            <p className="text-sm text-muted-foreground">{flight.to}</p>
+                            <p className="text-xs md:text-sm text-muted-foreground mb-1">Arrivée</p>
+                            <p className="text-xl md:text-2xl font-bold">{flight.arrival}</p>
+                            <p className="text-xs md:text-sm text-muted-foreground line-clamp-1">{flight.to}</p>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-2 mt-4 text-sm text-muted-foreground">
-                          <CalendarIcon className="w-4 h-4" />
-                          <span>{new Date(flight.date).toLocaleDateString('fr-FR', { 
+                        <div className="flex items-center gap-2 mt-3 md:mt-4 text-xs md:text-sm text-muted-foreground">
+                          <CalendarIcon className="w-3 h-3 md:w-4 md:h-4" />
+                          <span className="line-clamp-1">{new Date(flight.date).toLocaleDateString('fr-FR', { 
                             weekday: 'long', 
                             year: 'numeric', 
                             month: 'long', 
@@ -671,15 +766,15 @@ const Flights = () => {
                         </div>
                       </div>
 
-                      <div className="flex flex-col items-end justify-between border-l pl-6">
-                        <div className="text-right">
-                          <p className="text-sm text-muted-foreground mb-1">À partir de</p>
-                          <p className="text-3xl font-bold text-primary mb-1">
+                      <div className="flex flex-col items-end justify-between border-t md:border-t-0 md:border-l pt-3 md:pt-0 md:pl-6">
+                        <div className="text-right w-full">
+                          <p className="text-xs md:text-sm text-muted-foreground mb-1">À partir de</p>
+                          <p className="text-2xl md:text-3xl font-bold text-primary mb-1">
                             {flight.price.toLocaleString()}
                           </p>
-                          <p className="text-sm text-muted-foreground">FCFA</p>
+                          <p className="text-xs md:text-sm text-muted-foreground">FCFA</p>
                         </div>
-                        <Button size="lg" className="w-full" onClick={() => {
+                        <Button size="sm" className="w-full md:size-lg mt-3 md:mt-0" onClick={() => {
                           setSelectedFlight(flight);
                           setDialogOpen(true);
                         }}>

@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Star, MapPin, Users, Wifi, UtensilsCrossed, Car, Loader2, Globe, GitCompare } from "lucide-react";
+import { Star, MapPin, Users, Wifi, UtensilsCrossed, Car, Loader2, Globe, GitCompare, SlidersHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import hotelIvoire from "@/assets/hotel-ivoire.jpg";
 import hotelSofitel from "@/assets/hotel-sofitel.jpg";
 import hotelAzalai from "@/assets/hotel-azalai.jpg";
@@ -402,26 +403,26 @@ const Hotels = () => {
       <Navbar />
       
       {/* Hero Banner */}
-      <div className="relative py-32 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
+      <div className="relative py-16 md:py-32 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
         <img 
           src="/src/assets/destination-hotel.jpg" 
           alt="Hotels" 
           className="absolute inset-0 w-full h-full object-cover opacity-40"
         />
         <div className="relative z-10 container mx-auto px-4">
-          <div className="text-center mb-10">
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">Hôtels & Hébergements</h1>
-            <p className="text-2xl md:text-3xl text-white/95 font-medium">Des hébergements de qualité partout dans le monde</p>
+          <div className="text-center mb-6 md:mb-10">
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-3 md:mb-6">Hôtels & Hébergements</h1>
+            <p className="text-lg md:text-2xl lg:text-3xl text-white/95 font-medium">Des hébergements de qualité partout dans le monde</p>
           </div>
           <HotelSearchForm />
         </div>
       </div>
       
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-4 py-6 md:py-8">
         
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Filtres */}
-          <aside className="lg:col-span-1 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 md:gap-8">
+          {/* Filtres Desktop */}
+          <aside className="hidden lg:block lg:col-span-1 space-y-6">
             <Card className="p-6">
               <h2 className="text-xl font-semibold mb-4">Filtres</h2>
               
@@ -506,14 +507,107 @@ const Hotels = () => {
           </aside>
 
           {/* Liste des hôtels */}
-          <div className="lg:col-span-3 space-y-6">
+          <div className="lg:col-span-3 space-y-4 md:space-y-6">
+            {/* Mobile Filters Button */}
+            <div className="lg:hidden flex gap-3">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" className="flex-1">
+                    <SlidersHorizontal className="w-4 h-4 mr-2" />
+                    Filtres
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-full sm:w-[400px] overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle>Filtres</SheetTitle>
+                  </SheetHeader>
+                  <div className="space-y-6 mt-6">
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Destination</label>
+                      <Input 
+                        placeholder="Rechercher une ville..." 
+                        value={filterDestination}
+                        onChange={(e) => setFilterDestination(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Étoiles</label>
+                      <Select value={filterStars} onValueChange={setFilterStars}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Toutes" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Toutes</SelectItem>
+                          <SelectItem value="5">5 étoiles</SelectItem>
+                          <SelectItem value="4">4 étoiles</SelectItem>
+                          <SelectItem value="3">3 étoiles</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">
+                        Prix par nuit: {priceRange[0].toLocaleString()} - {priceRange[1].toLocaleString()} FCFA
+                      </label>
+                      <Slider
+                        min={0}
+                        max={500000}
+                        step={5000}
+                        value={priceRange}
+                        onValueChange={setPriceRange}
+                        className="mt-4"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Équipements</label>
+                      <div className="space-y-2">
+                        {availableAmenities.map(amenity => (
+                          <div key={amenity} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`mobile-${amenity}`}
+                              checked={selectedAmenities.includes(amenity)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setSelectedAmenities([...selectedAmenities, amenity]);
+                                } else {
+                                  setSelectedAmenities(selectedAmenities.filter(a => a !== amenity));
+                                }
+                              }}
+                            />
+                            <label htmlFor={`mobile-${amenity}`} className="text-sm cursor-pointer">
+                              {amenity}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="flex-1">
+                  <SelectValue placeholder="Trier" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="popular">Plus populaires</SelectItem>
+                  <SelectItem value="price-asc">Prix croissant</SelectItem>
+                  <SelectItem value="price-desc">Prix décroissant</SelectItem>
+                  <SelectItem value="rating">Mieux notés</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
             {loading && (
               <div className="flex justify-center items-center py-12">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
                 <span className="ml-3 text-lg">Recherche en cours...</span>
               </div>
             )}
-            <div className="flex justify-between items-center">
+            
+            {/* Desktop Header */}
+            <div className="hidden lg:flex justify-between items-center">
               <p className="text-muted-foreground">
                 {filteredAndSortedHotels.length} hôtel{filteredAndSortedHotels.length > 1 ? 's' : ''} trouvé{filteredAndSortedHotels.length > 1 ? 's' : ''}
               </p>
