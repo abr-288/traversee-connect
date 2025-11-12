@@ -33,25 +33,26 @@ interface FlightBookingDialogProps {
 
 export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams }: FlightBookingDialogProps) => {
   const [loading, setLoading] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
+  const [formData, setFormData] = useState<any>(null);
   const navigate = useNavigate();
   
   const departureDate = searchParams?.departureDate || flight.departureDate || new Date().toISOString().split('T')[0];
   const returnDate = searchParams?.returnDate || flight.returnDate;
   const tripType = returnDate ? "Aller-retour" : "Aller simple";
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
 
-    const formData = new FormData(e.currentTarget);
-    const passengers = parseInt(formData.get("passengers") as string);
-    const customerName = formData.get("customerName") as string;
-    const customerEmail = formData.get("customerEmail") as string;
-    const customerPhone = formData.get("customerPhone") as string;
-    const passportNumber = formData.get("passportNumber") as string;
-    const passportIssueDate = formData.get("passportIssueDate") as string;
-    const passportExpiryDate = formData.get("passportExpiryDate") as string;
-    const notes = formData.get("notes") as string;
+    const form = new FormData(e.currentTarget);
+    const passengers = parseInt(form.get("passengers") as string);
+    const customerName = form.get("customerName") as string;
+    const customerEmail = form.get("customerEmail") as string;
+    const customerPhone = form.get("customerPhone") as string;
+    const passportNumber = form.get("passportNumber") as string;
+    const passportIssueDate = form.get("passportIssueDate") as string;
+    const passportExpiryDate = form.get("passportExpiryDate") as string;
+    const notes = form.get("notes") as string;
 
     // Validate input
     try {
@@ -63,9 +64,29 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams }
       });
     } catch (error: any) {
       toast.error(error.errors?.[0]?.message || "Veuillez vérifier vos informations");
-      setLoading(false);
       return;
     }
+
+    // Store form data and show summary
+    setFormData({
+      passengers,
+      customerName,
+      customerEmail,
+      customerPhone,
+      passportNumber,
+      passportIssueDate,
+      passportExpiryDate,
+      notes,
+    });
+    setShowSummary(true);
+  };
+
+  const handleConfirmBooking = async () => {
+    if (!formData) return;
+    
+    setLoading(true);
+
+    const { passengers, customerName, customerEmail, customerPhone, passportNumber, passportIssueDate, passportExpiryDate, notes } = formData;
 
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -129,10 +150,16 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams }
     } else {
       toast.success("Réservation confirmée! Redirection vers le paiement...");
       onOpenChange(false);
+      setShowSummary(false);
+      setFormData(null);
       setTimeout(() => {
         navigate(`/payment?bookingId=${booking.id}`);
       }, 1500);
     }
+  };
+
+  const handleBackToForm = () => {
+    setShowSummary(false);
   };
 
   return (
@@ -141,12 +168,154 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams }
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Plane className="h-5 w-5 text-primary" />
-            Réserver votre vol
+            {showSummary ? "Récapitulatif de votre réservation" : "Réserver votre vol"}
           </DialogTitle>
           <DialogDescription>
             {flight.airline} • {flight.from} → {flight.to} • {flight.class} • {tripType}
           </DialogDescription>
         </DialogHeader>
+
+        {showSummary ? (
+          // Summary View
+          <div className="space-y-6">
+            <div className="bg-primary/5 border-2 border-primary/20 p-6 rounded-lg space-y-4">
+              <h3 className="font-semibold text-lg flex items-center gap-2">
+                <Plane className="h-5 w-5 text-primary" />
+                Détails du vol
+              </h3>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-muted-foreground text-sm">Compagnie</p>
+                  <p className="font-semibold">{flight.airline}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-sm">Classe</p>
+                  <p className="font-semibold">{flight.class}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-sm">Trajet</p>
+                  <p className="font-semibold">{flight.from} → {flight.to}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-sm">Type</p>
+                  <p className="font-semibold">{tripType}</p>
+                </div>
+              </div>
+
+              <div className="border-t pt-4 grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-muted-foreground text-sm">Départ</p>
+                  <p className="font-semibold">{new Date(departureDate).toLocaleDateString('fr-FR', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                  })}</p>
+                  <p className="text-primary font-bold text-lg">{flight.departure}</p>
+                </div>
+                {returnDate && (
+                  <div>
+                    <p className="text-muted-foreground text-sm">Retour</p>
+                    <p className="font-semibold">{new Date(returnDate).toLocaleDateString('fr-FR', { 
+                      weekday: 'long', 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}</p>
+                    <p className="text-primary font-bold text-lg">{flight.arrival}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="bg-muted/50 p-6 rounded-lg space-y-4">
+              <h3 className="font-semibold text-lg flex items-center gap-2">
+                <User className="h-5 w-5 text-primary" />
+                Informations passagers
+              </h3>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-muted-foreground text-sm">Nombre de passagers</p>
+                  <p className="font-semibold">{formData?.passengers}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-sm">Nom complet</p>
+                  <p className="font-semibold">{formData?.customerName}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-sm">Email</p>
+                  <p className="font-semibold">{formData?.customerEmail}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-sm">Téléphone</p>
+                  <p className="font-semibold">{formData?.customerPhone}</p>
+                </div>
+              </div>
+
+              <div className="border-t pt-4 grid grid-cols-3 gap-4">
+                <div>
+                  <p className="text-muted-foreground text-sm">Passeport N°</p>
+                  <p className="font-semibold">{formData?.passportNumber}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-sm">Délivré le</p>
+                  <p className="font-semibold">{new Date(formData?.passportIssueDate).toLocaleDateString('fr-FR')}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-sm">Expire le</p>
+                  <p className="font-semibold">{new Date(formData?.passportExpiryDate).toLocaleDateString('fr-FR')}</p>
+                </div>
+              </div>
+
+              {formData?.notes && (
+                <div className="border-t pt-4">
+                  <p className="text-muted-foreground text-sm">Demandes spéciales</p>
+                  <p className="font-semibold">{formData.notes}</p>
+                </div>
+              )}
+            </div>
+
+            <div className="bg-gradient-to-br from-primary/10 to-primary/5 p-6 rounded-xl border-2 border-primary/20">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-muted-foreground text-sm">Prix par passager</p>
+                  <p className="text-lg font-semibold">{flight.price.toLocaleString()} FCFA</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-muted-foreground text-sm">Montant total</p>
+                  <p className="text-3xl font-bold text-primary">
+                    {(flight.price * formData?.passengers).toLocaleString()} FCFA
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-4">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={handleBackToForm}
+                className="flex-1"
+                disabled={loading}
+              >
+                Modifier
+              </Button>
+              <Button 
+                type="button" 
+                onClick={handleConfirmBooking}
+                className="flex-1"
+                disabled={loading}
+                size="lg"
+              >
+                {loading ? "Confirmation en cours..." : "Confirmer et payer"}
+              </Button>
+            </div>
+          </div>
+        ) : (
+          // Form View
+          <>
 
         <div className="bg-muted p-4 rounded-lg mb-4">
           <div className="grid grid-cols-2 gap-4 text-sm">
@@ -175,7 +344,7 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams }
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleFormSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="passengers" className="flex items-center gap-2">
               <User className="h-4 w-4" />
@@ -225,10 +394,12 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams }
             />
           </div>
 
-          <Button type="submit" className="w-full" size="lg" disabled={loading}>
-            {loading ? "Réservation en cours..." : "Confirmer et payer"}
+          <Button type="submit" className="w-full" size="lg">
+            Voir le récapitulatif
           </Button>
         </form>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );
