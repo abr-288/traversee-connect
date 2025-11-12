@@ -182,6 +182,26 @@ const Hotels = () => {
         };
       });
 
+      const amadeusHotels = (result.data?.amadeus || []).map((hotel: any) => {
+        const price = typeof hotel.price === 'object' && hotel.price?.grandTotal 
+          ? parseFloat(hotel.price.grandTotal) 
+          : typeof hotel.price === 'number' 
+          ? hotel.price 
+          : parseFloat(hotel.price?.total || hotel.price || 0);
+        
+        return {
+          id: hotel.id || hotel.hotel_id || Math.random().toString(),
+          name: hotel.name || hotel.hotel_name || 'Hôtel',
+          location: hotel.location || hotel.address || location,
+          price: Math.round(price),
+          rating: hotel.rating || hotel.review_score || 4.0,
+          reviews: hotel.reviews || hotel.review_count || 0,
+          image: hotel.image || hotel.main_photo_url || '/placeholder.svg',
+          amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
+          source: 'Amadeus'
+        };
+      });
+
       const tripadvisorHotels = (result.data?.tripadvisor || []).map((hotel: any) => {
         const price = typeof hotel.price === 'object' && hotel.price?.grandTotal 
           ? parseFloat(hotel.price.grandTotal) 
@@ -203,6 +223,7 @@ const Hotels = () => {
       });
 
       const transformedHotels = [
+        ...amadeusHotels,
         ...bookingHotels, 
         ...airbnbHotels, 
         ...worldwideHotels,

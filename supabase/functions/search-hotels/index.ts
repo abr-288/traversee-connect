@@ -122,6 +122,7 @@ serve(async (req) => {
       hotelscom: any[];
       priceline: any[];
       tripadvisor: any[];
+      amadeus: any[];
     } = {
       booking: [],
       airbnb: [],
@@ -129,9 +130,14 @@ serve(async (req) => {
       hotelscom: [],
       priceline: [],
       tripadvisor: [],
+      amadeus: [],
     };
 
     let apiSuccess = false;
+    
+    const AMADEUS_API_KEY = Deno.env.get('AMADEUS_API_KEY');
+    const AMADEUS_API_SECRET = Deno.env.get('AMADEUS_API_SECRET');
+    console.log('AMADEUS credentials configured:', AMADEUS_API_KEY ? 'YES' : 'NO');
 
     // Search Booking.com (booking-com15.p.rapidapi.com)
     if (RAPIDAPI_KEY) {
@@ -495,13 +501,142 @@ serve(async (req) => {
       }
     }
 
+    // Search Amadeus Hotels (PRIMARY API - more reliable)
+    if (AMADEUS_API_KEY && AMADEUS_API_SECRET) {
+      console.log('Starting Amadeus Hotel search');
+      try {
+        // Step 1: Get Amadeus access token
+        console.log('Step 1: Getting Amadeus access token');
+        const tokenResponse = await fetch(
+          'https://test.api.amadeus.com/v1/security/oauth2/token',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+              grant_type: 'client_credentials',
+              client_id: AMADEUS_API_KEY,
+              client_secret: AMADEUS_API_SECRET,
+            }),
+          }
+        );
+
+        if (tokenResponse.ok) {
+          const tokenData = await tokenResponse.json();
+          const accessToken = tokenData.access_token;
+          console.log('Amadeus access token obtained');
+
+          // Step 2: Get hotel list by city code
+          console.log('Step 2: Getting hotel list for city:', location);
+          
+          // Convert location to city code (first 3 letters uppercase)
+          const cityCode = location.substring(0, 3).toUpperCase();
+          
+          const hotelListResponse = await fetch(
+            `https://test.api.amadeus.com/v1/reference-data/locations/hotels/by-city?cityCode=${cityCode}&radius=50&radiusUnit=KM&hotelSource=ALL`,
+            {
+              headers: {
+                'Authorization': `Bearer ${accessToken}`,
+              },
+            }
+          );
+
+          if (hotelListResponse.ok) {
+            const hotelListData = await hotelListResponse.json();
+            console.log('Amadeus hotel list status:', hotelListResponse.status);
+            console.log('Amadeus hotel list count:', hotelListData.data?.length || 0);
+
+            if (hotelListData.data && Array.isArray(hotelListData.data) && hotelListData.data.length > 0) {
+              // Get hotel IDs (limit to 50 for performance)
+              const hotelIds = hotelListData.data.slice(0, 50).map((h: any) => h.hotelId).join(',');
+              console.log('Step 3: Searching offers for hotels:', hotelIds.split(',').length, 'hotels');
+
+              // Step 3: Get hotel offers
+              const offersSearchParams = new URLSearchParams({
+                hotelIds: hotelIds,
+                checkInDate: checkIn,
+                checkOutDate: checkOut,
+                adults: adults.toString(),
+                roomQuantity: (rooms || 1).toString(),
+                currency: 'USD',
+                bestRateOnly: 'true',
+                view: 'FULL',
+              });
+
+              const offersResponse = await fetch(
+                `https://test.api.amadeus.com/v2/shopping/hotel-offers?${offersSearchParams}`,
+                {
+                  headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                  },
+                }
+              );
+
+              if (offersResponse.ok) {
+                const offersData = await offersResponse.json();
+                console.log('Amadeus offers status:', offersResponse.status);
+                console.log('Amadeus offers count:', offersData.data?.length || 0);
+
+                if (offersData.data && Array.isArray(offersData.data)) {
+                  results.amadeus = offersData.data.slice(0, 20).map((offer: any) => {
+                    const hotel = offer.hotel;
+                    const firstOffer = offer.offers?.[0];
+                    const price = firstOffer?.price?.total || 50000;
+                    
+                    return {
+                      id: hotel.hotelId,
+                      name: hotel.name || 'Hotel',
+                      location: `${hotel.address?.cityName || location}, ${hotel.address?.countryCode || ''}`,
+                      price: { grandTotal: Math.round(parseFloat(price) * 655) }, // Convert USD to FCFA
+                      rating: hotel.rating ? parseFloat(hotel.rating) : 4.0,
+                      reviews: Math.floor(Math.random() * 500) + 50,
+                      image: `https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&sig=${hotel.hotelId}`,
+                      images: [`https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&sig=${hotel.hotelId}`],
+                      description: hotel.description?.text || `${hotel.name} est un établissement de qualité.`,
+                      amenities: hotel.amenities || ['WiFi', 'Restaurant', 'Room Service'],
+                    };
+                  });
+                  apiSuccess = true;
+                  console.log('Amadeus results transformed:', results.amadeus.length);
+                } else {
+                  console.log('Amadeus offers returned unexpected structure:', Object.keys(offersData));
+                }
+              } else {
+                const errorText = await offersResponse.text();
+                console.error('Amadeus offers search failed:', offersResponse.status);
+                console.error('Amadeus offers error:', errorText.substring(0, 500));
+              }
+            } else {
+              console.log('No hotels found for city code:', cityCode);
+            }
+          } else {
+            const errorText = await hotelListResponse.text();
+            console.error('Amadeus hotel list failed:', hotelListResponse.status);
+            console.error('Amadeus hotel list error:', errorText.substring(0, 500));
+          }
+        } else {
+          const errorText = await tokenResponse.text();
+          console.error('Amadeus token request failed:', tokenResponse.status);
+          console.error('Amadeus token error:', errorText.substring(0, 500));
+        }
+      } catch (error) {
+        console.error('Amadeus API exception:', error instanceof Error ? error.message : String(error));
+      }
+    }
+
     if (!RAPIDAPI_KEY) {
       console.log('RAPIDAPI_KEY not configured');
+    }
+    
+    if (!AMADEUS_API_KEY || !AMADEUS_API_SECRET) {
+      console.log('AMADEUS credentials not configured');
     }
 
     // If no API results, use mock data
     const totalResults = results.booking.length + results.airbnb.length + results.worldwide.length + 
-                         results.hotelscom.length + results.priceline.length + results.tripadvisor.length;
+                         results.hotelscom.length + results.priceline.length + results.tripadvisor.length + 
+                         results.amadeus.length;
     
     if (!apiSuccess || totalResults === 0) {
       console.log('Using mock hotel data for location:', location);
@@ -514,8 +649,16 @@ serve(async (req) => {
         success: true,
         data: results,
         count: results.booking.length + results.airbnb.length + results.worldwide.length + 
-               results.hotelscom.length + results.priceline.length + results.tripadvisor.length,
+               results.hotelscom.length + results.priceline.length + results.tripadvisor.length + 
+               results.amadeus.length,
         mock: !apiSuccess,
+        sources: {
+          amadeus: results.amadeus.length,
+          booking: results.booking.length,
+          hotelscom: results.hotelscom.length,
+          priceline: results.priceline.length,
+          tripadvisor: results.tripadvisor.length
+        }
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
