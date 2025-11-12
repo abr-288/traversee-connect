@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { EventLocationAutocomplete } from "@/components/EventLocationAutocomplete";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -62,11 +62,10 @@ export const EventSearchForm = ({ onResults }: EventSearchFormProps) => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="location">Localisation</Label>
-              <Input
-                id="location"
-                placeholder="Paris, Londres..."
+              <EventLocationAutocomplete
                 value={location}
-                onChange={(e) => setLocation(e.target.value)}
+                onChange={setLocation}
+                placeholder="Paris, Londres..."
               />
             </div>
 
@@ -82,12 +81,13 @@ export const EventSearchForm = ({ onResults }: EventSearchFormProps) => {
                     {date ? format(date, "PP") : "Sélectionner une date"}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0 bg-background border border-border shadow-lg z-50" align="start">
                   <Calendar
                     mode="single"
                     selected={date}
                     onSelect={setDate}
                     disabled={(date) => date < new Date()}
+                    className="pointer-events-auto"
                   />
                 </PopoverContent>
               </Popover>

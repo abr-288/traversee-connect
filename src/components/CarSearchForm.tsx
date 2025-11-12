@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { CarLocationAutocomplete } from "@/components/CarLocationAutocomplete";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon, MapPin, Search } from "lucide-react";
@@ -40,14 +40,12 @@ export const CarSearchForm = () => {
               Lieu
             </label>
             <div className="relative">
-              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Ville ou aéroport"
+              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
+              <CarLocationAutocomplete
                 value={location}
-                onChange={(e) => setLocation(e.target.value)}
+                onChange={setLocation}
+                placeholder="Ville ou aéroport"
                 className="pl-10"
-                required
               />
             </div>
           </div>

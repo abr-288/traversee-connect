@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { AirportAutocomplete } from "@/components/AirportAutocomplete";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -68,21 +68,21 @@ export const TrainSearchForm = ({ onResults }: TrainSearchFormProps) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <div className="space-y-2">
           <Label htmlFor="origin">{t('search.from')}</Label>
-          <Input
-            id="origin"
-            placeholder="Paris"
+          <AirportAutocomplete
             value={origin}
-            onChange={(e) => setOrigin(e.target.value)}
+            onChange={setOrigin}
+            placeholder="Paris"
+            type="train"
           />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="destination">{t('search.to')}</Label>
-          <Input
-            id="destination"
-            placeholder="Londres"
+          <AirportAutocomplete
             value={destination}
-            onChange={(e) => setDestination(e.target.value)}
+            onChange={setDestination}
+            placeholder="Londres"
+            type="train"
           />
         </div>
 
@@ -98,12 +98,13 @@ export const TrainSearchForm = ({ onResults }: TrainSearchFormProps) => {
                 {departureDate ? format(departureDate, "PP", { locale: fr }) : <span>Sélectionner</span>}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 z-50">
+            <PopoverContent className="w-auto p-0 bg-background border border-border shadow-lg z-50">
               <Calendar
                 mode="single"
                 selected={departureDate}
                 onSelect={setDepartureDate}
                 initialFocus
+                className="pointer-events-auto"
               />
             </PopoverContent>
           </Popover>
@@ -121,13 +122,14 @@ export const TrainSearchForm = ({ onResults }: TrainSearchFormProps) => {
                 {returnDate ? format(returnDate, "PP", { locale: fr }) : <span>Sélectionner</span>}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 z-50">
+            <PopoverContent className="w-auto p-0 bg-background border border-border shadow-lg z-50">
               <Calendar
                 mode="single"
                 selected={returnDate}
                 onSelect={setReturnDate}
                 initialFocus
                 disabled={(date) => departureDate ? date < departureDate : false}
+                className="pointer-events-auto"
               />
             </PopoverContent>
           </Popover>

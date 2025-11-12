@@ -6,7 +6,7 @@ import { CalendarIcon, Plane, Search, Users, Hotel, ArrowRightLeft } from "lucid
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-import { CityAutocomplete } from "./CityAutocomplete";
+import { AirportAutocomplete } from "./AirportAutocomplete";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 
@@ -69,11 +69,12 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
             </label>
             <div className="relative">
               <Plane className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <CityAutocomplete
+              <AirportAutocomplete
                 value={origin}
                 onChange={setOrigin}
                 placeholder="Ville de départ"
                 className="pl-10"
+                type="flight"
               />
             </div>
           </div>
@@ -98,11 +99,12 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
             </label>
             <div className="relative">
               <Hotel className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <CityAutocomplete
+              <AirportAutocomplete
                 value={destination}
                 onChange={setDestination}
                 placeholder="Ville d'arrivée"
                 className="pl-10"
+                type="flight"
               />
             </div>
           </div>
@@ -125,7 +127,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
                   {departureDate ? format(departureDate, "dd MMM", { locale: fr }) : "Date"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0 bg-background border border-border shadow-lg z-50" align="start">
                 <Calendar
                   mode="single"
                   selected={departureDate}
@@ -156,7 +158,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
                   {returnDate ? format(returnDate, "dd MMM", { locale: fr }) : "Date"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0 bg-background border border-border shadow-lg z-50" align="start">
                 <Calendar
                   mode="single"
                   selected={returnDate}
@@ -181,7 +183,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
                   {parseInt(adults) + parseInt(children)}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-64">
+              <PopoverContent className="w-64 bg-background border border-border shadow-lg z-50">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Adultes</span>
