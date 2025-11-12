@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, MapPin, Search, Users } from "lucide-react";
+import { CalendarIcon, Search, Users } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { HotelAutocomplete } from "./HotelAutocomplete";
 
 export const HotelSearchForm = () => {
   const navigate = useNavigate();
@@ -45,17 +46,11 @@ export const HotelSearchForm = () => {
             <label className="text-sm font-medium text-gray-700 mb-2 block">
               Destination
             </label>
-            <div className="relative">
-              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Ville ou pays"
-                value={destination}
-                onChange={(e) => setDestination(e.target.value)}
-                className="pl-10"
-                required
-              />
-            </div>
+            <HotelAutocomplete
+              value={destination}
+              onChange={setDestination}
+              placeholder="Ville ou pays"
+            />
           </div>
 
           <div className="md:col-span-1">
@@ -75,7 +70,7 @@ export const HotelSearchForm = () => {
                   {checkIn ? format(checkIn, "dd MMM", { locale: fr }) : "Date"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0 bg-background border border-border shadow-lg z-50" align="start">
                 <Calendar
                   mode="single"
                   selected={checkIn}
@@ -105,7 +100,7 @@ export const HotelSearchForm = () => {
                   {checkOut ? format(checkOut, "dd MMM", { locale: fr }) : "Date"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0 bg-background border border-border shadow-lg z-50" align="start">
                 <Calendar
                   mode="single"
                   selected={checkOut}
@@ -129,7 +124,7 @@ export const HotelSearchForm = () => {
                   {parseInt(adults) + parseInt(children)} pers.
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-64">
+              <PopoverContent className="w-64 bg-background border border-border shadow-lg z-50">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Adultes</span>
