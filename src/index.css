@@ -14,7 +14,7 @@ All colors MUST be HSL.
     --card: 0 0% 100%;
     --card-foreground: 210 24% 16%;
 
-    --popover: 0 0% 100%;
+    --popover: 0 0% 98%;
     --popover-foreground: 210 24% 16%;
 
     /* Bossiz Brand Colors */
@@ -40,7 +40,7 @@ All colors MUST be HSL.
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 20% 90%;
+    --border: 210 20% 85%;
     --input: 210 20% 90%;
     --ring: 158 100% 48%;
     
