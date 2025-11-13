@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Plane, Calendar, User } from "lucide-react";
+import { Plane, Calendar, User, Download } from "lucide-react";
 import { bookingSchema } from "@/lib/validation";
 
 interface FlightBookingDialogProps {
@@ -35,6 +35,7 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams }
   const [loading, setLoading] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const [formData, setFormData] = useState<any>(null);
+  const [bookingId, setBookingId] = useState<string | null>(null);
   const navigate = useNavigate();
   
   const departureDate = searchParams?.departureDate || flight.departureDate || new Date().toISOString().split('T')[0];
@@ -148,6 +149,8 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams }
     if (error) {
       toast.error("Erreur de réservation: " + error.message);
     } else {
+      setBookingId(booking.id);
+      
       // Send confirmation email
       try {
         await supabase.functions.invoke("send-flight-confirmation", {
@@ -189,6 +192,39 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams }
 
   const handleBackToForm = () => {
     setShowSummary(false);
+  };
+
+  const handleDownloadTicket = async () => {
+    if (!bookingId) {
+      toast.error("Veuillez d'abord confirmer la réservation");
+      return;
+    }
+
+    try {
+      toast.loading("Génération du billet...");
+      
+      const { data, error } = await supabase.functions.invoke("generate-flight-ticket", {
+        body: { bookingId },
+      });
+
+      if (error) throw error;
+
+      // Create a blob from the HTML and download it
+      const blob = new Blob([data.ticket], { type: "text/html" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `billet-vol-${bookingId.substring(0, 8)}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+      toast.success("Billet téléchargé avec succès!");
+    } catch (error: any) {
+      console.error("Error downloading ticket:", error);
+      toast.error("Erreur lors du téléchargement du billet");
+    }
   };
 
   return (
@@ -321,25 +357,40 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams }
               </div>
             </div>
 
-            <div className="flex gap-3 pt-4">
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={handleBackToForm}
-                className="flex-1"
-                disabled={loading}
-              >
-                Modifier
-              </Button>
-              <Button 
-                type="button" 
-                onClick={handleConfirmBooking}
-                className="flex-1"
-                disabled={loading}
-                size="lg"
-              >
-                {loading ? "Confirmation en cours..." : "Confirmer et payer"}
-              </Button>
+            <div className="flex flex-col gap-3 pt-4">
+              <div className="flex gap-3">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={handleBackToForm}
+                  className="flex-1"
+                  disabled={loading}
+                >
+                  Modifier
+                </Button>
+                <Button 
+                  type="button" 
+                  onClick={handleConfirmBooking}
+                  className="flex-1"
+                  disabled={loading}
+                  size="lg"
+                >
+                  {loading ? "Confirmation en cours..." : "Confirmer et payer"}
+                </Button>
+              </div>
+              
+              {bookingId && (
+                <Button 
+                  type="button" 
+                  variant="secondary"
+                  onClick={handleDownloadTicket}
+                  className="w-full"
+                  size="lg"
+                >
+                  <Download className="h-5 w-5 mr-2" />
+                  Télécharger le billet (PDF)
+                </Button>
+              )}
             </div>
           </div>
         ) : (
