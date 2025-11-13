@@ -148,7 +148,36 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams }
     if (error) {
       toast.error("Erreur de réservation: " + error.message);
     } else {
-      toast.success("Réservation confirmée! Redirection vers le paiement...");
+      // Send confirmation email
+      try {
+        await supabase.functions.invoke("send-flight-confirmation", {
+          body: {
+            customerEmail,
+            customerName,
+            bookingId: booking.id,
+            flight: {
+              airline: flight.airline,
+              from: flight.from,
+              to: flight.to,
+              departure: flight.departure,
+              arrival: flight.arrival,
+              class: flight.class,
+            },
+            departureDate,
+            returnDate,
+            passengers,
+            totalPrice,
+            passportNumber,
+            tripType,
+          },
+        });
+        console.log("Confirmation email sent");
+      } catch (emailError) {
+        console.error("Error sending confirmation email:", emailError);
+        // Don't block the booking flow if email fails
+      }
+
+      toast.success("Réservation confirmée! Email de confirmation envoyé.");
       onOpenChange(false);
       setShowSummary(false);
       setFormData(null);
