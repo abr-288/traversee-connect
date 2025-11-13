@@ -121,23 +121,20 @@ export const HotelAutocomplete = ({
 
   return (
     <div className="relative w-full">
-      <div className="relative">
-        <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
-        <Input
-          ref={inputRef}
-          type="text"
-          placeholder={placeholder}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onFocus={() => value.length >= 2 && suggestions.length > 0 && setIsOpen(true)}
-          className={cn("pl-10", className)}
-          required
-        />
-        {isLoading && (
-          <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" />
-        )}
-      </div>
+      <Input
+        ref={inputRef}
+        type="text"
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={handleKeyDown}
+        onFocus={() => value.length >= 2 && suggestions.length > 0 && setIsOpen(true)}
+        className={cn(className)}
+        required
+      />
+      {isLoading && (
+        <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" />
+      )}
 
       {isOpen && suggestions.length > 0 && (
         <div

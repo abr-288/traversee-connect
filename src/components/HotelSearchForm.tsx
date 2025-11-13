@@ -1,23 +1,23 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Search, Users } from "lucide-react";
+import { CalendarIcon, Search, MapPin } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { HotelAutocomplete } from "./HotelAutocomplete";
+import { TravelersSelector } from "./TravelersSelector";
 
 export const HotelSearchForm = () => {
   const navigate = useNavigate();
   const [destination, setDestination] = useState("");
   const [checkIn, setCheckIn] = useState<Date>();
   const [checkOut, setCheckOut] = useState<Date>();
-  const [adults, setAdults] = useState("2");
-  const [children, setChildren] = useState("0");
-  const [rooms, setRooms] = useState("1");
+  const [adults, setAdults] = useState(2);
+  const [children, setChildren] = useState(0);
+  const [rooms, setRooms] = useState(1);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,9 +30,9 @@ export const HotelSearchForm = () => {
       destination,
       checkIn: format(checkIn, "yyyy-MM-dd"),
       checkOut: format(checkOut, "yyyy-MM-dd"),
-      adults,
-      children,
-      rooms,
+      adults: adults.toString(),
+      children: children.toString(),
+      rooms: rooms.toString(),
     });
 
     navigate(`/hotels?${params.toString()}`);
@@ -40,37 +40,43 @@ export const HotelSearchForm = () => {
 
   return (
     <form onSubmit={handleSearch} className="w-full max-w-6xl mx-auto">
-      <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6">
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
-          <div className="md:col-span-2">
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
+      <div className="bg-background rounded-xl shadow-2xl overflow-hidden">
+        <div className="flex flex-col lg:flex-row lg:items-end gap-0">
+          {/* Destination */}
+          <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+            <label className="text-xs font-medium text-muted-foreground mb-1 block">
               Destination
             </label>
-            <HotelAutocomplete
-              value={destination}
-              onChange={setDestination}
-              placeholder="Ville ou pays"
-            />
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-muted-foreground" />
+              <HotelAutocomplete
+                value={destination}
+                onChange={setDestination}
+                placeholder="Ville, région ou pays"
+                className="border-0 px-0 focus-visible:ring-0 h-10"
+              />
+            </div>
           </div>
 
-          <div className="md:col-span-1">
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
+          {/* Check-in */}
+          <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+            <label className="text-xs font-medium text-muted-foreground mb-1 block">
               Arrivée
             </label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   className={cn(
-                    "w-full justify-start text-left font-normal",
+                    "w-full h-10 justify-start text-left font-normal px-0 hover:bg-transparent",
                     !checkIn && "text-muted-foreground"
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {checkIn ? format(checkIn, "dd MMM", { locale: fr }) : "Date"}
+                  {checkIn ? format(checkIn, "dd MMM yyyy", { locale: fr }) : "Sélectionner"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 bg-background border border-border shadow-lg z-50" align="start">
+              <PopoverContent className="w-auto p-0 bg-popover z-50" align="start">
                 <Calendar
                   mode="single"
                   selected={checkIn}
@@ -83,24 +89,25 @@ export const HotelSearchForm = () => {
             </Popover>
           </div>
 
-          <div className="md:col-span-1">
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
+          {/* Check-out */}
+          <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+            <label className="text-xs font-medium text-muted-foreground mb-1 block">
               Départ
             </label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   className={cn(
-                    "w-full justify-start text-left font-normal",
+                    "w-full h-10 justify-start text-left font-normal px-0 hover:bg-transparent",
                     !checkOut && "text-muted-foreground"
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {checkOut ? format(checkOut, "dd MMM", { locale: fr }) : "Date"}
+                  {checkOut ? format(checkOut, "dd MMM yyyy", { locale: fr }) : "Sélectionner"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 bg-background border border-border shadow-lg z-50" align="start">
+              <PopoverContent className="w-auto p-0 bg-popover z-50" align="start">
                 <Calendar
                   mode="single"
                   selected={checkOut}
@@ -113,61 +120,30 @@ export const HotelSearchForm = () => {
             </Popover>
           </div>
 
-          <div className="md:col-span-1">
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
-              Voyageurs
+          {/* Voyageurs et Chambres */}
+          <div className="flex-1 p-4 border-b lg:border-b-0 lg:border-r border-border">
+            <label className="text-xs font-medium text-muted-foreground mb-1 block">
+              Voyageurs & Chambres
             </label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full justify-start">
-                  <Users className="mr-2 h-4 w-4" />
-                  {parseInt(adults) + parseInt(children)} pers.
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-64 bg-background border border-border shadow-lg z-50">
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Adultes</span>
-                    <Input
-                      type="number"
-                      min="1"
-                      max="10"
-                      value={adults}
-                      onChange={(e) => setAdults(e.target.value)}
-                      className="w-20"
-                    />
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Enfants</span>
-                    <Input
-                      type="number"
-                      min="0"
-                      max="10"
-                      value={children}
-                      onChange={(e) => setChildren(e.target.value)}
-                      className="w-20"
-                    />
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Chambres</span>
-                    <Input
-                      type="number"
-                      min="1"
-                      max="5"
-                      value={rooms}
-                      onChange={(e) => setRooms(e.target.value)}
-                      className="w-20"
-                    />
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
+            <TravelersSelector
+              adults={adults}
+              children={children}
+              rooms={rooms}
+              onAdultsChange={setAdults}
+              onChildrenChange={setChildren}
+              onRoomsChange={setRooms}
+              showRooms
+            />
           </div>
 
-          <div className="md:col-span-1 flex items-end">
-            <Button type="submit" className="w-full h-10">
-              <Search className="w-4 h-4 md:mr-2" />
-              <span className="hidden md:inline">Rechercher</span>
+          {/* Search Button */}
+          <div className="lg:w-auto w-full">
+            <Button 
+              type="submit"
+              className="w-full h-12 lg:h-16 px-6 md:px-8 bg-secondary text-primary hover:bg-secondary/90 text-base font-semibold gap-2 rounded-none lg:rounded-r-xl"
+            >
+              <Search className="w-5 h-5" />
+              Rechercher
             </Button>
           </div>
         </div>
