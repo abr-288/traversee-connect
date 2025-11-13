@@ -151,12 +151,13 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams }
     } else {
       setBookingId(booking.id);
       
-      // Send confirmation email
+      // Send confirmation email with ticket PDF
       try {
         await supabase.functions.invoke("send-flight-confirmation", {
           body: {
             customerEmail,
             customerName,
+            customerPhone,
             bookingId: booking.id,
             flight: {
               airline: flight.airline,
@@ -171,10 +172,13 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams }
             passengers,
             totalPrice,
             passportNumber,
+            passportIssueDate,
+            passportExpiryDate,
             tripType,
+            currency: "FCFA",
           },
         });
-        console.log("Confirmation email sent");
+        console.log("Confirmation email with ticket sent");
       } catch (emailError) {
         console.error("Error sending confirmation email:", emailError);
         // Don't block the booking flow if email fails

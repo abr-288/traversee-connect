@@ -1,5 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { encode } from "https://deno.land/std@0.190.0/encoding/base64.ts";
+import { generateQRCodeSVG, generateTicketHTML } from "./_utils.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -11,6 +14,7 @@ const corsHeaders = {
 interface FlightConfirmationRequest {
   customerEmail: string;
   customerName: string;
+  customerPhone: string;
   bookingId: string;
   flight: {
     airline: string;
@@ -25,7 +29,10 @@ interface FlightConfirmationRequest {
   passengers: number;
   totalPrice: number;
   passportNumber: string;
+  passportIssueDate: string;
+  passportExpiryDate: string;
   tripType: string;
+  currency: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -34,9 +41,21 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      throw new Error("No authorization header");
+    }
+
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
     const {
       customerEmail,
       customerName,
+      customerPhone,
       bookingId,
       flight,
       departureDate,
@@ -44,10 +63,25 @@ const handler = async (req: Request): Promise<Response> => {
       passengers,
       totalPrice,
       passportNumber,
+      passportIssueDate,
+      passportExpiryDate,
       tripType,
+      currency,
     }: FlightConfirmationRequest = await req.json();
 
     console.log("Sending flight confirmation to:", customerEmail);
+
+    // Generate QR code data
+    const qrData = {
+      bookingId,
+      passenger: customerName,
+      from: flight.from,
+      to: flight.to,
+      date: departureDate,
+      flight: flight.airline,
+    };
+    const qrDataString = JSON.stringify(qrData);
+    const qrCodeSvg = await generateQRCodeSVG(qrDataString);
 
     const formattedDepartureDate = new Date(departureDate).toLocaleDateString('fr-FR', {
       weekday: 'long',
@@ -231,14 +265,40 @@ const handler = async (req: Request): Promise<Response> => {
       </html>
     `;
 
+    // Generate ticket PDF HTML
+    const ticketHtml = generateTicketHTML({
+      customerName,
+      customerEmail,
+      customerPhone,
+      bookingId,
+      flight,
+      departureDate,
+      returnDate,
+      passengers,
+      totalPrice,
+      passportNumber,
+      passportIssueDate,
+      passportExpiryDate,
+      currency,
+      qrCodeSvg,
+    });
+
+    const ticketBase64 = encode(new TextEncoder().encode(ticketHtml));
+
     const emailResponse = await resend.emails.send({
       from: "Bossiz Travel <onboarding@resend.dev>",
       to: [customerEmail],
       subject: `✈️ Confirmation de vol ${flight.from} → ${flight.to}`,
       html: emailHtml,
+      attachments: [
+        {
+          filename: `billet-vol-${bookingId.substring(0, 8)}.html`,
+          content: ticketBase64,
+        },
+      ],
     });
 
-    console.log("Email sent successfully:", emailResponse);
+    console.log("Email sent successfully with ticket attachment:", emailResponse);
 
     return new Response(JSON.stringify({ success: true, emailResponse }), {
       status: 200,
