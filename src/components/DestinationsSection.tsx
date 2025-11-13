@@ -1,12 +1,13 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MapPin, Star } from "lucide-react";
+import { MapPin, Star, Loader2 } from "lucide-react";
 import hotelImg from "@/assets/destination-hotel.jpg";
 import safariImg from "@/assets/destination-safari.jpg";
 import cityImg from "@/assets/destination-city.jpg";
 import { useState } from "react";
 import { BookingDialog } from "@/components/BookingDialog";
 import { useNavigate } from "react-router-dom";
+import { useServices } from "@/hooks/useServices";
 
 const destinations = [
   {
@@ -45,6 +46,25 @@ const DestinationsSection = () => {
   const [selectedDestination, setSelectedDestination] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const navigate = useNavigate();
+  const { services, loading } = useServices();
+
+  // Fallback destinations statiques
+  const fallbackDestinations = destinations;
+
+  // Transformer les services en format destinations
+  const destinationsFromServices = services.slice(0, 6).map(service => ({
+    id: service.id,
+    title: service.name,
+    location: service.location,
+    image: service.image_url || service.images?.[0] || cityImg,
+    rating: Number(service.rating) || 4.5,
+    reviews: service.total_reviews || 0,
+    price: new Intl.NumberFormat('fr-FR').format(Number(service.price_per_unit)),
+    description: service.description || `Découvrez ${service.name}`,
+    type: service.type
+  }));
+
+  const displayDestinations = destinationsFromServices.length > 0 ? destinationsFromServices : fallbackDestinations;
 
   return (
     <>
@@ -66,8 +86,13 @@ const DestinationsSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {destinations.map((destination) => (
+        {loading ? (
+          <div className="flex justify-center items-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {displayDestinations.map((destination) => (
             <Card
               key={destination.id}
               className="group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-smooth cursor-pointer"
@@ -122,8 +147,9 @@ const DestinationsSection = () => {
                 </Button>
               </CardContent>
             </Card>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         <div className="text-center mt-12">
           <Button 
