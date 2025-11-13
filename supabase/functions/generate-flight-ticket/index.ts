@@ -341,7 +341,7 @@ const handler = async (req: Request): Promise<Response> => {
       </html>
     `;
 
-    const htmlBase64 = encode(new TextEncoder().encode(ticketHtml));
+    const htmlBase64 = encode(new TextEncoder().encode(ticketHtml).buffer);
 
     console.log("Flight ticket generated successfully");
 
