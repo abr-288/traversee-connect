@@ -3,31 +3,43 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Bot, Send, X } from "lucide-react";
+import { Bot, Send, X, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useTravelChatbot } from "@/hooks/useTravelChatbot";
+import { useToast } from "@/hooks/use-toast";
 
 export const Boss = () => {
   const { t } = useTranslation();
+  const { toast } = useToast();
+  const { sendMessage, loading } = useTravelChatbot();
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Array<{ role: string; content: string }>>([
+  const [messages, setMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([
     { role: "assistant", content: t("boss.welcome") }
   ]);
   const [input, setInput] = useState("");
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const handleSend = async () => {
+    if (!input.trim() || loading) return;
 
-    setMessages([...messages, { role: "user", content: input }]);
-    
-    // Simulation de réponse
-    setTimeout(() => {
-      setMessages(prev => [...prev, {
-        role: "assistant",
-        content: t("boss.response")
-      }]);
-    }, 1000);
-
+    const userMessage = input.trim();
+    const newMessages = [...messages, { role: "user" as const, content: userMessage }];
+    setMessages(newMessages);
     setInput("");
+
+    const reply = await sendMessage(newMessages);
+    
+    if (reply) {
+      setMessages(prev => [...prev, {
+        role: "assistant" as const,
+        content: reply
+      }]);
+    } else {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'obtenir une réponse. Veuillez réessayer.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -88,12 +100,17 @@ export const Boss = () => {
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleSend()}
+                onKeyPress={(e) => e.key === "Enter" && !loading && handleSend()}
                 placeholder={t("boss.placeholder")}
                 className="flex-1"
+                disabled={loading}
               />
-              <Button onClick={handleSend} size="icon">
-                <Send className="h-4 w-4" />
+              <Button onClick={handleSend} size="icon" disabled={loading}>
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
               </Button>
             </div>
           </div>
