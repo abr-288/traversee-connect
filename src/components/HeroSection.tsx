@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Hotel, Map, Car, Plane, Calendar as CalendarIcon, Search, ArrowRightLeft, ArrowRight, MapPin } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -47,6 +49,8 @@ const HeroSection = () => {
   const [flightReturnDate, setFlightReturnDate] = useState<Date>();
   const [flightAdults, setFlightAdults] = useState(1);
   const [flightChildren, setFlightChildren] = useState(0);
+  const [cabinClass, setCabinClass] = useState("economy");
+  const [directFlights, setDirectFlights] = useState(false);
 
   // Car state
   const [carLocation, setCarLocation] = useState("");
@@ -75,6 +79,8 @@ const HeroSection = () => {
     params.set("adults", flightAdults.toString());
     params.set("children", flightChildren.toString());
     params.set("tripType", tripType);
+    params.set("cabinClass", cabinClass);
+    params.set("directFlights", directFlights.toString());
     navigate(`/flights?${params.toString()}`);
   };
 
@@ -143,7 +149,7 @@ const HeroSection = () => {
 
             {/* Flight Tab */}
             <TabsContent value="flight" className="p-4 md:p-6">
-              <div className="mb-4 flex flex-wrap gap-2 md:gap-3">
+              <div className="mb-4 flex flex-wrap items-center gap-2 md:gap-3">
                 <button
                   onClick={() => setTripType("round-trip")}
                   className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 rounded-full text-xs md:text-sm transition-smooth ${
@@ -180,6 +186,31 @@ const HeroSection = () => {
                   <span className="hidden sm:inline">Multi-destinations</span>
                   <span className="sm:hidden">Multi</span>
                 </button>
+                
+                <div className="ml-auto flex items-center gap-3">
+                  <Select value={cabinClass} onValueChange={setCabinClass}>
+                    <SelectTrigger className="w-[140px] h-9 text-xs md:text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover z-50">
+                      <SelectItem value="economy">Économique</SelectItem>
+                      <SelectItem value="premium">Premium</SelectItem>
+                      <SelectItem value="business">Affaires</SelectItem>
+                      <SelectItem value="first">Première</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  
+                  <div className="flex items-center gap-2">
+                    <Checkbox 
+                      id="direct-flights" 
+                      checked={directFlights}
+                      onCheckedChange={(checked) => setDirectFlights(checked as boolean)}
+                    />
+                    <label htmlFor="direct-flights" className="text-xs md:text-sm text-foreground cursor-pointer whitespace-nowrap">
+                      Vols directs
+                    </label>
+                  </div>
+                </div>
               </div>
               
               {tripType === "multi-city" ? (
