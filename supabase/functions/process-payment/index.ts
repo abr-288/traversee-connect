@@ -103,6 +103,19 @@ serve(async (req) => {
       }
       // Si paymentMethod === 'all', channels reste 'ALL' par défaut
       
+      // Format du numéro de téléphone pour Wave/Mobile Money
+      let formattedPhone = sanitizedCustomerInfo.phone;
+      if (formattedPhone && !formattedPhone.startsWith('+')) {
+        // Si le numéro ne commence pas par +, on ajoute l'indicatif CI
+        if (formattedPhone.startsWith('0')) {
+          formattedPhone = '+225' + formattedPhone.substring(1);
+        } else if (!formattedPhone.startsWith('225')) {
+          formattedPhone = '+225' + formattedPhone;
+        } else {
+          formattedPhone = '+' + formattedPhone;
+        }
+      }
+      
       const payloadData: any = {
         apikey: cinetpayApiKey,
         site_id: cinetpaySiteId,
@@ -113,7 +126,7 @@ serve(async (req) => {
         customer_name: sanitizedCustomerInfo.name.split(' ')[0] || sanitizedCustomerInfo.name,
         customer_surname: sanitizedCustomerInfo.name.split(' ').slice(1).join(' ') || sanitizedCustomerInfo.name,
         customer_email: sanitizedCustomerInfo.email,
-        customer_phone_number: sanitizedCustomerInfo.phone,
+        customer_phone_number: formattedPhone,
         customer_address: sanitizedCustomerInfo.address,
         customer_city: sanitizedCustomerInfo.city,
         customer_country: 'CI',
@@ -122,6 +135,7 @@ serve(async (req) => {
         notify_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/payment-callback`,
         return_url: `${Deno.env.get('SITE_URL') || 'https://lovableproject.com'}/dashboard?tab=bookings`,
         channels: channels,
+        lock_phone_number: false, // Permet à l'utilisateur de modifier le numéro dans l'interface CinetPay
         metadata: JSON.stringify({ booking_id: bookingId }),
       };
 
