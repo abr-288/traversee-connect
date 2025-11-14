@@ -137,59 +137,14 @@ export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProp
       return;
     }
 
-    // Immediately create payment and redirect to CinetPay
-    try {
-      const { data: paymentData, error: paymentError } = await supabase.functions.invoke('process-payment', {
-        body: {
-          bookingId: bookingData.id,
-          amount: totalPrice,
-          currency: service.currency === 'FCFA' ? 'XOF' : service.currency,
-          paymentMethod: 'all',
-          customerInfo: {
-            name: customerName,
-            email: customerEmail,
-            phone: customerPhone || '0000000000',
-            address: 'N/A',
-            city: 'Abidjan',
-          },
-        },
-      });
+    toast({
+      title: "Réservation créée",
+      description: "Redirection vers le paiement...",
+    });
 
-      if (paymentError) {
-        console.error('Payment error:', paymentError);
-        setLoading(false);
-        toast({
-          title: "Erreur de paiement",
-          description: "Impossible de créer le paiement. Veuillez réessayer.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (paymentData?.cinetpay_data?.payment_url) {
-        toast({
-          title: "Réservation réussie !",
-          description: "Redirection vers la page de paiement...",
-        });
-        
-        onOpenChange(false);
-        
-        // Redirect to CinetPay payment page
-        setTimeout(() => {
-          window.location.href = paymentData.cinetpay_data.payment_url;
-        }, 1000);
-      } else {
-        throw new Error('URL de paiement non disponible');
-      }
-    } catch (error) {
-      console.error('Payment processing error:', error);
-      setLoading(false);
-      toast({
-        title: "Erreur",
-        description: "Impossible de traiter le paiement. Veuillez réessayer.",
-        variant: "destructive",
-      });
-    }
+    // Redirect to payment page
+    onOpenChange(false);
+    navigate(`/payment?bookingId=${bookingData.id}`);
   };
 
   return (
