@@ -87,40 +87,52 @@ serve(async (req) => {
       
       // Déterminer les canaux de paiement en fonction de la méthode choisie
       let channels = 'ALL';
+      let operator = undefined;
+      
       if (paymentMethod === 'card') {
         channels = 'CREDIT_CARD';
       } else if (paymentMethod === 'mobile_money') {
         channels = 'MOBILE_MONEY';
+      } else if (paymentMethod === 'wave') {
+        channels = 'MOBILE_MONEY';
+        operator = 'WAVE';
       } else if (paymentMethod === 'bank_transfer') {
         channels = 'BANK_TRANSFER';
       }
       
+      const payloadData: any = {
+        apikey: cinetpayApiKey,
+        site_id: cinetpaySiteId,
+        transaction_id: transactionId,
+        amount: amount,
+        currency: currency === 'FCFA' ? 'XOF' : currency,
+        description: `Payment for booking ${bookingId}`,
+        customer_name: sanitizedCustomerInfo.name.split(' ')[0] || sanitizedCustomerInfo.name,
+        customer_surname: sanitizedCustomerInfo.name.split(' ').slice(1).join(' ') || sanitizedCustomerInfo.name,
+        customer_email: sanitizedCustomerInfo.email,
+        customer_phone_number: sanitizedCustomerInfo.phone,
+        customer_address: sanitizedCustomerInfo.address,
+        customer_city: sanitizedCustomerInfo.city,
+        customer_country: 'CI',
+        customer_state: 'CI',
+        customer_zip_code: '00225',
+        notify_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/payment-callback`,
+        return_url: `${Deno.env.get('SITE_URL') || 'https://lovableproject.com'}/dashboard?tab=bookings`,
+        channels: channels,
+        metadata: JSON.stringify({ booking_id: bookingId }),
+      };
+
+      // Ajouter l'opérateur si spécifié (pour Wave)
+      if (operator) {
+        payloadData.operator = operator;
+      }
+
       const cinetpayResponse = await fetch('https://api-checkout.cinetpay.com/v2/payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          apikey: cinetpayApiKey,
-          site_id: cinetpaySiteId,
-          transaction_id: transactionId,
-          amount: amount,
-          currency: currency === 'FCFA' ? 'XOF' : currency,
-          description: `Payment for booking ${bookingId}`,
-          customer_name: sanitizedCustomerInfo.name.split(' ')[0] || sanitizedCustomerInfo.name,
-          customer_surname: sanitizedCustomerInfo.name.split(' ').slice(1).join(' ') || sanitizedCustomerInfo.name,
-          customer_email: sanitizedCustomerInfo.email,
-          customer_phone_number: sanitizedCustomerInfo.phone,
-          customer_address: sanitizedCustomerInfo.address,
-          customer_city: sanitizedCustomerInfo.city,
-          customer_country: 'CI',
-          customer_state: 'CI',
-          customer_zip_code: '00225',
-          notify_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/payment-callback`,
-          return_url: `${Deno.env.get('SITE_URL') || 'https://lovableproject.com'}/dashboard?tab=bookings`,
-          channels: channels,
-          metadata: JSON.stringify({ booking_id: bookingId }),
-        }),
+        body: JSON.stringify(payloadData),
       });
 
       console.log('CinetPay response status:', cinetpayResponse.status);
