@@ -144,7 +144,7 @@ export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProp
           bookingId: bookingData.id,
           amount: totalPrice,
           currency: service.currency === 'FCFA' ? 'XOF' : service.currency,
-          paymentMethod: 'mobile_money',
+          paymentMethod: 'all',
           customerInfo: {
             name: customerName,
             email: customerEmail,
