@@ -19,7 +19,7 @@ const Payment = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [booking, setBooking] = useState<any>(null);
-  const [paymentMethod, setPaymentMethod] = useState("mobile_money");
+  const [paymentMethod, setPaymentMethod] = useState("wave");
   const [countryCode, setCountryCode] = useState("+225");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [cardNumber, setCardNumber] = useState("");
@@ -107,7 +107,7 @@ const Payment = () => {
     if (!booking) return;
 
     // Validation
-    if (paymentMethod === "mobile_money" && !phoneNumber) {
+    if ((paymentMethod === "mobile_money" || paymentMethod === "wave") && !phoneNumber) {
       toast({
         title: "Erreur",
         description: "Veuillez entrer votre numéro de téléphone",
@@ -315,6 +315,45 @@ const Payment = () => {
                   )}
 
                   <Card 
+                    className={cn(
+                      "cursor-pointer transition-all hover:shadow-md",
+                      paymentMethod === "wave" && "border-primary shadow-md bg-primary/5"
+                    )}
+                    onClick={() => setPaymentMethod("wave")}
+                  >
+                    <CardContent className="flex items-center gap-4 p-4">
+                      <div className={cn(
+                        "p-3 rounded-full",
+                        paymentMethod === "wave" ? "bg-primary text-primary-foreground" : "bg-muted"
+                      )}>
+                        <Smartphone className="h-5 w-5" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold">Wave</h4>
+                        <p className="text-sm text-muted-foreground">Paiement rapide et sécurisé via Wave</p>
+                      </div>
+                      <RadioGroupItem value="wave" id="wave" />
+                    </CardContent>
+                  </Card>
+
+                  {paymentMethod === "wave" && (
+                    <div className="ml-4 space-y-2 animate-in slide-in-from-top-2">
+                      <Label htmlFor="wave-phone">Numéro Wave</Label>
+                      <div className="flex gap-2">
+                        <CountryCodeSelect value={countryCode} onValueChange={setCountryCode} />
+                        <Input
+                          id="wave-phone"
+                          type="tel"
+                          placeholder="XX XX XX XX XX"
+                          value={phoneNumber}
+                          onChange={(e) => setPhoneNumber(e.target.value)}
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <Card
                     className={cn(
                       "cursor-pointer transition-all hover:shadow-md",
                       paymentMethod === "card" && "border-primary shadow-md bg-primary/5"
