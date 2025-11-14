@@ -85,24 +85,6 @@ serve(async (req) => {
         customer: customerInfo.name,
       });
       
-      // Déterminer les canaux de paiement en fonction de la méthode choisie
-      let channels = 'ALL';
-      let operator = undefined;
-      
-      // Si paymentMethod est 'all' ou non spécifié, on laisse channels = 'ALL'
-      // Sinon on filtre selon la méthode choisie
-      if (paymentMethod === 'card') {
-        channels = 'CREDIT_CARD';
-      } else if (paymentMethod === 'mobile_money') {
-        channels = 'MOBILE_MONEY';
-      } else if (paymentMethod === 'wave') {
-        channels = 'MOBILE_MONEY';
-        operator = 'WAVE';
-      } else if (paymentMethod === 'bank_transfer') {
-        channels = 'BANK_TRANSFER';
-      }
-      // Si paymentMethod === 'all', channels reste 'ALL' par défaut
-      
       // Format du numéro de téléphone pour Wave/Mobile Money
       let formattedPhone = sanitizedCustomerInfo.phone;
       if (formattedPhone && !formattedPhone.startsWith('+')) {
@@ -115,6 +97,29 @@ serve(async (req) => {
           formattedPhone = '+' + formattedPhone;
         }
       }
+      
+      // Déterminer les canaux de paiement en fonction de la méthode choisie
+      // Selon la documentation CinetPay: channels peut être ALL, MOBILE_MONEY, CREDIT_CARD, ou WALLET
+      let channels = 'ALL';
+      
+      // Si paymentMethod est 'all' ou non spécifié, on laisse channels = 'ALL'
+      // Sinon on filtre selon la méthode choisie
+      if (paymentMethod === 'card') {
+        channels = 'CREDIT_CARD';
+      } else if (paymentMethod === 'mobile_money' || paymentMethod === 'wave') {
+        // Wave fait partie de MOBILE_MONEY, l'utilisateur pourra sélectionner Wave dans l'interface
+        channels = 'MOBILE_MONEY';
+      } else if (paymentMethod === 'bank_transfer') {
+        channels = 'BANK_TRANSFER';
+      }
+      // Si paymentMethod === 'all', channels reste 'ALL' par défaut
+      
+      console.log('Payment configuration:', {
+        paymentMethod,
+        channels,
+        lock_phone_number: false,
+        customer_phone: formattedPhone
+      });
       
       const payloadData: any = {
         apikey: cinetpayApiKey,
@@ -139,10 +144,12 @@ serve(async (req) => {
         metadata: JSON.stringify({ booking_id: bookingId }),
       };
 
-      // Ajouter l'opérateur si spécifié (pour Wave)
-      if (operator) {
-        payloadData.operator = operator;
-      }
+      // Log des données avant l'envoi à CinetPay
+      console.log('Payload to CinetPay:', JSON.stringify({
+        ...payloadData,
+        apikey: '***HIDDEN***',
+        site_id: '***HIDDEN***'
+      }, null, 2));
 
       const cinetpayResponse = await fetch('https://api-checkout.cinetpay.com/v2/payment', {
         method: 'POST',
