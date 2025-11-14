@@ -88,7 +88,7 @@ export const validatePaymentInput = (data: {
     errors.push({ field: "currency", message: "Currency must be 3 characters" });
   }
 
-  if (!["card", "mobile_money", "bank_transfer"].includes(data.paymentMethod)) {
+  if (!["card", "mobile_money", "bank_transfer", "wave", "all"].includes(data.paymentMethod)) {
     errors.push({ field: "paymentMethod", message: "Invalid payment method" });
   }
 
