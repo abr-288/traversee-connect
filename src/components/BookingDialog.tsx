@@ -127,22 +127,68 @@ export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProp
       payment_status: "pending",
     }).select().single();
 
-    setLoading(false);
-
     if (error) {
+      setLoading(false);
       toast({
         title: "Erreur de réservation",
         description: error.message,
         variant: "destructive",
       });
-    } else {
-      toast({
-        title: "Réservation confirmée",
-        description: `Votre réservation pour ${service.name} a été enregistrée`,
+      return;
+    }
+
+    // Immediately create payment and redirect to CinetPay
+    try {
+      const { data: paymentData, error: paymentError } = await supabase.functions.invoke('process-payment', {
+        body: {
+          bookingId: bookingData.id,
+          amount: totalPrice,
+          currency: service.currency === 'FCFA' ? 'XOF' : service.currency,
+          paymentMethod: 'mobile_money',
+          customerInfo: {
+            name: customerName,
+            email: customerEmail,
+            phone: customerPhone || '0000000000',
+            address: 'N/A',
+            city: 'Abidjan',
+          },
+        },
       });
-      onOpenChange(false);
-      // Redirection vers la page de paiement
-      navigate(`/payment?bookingId=${bookingData.id}`);
+
+      if (paymentError) {
+        console.error('Payment error:', paymentError);
+        setLoading(false);
+        toast({
+          title: "Erreur de paiement",
+          description: "Impossible de créer le paiement. Veuillez réessayer.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (paymentData?.cinetpay_data?.payment_url) {
+        toast({
+          title: "Réservation réussie !",
+          description: "Redirection vers la page de paiement...",
+        });
+        
+        onOpenChange(false);
+        
+        // Redirect to CinetPay payment page
+        setTimeout(() => {
+          window.location.href = paymentData.cinetpay_data.payment_url;
+        }, 1000);
+      } else {
+        throw new Error('URL de paiement non disponible');
+      }
+    } catch (error) {
+      console.error('Payment processing error:', error);
+      setLoading(false);
+      toast({
+        title: "Erreur",
+        description: "Impossible de traiter le paiement. Veuillez réessayer.",
+        variant: "destructive",
+      });
     }
   };
 
