@@ -48,8 +48,14 @@ const DestinationsSection = () => {
   const navigate = useNavigate();
   const { services, loading } = useServices();
 
-  // Fallback destinations statiques
-  const fallbackDestinations = destinations;
+  // Fallback destinations statiques avec format booking
+  const fallbackDestinations = destinations.map(dest => ({
+    ...dest,
+    name: dest.title,
+    price_per_unit: parseFloat(dest.price.replace(/\s/g, '')),
+    currency: 'FCFA',
+    type: 'hotel'
+  }));
 
   // Transformer les services en format destinations
   const destinationsFromServices = services.slice(0, 6).map(service => ({
@@ -61,7 +67,11 @@ const DestinationsSection = () => {
     reviews: service.total_reviews || 0,
     price: new Intl.NumberFormat('fr-FR').format(Number(service.price_per_unit)),
     description: service.description || `Découvrez ${service.name}`,
-    type: service.type
+    type: service.type,
+    // Données pour le booking
+    name: service.name,
+    price_per_unit: Number(service.price_per_unit),
+    currency: service.currency || 'FCFA'
   }));
 
   const displayDestinations = destinationsFromServices.length > 0 ? destinationsFromServices : fallbackDestinations;
