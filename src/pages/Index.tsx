@@ -6,6 +6,10 @@ import TestimonialsSection from "@/components/TestimonialsSection";
 import Footer from "@/components/Footer";
 import { AITravelAdvisor } from "@/components/AITravelAdvisor";
 import { Boss } from "@/components/Boss";
+import StatsSection from "@/components/StatsSection";
+import FeaturedServices from "@/components/FeaturedServices";
+import QuickSearch from "@/components/QuickSearch";
+import SpecialOffers from "@/components/SpecialOffers";
 
 const Index = () => {
   return (
@@ -13,7 +17,11 @@ const Index = () => {
       <Navbar />
       <main>
         <HeroSection />
+        <StatsSection />
+        <QuickSearch />
         <DestinationsSection />
+        <FeaturedServices />
+        <SpecialOffers />
         
         {/* AI Travel Advisor Section */}
         <section className="py-16 px-4 bg-muted/30">
