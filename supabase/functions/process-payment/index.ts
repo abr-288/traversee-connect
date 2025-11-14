@@ -30,7 +30,15 @@ serve(async (req) => {
     }
 
     const requestData = await req.json();
-    const { bookingId, amount, currency, paymentMethod, customerInfo, paymentDetails } = requestData;
+    const { bookingId, amount, currency, paymentMethod, customerInfo } = requestData;
+
+    console.log('Processing payment request:', {
+      bookingId,
+      amount,
+      currency,
+      paymentMethod,
+      customer: customerInfo?.name
+    });
 
     // Validate input
     const validationErrors = validatePaymentInput({
@@ -42,6 +50,7 @@ serve(async (req) => {
     });
 
     if (validationErrors.length > 0) {
+      console.error('Validation errors:', validationErrors);
       return new Response(
         JSON.stringify({
           success: false,
@@ -59,18 +68,17 @@ serve(async (req) => {
     const sanitizedCustomerInfo = {
       name: sanitizeString(customerInfo.name, 100),
       email: sanitizeString(customerInfo.email, 255),
-      phone: customerInfo.phone ? sanitizeString(customerInfo.phone, 20) : '0000000000',
-      address: customerInfo.address ? sanitizeString(customerInfo.address, 200) : 'N/A',
+      phone: customerInfo.phone ? sanitizeString(customerInfo.phone, 20) : null,
+      address: customerInfo.address ? sanitizeString(customerInfo.address, 200) : null,
       city: customerInfo.city ? sanitizeString(customerInfo.city, 100) : 'Abidjan',
     };
 
-    console.log('Processing payment for booking:', bookingId, 'Amount:', amount, currency);
-
-    // Appel à l'API CinetPay pour traiter le paiement
+    // Get CinetPay credentials
     const cinetpayApiKey = Deno.env.get('CINETPAY_API_KEY');
     const cinetpaySiteId = Deno.env.get('CINETPAY_SITE_ID');
     
     if (!cinetpayApiKey || !cinetpaySiteId) {
+      console.error('CinetPay credentials missing');
       throw new Error('CinetPay credentials not configured');
     }
 
@@ -78,121 +86,116 @@ serve(async (req) => {
     try {
       const transactionId = `TXN-${bookingId}-${Date.now()}`;
       
-      console.log('Calling CinetPay API with:', {
-        transaction_id: transactionId,
-        amount,
-        currency,
-        customer: customerInfo.name,
-      });
-      
-      // Format du numéro de téléphone pour Wave/Mobile Money
-      let formattedPhone = sanitizedCustomerInfo.phone;
-      if (formattedPhone && !formattedPhone.startsWith('+')) {
-        // Si le numéro ne commence pas par +, on ajoute l'indicatif CI
-        if (formattedPhone.startsWith('0')) {
-          formattedPhone = '+225' + formattedPhone.substring(1);
-        } else if (!formattedPhone.startsWith('225')) {
-          formattedPhone = '+225' + formattedPhone;
-        } else {
-          formattedPhone = '+' + formattedPhone;
+      // Format phone number for international format
+      let formattedPhone = sanitizedCustomerInfo.phone || '';
+      if (formattedPhone) {
+        // Remove all spaces and special characters
+        formattedPhone = formattedPhone.replace(/[\s\-\(\)]/g, '');
+        
+        // Add +225 prefix if not present
+        if (!formattedPhone.startsWith('+')) {
+          if (formattedPhone.startsWith('0')) {
+            formattedPhone = '+225' + formattedPhone.substring(1);
+          } else if (!formattedPhone.startsWith('225')) {
+            formattedPhone = '+225' + formattedPhone;
+          } else {
+            formattedPhone = '+' + formattedPhone;
+          }
         }
       }
       
-      // Déterminer les canaux de paiement en fonction de la méthode choisie
-      // Selon la documentation CinetPay: channels peut être ALL, MOBILE_MONEY, CREDIT_CARD, ou WALLET
+      // Determine payment channels based on method
       let channels = 'ALL';
-      
-      // Si paymentMethod est 'all' ou non spécifié, on laisse channels = 'ALL'
-      // Sinon on filtre selon la méthode choisie
       if (paymentMethod === 'card') {
         channels = 'CREDIT_CARD';
       } else if (paymentMethod === 'mobile_money' || paymentMethod === 'wave') {
-        // Wave fait partie de MOBILE_MONEY, l'utilisateur pourra sélectionner Wave dans l'interface
         channels = 'MOBILE_MONEY';
       } else if (paymentMethod === 'bank_transfer') {
         channels = 'BANK_TRANSFER';
       }
-      // Si paymentMethod === 'all', channels reste 'ALL' par défaut
       
-      console.log('Payment configuration:', {
-        paymentMethod,
+      console.log('CinetPay request:', {
+        transaction_id: transactionId,
+        amount,
+        currency: currency === 'FCFA' ? 'XOF' : currency,
         channels,
-        lock_phone_number: false,
-        customer_phone: formattedPhone
+        customer_phone: formattedPhone,
+        lock_phone: !formattedPhone // Lock only if phone is provided
       });
       
+      // Build CinetPay payload
       const payloadData: any = {
         apikey: cinetpayApiKey,
         site_id: cinetpaySiteId,
         transaction_id: transactionId,
         amount: amount,
         currency: currency === 'FCFA' ? 'XOF' : currency,
-        description: `Payment for booking ${bookingId}`,
+        description: `Réservation #${bookingId}`,
         customer_name: sanitizedCustomerInfo.name.split(' ')[0] || sanitizedCustomerInfo.name,
         customer_surname: sanitizedCustomerInfo.name.split(' ').slice(1).join(' ') || sanitizedCustomerInfo.name,
         customer_email: sanitizedCustomerInfo.email,
-        customer_phone_number: formattedPhone,
-        customer_address: sanitizedCustomerInfo.address,
+        customer_phone_number: formattedPhone || '+2250000000000',
+        customer_address: sanitizedCustomerInfo.address || 'N/A',
         customer_city: sanitizedCustomerInfo.city,
         customer_country: 'CI',
         customer_state: 'CI',
         customer_zip_code: '00225',
         notify_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/payment-callback`,
-        return_url: `${Deno.env.get('SITE_URL') || 'https://lovableproject.com'}/dashboard?tab=bookings`,
+        return_url: `${Deno.env.get('SITE_URL') || window.location.origin}/dashboard?tab=bookings`,
         channels: channels,
-        lock_phone_number: false, // Permet à l'utilisateur de modifier le numéro dans l'interface CinetPay
+        lock_phone_number: formattedPhone ? false : true,
         metadata: JSON.stringify({ booking_id: bookingId }),
       };
 
-      // Log des données avant l'envoi à CinetPay
-      console.log('Payload to CinetPay:', JSON.stringify({
-        ...payloadData,
-        apikey: '***HIDDEN***',
-        site_id: '***HIDDEN***'
-      }, null, 2));
-
+      // Call CinetPay API
       const cinetpayResponse = await fetch('https://api-checkout.cinetpay.com/v2/payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         body: JSON.stringify(payloadData),
       });
 
-      console.log('CinetPay response status:', cinetpayResponse.status);
-      
       const cinetpayData = await cinetpayResponse.json();
-      console.log('CinetPay response:', cinetpayData);
+      console.log('CinetPay response:', {
+        status: cinetpayResponse.status,
+        code: cinetpayData.code,
+        message: cinetpayData.message,
+        has_payment_url: !!cinetpayData.data?.payment_url
+      });
       
       if (cinetpayData.code !== '201') {
-        console.error('CinetPay API error:', cinetpayData);
-        throw new Error(cinetpayData.message || 'Payment processing failed');
+        console.error('CinetPay error:', cinetpayData);
+        throw new Error(cinetpayData.message || 'Erreur lors de la création du paiement');
+      }
+
+      if (!cinetpayData.data?.payment_url) {
+        throw new Error('URL de paiement non reçue de CinetPay');
       }
 
       paymentData = {
         transaction_id: transactionId,
         status: 'pending',
-        payment_url: cinetpayData.data?.payment_url || null,
-        payment_token: cinetpayData.data?.payment_token || null,
-        message: 'Payment gateway created. Please complete payment at the provided URL.',
+        payment_url: cinetpayData.data.payment_url,
+        payment_token: cinetpayData.data.payment_token || null,
         raw_response: cinetpayData,
       };
       
-      console.log('CinetPay payment gateway created:', paymentData);
+      console.log('Payment created successfully:', transactionId);
     } catch (error) {
-      console.error('Error calling CinetPay API:', error);
-      throw new Error(`Failed to process payment: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error('CinetPay API error:', error);
+      throw new Error(`Erreur de paiement: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
     }
 
-
-    // Enregistrer le paiement dans la base de données
+    // Save payment to database
     const { data: payment, error: paymentError } = await supabase
       .from('payments')
       .insert({
         booking_id: bookingId,
         user_id: user.id,
         amount: amount,
-        currency: currency === 'FCFA' ? 'XOF' : currency || 'XOF',
+        currency: currency === 'FCFA' ? 'XOF' : currency,
         payment_method: paymentMethod,
         payment_provider: 'cinetpay',
         transaction_id: paymentData.transaction_id,
@@ -204,23 +207,19 @@ serve(async (req) => {
 
     if (paymentError) {
       console.error('Database error:', paymentError);
-      throw new Error('Failed to record payment');
+      throw new Error('Impossible d\'enregistrer le paiement');
     }
 
-    // Le statut sera mis à jour par le callback webhook de Lygos
+    console.log('Payment record created:', payment.id);
 
     return new Response(
       JSON.stringify({
         success: true,
-        payment: payment,
-        cinetpay_data: {
-          payment_url: paymentData.payment_url,
-          payment_token: paymentData.payment_token,
-          transaction_id: paymentData.transaction_id,
-          status: paymentData.status,
-        },
+        payment_url: paymentData.payment_url,
+        transaction_id: paymentData.transaction_id,
       }),
       {
+        status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );

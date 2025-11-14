@@ -106,14 +106,16 @@ const Payment = () => {
   const handlePayment = async () => {
     if (!booking) return;
 
-    // Validation
-    if ((paymentMethod === "mobile_money" || paymentMethod === "wave") && !phoneNumber) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez entrer votre numéro de téléphone",
-        variant: "destructive",
-      });
-      return;
+    // Validation based on payment method
+    if (paymentMethod === "mobile_money" || paymentMethod === "wave") {
+      if (!phoneNumber) {
+        toast({
+          title: "Erreur",
+          description: "Veuillez entrer votre numéro de téléphone",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     if (paymentMethod === "card") {
@@ -166,71 +168,78 @@ const Payment = () => {
     }
 
     setLoading(true);
+
     try {
-      const fullPhoneNumber = paymentMethod === "mobile_money" ? `${countryCode}${phoneNumber}` : booking.customer_phone;
+      const { data: { user } } = await supabase.auth.getUser();
       
-      // Nettoyer le numéro de carte (enlever les espaces)
-      const cleanCardNumber = cardNumber.replace(/\s+/g, "");
-      
+      if (!user) {
+        toast({
+          title: "Erreur",
+          description: "Vous devez être connecté",
+          variant: "destructive",
+        });
+        navigate("/auth");
+        return;
+      }
+
+      // Prepare customer info with phone number
+      const fullPhoneNumber = (paymentMethod === "mobile_money" || paymentMethod === "wave") && phoneNumber
+        ? `${countryCode}${phoneNumber}`
+        : booking.customer_phone;
+
+      const customerInfo = {
+        name: booking.customer_name,
+        email: booking.customer_email,
+        phone: fullPhoneNumber,
+        address: billingAddress || undefined,
+        city: billingCity || 'Abidjan',
+      };
+
+      console.log('Processing payment:', {
+        bookingId: booking.id,
+        amount: booking.total_price,
+        currency: booking.currency,
+        paymentMethod,
+      });
+
+      // Call payment processing function
       const { data, error } = await supabase.functions.invoke("process-payment", {
         body: {
           bookingId: booking.id,
           amount: booking.total_price,
           currency: booking.currency === "FCFA" || !booking.currency ? "XOF" : booking.currency,
-          paymentMethod: paymentMethod,
-          customerInfo: {
-            name: booking.customer_name,
-            email: booking.customer_email,
-            phone: fullPhoneNumber,
-            address: paymentMethod === "card" ? billingAddress : "",
-            city: paymentMethod === "card" ? billingCity : "",
-          },
-          paymentDetails: paymentMethod === "card" ? {
-            cardNumber: cleanCardNumber,
-            cardExpiry,
-            cardCvv
-          } : {
-            phone: fullPhoneNumber
-          },
+          paymentMethod,
+          customerInfo,
         },
       });
 
-      if (error) throw error;
-
-      if (data.success) {
-        // Si CinetPay retourne une URL de paiement, rediriger l'utilisateur
-        if (data.cinetpay_data?.payment_url) {
-          toast({
-            title: "Redirection vers le paiement",
-            description: "Vous allez être redirigé vers la page de paiement CinetPay...",
-          });
-          
-          // Rediriger directement vers la page de paiement CinetPay
-          window.location.href = data.cinetpay_data.payment_url;
-        } else {
-          toast({
-            title: "Succès",
-            description: "Paiement effectué avec succès",
-          });
-
-          // Générer la facture
-          await supabase.functions.invoke("generate-invoice", {
-            body: { bookingId: booking.id },
-          });
-
-          navigate(`/dashboard?tab=bookings`);
-        }
-      } else {
-        throw new Error(data.error || "Payment failed");
+      if (error) {
+        console.error('Payment function error:', error);
+        throw error;
       }
-    } catch (error) {
+
+      if (!data?.payment_url) {
+        throw new Error("URL de paiement non reçue");
+      }
+
+      console.log('Redirecting to payment URL');
+      toast({
+        title: "Redirection",
+        description: "Redirection vers la page de paiement...",
+      });
+      
+      // Redirect to CinetPay
+      setTimeout(() => {
+        window.location.href = data.payment_url;
+      }, 500);
+      
+    } catch (error: any) {
       console.error("Payment error:", error);
       toast({
-        title: "Erreur",
-        description: "Le paiement a échoué. Veuillez réessayer.",
+        title: "Erreur de paiement",
+        description: error.message || "Une erreur est survenue lors du traitement du paiement",
         variant: "destructive",
       });
-    } finally {
       setLoading(false);
     }
   };
