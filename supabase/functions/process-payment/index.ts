@@ -89,6 +89,8 @@ serve(async (req) => {
       let channels = 'ALL';
       let operator = undefined;
       
+      // Si paymentMethod est 'all' ou non spécifié, on laisse channels = 'ALL'
+      // Sinon on filtre selon la méthode choisie
       if (paymentMethod === 'card') {
         channels = 'CREDIT_CARD';
       } else if (paymentMethod === 'mobile_money') {
@@ -99,6 +101,7 @@ serve(async (req) => {
       } else if (paymentMethod === 'bank_transfer') {
         channels = 'BANK_TRANSFER';
       }
+      // Si paymentMethod === 'all', channels reste 'ALL' par défaut
       
       const payloadData: any = {
         apikey: cinetpayApiKey,
