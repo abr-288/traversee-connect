@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,7 @@ interface BookingDialogProps {
 
 export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProps) => {
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -109,7 +111,7 @@ export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProp
     const days = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
     const totalPrice = service.price_per_unit * guests * days;
 
-    const { error } = await supabase.from("bookings").insert({
+    const { data: bookingData, error } = await supabase.from("bookings").insert({
       user_id: user.id,
       service_id: serviceId,
       start_date: startDate,
@@ -123,7 +125,7 @@ export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProp
       currency: service.currency,
       status: "pending",
       payment_status: "pending",
-    });
+    }).select().single();
 
     setLoading(false);
 
@@ -139,6 +141,8 @@ export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProp
         description: `Votre réservation pour ${service.name} a été enregistrée`,
       });
       onOpenChange(false);
+      // Redirection vers la page de paiement
+      navigate(`/payment?bookingId=${bookingData.id}`);
     }
   };
 
