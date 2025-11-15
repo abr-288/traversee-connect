@@ -141,7 +141,7 @@ serve(async (req) => {
         customer_state: 'CI',
         customer_zip_code: '00225',
         notify_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/payment-callback`,
-        return_url: `${Deno.env.get('SITE_URL') || window.location.origin}/dashboard?tab=bookings`,
+        return_url: `https://traversee-connect.lovable.app/dashboard?tab=bookings`,
         channels: channels,
         lock_phone_number: formattedPhone ? false : true,
         metadata: JSON.stringify({ booking_id: bookingId }),
