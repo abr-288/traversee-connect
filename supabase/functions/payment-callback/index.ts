@@ -12,168 +12,175 @@ serve(async (req) => {
   }
 
   try {
-    const body = await req.json();
-    
-    console.log('CinetPay callback received:', {
-      transaction_id: body.cpm_trans_id,
-      timestamp: new Date().toISOString(),
-    });
+    const requestData = await req.json();
+    console.log('=== PAYMENT CALLBACK START ===');
+    console.log('Raw callback data:', JSON.stringify(requestData, null, 2));
 
-    const cinetpayApiKey = Deno.env.get('CINETPAY_API_KEY');
-    const cinetpaySiteId = Deno.env.get('CINETPAY_SITE_ID');
+    const { cpm_trans_id, cpm_site_id, signature } = requestData;
 
-    if (!cinetpayApiKey || !cinetpaySiteId) {
-      console.error('CinetPay credentials not configured');
-      throw new Error('CinetPay credentials not configured');
+    if (!cpm_trans_id || !cpm_site_id) {
+      console.error('❌ Missing required parameters');
+      throw new Error('Missing transaction ID or site ID');
     }
 
+    // Get CinetPay credentials
+    const cinetpayApiKey = Deno.env.get('CINETPAY_API_KEY');
+    const cinetpaySiteId = Deno.env.get('CINETPAY_SITE_ID');
+    
+    if (!cinetpayApiKey || !cinetpaySiteId) {
+      console.error('❌ CinetPay credentials missing');
+      throw new Error('Payment gateway not configured');
+    }
+
+    // Verify site ID matches
+    if (cpm_site_id !== cinetpaySiteId) {
+      console.error('❌ Site ID mismatch');
+      throw new Error('Invalid site ID');
+    }
+
+    // Initialize Supabase client with service role for server-side operations
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Check if transaction was already processed (idempotency)
-    const transactionId = body.cpm_trans_id;
+    // Check idempotency - avoid processing same callback twice
     const { data: existingPayment } = await supabase
       .from('payments')
-      .select('id, status')
-      .eq('transaction_id', transactionId)
+      .select('id, status, transaction_id')
+      .eq('transaction_id', cpm_trans_id)
       .single();
 
     if (existingPayment && existingPayment.status === 'completed') {
-      console.log('Transaction already processed:', transactionId);
+      console.log('⚠️ Payment already processed:', cpm_trans_id);
       return new Response(
-        JSON.stringify({
-          success: true,
-          message: 'Transaction already processed',
-        }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        JSON.stringify({ success: true, message: 'Payment already processed' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     // Verify payment status with CinetPay
-    const checkResponse = await fetch('https://api-checkout.cinetpay.com/v2/payment/check', {
+    console.log('=== VERIFYING WITH CINETPAY ===');
+    const verifyPayload = {
+      apikey: cinetpayApiKey,
+      site_id: cinetpaySiteId,
+      transaction_id: cpm_trans_id,
+    };
+
+    const verifyResponse = await fetch('https://api-checkout.cinetpay.com/v2/payment/check', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
-      body: JSON.stringify({
-        apikey: cinetpayApiKey,
-        site_id: cinetpaySiteId,
-        transaction_id: transactionId,
-      }),
+      body: JSON.stringify(verifyPayload),
     });
 
-    const checkData = await checkResponse.json();
-    console.log('CinetPay verification:', {
-      code: checkData.code,
-      payment_status: checkData.data?.payment_status,
-      transaction_id: transactionId
-    });
+    const verifyData = await verifyResponse.json();
+    console.log('CinetPay verification response:', JSON.stringify(verifyData, null, 2));
 
-    if (checkData.code !== '00') {
-      throw new Error(`Payment verification failed: ${checkData.message}`);
-    }
-
-    // Extract booking_id from metadata
-    let bookingId;
-    try {
-      const metadata = JSON.parse(checkData.data.metadata || '{}');
-      bookingId = metadata.booking_id;
-    } catch (e) {
-      // Fallback: extract from transaction_id (TXN-{bookingId}-{timestamp})
-      const match = transactionId.match(/TXN-([a-f0-9-]+)-\d+/);
-      bookingId = match ? match[1] : null;
-    }
-
-    if (!bookingId) {
-      console.error('Cannot extract booking_id from:', checkData.data);
-      throw new Error('Unable to extract booking_id');
-    }
-
-    const paymentStatus = checkData.data.payment_status;
-
-    if (paymentStatus === 'ACCEPTED' || paymentStatus === 'SUCCESSFUL') {
-      // Update payment status
-      const { error: paymentError } = await supabase
-        .from('payments')
-        .update({ 
-          status: 'completed',
-          payment_data: checkData.data
-        })
-        .eq('transaction_id', transactionId);
-
-      if (paymentError) {
-        console.error('Error updating payment:', paymentError);
+    if (verifyData.code !== '00') {
+      console.error('❌ Payment verification failed:', verifyData.message);
+      
+      // Update payment as failed
+      if (existingPayment) {
+        await supabase
+          .from('payments')
+          .update({
+            status: 'failed',
+            payment_data: { ...existingPayment, verification_response: verifyData },
+            updated_at: new Date().toISOString(),
+          })
+          .eq('transaction_id', cpm_trans_id);
       }
 
-      // Update booking status
-      const { error: bookingError } = await supabase
+      throw new Error(verifyData.message || 'Payment verification failed');
+    }
+
+    const paymentStatus = verifyData.data?.status;
+    const metadata = verifyData.data?.metadata ? JSON.parse(verifyData.data.metadata) : {};
+    const bookingId = metadata.booking_id;
+
+    console.log('Payment status:', paymentStatus);
+    console.log('Booking ID:', bookingId);
+
+    if (!bookingId) {
+      console.error('❌ No booking ID in metadata');
+      throw new Error('No booking ID found');
+    }
+
+    // Update payment record
+    const paymentUpdateData: any = {
+      status: paymentStatus === 'ACCEPTED' ? 'completed' : 'failed',
+      payment_data: {
+        verification_response: verifyData,
+        callback_data: requestData,
+      },
+      updated_at: new Date().toISOString(),
+    };
+
+    const { error: paymentUpdateError } = await supabase
+      .from('payments')
+      .update(paymentUpdateData)
+      .eq('transaction_id', cpm_trans_id);
+
+    if (paymentUpdateError) {
+      console.error('❌ Failed to update payment:', paymentUpdateError);
+      throw new Error('Failed to update payment');
+    }
+
+    console.log('✅ Payment updated:', cpm_trans_id, paymentUpdateData.status);
+
+    // If payment successful, update booking
+    if (paymentStatus === 'ACCEPTED') {
+      const { error: bookingUpdateError } = await supabase
         .from('bookings')
-        .update({ 
-          payment_status: 'paid', 
-          status: 'confirmed' 
+        .update({
+          payment_status: 'paid',
+          status: 'confirmed',
+          updated_at: new Date().toISOString(),
         })
         .eq('id', bookingId);
 
-      if (bookingError) {
-        console.error('Error updating booking:', bookingError);
+      if (bookingUpdateError) {
+        console.error('❌ Failed to update booking:', bookingUpdateError);
+      } else {
+        console.log('✅ Booking confirmed:', bookingId);
       }
 
       // Generate invoice
       try {
-        await supabase.functions.invoke('generate-invoice', {
-          body: { bookingId },
-        });
-      } catch (invoiceError) {
-        console.error('Error generating invoice:', invoiceError);
-      }
+        console.log('Generating invoice...');
+        const { data: invoiceData, error: invoiceError } = await supabase.functions.invoke(
+          'generate-invoice',
+          { body: { bookingId } }
+        );
 
-      console.log('Payment successful for booking:', bookingId);
-
-      return new Response(
-        JSON.stringify({
-          success: true,
-          message: 'Payment processed successfully',
-        }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        if (invoiceError) {
+          console.error('⚠️ Invoice generation failed:', invoiceError);
+        } else {
+          console.log('✅ Invoice generated');
         }
-      );
-    } else {
-      // Update payment as failed
-      const { error: paymentError } = await supabase
-        .from('payments')
-        .update({ 
-          status: 'failed',
-          payment_data: checkData.data
-        })
-        .eq('transaction_id', transactionId);
-
-      if (paymentError) {
-        console.error('Error updating payment:', paymentError);
+      } catch (invoiceErr) {
+        console.error('⚠️ Invoice generation error:', invoiceErr);
       }
-
-      console.log('Payment failed for booking:', bookingId);
-
-      return new Response(
-        JSON.stringify({
-          success: false,
-          message: 'Payment failed',
-        }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      );
     }
+
+    console.log('=== PAYMENT CALLBACK END ===');
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        status: paymentStatus,
+        booking_id: bookingId,
+      }),
+      {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   } catch (error) {
-    console.error('Error in payment-callback:', error);
+    console.error('❌ ERROR in payment-callback:', error);
     return new Response(
       JSON.stringify({
         success: false,

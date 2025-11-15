@@ -1,86 +1,41 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, CreditCard, Smartphone, Building2, CheckCircle2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { cn } from "@/lib/utils";
-import { CountryCodeSelect } from "@/components/CountryCodeSelect";
 
-const Payment = () => {
+export default function Payment() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
-  const [booking, setBooking] = useState<any>(null);
-  const [paymentMethod, setPaymentMethod] = useState("wave");
-  const [countryCode, setCountryCode] = useState("+225");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [cardNumber, setCardNumber] = useState("");
-  const [cardExpiry, setCardExpiry] = useState("");
-  const [cardCvv, setCardCvv] = useState("");
-  const [billingAddress, setBillingAddress] = useState("");
-  const [billingCity, setBillingCity] = useState("");
-
-  // Formatage automatique du numéro de carte
-  const formatCardNumber = (value: string) => {
-    const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
-    const matches = v.match(/\d{4,16}/g);
-    const match = (matches && matches[0]) || "";
-    const parts = [];
-
-    for (let i = 0, len = match.length; i < len; i += 4) {
-      parts.push(match.substring(i, i + 4));
-    }
-
-    if (parts.length) {
-      return parts.join(" ");
-    } else {
-      return value;
-    }
-  };
-
-  // Formatage automatique de la date d'expiration
-  const formatCardExpiry = (value: string) => {
-    const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
-    
-    if (v.length >= 2) {
-      return v.slice(0, 2) + "/" + v.slice(2, 4);
-    }
-    
-    return v;
-  };
-
-  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatCardNumber(e.target.value);
-    setCardNumber(formatted);
-  };
-
-  const handleCardExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatCardExpiry(e.target.value);
-    setCardExpiry(formatted);
-  };
-
   const bookingId = searchParams.get("bookingId");
 
-  useEffect(() => {
-    if (!bookingId) {
-      toast({
-        title: "Erreur",
-        description: "ID de réservation manquant",
-        variant: "destructive",
-      });
-      navigate("/");
-      return;
-    }
+  const [loading, setLoading] = useState(true);
+  const [processing, setProcessing] = useState(false);
+  const [booking, setBooking] = useState<any>(null);
+  const [paymentMethod, setPaymentMethod] = useState("wave");
+  
+  // Customer info
+  const [customerName, setCustomerName] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [customerAddress, setCustomerAddress] = useState("");
+  const [customerCity, setCustomerCity] = useState("Abidjan");
 
-    loadBooking();
+  useEffect(() => {
+    if (bookingId) {
+      loadBooking();
+      loadUserProfile();
+    } else {
+      navigate("/dashboard?tab=bookings");
+    }
   }, [bookingId]);
 
   const loadBooking = async () => {
@@ -92,7 +47,21 @@ const Payment = () => {
         .single();
 
       if (error) throw error;
+
+      if (!data) {
+        toast({
+          title: "Erreur",
+          description: "Réservation introuvable",
+          variant: "destructive",
+        });
+        navigate("/dashboard?tab=bookings");
+        return;
+      }
+
       setBooking(data);
+      setCustomerName(data.customer_name || "");
+      setCustomerEmail(data.customer_email || "");
+      setCustomerPhone(data.customer_phone || "");
     } catch (error) {
       console.error("Error loading booking:", error);
       toast({
@@ -100,151 +69,122 @@ const Payment = () => {
         description: "Impossible de charger la réservation",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadUserProfile = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single();
+
+        if (profile) {
+          if (!customerName) setCustomerName(profile.full_name || "");
+          if (!customerPhone) setCustomerPhone(profile.phone || "");
+          if (!customerEmail) setCustomerEmail(user.email || "");
+        }
+      }
+    } catch (error) {
+      console.error("Error loading user profile:", error);
     }
   };
 
   const handlePayment = async () => {
     if (!booking) return;
 
-    // Validation based on payment method
-    if (paymentMethod === "mobile_money" || paymentMethod === "wave") {
-      if (!phoneNumber) {
-        toast({
-          title: "Erreur",
-          description: "Veuillez entrer votre numéro de téléphone",
-          variant: "destructive",
-        });
-        return;
-      }
+    // Validation
+    if (!customerName || !customerEmail || !customerPhone) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez remplir tous les champs obligatoires",
+        variant: "destructive",
+      });
+      return;
     }
 
-    if (paymentMethod === "card") {
-      const cleanCardNumber = cardNumber.replace(/\s+/g, "");
-      
-      if (!cardNumber || cleanCardNumber.length < 16) {
-        toast({
-          title: "Erreur",
-          description: "Veuillez entrer un numéro de carte valide (16 chiffres)",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      if (!cardExpiry || cardExpiry.length !== 5) {
-        toast({
-          title: "Erreur",
-          description: "Veuillez entrer une date d'expiration valide (MM/AA)",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      if (!cardCvv || cardCvv.length !== 3) {
-        toast({
-          title: "Erreur",
-          description: "Veuillez entrer un CVV valide (3 chiffres)",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (!billingAddress || billingAddress.trim().length === 0) {
-        toast({
-          title: "Erreur",
-          description: "Veuillez entrer votre adresse de facturation",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (!billingCity || billingCity.trim().length === 0) {
-        toast({
-          title: "Erreur",
-          description: "Veuillez entrer votre ville",
-          variant: "destructive",
-        });
-        return;
-      }
+    // Phone validation
+    const phoneRegex = /^[\d\s\-\+\(\)]{8,}$/;
+    if (!phoneRegex.test(customerPhone)) {
+      toast({
+        title: "Erreur",
+        description: "Numéro de téléphone invalide",
+        variant: "destructive",
+      });
+      return;
     }
 
-    setLoading(true);
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(customerEmail)) {
+      toast({
+        title: "Erreur",
+        description: "Adresse email invalide",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setProcessing(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast({
-          title: "Erreur",
-          description: "Vous devez être connecté",
-          variant: "destructive",
-        });
-        navigate("/auth");
-        return;
-      }
+      console.log("=== INITIATING PAYMENT ===");
+      console.log("Booking ID:", bookingId);
+      console.log("Amount:", booking.total_price, booking.currency);
+      console.log("Method:", paymentMethod);
 
-      // Prepare customer info with phone number
-      const fullPhoneNumber = (paymentMethod === "mobile_money" || paymentMethod === "wave") && phoneNumber
-        ? `${countryCode}${phoneNumber}`
-        : booking.customer_phone;
-
-      const customerInfo = {
-        name: booking.customer_name,
-        email: booking.customer_email,
-        phone: fullPhoneNumber,
-        address: billingAddress || undefined,
-        city: billingCity || 'Abidjan',
-      };
-
-      console.log('Processing payment:', {
-        bookingId: booking.id,
-        amount: booking.total_price,
-        currency: booking.currency,
-        paymentMethod,
-      });
-
-      // Call payment processing function
       const { data, error } = await supabase.functions.invoke("process-payment", {
         body: {
-          bookingId: booking.id,
+          bookingId: bookingId,
           amount: booking.total_price,
-          currency: booking.currency === "FCFA" || !booking.currency ? "XOF" : booking.currency,
-          paymentMethod,
-          customerInfo,
+          currency: booking.currency,
+          paymentMethod: paymentMethod,
+          customerInfo: {
+            name: customerName,
+            email: customerEmail,
+            phone: customerPhone,
+            address: customerAddress,
+            city: customerCity,
+          },
         },
       });
 
+      console.log("Payment response:", data);
+
       if (error) {
-        console.error('Payment function error:', error);
+        console.error("Payment error:", error);
         throw error;
       }
 
-      if (!data?.payment_url) {
+      if (!data?.success) {
+        throw new Error(data?.error || "Échec de la création du paiement");
+      }
+
+      if (!data.payment_url) {
         throw new Error("URL de paiement non reçue");
       }
 
-      console.log('Redirecting to payment URL');
-      toast({
-        title: "Redirection",
-        description: "Redirection vers la page de paiement...",
-      });
-      
-      // Redirect to CinetPay
-      setTimeout(() => {
-        window.location.href = data.payment_url;
-      }, 500);
-      
-    } catch (error: any) {
+      console.log("✅ Redirecting to:", data.payment_url);
+
+      // Redirect to CinetPay payment page
+      window.location.href = data.payment_url;
+    } catch (error) {
       console.error("Payment error:", error);
       toast({
         title: "Erreur de paiement",
-        description: error.message || "Une erreur est survenue lors du traitement du paiement",
+        description: error instanceof Error ? error.message : "Une erreur s'est produite",
         variant: "destructive",
       });
-      setLoading(false);
+      setProcessing(false);
     }
   };
 
-  if (!booking) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -252,243 +192,158 @@ const Payment = () => {
     );
   }
 
+  if (!booking) {
+    return null;
+  }
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="container mx-auto px-4 py-24">
+      <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
-          <Card>
-            <CardHeader>
-              <CardTitle>Paiement de votre réservation</CardTitle>
-              <CardDescription>
-                Référence: {booking.booking_reference}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="bg-gradient-to-br from-primary/10 to-primary/5 p-6 rounded-xl border-2 border-primary/20 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground font-medium">Montant total</span>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-primary" />
-                    <span className="text-2xl font-bold text-primary">
-                      {booking.total_price} {booking.currency || "FCFA"}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex justify-between pt-2 border-t border-primary/10">
-                  <span className="text-sm text-muted-foreground">Client:</span>
-                  <span className="text-sm font-medium">{booking.customer_name}</span>
-                </div>
+          <h1 className="text-3xl font-bold mb-2">Paiement</h1>
+          <p className="text-muted-foreground mb-8">
+            Complétez votre réservation en effectuant le paiement
+          </p>
+
+          <Card className="p-6 mb-6">
+            <h2 className="text-xl font-semibold mb-4">Détails de la réservation</h2>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Référence:</span>
+                <span className="font-medium">{booking.id.substring(0, 8)}</span>
               </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Montant:</span>
+                <span className="font-bold text-lg">
+                  {booking.total_price.toLocaleString()} {booking.currency}
+                </span>
+              </div>
+            </div>
+          </Card>
 
-              <div className="space-y-4">
-                <Label className="text-base font-semibold">Méthode de paiement</Label>
-                <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="grid gap-3">
-                  <Card 
-                    className={cn(
-                      "cursor-pointer transition-all hover:shadow-md",
-                      paymentMethod === "mobile_money" && "border-primary shadow-md bg-primary/5"
-                    )}
-                    onClick={() => setPaymentMethod("mobile_money")}
-                  >
-                    <CardContent className="flex items-center gap-4 p-4">
-                      <div className={cn(
-                        "p-3 rounded-full",
-                        paymentMethod === "mobile_money" ? "bg-primary text-primary-foreground" : "bg-muted"
-                      )}>
-                        <Smartphone className="h-5 w-5" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold">Mobile Money</h4>
-                        <p className="text-sm text-muted-foreground">Orange Money, MTN, Moov</p>
-                      </div>
-                      <RadioGroupItem value="mobile_money" id="mobile_money" />
-                    </CardContent>
-                  </Card>
-
-                  {paymentMethod === "mobile_money" && (
-                    <div className="ml-4 space-y-2 animate-in slide-in-from-top-2">
-                      <Label htmlFor="phone">Numéro de téléphone</Label>
-                      <div className="flex gap-2">
-                        <CountryCodeSelect value={countryCode} onValueChange={setCountryCode} />
-                        <Input
-                          id="phone"
-                          type="tel"
-                          placeholder="XX XX XX XX XX"
-                          value={phoneNumber}
-                          onChange={(e) => setPhoneNumber(e.target.value)}
-                          className="flex-1"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  <Card 
-                    className={cn(
-                      "cursor-pointer transition-all hover:shadow-md",
-                      paymentMethod === "wave" && "border-primary shadow-md bg-primary/5"
-                    )}
-                    onClick={() => setPaymentMethod("wave")}
-                  >
-                    <CardContent className="flex items-center gap-4 p-4">
-                      <div className={cn(
-                        "p-3 rounded-full",
-                        paymentMethod === "wave" ? "bg-primary text-primary-foreground" : "bg-muted"
-                      )}>
-                        <Smartphone className="h-5 w-5" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold">Wave</h4>
-                        <p className="text-sm text-muted-foreground">Paiement rapide et sécurisé via Wave</p>
-                      </div>
-                      <RadioGroupItem value="wave" id="wave" />
-                    </CardContent>
-                  </Card>
-
-                  {paymentMethod === "wave" && (
-                    <div className="ml-4 space-y-2 animate-in slide-in-from-top-2">
-                      <Label htmlFor="wave-phone">Numéro Wave</Label>
-                      <div className="flex gap-2">
-                        <CountryCodeSelect value={countryCode} onValueChange={setCountryCode} />
-                        <Input
-                          id="wave-phone"
-                          type="tel"
-                          placeholder="XX XX XX XX XX"
-                          value={phoneNumber}
-                          onChange={(e) => setPhoneNumber(e.target.value)}
-                          className="flex-1"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  <Card
-                    className={cn(
-                      "cursor-pointer transition-all hover:shadow-md",
-                      paymentMethod === "card" && "border-primary shadow-md bg-primary/5"
-                    )}
-                    onClick={() => setPaymentMethod("card")}
-                  >
-                    <CardContent className="flex items-center gap-4 p-4">
-                      <div className={cn(
-                        "p-3 rounded-full",
-                        paymentMethod === "card" ? "bg-primary text-primary-foreground" : "bg-muted"
-                      )}>
-                        <CreditCard className="h-5 w-5" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold">Carte bancaire</h4>
-                        <p className="text-sm text-muted-foreground">Visa, Mastercard</p>
-                      </div>
-                      <RadioGroupItem value="card" id="card" />
-                    </CardContent>
-                  </Card>
-
-                  {paymentMethod === "card" && (
-                    <div className="ml-4 space-y-4 animate-in slide-in-from-top-2">
-                      <div className="space-y-2">
-                        <Label htmlFor="cardNumber">Numéro de carte</Label>
-                        <Input
-                          id="cardNumber"
-                          placeholder="1234 5678 9012 3456"
-                          value={cardNumber}
-                          onChange={handleCardNumberChange}
-                          maxLength={19}
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="expiry">Expiration</Label>
-                          <Input
-                            id="expiry"
-                            placeholder="MM/AA"
-                            value={cardExpiry}
-                            onChange={handleCardExpiryChange}
-                            maxLength={5}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="cvv">CVV</Label>
-                          <Input
-                            id="cvv"
-                            type="password"
-                            placeholder="123"
-                            value={cardCvv}
-                            onChange={(e) => setCardCvv(e.target.value)}
-                            maxLength={3}
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="billingAddress">Adresse de facturation</Label>
-                        <Input
-                          id="billingAddress"
-                          placeholder="123 Rue de la Paix"
-                          value={billingAddress}
-                          onChange={(e) => setBillingAddress(e.target.value)}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="billingCity">Ville</Label>
-                        <Input
-                          id="billingCity"
-                          placeholder="Abidjan"
-                          value={billingCity}
-                          onChange={(e) => setBillingCity(e.target.value)}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  <Card 
-                    className={cn(
-                      "cursor-pointer transition-all hover:shadow-md",
-                      paymentMethod === "bank_transfer" && "border-primary shadow-md bg-primary/5"
-                    )}
-                    onClick={() => setPaymentMethod("bank_transfer")}
-                  >
-                    <CardContent className="flex items-center gap-4 p-4">
-                      <div className={cn(
-                        "p-3 rounded-full",
-                        paymentMethod === "bank_transfer" ? "bg-primary text-primary-foreground" : "bg-muted"
-                      )}>
-                        <Building2 className="h-5 w-5" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold">Virement bancaire</h4>
-                        <p className="text-sm text-muted-foreground">Transfert bancaire</p>
-                      </div>
-                      <RadioGroupItem value="bank_transfer" id="bank_transfer" />
-                    </CardContent>
-                  </Card>
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4">Informations de paiement</h2>
+            
+            <div className="space-y-6">
+              {/* Payment Method */}
+              <div>
+                <Label className="text-base font-medium mb-3 block">
+                  Méthode de paiement
+                </Label>
+                <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-accent cursor-pointer">
+                    <RadioGroupItem value="wave" id="wave" />
+                    <Label htmlFor="wave" className="flex-1 cursor-pointer">
+                      Wave (Mobile Money)
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-accent cursor-pointer">
+                    <RadioGroupItem value="mobile_money" id="mobile_money" />
+                    <Label htmlFor="mobile_money" className="flex-1 cursor-pointer">
+                      Mobile Money (Orange, MTN, Moov)
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-accent cursor-pointer">
+                    <RadioGroupItem value="card" id="card" />
+                    <Label htmlFor="card" className="flex-1 cursor-pointer">
+                      Carte bancaire
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-accent cursor-pointer">
+                    <RadioGroupItem value="bank_transfer" id="bank_transfer" />
+                    <Label htmlFor="bank_transfer" className="flex-1 cursor-pointer">
+                      Virement bancaire
+                    </Label>
+                  </div>
                 </RadioGroup>
               </div>
 
+              {/* Customer Information */}
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="name">Nom complet *</Label>
+                  <Input
+                    id="name"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    placeholder="Votre nom complet"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="email">Email *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={customerEmail}
+                    onChange={(e) => setCustomerEmail(e.target.value)}
+                    placeholder="votre@email.com"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="phone">Téléphone *</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    placeholder="+225 07 XX XX XX XX"
+                    required
+                  />
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Ce numéro sera utilisé pour le paiement mobile
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="address">Adresse</Label>
+                  <Input
+                    id="address"
+                    value={customerAddress}
+                    onChange={(e) => setCustomerAddress(e.target.value)}
+                    placeholder="Votre adresse"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="city">Ville</Label>
+                  <Input
+                    id="city"
+                    value={customerCity}
+                    onChange={(e) => setCustomerCity(e.target.value)}
+                    placeholder="Abidjan"
+                  />
+                </div>
+              </div>
+
               <Button
-                className="w-full h-12 text-lg font-semibold"
                 onClick={handlePayment}
-                disabled={loading}
+                disabled={processing}
+                className="w-full"
                 size="lg"
               >
-                {loading ? (
+                {processing ? (
                   <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Traitement en cours...
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Traitement...
                   </>
                 ) : (
-                  <>
-                    <CheckCircle2 className="mr-2 h-5 w-5" />
-                    Payer {booking.total_price} {booking.currency || "FCFA"}
-                  </>
+                  `Payer ${booking.total_price.toLocaleString()} ${booking.currency}`
                 )}
               </Button>
-            </CardContent>
+
+              <p className="text-sm text-center text-muted-foreground">
+                Paiement sécurisé par CinetPay
+              </p>
+            </div>
           </Card>
         </div>
       </main>
       <Footer />
     </div>
   );
-};
-
-export default Payment;
+}
