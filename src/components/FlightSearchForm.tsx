@@ -1,16 +1,22 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Plane, Search, Users, ArrowRightLeft } from "lucide-react";
 import { format } from "date-fns";
-import { fr } from "date-fns/locale";
-import { cn } from "@/lib/utils";
-import { CityAutocomplete } from "./CityAutocomplete";
+import { ArrowRightLeft, Plane } from "lucide-react";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import { 
+  UnifiedForm, 
+  UnifiedAutocomplete,
+  UnifiedDatePicker,
+  UnifiedSubmitButton 
+} from "@/components/forms";
 
+/**
+ * FlightSearchForm - Recherche de vols avec UnifiedForm
+ * Design premium type Opodo/Booking avec identité Bossiz
+ */
 export const FlightSearchForm = () => {
   const navigate = useNavigate();
   const [tripType, setTripType] = useState<"roundtrip" | "oneway">("roundtrip");
@@ -49,214 +55,154 @@ export const FlightSearchForm = () => {
   };
 
   return (
-    <form onSubmit={handleSearch} className="w-full max-w-6xl mx-auto">
-      <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6">
-        {/* Trip Type Selector */}
-        <div className="flex gap-4 mb-6">
-          <button
+    <UnifiedForm onSubmit={handleSearch} variant="search" className="max-w-6xl mx-auto">
+      {/* Trip Type Selector */}
+      <div className="flex gap-3 mb-6">
+        {[
+          { value: "roundtrip", label: "Aller-retour" },
+          { value: "oneway", label: "Aller simple" }
+        ].map(({ value, label }) => (
+          <motion.button
+            key={value}
             type="button"
-            onClick={() => setTripType("roundtrip")}
+            onClick={() => setTripType(value as "roundtrip" | "oneway")}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             className={cn(
-              "px-4 py-2 rounded-lg font-medium transition-colors",
-              tripType === "roundtrip"
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
+              "px-6 py-2.5 rounded-xl font-semibold transition-all duration-200",
+              "border-2",
+              tripType === value
+                ? "bg-primary text-white border-primary shadow-lg"
+                : "bg-white text-foreground border-border hover:border-primary/50"
             )}
           >
-            Aller-retour
-          </button>
-          <button
-            type="button"
-            onClick={() => setTripType("oneway")}
-            className={cn(
-              "px-4 py-2 rounded-lg font-medium transition-colors",
-              tripType === "oneway"
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
-            )}
-          >
-            Aller simple
-          </button>
+            {label}
+          </motion.button>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+        {/* From */}
+        <div className="md:col-span-3">
+          <UnifiedAutocomplete
+            label="Départ"
+            type="airport"
+            value={from}
+            onChange={(value) => setFrom(value)}
+            placeholder="Ville ou aéroport"
+            required
+          />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-          {/* From */}
-          <div className="md:col-span-3">
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
-              Départ
-            </label>
-            <div className="relative">
-              <Plane className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <CityAutocomplete
-                value={from}
-                onChange={setFrom}
-                placeholder="Ville ou aéroport"
-                className="pl-10"
-              />
-            </div>
-          </div>
+        {/* Swap Button */}
+        <div className="md:col-span-1 flex items-end justify-center pb-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={handleSwap}
+            className="h-12 w-12 rounded-full border-2 hover:border-primary hover:bg-primary/5 transition-all"
+          >
+            <ArrowRightLeft className="h-5 w-5" />
+          </Button>
+        </div>
 
-          {/* Swap Button */}
-          <div className="md:col-span-1 flex items-end justify-center">
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              onClick={handleSwap}
-              className="mb-0"
-            >
-              <ArrowRightLeft className="h-4 w-4" />
-            </Button>
-          </div>
+        {/* To */}
+        <div className="md:col-span-3">
+          <UnifiedAutocomplete
+            label="Arrivée"
+            type="airport"
+            value={to}
+            onChange={(value) => setTo(value)}
+            placeholder="Ville ou aéroport"
+            required
+          />
+        </div>
 
-          {/* To */}
-          <div className="md:col-span-3">
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
-              Arrivée
-            </label>
-            <div className="relative">
-              <Plane className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 rotate-90" />
-              <CityAutocomplete
-                value={to}
-                onChange={setTo}
-                placeholder="Ville ou aéroport"
-                className="pl-10"
-              />
-            </div>
-          </div>
+        {/* Departure Date */}
+        <div className="md:col-span-2">
+          <UnifiedDatePicker
+            label="Départ"
+            value={departureDate}
+            onChange={setDepartureDate}
+            minDate={new Date()}
+            required
+          />
+        </div>
 
-          {/* Departure Date */}
+        {/* Return Date */}
+        {tripType === "roundtrip" && (
           <div className="md:col-span-2">
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
-              Départ
-            </label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !departureDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {departureDate ? format(departureDate, "dd MMM", { locale: fr }) : "Date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={departureDate}
-                  onSelect={setDepartureDate}
-                  disabled={(date) => date < new Date()}
-                  initialFocus
-                  className="pointer-events-auto"
-                />
-              </PopoverContent>
-            </Popover>
+            <UnifiedDatePicker
+              label="Retour"
+              value={returnDate}
+              onChange={setReturnDate}
+              minDate={departureDate || new Date()}
+              required
+            />
           </div>
+        )}
+      </div>
 
-          {/* Return Date */}
-          {tripType === "roundtrip" && (
-            <div className="md:col-span-2">
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                Retour
-              </label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !returnDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {returnDate ? format(returnDate, "dd MMM", { locale: fr }) : "Date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={returnDate}
-                    onSelect={setReturnDate}
-                    disabled={(date) => date < (departureDate || new Date())}
-                    initialFocus
-                    className="pointer-events-auto"
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-          )}
-
-          {/* Passengers */}
-          <div className={tripType === "roundtrip" ? "md:col-span-1" : "md:col-span-2"}>
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
-              Voyageurs
-            </label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full justify-start">
-                  <Users className="mr-2 h-4 w-4" />
-                  {parseInt(adults) + parseInt(children)}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-64">
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Adultes</span>
-                    <Input
-                      type="number"
-                      min="1"
-                      max="9"
-                      value={adults}
-                      onChange={(e) => setAdults(e.target.value)}
-                      className="w-20"
-                    />
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Enfants (0-11 ans)</span>
-                    <Input
-                      type="number"
-                      min="0"
-                      max="9"
-                      value={children}
-                      onChange={(e) => setChildren(e.target.value)}
-                      className="w-20"
-                    />
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          {/* Search Button */}
-          <div className={tripType === "roundtrip" ? "md:col-span-1" : "md:col-span-2"}>
-            <label className="text-sm font-medium text-gray-700 mb-2 block opacity-0">
-              Search
-            </label>
-            <Button type="submit" className="w-full h-10">
-              <Search className="w-4 h-4 md:mr-2" />
-              <span className="hidden md:inline">Rechercher</span>
-            </Button>
-          </div>
+      {/* Passengers & Class */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+        <div className="space-y-2">
+          <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <Plane className="w-4 h-4 text-primary" />
+            Adultes
+          </label>
+          <Select value={adults} onValueChange={setAdults}>
+            <SelectTrigger className="h-12 border-2 hover:border-primary/50 transition-colors">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+                <SelectItem key={num} value={num.toString()}>
+                  {num} adulte{num > 1 ? 's' : ''}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
-        {/* Class Selector */}
-        <div className="mt-4">
+        <div className="space-y-2">
+          <label className="text-sm font-semibold text-foreground">Enfants</label>
+          <Select value={children} onValueChange={setChildren}>
+            <SelectTrigger className="h-12 border-2 hover:border-primary/50 transition-colors">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {[0, 1, 2, 3, 4, 5, 6].map((num) => (
+                <SelectItem key={num} value={num.toString()}>
+                  {num} enfant{num > 1 ? 's' : ''}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-semibold text-foreground">Classe</label>
           <Select value={travelClass} onValueChange={setTravelClass}>
-            <SelectTrigger className="w-[200px]">
+            <SelectTrigger className="h-12 border-2 hover:border-primary/50 transition-colors">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ECONOMY">Économique</SelectItem>
               <SelectItem value="PREMIUM_ECONOMY">Économique Premium</SelectItem>
               <SelectItem value="BUSINESS">Affaires</SelectItem>
-              <SelectItem value="FIRST">Première Classe</SelectItem>
+              <SelectItem value="FIRST">Première</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
-    </form>
+
+      {/* Submit Button */}
+      <div className="mt-6">
+        <UnifiedSubmitButton variant="search">
+          Rechercher des vols
+        </UnifiedSubmitButton>
+      </div>
+    </UnifiedForm>
   );
 };
