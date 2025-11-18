@@ -2,13 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
-import { Calendar } from "lucide-react";
 import { bookingSchema } from "@/lib/validation";
+import { UnifiedForm, UnifiedFormField, UnifiedDatePicker, UnifiedSubmitButton } from "@/components/forms";
 
 interface BookingDialogProps {
   open: boolean;
@@ -24,6 +20,8 @@ interface BookingDialogProps {
 
 export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProps) => {
   const [loading, setLoading] = useState(false);
+  const [startDate, setStartDate] = useState<Date>();
+  const [endDate, setEndDate] = useState<Date>();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -31,8 +29,6 @@ export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProp
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
-    const startDate = formData.get("startDate") as string;
-    const endDate = formData.get("endDate") as string;
     const guests = parseInt(formData.get("guests") as string);
     const customerName = formData.get("customerName") as string;
     const customerEmail = formData.get("customerEmail") as string;
@@ -78,7 +74,6 @@ export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProp
       .maybeSingle();
 
     if (!existingService) {
-      // Create the service in the database
       const { data: newService, error: serviceError } = await supabase
         .from("services")
         .insert({
@@ -106,16 +101,16 @@ export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProp
     }
 
     // Calculate days
-    const start = new Date(startDate);
-    const end = endDate ? new Date(endDate) : start;
+    const start = startDate || new Date();
+    const end = endDate || start;
     const days = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
     const totalPrice = service.price_per_unit * guests * days;
 
     const { data: bookingData, error } = await supabase.from("bookings").insert({
       user_id: user.id,
       service_id: serviceId,
-      start_date: startDate,
-      end_date: endDate || startDate,
+      start_date: start.toISOString().split('T')[0],
+      end_date: end.toISOString().split('T')[0],
       guests,
       total_price: totalPrice,
       customer_name: customerName,
@@ -128,79 +123,105 @@ export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProp
     }).select().single();
 
     if (error) {
-      setLoading(false);
+      console.error("Booking error:", error);
       toast({
-        title: "Erreur de réservation",
-        description: error.message,
+        title: "Erreur",
+        description: "Impossible de créer la réservation: " + error.message,
         variant: "destructive",
       });
+      setLoading(false);
       return;
     }
 
     toast({
       title: "Réservation créée",
-      description: "Redirection vers le paiement...",
+      description: "Votre réservation a été créée avec succès",
     });
 
-    // Redirect to payment page
     onOpenChange(false);
     navigate(`/payment?bookingId=${bookingData.id}`);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-secondary" />
-            Réserver: {service.name}
-          </DialogTitle>
+          <DialogTitle>Réserver {service.name}</DialogTitle>
           <DialogDescription>
-            Prix: {service.price_per_unit} {service.currency} par {service.type === "hotel" ? "nuit" : "personne"}
+            Remplissez les informations ci-dessous pour finaliser votre réservation
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="startDate">Date de début</Label>
-              <Input id="startDate" name="startDate" type="date" required />
+        <UnifiedForm onSubmit={handleSubmit} variant="booking" loading={loading}>
+          <div className="space-y-6">
+            {/* Dates */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <UnifiedDatePicker
+                label="Date de début"
+                value={startDate}
+                onChange={setStartDate}
+                required
+                minDate={new Date()}
+              />
+              <UnifiedDatePicker
+                label="Date de fin"
+                value={endDate}
+                onChange={setEndDate}
+                minDate={startDate || new Date()}
+              />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="endDate">Date de fin</Label>
-              <Input id="endDate" name="endDate" type="date" />
+
+            {/* Guests */}
+            <UnifiedFormField
+              label="Nombre de personnes"
+              name="guests"
+              type="number"
+              defaultValue="1"
+              min={1}
+              required
+            />
+
+            {/* Customer Info */}
+            <div className="space-y-4 pt-4 border-t">
+              <h3 className="font-semibold text-lg">Informations du voyageur</h3>
+              
+              <UnifiedFormField
+                label="Nom complet"
+                name="customerName"
+                placeholder="John Doe"
+                required
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <UnifiedFormField
+                  label="Email"
+                  name="customerEmail"
+                  type="email"
+                  placeholder="john@example.com"
+                  required
+                />
+                <UnifiedFormField
+                  label="Téléphone"
+                  name="customerPhone"
+                  type="tel"
+                  placeholder="+225 XX XX XX XX XX"
+                  required
+                />
+              </div>
+
+              <UnifiedFormField
+                label="Notes supplémentaires"
+                name="notes"
+                type="textarea"
+                placeholder="Demandes spéciales, préférences..."
+              />
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="guests">Nombre de {service.type === "hotel" ? "chambres" : "personnes"}</Label>
-            <Input id="guests" name="guests" type="number" min="1" defaultValue="1" required />
+            <UnifiedSubmitButton variant="booking" loading={loading} fullWidth>
+              Confirmer la réservation
+            </UnifiedSubmitButton>
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="customerName">Nom complet</Label>
-            <Input id="customerName" name="customerName" type="text" required />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="customerEmail">Email</Label>
-            <Input id="customerEmail" name="customerEmail" type="email" required />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="customerPhone">Téléphone</Label>
-            <Input id="customerPhone" name="customerPhone" type="tel" required />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="notes">Notes (optionnel)</Label>
-            <Textarea id="notes" name="notes" placeholder="Des demandes spéciales?" />
-          </div>
-
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Réservation..." : "Confirmer la réservation"}
-          </Button>
-        </form>
+        </UnifiedForm>
       </DialogContent>
     </Dialog>
   );

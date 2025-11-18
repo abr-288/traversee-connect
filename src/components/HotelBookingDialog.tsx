@@ -2,13 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Hotel, Calendar } from "lucide-react";
 import { bookingSchema } from "@/lib/validation";
+import { UnifiedForm, UnifiedFormField, UnifiedDatePicker, UnifiedSubmitButton } from "@/components/forms";
 
 interface HotelBookingDialogProps {
   open: boolean;
@@ -23,6 +19,8 @@ interface HotelBookingDialogProps {
 
 export const HotelBookingDialog = ({ open, onOpenChange, hotel }: HotelBookingDialogProps) => {
   const [loading, setLoading] = useState(false);
+  const [checkIn, setCheckIn] = useState<Date>();
+  const [checkOut, setCheckOut] = useState<Date>();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -30,8 +28,6 @@ export const HotelBookingDialog = ({ open, onOpenChange, hotel }: HotelBookingDi
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
-    const checkIn = formData.get("checkIn") as string;
-    const checkOut = formData.get("checkOut") as string;
     const rooms = parseInt(formData.get("rooms") as string);
     const adults = parseInt(formData.get("adults") as string);
     const children = parseInt(formData.get("children") as string) || 0;
@@ -62,10 +58,14 @@ export const HotelBookingDialog = ({ open, onOpenChange, hotel }: HotelBookingDi
       return;
     }
 
+    if (!checkIn || !checkOut) {
+      toast.error("Veuillez sélectionner les dates d'arrivée et de départ");
+      setLoading(false);
+      return;
+    }
+
     // Calculate nights
-    const start = new Date(checkIn);
-    const end = new Date(checkOut);
-    const nights = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
+    const nights = Math.max(1, Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)));
     
     if (nights < 1) {
       toast.error("La date de départ doit être après la date d'arrivée");
@@ -101,8 +101,8 @@ export const HotelBookingDialog = ({ open, onOpenChange, hotel }: HotelBookingDi
     const { data: booking, error } = await supabase.from("bookings").insert({
       user_id: user.id,
       service_id: newService.id,
-      start_date: checkIn,
-      end_date: checkOut,
+      start_date: checkIn.toISOString().split('T')[0],
+      end_date: checkOut.toISOString().split('T')[0],
       guests: totalGuests,
       total_price: totalPrice,
       customer_name: customerName,
@@ -114,97 +114,116 @@ export const HotelBookingDialog = ({ open, onOpenChange, hotel }: HotelBookingDi
       payment_status: "pending",
     }).select().single();
 
-    setLoading(false);
-
     if (error) {
-      toast.error("Erreur de réservation: " + error.message);
-    } else {
-      toast.success("Réservation confirmée! Redirection vers le paiement...");
-      onOpenChange(false);
-      setTimeout(() => {
-        navigate(`/payment?bookingId=${booking.id}`);
-      }, 1500);
+      console.error("Booking error:", error);
+      toast.error("Erreur lors de la création de la réservation: " + error.message);
+      setLoading(false);
+      return;
     }
+
+    toast.success("Réservation créée avec succès");
+    onOpenChange(false);
+    navigate(`/payment?bookingId=${booking.id}`);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Hotel className="h-5 w-5 text-primary" />
-            Réserver votre hébergement
-          </DialogTitle>
+          <DialogTitle>Réserver {hotel.name}</DialogTitle>
           <DialogDescription>
-            {hotel.name} • {hotel.location}
+            Complétez votre réservation d'hôtel à {hotel.location}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="bg-muted p-4 rounded-lg mb-4">
-          <p className="text-sm text-muted-foreground">Prix par nuit</p>
-          <p className="text-2xl font-bold text-primary">{hotel.price.toLocaleString()} FCFA</p>
-        </div>
+        <UnifiedForm onSubmit={handleSubmit} variant="booking" loading={loading}>
+          <div className="space-y-6">
+            {/* Dates */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <UnifiedDatePicker
+                label="Date d'arrivée"
+                value={checkIn}
+                onChange={setCheckIn}
+                required
+                minDate={new Date()}
+              />
+              <UnifiedDatePicker
+                label="Date de départ"
+                value={checkOut}
+                onChange={setCheckOut}
+                required
+                minDate={checkIn || new Date()}
+              />
+            </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="checkIn" className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                Date d'arrivée
-              </Label>
-              <Input id="checkIn" name="checkIn" type="date" required />
+            {/* Room & Guests */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <UnifiedFormField
+                label="Chambres"
+                name="rooms"
+                type="number"
+                defaultValue="1"
+                min={1}
+                required
+              />
+              <UnifiedFormField
+                label="Adultes"
+                name="adults"
+                type="number"
+                defaultValue="1"
+                min={1}
+                required
+              />
+              <UnifiedFormField
+                label="Enfants"
+                name="children"
+                type="number"
+                defaultValue="0"
+                min={0}
+              />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="checkOut">Date de départ</Label>
-              <Input id="checkOut" name="checkOut" type="date" required />
+
+            {/* Customer Info */}
+            <div className="space-y-4 pt-4 border-t">
+              <h3 className="font-semibold text-lg">Informations de contact</h3>
+              
+              <UnifiedFormField
+                label="Nom complet"
+                name="customerName"
+                placeholder="Nom du client principal"
+                required
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <UnifiedFormField
+                  label="Email"
+                  name="customerEmail"
+                  type="email"
+                  placeholder="email@example.com"
+                  required
+                />
+                <UnifiedFormField
+                  label="Téléphone"
+                  name="customerPhone"
+                  type="tel"
+                  placeholder="+225 XX XX XX XX XX"
+                  required
+                />
+              </div>
+
+              <UnifiedFormField
+                label="Demandes spéciales"
+                name="notes"
+                type="textarea"
+                placeholder="Préférences, allergies, demandes particulières..."
+              />
             </div>
+
+            <UnifiedSubmitButton variant="booking" loading={loading} fullWidth>
+              Confirmer la réservation
+            </UnifiedSubmitButton>
           </div>
-
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="rooms">Chambres</Label>
-              <Input id="rooms" name="rooms" type="number" min="1" defaultValue="1" required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="adults">Adultes</Label>
-              <Input id="adults" name="adults" type="number" min="1" defaultValue="2" required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="children">Enfants</Label>
-              <Input id="children" name="children" type="number" min="0" defaultValue="0" />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="customerName">Nom complet</Label>
-              <Input id="customerName" name="customerName" type="text" required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="customerPhone">Téléphone</Label>
-              <Input id="customerPhone" name="customerPhone" type="tel" required />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="customerEmail">Email</Label>
-            <Input id="customerEmail" name="customerEmail" type="email" required />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="notes">Demandes spéciales (optionnel)</Label>
-            <Textarea 
-              id="notes" 
-              name="notes" 
-              placeholder="Heure d'arrivée, lit supplémentaire, etc."
-              rows={3}
-            />
-          </div>
-
-          <Button type="submit" className="w-full" size="lg" disabled={loading}>
-            {loading ? "Réservation en cours..." : "Confirmer et payer"}
-          </Button>
-        </form>
+        </UnifiedForm>
       </DialogContent>
     </Dialog>
   );

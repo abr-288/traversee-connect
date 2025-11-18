@@ -2,13 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Car, Calendar } from "lucide-react";
 import { carBookingSchema } from "@/lib/validation";
+import { UnifiedForm, UnifiedFormField, UnifiedSubmitButton } from "@/components/forms";
 
 interface CarBookingDialogProps {
   open: boolean;
@@ -113,123 +109,143 @@ export const CarBookingDialog = ({ open, onOpenChange, car }: CarBookingDialogPr
       customer_name: customerName,
       customer_email: customerEmail,
       customer_phone: customerPhone,
-      notes: `Prise: ${pickupLocation} (${pickupTime})\nRetour: ${dropoffLocation} (${dropoffTime})\nPermis: ${driverLicense}${notes ? `\n${notes}` : ''}`,
+      notes: notes || null,
       currency: "FCFA",
       status: "pending",
       payment_status: "pending",
+      booking_details: {
+        pickupTime,
+        dropoffTime,
+        pickupLocation,
+        dropoffLocation,
+        driverLicense,
+      }
     }).select().single();
 
-    setLoading(false);
-
     if (error) {
-      toast.error("Erreur de réservation: " + error.message);
-    } else {
-      toast.success("Réservation confirmée! Redirection vers le paiement...");
-      onOpenChange(false);
-      setTimeout(() => {
-        navigate(`/payment?bookingId=${booking.id}`);
-      }, 1500);
+      console.error("Booking error:", error);
+      toast.error("Erreur lors de la création de la réservation: " + error.message);
+      setLoading(false);
+      return;
     }
+
+    toast.success("Réservation créée avec succès");
+    onOpenChange(false);
+    navigate(`/payment?bookingId=${booking.id}`);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Car className="h-5 w-5 text-primary" />
-            Réserver votre véhicule
-          </DialogTitle>
+          <DialogTitle>Réserver {car.name}</DialogTitle>
           <DialogDescription>
-            {car.name} • {car.category} • {car.transmission || 'Automatique'}
+            {car.category} - {car.transmission || 'Automatique'} - {car.seats || 5} places
           </DialogDescription>
         </DialogHeader>
 
-        <div className="bg-muted p-4 rounded-lg mb-4">
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <p className="text-muted-foreground">Prix par jour</p>
-              <p className="text-xl font-bold text-primary">{car.price.toLocaleString()} FCFA</p>
+        <UnifiedForm onSubmit={handleSubmit} variant="booking" loading={loading}>
+          <div className="space-y-6">
+            {/* Pickup Info */}
+            <div className="space-y-4">
+              <h3 className="font-semibold text-lg">Lieu et horaire de prise en charge</h3>
+              <UnifiedFormField
+                label="Lieu de prise en charge"
+                name="pickupLocation"
+                placeholder="Abidjan - Aéroport"
+                required
+              />
+              <div className="grid grid-cols-2 gap-4">
+                <UnifiedFormField
+                  label="Date de prise en charge"
+                  name="pickupDate"
+                  type="date"
+                  required
+                />
+                <UnifiedFormField
+                  label="Heure de prise en charge"
+                  name="pickupTime"
+                  type="time"
+                  defaultValue="10:00"
+                  required
+                />
+              </div>
             </div>
-            <div>
-              <p className="text-muted-foreground">Caractéristiques</p>
-              <p className="font-semibold">{car.seats || 5} places • {car.transmission || 'Auto'}</p>
-            </div>
-          </div>
-        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="pickupDate" className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                Date de prise en charge
-              </Label>
-              <Input id="pickupDate" name="pickupDate" type="date" required />
+            {/* Dropoff Info */}
+            <div className="space-y-4 pt-4 border-t">
+              <h3 className="font-semibold text-lg">Lieu et horaire de retour</h3>
+              <UnifiedFormField
+                label="Lieu de retour"
+                name="dropoffLocation"
+                placeholder="Abidjan - Aéroport"
+                required
+              />
+              <div className="grid grid-cols-2 gap-4">
+                <UnifiedFormField
+                  label="Date de retour"
+                  name="dropoffDate"
+                  type="date"
+                  required
+                />
+                <UnifiedFormField
+                  label="Heure de retour"
+                  name="dropoffTime"
+                  type="time"
+                  defaultValue="10:00"
+                  required
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="pickupTime">Heure</Label>
-              <Input id="pickupTime" name="pickupTime" type="time" required />
-            </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="dropoffDate">Date de retour</Label>
-              <Input id="dropoffDate" name="dropoffDate" type="date" required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="dropoffTime">Heure</Label>
-              <Input id="dropoffTime" name="dropoffTime" type="time" required />
-            </div>
-          </div>
+            {/* Driver Info */}
+            <div className="space-y-4 pt-4 border-t">
+              <h3 className="font-semibold text-lg">Informations du conducteur</h3>
+              
+              <UnifiedFormField
+                label="Nom complet"
+                name="customerName"
+                placeholder="Nom du conducteur principal"
+                required
+              />
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="pickupLocation">Lieu de prise en charge</Label>
-              <Input id="pickupLocation" name="pickupLocation" type="text" placeholder="Adresse ou aéroport" required />
+              <UnifiedFormField
+                label="Numéro de permis de conduire"
+                name="driverLicense"
+                placeholder="ABC123456"
+                required
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <UnifiedFormField
+                  label="Email"
+                  name="customerEmail"
+                  type="email"
+                  placeholder="email@example.com"
+                  required
+                />
+                <UnifiedFormField
+                  label="Téléphone"
+                  name="customerPhone"
+                  type="tel"
+                  placeholder="+225 XX XX XX XX XX"
+                  required
+                />
+              </div>
+
+              <UnifiedFormField
+                label="Informations supplémentaires"
+                name="notes"
+                type="textarea"
+                placeholder="Demandes spéciales, équipements additionnels..."
+              />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="dropoffLocation">Lieu de retour</Label>
-              <Input id="dropoffLocation" name="dropoffLocation" type="text" placeholder="Adresse ou aéroport" required />
-            </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="driverLicense">Numéro de permis de conduire</Label>
-            <Input id="driverLicense" name="driverLicense" type="text" required />
+            <UnifiedSubmitButton variant="booking" loading={loading} fullWidth>
+              Confirmer la réservation
+            </UnifiedSubmitButton>
           </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="customerName">Nom complet</Label>
-              <Input id="customerName" name="customerName" type="text" required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="customerPhone">Téléphone</Label>
-              <Input id="customerPhone" name="customerPhone" type="tel" required />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="customerEmail">Email</Label>
-            <Input id="customerEmail" name="customerEmail" type="email" required />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="notes">Options supplémentaires (optionnel)</Label>
-            <Textarea 
-              id="notes" 
-              name="notes" 
-              placeholder="GPS, siège bébé, chauffeur, etc."
-              rows={3}
-            />
-          </div>
-
-          <Button type="submit" className="w-full" size="lg" disabled={loading}>
-            {loading ? "Réservation en cours..." : "Confirmer et payer"}
-          </Button>
-        </form>
+        </UnifiedForm>
       </DialogContent>
     </Dialog>
   );
