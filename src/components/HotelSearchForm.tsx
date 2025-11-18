@@ -86,7 +86,12 @@ export const HotelSearchForm = () => {
           <UnifiedPassengerSelector
             label="Voyageurs"
             value={passengers}
-            onChange={(value) => setPassengers({ ...value, infants: value.infants || 0, rooms: value.rooms || 1 })}
+            onChange={(value) => setPassengers({ 
+              adults: value.adults,
+              children: value.children,
+              rooms: value.rooms || 1,
+              infants: value.infants || 0
+            })}
             showRooms
             required
           />
