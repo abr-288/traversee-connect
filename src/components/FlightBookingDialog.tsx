@@ -3,12 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Plane, Calendar, User, Download } from "lucide-react";
+import { Plane, Download, ArrowLeft } from "lucide-react";
 import { bookingSchema } from "@/lib/validation";
+import { UnifiedForm, UnifiedFormField, UnifiedSubmitButton } from "@/components/forms";
 
 interface FlightBookingDialogProps {
   open: boolean;
@@ -115,7 +113,7 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams }
 
     if (serviceError) {
       console.error("Service creation error:", serviceError);
-      toast.error("Erreur lors de la création du service: " + serviceError.message);
+      toast.error("Erreur lors de la création du service");
       setLoading(false);
       return;
     }
@@ -132,66 +130,46 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams }
       customer_name: customerName,
       customer_email: customerEmail,
       customer_phone: customerPhone,
-      booking_details: {
-        tripType,
-        passportNumber,
-        passportIssueDate,
-        passportExpiryDate,
-      },
       notes: notes || null,
       currency: "FCFA",
       status: "pending",
       payment_status: "pending",
+      booking_details: {
+        passportNumber,
+        passportIssueDate,
+        passportExpiryDate,
+        flightDetails: {
+          airline: flight.airline,
+          from: flight.from,
+          to: flight.to,
+          departure: flight.departure,
+          arrival: flight.arrival,
+          class: flight.class,
+          tripType
+        }
+      }
     }).select().single();
 
-    setLoading(false);
-
     if (error) {
-      toast.error("Erreur de réservation: " + error.message);
-    } else {
-      setBookingId(booking.id);
-      
-      // Send confirmation email with ticket PDF
-      try {
-        await supabase.functions.invoke("send-flight-confirmation", {
-          body: {
-            customerEmail,
-            customerName,
-            customerPhone,
-            bookingId: booking.id,
-            flight: {
-              airline: flight.airline,
-              from: flight.from,
-              to: flight.to,
-              departure: flight.departure,
-              arrival: flight.arrival,
-              class: flight.class,
-            },
-            departureDate,
-            returnDate,
-            passengers,
-            totalPrice,
-            passportNumber,
-            passportIssueDate,
-            passportExpiryDate,
-            tripType,
-            currency: "FCFA",
-          },
-        });
-        console.log("Confirmation email with ticket sent");
-      } catch (emailError) {
-        console.error("Error sending confirmation email:", emailError);
-        // Don't block the booking flow if email fails
-      }
-
-      toast.success("Réservation confirmée! Email de confirmation envoyé.");
-      onOpenChange(false);
-      setShowSummary(false);
-      setFormData(null);
-      setTimeout(() => {
-        navigate(`/payment?bookingId=${booking.id}`);
-      }, 1500);
+      console.error("Booking error:", error);
+      toast.error("Erreur lors de la création de la réservation");
+      setLoading(false);
+      return;
     }
+
+    setBookingId(booking.id);
+
+    // Send confirmation email
+    try {
+      await supabase.functions.invoke("send-flight-confirmation", {
+        body: { bookingId: booking.id },
+      });
+    } catch (emailError) {
+      console.error("Email error:", emailError);
+    }
+
+    toast.success("Réservation créée avec succès!");
+    setLoading(false);
   };
 
   const handleBackToForm = () => {
@@ -213,7 +191,6 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams }
 
       if (error) throw error;
 
-      // Create a blob from the HTML and download it
       const blob = new Blob([data.ticket], { type: "text/html" });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -298,191 +275,146 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams }
               </div>
             </div>
 
-            <div className="bg-muted/50 p-6 rounded-lg space-y-4">
-              <h3 className="font-semibold text-lg flex items-center gap-2">
-                <User className="h-5 w-5 text-primary" />
-                Informations passagers
-              </h3>
-              
-              <div className="grid grid-cols-2 gap-4">
+            <div className="bg-muted/30 p-6 rounded-lg space-y-3">
+              <h3 className="font-semibold text-lg">Informations passager</h3>
+              <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  <p className="text-muted-foreground text-sm">Nombre de passagers</p>
-                  <p className="font-semibold">{formData?.passengers}</p>
+                  <p className="text-muted-foreground">Nom</p>
+                  <p className="font-medium">{formData?.customerName}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-sm">Nom complet</p>
-                  <p className="font-semibold">{formData?.customerName}</p>
+                  <p className="text-muted-foreground">Passagers</p>
+                  <p className="font-medium">{formData?.passengers}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-sm">Email</p>
-                  <p className="font-semibold">{formData?.customerEmail}</p>
+                  <p className="text-muted-foreground">Email</p>
+                  <p className="font-medium">{formData?.customerEmail}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-sm">Téléphone</p>
-                  <p className="font-semibold">{formData?.customerPhone}</p>
-                </div>
-              </div>
-
-              <div className="border-t pt-4 grid grid-cols-3 gap-4">
-                <div>
-                  <p className="text-muted-foreground text-sm">Passeport N°</p>
-                  <p className="font-semibold">{formData?.passportNumber}</p>
+                  <p className="text-muted-foreground">Téléphone</p>
+                  <p className="font-medium">{formData?.customerPhone}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-sm">Délivré le</p>
-                  <p className="font-semibold">{new Date(formData?.passportIssueDate).toLocaleDateString('fr-FR')}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground text-sm">Expire le</p>
-                  <p className="font-semibold">{new Date(formData?.passportExpiryDate).toLocaleDateString('fr-FR')}</p>
-                </div>
-              </div>
-
-              {formData?.notes && (
-                <div className="border-t pt-4">
-                  <p className="text-muted-foreground text-sm">Demandes spéciales</p>
-                  <p className="font-semibold">{formData.notes}</p>
-                </div>
-              )}
-            </div>
-
-            <div className="bg-gradient-to-br from-primary/10 to-primary/5 p-6 rounded-xl border-2 border-primary/20">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground text-sm">Prix par passager</p>
-                  <p className="text-lg font-semibold">{flight.price.toLocaleString()} FCFA</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-muted-foreground text-sm">Montant total</p>
-                  <p className="text-3xl font-bold text-primary">
-                    {(flight.price * formData?.passengers).toLocaleString()} FCFA
-                  </p>
+                  <p className="text-muted-foreground">Passeport</p>
+                  <p className="font-medium">{formData?.passportNumber}</p>
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col gap-3 pt-4">
-              <div className="flex gap-3">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={handleBackToForm}
-                  className="flex-1"
-                  disabled={loading}
-                >
-                  Modifier
-                </Button>
-                <Button 
-                  type="button" 
-                  onClick={handleConfirmBooking}
-                  className="flex-1"
-                  disabled={loading}
-                  size="lg"
-                >
-                  {loading ? "Confirmation en cours..." : "Confirmer et payer"}
-                </Button>
+            <div className="bg-primary/10 p-6 rounded-lg">
+              <div className="flex justify-between items-center">
+                <span className="text-lg font-semibold">Prix total</span>
+                <span className="text-2xl font-bold text-primary">
+                  {(flight.price * formData?.passengers).toLocaleString()} FCFA
+                </span>
               </div>
+            </div>
+
+            <div className="flex gap-3">
+              <Button variant="outline" onClick={handleBackToForm} className="flex-1">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Modifier
+              </Button>
               
-              {bookingId && (
-                <Button 
-                  type="button" 
-                  variant="secondary"
-                  onClick={handleDownloadTicket}
-                  className="w-full"
-                  size="lg"
-                >
-                  <Download className="h-5 w-5 mr-2" />
-                  Télécharger le billet (PDF)
+              {bookingId ? (
+                <>
+                  <Button onClick={handleDownloadTicket} variant="outline" className="flex-1">
+                    <Download className="h-4 w-4 mr-2" />
+                    Télécharger le billet
+                  </Button>
+                  <Button 
+                    onClick={() => navigate(`/payment?bookingId=${bookingId}`)}
+                    className="flex-1"
+                  >
+                    Procéder au paiement
+                  </Button>
+                </>
+              ) : (
+                <Button onClick={handleConfirmBooking} disabled={loading} className="flex-1">
+                  {loading ? "Confirmation..." : "Confirmer la réservation"}
                 </Button>
               )}
             </div>
           </div>
         ) : (
-          // Form View
-          <>
+          // Booking Form
+          <UnifiedForm onSubmit={handleFormSubmit} variant="booking" loading={loading}>
+            <div className="space-y-6">
+              <UnifiedFormField
+                label="Nombre de passagers"
+                name="passengers"
+                type="number"
+                defaultValue="1"
+                min={1}
+                required
+              />
 
-        <div className="bg-muted p-4 rounded-lg mb-4">
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <p className="text-muted-foreground">Date de départ</p>
-              <p className="font-semibold">{new Date(departureDate).toLocaleDateString('fr-FR')}</p>
-            </div>
-            {returnDate && (
-              <div>
-                <p className="text-muted-foreground">Date de retour</p>
-                <p className="font-semibold">{new Date(returnDate).toLocaleDateString('fr-FR')}</p>
+              <div className="space-y-4 pt-4 border-t">
+                <h3 className="font-semibold text-lg">Informations du passager principal</h3>
+                
+                <UnifiedFormField
+                  label="Nom complet"
+                  name="customerName"
+                  placeholder="Nom tel qu'inscrit sur le passeport"
+                  required
+                />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <UnifiedFormField
+                    label="Email"
+                    name="customerEmail"
+                    type="email"
+                    placeholder="email@example.com"
+                    required
+                  />
+                  <UnifiedFormField
+                    label="Téléphone"
+                    name="customerPhone"
+                    type="tel"
+                    placeholder="+225 XX XX XX XX XX"
+                    required
+                  />
+                </div>
               </div>
-            )}
-            <div>
-              <p className="text-muted-foreground">Horaire départ</p>
-              <p className="font-semibold">{flight.departure}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Horaire arrivée</p>
-              <p className="font-semibold">{flight.arrival}</p>
-            </div>
-            <div className="col-span-2">
-              <p className="text-muted-foreground">Prix par passager</p>
-              <p className="font-semibold text-primary text-xl">{flight.price.toLocaleString()} FCFA</p>
-            </div>
-          </div>
-        </div>
 
-        <form onSubmit={handleFormSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="passengers" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              Nombre de passagers
-            </Label>
-            <Input id="passengers" name="passengers" type="number" min="1" max="9" defaultValue="1" required />
-          </div>
+              <div className="space-y-4 pt-4 border-t">
+                <h3 className="font-semibold text-lg">Informations du passeport</h3>
+                
+                <UnifiedFormField
+                  label="Numéro de passeport"
+                  name="passportNumber"
+                  placeholder="ABC123456"
+                  required
+                />
 
-          <div className="space-y-2">
-            <Label htmlFor="customerName">Nom complet</Label>
-            <Input id="customerName" name="customerName" type="text" required />
-          </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <UnifiedFormField
+                    label="Date de délivrance"
+                    name="passportIssueDate"
+                    type="date"
+                    required
+                  />
+                  <UnifiedFormField
+                    label="Date d'expiration"
+                    name="passportExpiryDate"
+                    type="date"
+                    required
+                  />
+                </div>
+              </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="passportNumber">Numéro de passeport</Label>
-              <Input id="passportNumber" name="passportNumber" type="text" required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="passportIssueDate">Date de délivrance</Label>
-              <Input id="passportIssueDate" name="passportIssueDate" type="date" required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="passportExpiryDate">Date d'expiration</Label>
-              <Input id="passportExpiryDate" name="passportExpiryDate" type="date" required />
-            </div>
-          </div>
+              <UnifiedFormField
+                label="Demandes spéciales"
+                name="notes"
+                type="textarea"
+                placeholder="Préférences de siège, régime alimentaire, assistance spéciale..."
+              />
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="customerEmail">Email</Label>
-              <Input id="customerEmail" name="customerEmail" type="email" required />
+              <UnifiedSubmitButton variant="booking" loading={loading} fullWidth>
+                Continuer vers le récapitulatif
+              </UnifiedSubmitButton>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="customerPhone">Téléphone</Label>
-              <Input id="customerPhone" name="customerPhone" type="tel" required />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="notes">Demandes spéciales (optionnel)</Label>
-            <Textarea 
-              id="notes" 
-              name="notes" 
-              placeholder="Repas spécial, assistance, etc."
-              rows={3}
-            />
-          </div>
-
-          <Button type="submit" className="w-full" size="lg">
-            Voir le récapitulatif
-          </Button>
-        </form>
-          </>
+          </UnifiedForm>
         )}
       </DialogContent>
     </Dialog>
