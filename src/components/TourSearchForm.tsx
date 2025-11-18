@@ -1,25 +1,21 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, MapPin, Search, Users } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { format } from "date-fns";
-import { fr } from "date-fns/locale";
-import { cn } from "@/lib/utils";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { UnifiedForm, UnifiedFormField, UnifiedDatePicker, UnifiedSubmitButton } from "@/components/forms";
 
 export const TourSearchForm = () => {
   const navigate = useNavigate();
-  const [destination, setDestination] = useState("");
   const [date, setDate] = useState<Date>();
-  const [guests, setGuests] = useState("2");
-  const [duration, setDuration] = useState("");
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    const destination = formData.get("destination") as string;
+    const guests = formData.get("guests") as string;
+    const duration = formData.get("duration") as string;
+
     if (!destination) {
       return;
     }
@@ -35,81 +31,44 @@ export const TourSearchForm = () => {
   };
 
   return (
-    <form onSubmit={handleSearch} className="w-full max-w-5xl mx-auto">
-      <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <div className="md:col-span-2">
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
-              Destination
-            </label>
-            <div className="relative">
-              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Où voulez-vous aller?"
-                value={destination}
-                onChange={(e) => setDestination(e.target.value)}
-                className="pl-10"
-                required
-              />
-            </div>
-          </div>
+    <UnifiedForm onSubmit={handleSearch} variant="search" className="w-full max-w-5xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div className="md:col-span-2">
+          <UnifiedFormField
+            label="Destination"
+            name="destination"
+            placeholder="Où voulez-vous aller?"
+            icon={MapPin}
+            required
+          />
+        </div>
 
-          <div className="md:col-span-1">
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
-              Date de départ
-            </label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !date && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "dd MMM", { locale: fr }) : "Date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  disabled={(date) => date < new Date()}
-                  initialFocus
-                  className="pointer-events-auto"
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
+        <div className="md:col-span-1">
+          <UnifiedDatePicker
+            label="Date de départ"
+            value={date}
+            onChange={setDate}
+            minDate={new Date()}
+          />
+        </div>
 
-          <div className="md:col-span-1">
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
-              Voyageurs
-            </label>
-            <div className="relative">
-              <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                type="number"
-                min="1"
-                max="20"
-                value={guests}
-                onChange={(e) => setGuests(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
+        <div className="md:col-span-1">
+          <UnifiedFormField
+            label="Voyageurs"
+            name="guests"
+            type="number"
+            defaultValue="2"
+            min={1}
+            max={20}
+          />
+        </div>
 
-          <div className="md:col-span-1 flex items-end">
-            <Button type="submit" className="w-full h-10">
-              <Search className="w-4 h-4 md:mr-2" />
-              <span className="hidden md:inline">Rechercher</span>
-            </Button>
-          </div>
+        <div className="md:col-span-1 flex items-end">
+          <UnifiedSubmitButton fullWidth>
+            Rechercher
+          </UnifiedSubmitButton>
         </div>
       </div>
-    </form>
+    </UnifiedForm>
   );
 };

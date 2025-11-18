@@ -1,14 +1,10 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Plane, Search, Users, Hotel, ArrowRightLeft } from "lucide-react";
+import { Plane, Hotel, ArrowRightLeft } from "lucide-react";
 import { format } from "date-fns";
-import { fr } from "date-fns/locale";
-import { cn } from "@/lib/utils";
-import { AirportAutocomplete } from "./AirportAutocomplete";
+import { Button } from "@/components/ui/button";
+import { UnifiedForm, UnifiedAutocomplete, UnifiedDatePicker, UnifiedFormField, UnifiedSubmitButton } from "@/components/forms";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface FlightHotelSearchFormProps {
   onSearch: (params: {
@@ -28,9 +24,6 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
   const [destination, setDestination] = useState("");
   const [departureDate, setDepartureDate] = useState<Date>();
   const [returnDate, setReturnDate] = useState<Date>();
-  const [adults, setAdults] = useState("2");
-  const [children, setChildren] = useState("0");
-  const [rooms, setRooms] = useState("1");
   const [travelClass, setTravelClass] = useState("ECONOMY");
 
   const handleSwap = () => {
@@ -46,210 +39,136 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
       return;
     }
 
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    const adults = parseInt(formData.get("adults") as string);
+    const children = parseInt(formData.get("children") as string);
+    const rooms = parseInt(formData.get("rooms") as string);
+
     onSearch({
       origin,
       destination,
       departureDate: format(departureDate, "yyyy-MM-dd"),
       returnDate: format(returnDate, "yyyy-MM-dd"),
-      adults: parseInt(adults),
-      children: parseInt(children),
-      rooms: parseInt(rooms),
+      adults,
+      children,
+      rooms,
       travelClass,
     });
   };
 
   return (
-    <form onSubmit={handleSearch} className="w-full max-w-6xl mx-auto mb-8">
-      <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-4 md:p-6">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-          {/* Origin */}
-          <div className="md:col-span-3">
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
-              Départ
-            </label>
-            <div className="relative">
-              <Plane className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <AirportAutocomplete
-                value={origin}
-                onChange={setOrigin}
-                placeholder="Ville de départ"
-                className="pl-10"
-                type="flight"
-              />
-            </div>
-          </div>
-
-          {/* Swap Button */}
-          <div className="md:col-span-1 flex items-end justify-center">
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              onClick={handleSwap}
-              className="mb-0"
-            >
-              <ArrowRightLeft className="h-4 w-4" />
-            </Button>
-          </div>
-
-          {/* Destination */}
-          <div className="md:col-span-3">
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
-              Destination
-            </label>
-            <div className="relative">
-              <Hotel className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <AirportAutocomplete
-                value={destination}
-                onChange={setDestination}
-                placeholder="Ville d'arrivée"
-                className="pl-10"
-                type="flight"
-              />
-            </div>
-          </div>
-
-          {/* Departure Date */}
-          <div className="md:col-span-2">
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
-              Départ
-            </label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !departureDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {departureDate ? format(departureDate, "dd MMM", { locale: fr }) : "Date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 bg-background border border-border shadow-lg z-50" align="start">
-                <Calendar
-                  mode="single"
-                  selected={departureDate}
-                  onSelect={setDepartureDate}
-                  disabled={(date) => date < new Date()}
-                  initialFocus
-                  className="pointer-events-auto"
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          {/* Return Date */}
-          <div className="md:col-span-2">
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
-              Retour
-            </label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !returnDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {returnDate ? format(returnDate, "dd MMM", { locale: fr }) : "Date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 bg-background border border-border shadow-lg z-50" align="start">
-                <Calendar
-                  mode="single"
-                  selected={returnDate}
-                  onSelect={setReturnDate}
-                  disabled={(date) => date < (departureDate || new Date())}
-                  initialFocus
-                  className="pointer-events-auto"
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          {/* Passengers and Rooms */}
-          <div className="md:col-span-1">
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
-              Voyageurs
-            </label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full justify-start">
-                  <Users className="mr-2 h-4 w-4" />
-                  {parseInt(adults) + parseInt(children)}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-64 bg-background border border-border shadow-lg z-50">
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Adultes</span>
-                    <Input
-                      type="number"
-                      min="1"
-                      max="9"
-                      value={adults}
-                      onChange={(e) => setAdults(e.target.value)}
-                      className="w-20"
-                    />
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Enfants</span>
-                    <Input
-                      type="number"
-                      min="0"
-                      max="9"
-                      value={children}
-                      onChange={(e) => setChildren(e.target.value)}
-                      className="w-20"
-                    />
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Chambres</span>
-                    <Input
-                      type="number"
-                      min="1"
-                      max="5"
-                      value={rooms}
-                      onChange={(e) => setRooms(e.target.value)}
-                      className="w-20"
-                    />
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          {/* Search Button */}
-          <div className="md:col-span-1">
-            <label className="text-sm font-medium text-gray-700 mb-2 block opacity-0">
-              Search
-            </label>
-            <Button type="submit" className="w-full h-10">
-              <Search className="w-4 h-4 md:mr-2" />
-              <span className="hidden md:inline">Rechercher</span>
-            </Button>
-          </div>
+    <UnifiedForm onSubmit={handleSearch} variant="search" className="w-full max-w-6xl mx-auto mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+        {/* Origin */}
+        <div className="md:col-span-3">
+          <UnifiedAutocomplete
+            label="Départ"
+            value={origin}
+            onChange={setOrigin}
+            placeholder="Ville de départ"
+            type="airport"
+            required
+          />
         </div>
 
-        {/* Class Selector */}
-        <div className="mt-4">
+        {/* Swap Button */}
+        <div className="md:col-span-1 flex items-end justify-center">
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={handleSwap}
+            className="mb-0"
+          >
+            <ArrowRightLeft className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Destination */}
+        <div className="md:col-span-3">
+          <UnifiedAutocomplete
+            label="Destination"
+            value={destination}
+            onChange={setDestination}
+            placeholder="Ville d'arrivée"
+            type="airport"
+            required
+          />
+        </div>
+
+        {/* Departure Date */}
+        <div className="md:col-span-2">
+          <UnifiedDatePicker
+            label="Départ"
+            value={departureDate}
+            onChange={setDepartureDate}
+            required
+            minDate={new Date()}
+          />
+        </div>
+
+        {/* Return Date */}
+        <div className="md:col-span-2">
+          <UnifiedDatePicker
+            label="Retour"
+            value={returnDate}
+            onChange={setReturnDate}
+            required
+            minDate={departureDate || new Date()}
+          />
+        </div>
+
+        {/* Search Button */}
+        <div className="md:col-span-1 flex items-end">
+          <UnifiedSubmitButton fullWidth>
+            Rechercher
+          </UnifiedSubmitButton>
+        </div>
+      </div>
+
+      {/* Travelers & Class */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+        <UnifiedFormField
+          label="Adultes"
+          name="adults"
+          type="number"
+          defaultValue="2"
+          min={1}
+          max={9}
+          required
+        />
+        <UnifiedFormField
+          label="Enfants"
+          name="children"
+          type="number"
+          defaultValue="0"
+          min={0}
+          max={9}
+        />
+        <UnifiedFormField
+          label="Chambres"
+          name="rooms"
+          type="number"
+          defaultValue="1"
+          min={1}
+          max={9}
+          required
+        />
+        <div className="space-y-2">
+          <Label>Classe</Label>
           <Select value={travelClass} onValueChange={setTravelClass}>
-            <SelectTrigger className="w-[200px]">
+            <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ECONOMY">Économique</SelectItem>
               <SelectItem value="PREMIUM_ECONOMY">Économique Premium</SelectItem>
               <SelectItem value="BUSINESS">Affaires</SelectItem>
-              <SelectItem value="FIRST">Première Classe</SelectItem>
+              <SelectItem value="FIRST">Première</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
-    </form>
+    </UnifiedForm>
   );
 };

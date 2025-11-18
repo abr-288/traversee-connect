@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plane, Hotel, Car, Calendar, MapPin, Search } from "lucide-react";
+import { Plane, Hotel, Car, Calendar, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { UnifiedForm, UnifiedFormField, UnifiedSubmitButton } from "@/components/forms";
 
 const QuickSearch = () => {
   const navigate = useNavigate();
@@ -16,6 +15,11 @@ const QuickSearch = () => {
     { value: "cars", label: "Voitures", icon: Car, route: "/cars" },
     { value: "events", label: "Événements", icon: Calendar, route: "/events" }
   ];
+
+  const handleSearch = (route: string) => (e: React.FormEvent) => {
+    e.preventDefault();
+    navigate(route);
+  };
 
   return (
     <section className="py-16 bg-muted/30">
@@ -43,48 +47,48 @@ const QuickSearch = () => {
 
               {searchTypes.map((type) => (
                 <TabsContent key={type.value} value={type.value}>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">Départ</label>
-                        <div className="relative">
-                          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                          <Input placeholder="Ville de départ" className="pl-10" />
-                        </div>
+                  <UnifiedForm onSubmit={handleSearch(type.route)} variant="search">
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <UnifiedFormField
+                          label="Départ"
+                          name="departure"
+                          placeholder="Ville de départ"
+                          icon={MapPin}
+                        />
+                        <UnifiedFormField
+                          label="Destination"
+                          name="destination"
+                          placeholder="Ville d'arrivée"
+                          icon={MapPin}
+                        />
                       </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">Destination</label>
-                        <div className="relative">
-                          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                          <Input placeholder="Ville d'arrivée" className="pl-10" />
-                        </div>
-                      </div>
-                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">Date de départ</label>
-                        <Input type="date" />
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <UnifiedFormField
+                          label="Date de départ"
+                          name="departureDate"
+                          type="date"
+                        />
+                        <UnifiedFormField
+                          label="Date de retour"
+                          name="returnDate"
+                          type="date"
+                        />
+                        <UnifiedFormField
+                          label="Voyageurs"
+                          name="travelers"
+                          type="number"
+                          defaultValue="1"
+                          min={1}
+                        />
                       </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">Date de retour</label>
-                        <Input type="date" />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">Voyageurs</label>
-                        <Input type="number" min="1" defaultValue="1" />
-                      </div>
-                    </div>
 
-                    <Button
-                      className="w-full gap-2 gradient-primary shadow-primary"
-                      size="lg"
-                      onClick={() => navigate(type.route)}
-                    >
-                      <Search className="w-4 h-4" />
-                      Rechercher
-                    </Button>
-                  </div>
+                      <UnifiedSubmitButton fullWidth>
+                        Rechercher
+                      </UnifiedSubmitButton>
+                    </div>
+                  </UnifiedForm>
                 </TabsContent>
               ))}
             </Tabs>

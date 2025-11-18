@@ -1,11 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CityAutocomplete } from "./CityAutocomplete";
-import { Calendar as CalendarIcon, Plus, X } from "lucide-react";
-import { format } from "date-fns";
-import { fr } from "date-fns/locale";
+import { Plus, X } from "lucide-react";
+import { UnifiedForm, UnifiedAutocomplete, UnifiedDatePicker, UnifiedSubmitButton } from "@/components/forms";
 
 interface FlightLeg {
   id: string;
@@ -40,87 +36,77 @@ export const MultiCityFlightForm = ({ onSearch }: MultiCityFlightFormProps) => {
     setLegs(legs.map(leg => leg.id === id ? { ...leg, [field]: value } : leg));
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSearch(legs);
+  };
+
   return (
-    <div className="space-y-4">
-      {legs.map((leg, index) => (
-        <div key={leg.id} className="relative">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border border-border rounded-lg bg-muted/20">
-            <div className="flex items-center gap-2">
-              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-bold flex-shrink-0">
-                {index + 1}
-              </span>
-              <div className="flex-1 space-y-2">
-                <label className="text-sm font-medium text-muted-foreground">Départ</label>
-                <CityAutocomplete
-                  placeholder="Ville de départ"
-                  value={leg.from}
-                  onChange={(value) => updateLeg(leg.id, "from", value)}
-                  className="h-12"
-                />
+    <UnifiedForm onSubmit={handleSubmit} variant="search">
+      <div className="space-y-4">
+        {legs.map((leg, index) => (
+          <div key={leg.id} className="relative">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border border-border rounded-lg bg-muted/20">
+              <div className="flex items-center gap-2">
+                <span className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-bold flex-shrink-0">
+                  {index + 1}
+                </span>
+                <div className="flex-1">
+                  <UnifiedAutocomplete
+                    label="Départ"
+                    value={leg.from}
+                    onChange={(value) => updateLeg(leg.id, "from", value)}
+                    placeholder="Ville de départ"
+                    type="airport"
+                  />
+                </div>
               </div>
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">Arrivée</label>
-              <CityAutocomplete
-                placeholder="Destination"
+              
+              <UnifiedAutocomplete
+                label="Arrivée"
                 value={leg.to}
                 onChange={(value) => updateLeg(leg.id, "to", value)}
-                className="h-12"
+                placeholder="Destination"
+                type="airport"
+              />
+              
+              <UnifiedDatePicker
+                label="Date"
+                value={leg.date}
+                onChange={(date) => updateLeg(leg.id, "date", date)}
+                minDate={new Date()}
               />
             </div>
             
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">Date</label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full h-12 justify-start text-left font-normal">
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {leg.date ? format(leg.date, "PPP", { locale: fr }) : "Date du vol"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar 
-                    mode="single" 
-                    selected={leg.date} 
-                    onSelect={(date) => updateLeg(leg.id, "date", date)} 
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
+            {legs.length > 2 && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                onClick={() => removeLeg(leg.id)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
           </div>
-          
-          {legs.length > 2 && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={() => removeLeg(leg.id)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
-      ))}
-      
-      {legs.length < 5 && (
-        <Button
-          variant="outline"
-          className="w-full gap-2"
-          onClick={addLeg}
-        >
-          <Plus className="w-4 h-4" />
-          Ajouter un vol (max 5)
-        </Button>
-      )}
-      
-      <Button 
-        onClick={() => onSearch(legs)}
-        className="w-full md:w-auto px-4 md:px-8 h-12 gradient-primary shadow-primary text-base md:text-lg"
-        disabled={legs.some(leg => !leg.from || !leg.to || !leg.date)}
-      >
-        <span className="truncate">Rechercher vols multi-destinations</span>
-      </Button>
-    </div>
+        ))}
+        
+        {legs.length < 5 && (
+          <Button
+            variant="outline"
+            onClick={addLeg}
+            className="w-full"
+            type="button"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Ajouter un vol (max 5)
+          </Button>
+        )}
+        
+        <UnifiedSubmitButton fullWidth>
+          Rechercher des vols multi-destinations
+        </UnifiedSubmitButton>
+      </div>
+    </UnifiedForm>
   );
 };
