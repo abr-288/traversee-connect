@@ -1,20 +1,17 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Train } from "lucide-react";
 import { format } from "date-fns";
-import { useTrainSearch } from "@/hooks/useTrainSearch";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { UnifiedForm, UnifiedAutocomplete, UnifiedDatePicker, UnifiedFormField, UnifiedSubmitButton } from "@/components/forms";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-interface TrainSearchFormProps {
-  onResults?: (results: any) => void;
-}
-
-export const TrainSearchForm = ({ onResults }: TrainSearchFormProps) => {
+export const TrainSearchForm = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const { searchTrains, loading } = useTrainSearch();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
@@ -34,27 +31,28 @@ export const TrainSearchForm = ({ onResults }: TrainSearchFormProps) => {
       return;
     }
 
+    setLoading(true);
+    
     const formData = new FormData(e.currentTarget as HTMLFormElement);
     const adults = parseInt(formData.get("adults") as string);
     const children = parseInt(formData.get("children") as string);
 
-    const results = await searchTrains({
-      origin,
-      destination,
-      departureDate: format(departureDate, "yyyy-MM-dd"),
-      returnDate: returnDate ? format(returnDate, "yyyy-MM-dd") : undefined,
-      adults,
-      children,
-      travelClass,
+    // Navigate to trains page with search params
+    const searchParams = new URLSearchParams({
+      from: origin,
+      to: destination,
+      date: format(departureDate, "yyyy-MM-dd"),
+      adults: adults.toString(),
+      children: children.toString(),
+      class: travelClass,
     });
 
-    if (results) {
-      toast({
-        title: "Recherche effectuée",
-        description: `${results.trains?.length || 0} trains trouvés`,
-      });
-      onResults?.(results);
+    if (returnDate) {
+      searchParams.append("returnDate", format(returnDate, "yyyy-MM-dd"));
     }
+
+    navigate(`/trains?${searchParams.toString()}`);
+    setLoading(false);
   };
 
   return (
@@ -64,7 +62,7 @@ export const TrainSearchForm = ({ onResults }: TrainSearchFormProps) => {
         <h2 className="text-2xl font-bold">{t('search.from')} / {t('search.to')}</h2>
       </div>
 
-      <UnifiedForm onSubmit={handleSearch} variant="search" loading={loading}>
+      <UnifiedForm onSubmit={handleSearch} variant="search">
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <UnifiedAutocomplete
