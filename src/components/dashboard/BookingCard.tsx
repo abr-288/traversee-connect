@@ -18,7 +18,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { MapPin, Calendar, Users, MoreVertical, Edit, Trash2, CheckCircle, XCircle } from "lucide-react";
+import { MapPin, Calendar, Users, MoreVertical, Edit, Trash2, CheckCircle, XCircle, FileDown, Loader2 } from "lucide-react";
+import { useBookingPDF } from "@/hooks/useBookingPDF";
 
 interface Booking {
   id: string;
@@ -52,6 +53,7 @@ interface BookingCardProps {
 export const BookingCard = ({ booking, onConfirm, onCancel, onEdit, onDelete }: BookingCardProps) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const { generatePDF, downloadPDF, isGenerating } = useBookingPDF();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -121,6 +123,17 @@ export const BookingCard = ({ booking, onConfirm, onCancel, onEdit, onDelete }: 
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem 
+                  onClick={() => generatePDF(booking.id)}
+                  disabled={isGenerating}
+                >
+                  {isGenerating ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <FileDown className="h-4 w-4 mr-2" />
+                  )}
+                  Exporter PDF
+                </DropdownMenuItem>
                 {canConfirm && (
                   <DropdownMenuItem onClick={() => onConfirm(booking.id)}>
                     <CheckCircle className="h-4 w-4 mr-2" />
