@@ -296,7 +296,7 @@ const handler = async (req: Request): Promise<Response> => {
     const ticketBase64 = encode(new TextEncoder().encode(ticketHtml).buffer);
 
     const emailResponse = await smtpClient.send({
-      from: "B-Reserve <reservations@bossiz.com>",
+      from: "B-Reserve Réservations <notifications@bossiz.com>",
       to: customerEmail,
       subject: `✈️ Confirmation de vol ${flight.from} → ${flight.to}`,
       html: emailHtml,
