@@ -23,8 +23,10 @@ import { HotelComparisonDialog } from "@/components/HotelComparisonDialog";
 import { Pagination } from "@/components/Pagination";
 import { useHotelSearch } from "@/hooks/useHotelSearch";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 const Hotels = () => {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const { searchHotels, loading } = useHotelSearch();
   const [priceRange, setPriceRange] = useState([0, 500000]);
