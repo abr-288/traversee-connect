@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
-import { ArrowRightLeft, Plane } from "lucide-react";
+import { ArrowRightLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -147,8 +147,7 @@ export const FlightSearchForm = () => {
       {/* Passengers & Class */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
         <div className="space-y-2">
-          <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-            <Plane className="w-4 h-4 text-primary" />
+          <label className="text-sm font-semibold text-foreground">
             Adultes
           </label>
           <Select value={adults} onValueChange={setAdults}>
