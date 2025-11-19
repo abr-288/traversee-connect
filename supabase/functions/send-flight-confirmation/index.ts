@@ -286,7 +286,7 @@ const handler = async (req: Request): Promise<Response> => {
     const ticketBase64 = encode(new TextEncoder().encode(ticketHtml).buffer);
 
     const emailResponse = await resend.emails.send({
-      from: "Bossiz Travel <onboarding@resend.dev>",
+      from: "B-Reserve <reservations@bossiz.com>",
       to: [customerEmail],
       subject: `✈️ Confirmation de vol ${flight.from} → ${flight.to}`,
       html: emailHtml,

@@ -53,3 +53,9 @@ verify_jwt = false
 
 [functions.travel-chatbot]
 verify_jwt = false
+
+[functions.send-invoice-email]
+verify_jwt = true
+
+[functions.send-flight-confirmation]
+verify_jwt = true
