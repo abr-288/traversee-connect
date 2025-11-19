@@ -17,20 +17,27 @@ const generateQRCodeSVG = async (data: string): Promise<string> => {
 
 const generatePDFHTML = (booking: any, qrCodeSvg: string): string => {
   const startDate = new Date(booking.start_date).toLocaleDateString("fr-FR", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
+    day: "2-digit",
+    month: "short",
     year: "numeric",
+  });
+
+  const startTime = new Date(booking.start_date).toLocaleTimeString("fr-FR", {
+    hour: "2-digit",
+    minute: "2-digit",
   });
 
   const endDate = booking.end_date
     ? new Date(booking.end_date).toLocaleDateString("fr-FR", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
+        day: "2-digit",
+        month: "short",
         year: "numeric",
       })
     : null;
+
+  const serviceType = booking.services?.type || "SERVICE";
+  const statusColor = booking.status === "confirmed" ? "#10b981" : booking.status === "pending" ? "#f59e0b" : "#64748b";
+  const statusText = booking.status === "confirmed" ? "CONFIRMÉ" : booking.status === "pending" ? "EN ATTENTE" : booking.status.toUpperCase();
 
   return `
     <!DOCTYPE html>
@@ -44,226 +51,302 @@ const generatePDFHTML = (booking: any, qrCodeSvg: string): string => {
             box-sizing: border-box;
           }
           body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            color: #333;
-            padding: 40px;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            background: #f5f5f5;
+            padding: 0;
+            margin: 0;
+          }
+          .container {
+            max-width: 900px;
+            margin: 0 auto;
             background: white;
+            box-shadow: 0 0 40px rgba(0,0,0,0.1);
+          }
+          .ticket {
+            display: flex;
+            min-height: 500px;
+          }
+          .left-section {
+            flex: 1;
+            background: white;
+            padding: 40px;
+            position: relative;
+          }
+          .right-section {
+            width: 280px;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            padding: 40px 30px;
+            position: relative;
           }
           .header {
-            text-align: center;
             margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 3px solid #667eea;
           }
           .logo {
-            font-size: 32px;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 10px;
+            font-size: 28px;
+            font-weight: 900;
+            color: #dc2626;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
           }
-          .subtitle {
+          .company-name {
+            font-size: 13px;
             color: #666;
-            font-size: 14px;
-          }
-          .booking-info {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-          }
-          .booking-id {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-          }
-          .service-name {
-            font-size: 20px;
-            opacity: 0.9;
-          }
-          .details-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
-          }
-          .detail-card {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-          }
-          .detail-label {
-            font-size: 12px;
-            color: #667eea;
-            font-weight: bold;
             text-transform: uppercase;
-            margin-bottom: 8px;
+            letter-spacing: 2px;
           }
-          .detail-value {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-          }
-          .qr-section {
+          .booking-class {
+            background: #dc2626;
+            color: white;
+            padding: 15px 25px;
             text-align: center;
-            padding: 30px;
-            background: #f9f9f9;
-            border-radius: 12px;
-            margin-bottom: 30px;
-          }
-          .qr-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #667eea;
-          }
-          .qr-code {
-            display: inline-block;
-            padding: 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-          }
-          .footer {
-            text-align: center;
-            padding-top: 30px;
-            border-top: 2px solid #eee;
-            color: #666;
-            font-size: 12px;
-          }
-          .status-badge {
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: bold;
-            margin-top: 10px;
-          }
-          .status-confirmed {
-            background: #10b981;
-            color: white;
-          }
-          .status-pending {
-            background: #f59e0b;
-            color: white;
-          }
-          .status-completed {
-            background: #3b82f6;
-            color: white;
-          }
-          .important-note {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
-            margin: 20px 0;
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            margin: 30px 0;
             border-radius: 4px;
           }
-          .important-note strong {
-            color: #856404;
+          .info-row {
+            margin-bottom: 25px;
+          }
+          .info-label {
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            font-weight: 600;
+          }
+          .info-value {
+            font-size: 16px;
+            color: #1a1a1a;
+            font-weight: 700;
+          }
+          .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-top: 30px;
+          }
+          .divider {
+            height: 2px;
+            background: #e5e5e5;
+            margin: 30px 0;
+          }
+          .right-logo {
+            font-size: 24px;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+          }
+          .status-badge {
+            background: ${statusColor};
+            padding: 8px 15px;
+            border-radius: 20px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 30px;
+          }
+          .right-info {
+            margin-bottom: 25px;
+          }
+          .right-label {
+            font-size: 9px;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+          }
+          .right-value {
+            font-size: 15px;
+            font-weight: 700;
+          }
+          .qr-section {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+          }
+          .qr-code {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            display: inline-block;
+          }
+          .barcode {
+            margin-top: 30px;
+            text-align: center;
+          }
+          .barcode-lines {
+            display: flex;
+            justify-content: center;
+            gap: 2px;
+            margin-bottom: 10px;
+          }
+          .barcode-line {
+            width: 2px;
+            height: 40px;
+            background: #1a1a1a;
+          }
+          .barcode-line:nth-child(even) {
+            height: 50px;
+          }
+          .barcode-text {
+            font-size: 12px;
+            color: #666;
+            letter-spacing: 3px;
+            font-weight: 600;
+          }
+          .price-section {
+            background: #fef3c7;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+          }
+          .price-label {
+            font-size: 11px;
+            color: #92400e;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            font-weight: 600;
+          }
+          .price-value {
+            font-size: 28px;
+            color: #dc2626;
+            font-weight: 900;
+          }
+          .footer-note {
+            margin-top: 30px;
+            padding: 15px;
+            background: #f9fafb;
+            border-left: 4px solid #dc2626;
+            font-size: 11px;
+            color: #666;
+            line-height: 1.6;
           }
         </style>
       </head>
       <body>
-        <div class="header">
-          <div class="logo">🌍 B-Reserve</div>
-          <div class="subtitle">Votre réservation de voyage</div>
-        </div>
+        <div class="container">
+          <div class="ticket">
+            <!-- Section gauche blanche -->
+            <div class="left-section">
+              <div class="header">
+                <div class="logo">B-RESERVE</div>
+                <div class="company-name">Travel & Tourism</div>
+              </div>
 
-        <div class="booking-info">
-          <div class="booking-id">Réservation #${booking.id.substring(0, 8).toUpperCase()}</div>
-          <div class="service-name">${booking.services.name}</div>
-          <span class="status-badge status-${booking.status}">
-            ${booking.status === "confirmed" ? "Confirmée" : booking.status === "pending" ? "En attente" : booking.status === "completed" ? "Terminée" : "Annulée"}
-          </span>
-        </div>
+              <div class="booking-class">
+                ${serviceType.toUpperCase()}
+              </div>
 
-        <div class="details-grid">
-          <div class="detail-card">
-            <div class="detail-label">👤 Voyageur</div>
-            <div class="detail-value">${booking.customer_name}</div>
-          </div>
-          
-          <div class="detail-card">
-            <div class="detail-label">📧 Email</div>
-            <div class="detail-value">${booking.customer_email}</div>
-          </div>
+              <div class="info-row">
+                <div class="info-label">Nom du voyageur</div>
+                <div class="info-value">${booking.customer_name.toUpperCase()}</div>
+              </div>
 
-          <div class="detail-card">
-            <div class="detail-label">📱 Téléphone</div>
-            <div class="detail-value">${booking.customer_phone}</div>
-          </div>
+              <div class="info-row">
+                <div class="info-label">Référence de réservation</div>
+                <div class="info-value">${booking.id.substring(0, 12).toUpperCase()}</div>
+              </div>
 
-          <div class="detail-card">
-            <div class="detail-label">👥 Nombre de voyageurs</div>
-            <div class="detail-value">${booking.guests} personne${booking.guests > 1 ? "s" : ""}</div>
-          </div>
+              <div class="divider"></div>
 
-          <div class="detail-card">
-            <div class="detail-label">📍 Destination</div>
-            <div class="detail-value">${booking.services.location}</div>
-          </div>
+              <div class="info-grid">
+                <div class="info-row">
+                  <div class="info-label">Service</div>
+                  <div class="info-value">${booking.services.name}</div>
+                </div>
 
-          <div class="detail-card">
-            <div class="detail-label">📅 Date de début</div>
-            <div class="detail-value">${startDate}</div>
-          </div>
+                <div class="info-row">
+                  <div class="info-label">Destination</div>
+                  <div class="info-value">${booking.services.location}</div>
+                </div>
 
-          ${endDate ? `
-            <div class="detail-card">
-              <div class="detail-label">📅 Date de fin</div>
-              <div class="detail-value">${endDate}</div>
+                <div class="info-row">
+                  <div class="info-label">Date de départ</div>
+                  <div class="info-value">${startDate}</div>
+                </div>
+
+                <div class="info-row">
+                  <div class="info-label">Heure</div>
+                  <div class="info-value">${startTime}</div>
+                </div>
+
+                <div class="info-row">
+                  <div class="info-label">Voyageurs</div>
+                  <div class="info-value">${booking.guests} ${booking.guests > 1 ? "Personnes" : "Personne"}</div>
+                </div>
+
+                <div class="info-row">
+                  <div class="info-label">Téléphone</div>
+                  <div class="info-value">${booking.customer_phone}</div>
+                </div>
+              </div>
+
+              <div class="price-section">
+                <div class="price-label">Montant total</div>
+                <div class="price-value">${booking.total_price.toLocaleString()} ${booking.currency}</div>
+              </div>
+
+              <div class="barcode">
+                <div class="barcode-lines">
+                  ${Array(30).fill(0).map((_, i) => `<div class="barcode-line" style="height: ${i % 3 === 0 ? '50px' : i % 2 === 0 ? '45px' : '40px'}"></div>`).join('')}
+                </div>
+                <div class="barcode-text">${booking.id.substring(0, 16).toUpperCase()}</div>
+              </div>
+
+              ${booking.notes ? `
+                <div class="footer-note">
+                  <strong>⚠️ Note importante:</strong><br>
+                  ${booking.notes}
+                </div>
+              ` : ''}
             </div>
-          ` : ""}
 
-          <div class="detail-card">
-            <div class="detail-label">💳 Montant total</div>
-            <div class="detail-value">${Number(booking.total_price).toLocaleString()} ${booking.currency}</div>
-          </div>
+            <!-- Section droite rouge -->
+            <div class="right-section">
+              <div class="right-logo">B-RESERVE</div>
+              
+              <div class="status-badge">
+                ${statusText}
+              </div>
 
-          <div class="detail-card">
-            <div class="detail-label">💰 Statut paiement</div>
-            <div class="detail-value">
-              ${booking.payment_status === "paid" ? "✅ Payé" : booking.payment_status === "pending" ? "⏳ En attente" : "❌ Échec"}
+              <div class="right-info">
+                <div class="right-label">Type de réservation</div>
+                <div class="right-value">${serviceType.toUpperCase()}</div>
+              </div>
+
+              ${endDate ? `
+                <div class="right-info">
+                  <div class="right-label">Date de retour</div>
+                  <div class="right-value">${endDate}</div>
+                </div>
+              ` : ''}
+
+              <div class="right-info">
+                <div class="right-label">Email</div>
+                <div class="right-value" style="font-size: 12px; word-break: break-all;">${booking.customer_email}</div>
+              </div>
+
+              <div class="right-info">
+                <div class="right-label">Statut paiement</div>
+                <div class="right-value">${booking.payment_status === "paid" ? "PAYÉ" : booking.payment_status === "pending" ? "EN ATTENTE" : booking.payment_status.toUpperCase()}</div>
+              </div>
+
+              <div class="qr-section">
+                <div class="qr-code">
+                  ${qrCodeSvg}
+                </div>
+              </div>
             </div>
           </div>
-
-          <div class="detail-card">
-            <div class="detail-label">🎫 Type de service</div>
-            <div class="detail-value">${booking.services.type}</div>
-          </div>
         </div>
 
-        ${booking.notes ? `
-          <div class="important-note">
-            <strong>📝 Notes importantes :</strong><br>
-            ${booking.notes}
-          </div>
-        ` : ""}
-
-        <div class="qr-section">
-          <div class="qr-title">🔍 Code QR de votre réservation</div>
-          <div class="qr-code">
-            ${qrCodeSvg}
-          </div>
-          <p style="margin-top: 15px; color: #666; font-size: 14px;">
-            Scannez ce code pour accéder rapidement aux détails de votre réservation
-          </p>
-        </div>
-
-        <div class="important-note">
-          <strong>ℹ️ Informations importantes :</strong><br>
-          • Présentez ce document lors de votre arrivée<br>
-          • Vérifiez vos documents de voyage avant le départ<br>
-          • Arrivez au moins 2 heures avant l'heure prévue<br>
-          • Contactez notre support en cas de question : support@bossiz.com
-        </div>
-
-        <div class="footer">
-          <p><strong>B-Reserve</strong> - Votre partenaire voyage de confiance</p>
-          <p>Email : reservations@bossiz.com | Téléphone : +225 XX XX XX XX XX</p>
-          <p style="margin-top: 10px;">© 2025 B-Reserve. Tous droits réservés.</p>
-        </div>
       </body>
     </html>
   `;
