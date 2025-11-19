@@ -66,8 +66,19 @@ const Trains = () => {
         children,
       });
 
-      if (result?.success && Array.isArray(result.data)) {
-        const mapped: MappedTrain[] = result.data.map((train: any) => {
+      if (result) {
+        const trainsData = Array.isArray((result as any).data)
+          ? (result as any).data
+          : Array.isArray((result as any).trains)
+          ? (result as any).trains
+          : [];
+
+        if (trainsData.length === 0) {
+          setTrains([]);
+          return;
+        }
+
+        const mapped: MappedTrain[] = trainsData.map((train: any) => {
           const price = typeof train.price === "object" 
             ? parseFloat(train.price.total || train.price.amount || 0)
             : typeof train.price === "number"
