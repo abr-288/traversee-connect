@@ -8,7 +8,6 @@ import { AITravelAdvisor } from "@/components/AITravelAdvisor";
 import { Boss } from "@/components/Boss";
 import StatsSection from "@/components/StatsSection";
 import FeaturedServices from "@/components/FeaturedServices";
-import QuickSearch from "@/components/QuickSearch";
 import SpecialOffers from "@/components/SpecialOffers";
 import { useTranslation } from "react-i18next";
 
@@ -21,7 +20,6 @@ const Index = () => {
       <main>
         <HeroSection />
         <StatsSection />
-        <QuickSearch />
         <DestinationsSection />
         <FeaturedServices />
         <SpecialOffers />
