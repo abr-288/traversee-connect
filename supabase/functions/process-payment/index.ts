@@ -91,7 +91,7 @@ serve(async (req) => {
     } else if (requestData.paymentMethod === 'mobile_money') {
       channels = 'MOBILE_MONEY';
     } else if (requestData.paymentMethod === 'wave') {
-      channels = 'MOBILE_MONEY'; // Wave is part of mobile money in CinetPay
+      channels = 'WAVE'; // Wave has its own channel in CinetPay
     } else if (requestData.paymentMethod === 'bank_transfer') {
       channels = 'BANK_TRANSFER';
     }
