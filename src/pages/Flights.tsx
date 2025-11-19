@@ -525,12 +525,14 @@ const Flights = () => {
 
       <Footer />
 
-      <FlightBookingDialog
-        flight={selectedFlight}
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        searchParams={flightSearchParams}
-      />
+      {selectedFlight && (
+        <FlightBookingDialog
+          flight={selectedFlight}
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          searchParams={flightSearchParams}
+        />
+      )}
     </div>
   );
 };
