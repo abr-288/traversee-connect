@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin } from "lucide-react";
 import { format } from "date-fns";
-import { UnifiedForm, UnifiedFormField, UnifiedDatePicker, UnifiedSubmitButton } from "@/components/forms";
+import { UnifiedForm, UnifiedAutocomplete, UnifiedFormField, UnifiedDatePicker, UnifiedSubmitButton } from "@/components/forms";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export const StaySearchForm = () => {
   const navigate = useNavigate();
+  const [destination, setDestination] = useState("");
   const [checkIn, setCheckIn] = useState<Date>();
   const [checkOut, setCheckOut] = useState<Date>();
   const [type, setType] = useState("all");
@@ -15,7 +15,6 @@ export const StaySearchForm = () => {
     e.preventDefault();
     
     const formData = new FormData(e.currentTarget as HTMLFormElement);
-    const destination = formData.get("destination") as string;
     const guests = formData.get("guests") as string;
 
     if (!destination) {
@@ -37,11 +36,12 @@ export const StaySearchForm = () => {
     <UnifiedForm onSubmit={handleSearch} variant="search" className="w-full max-w-6xl mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
         <div className="md:col-span-2">
-          <UnifiedFormField
+          <UnifiedAutocomplete
             label="Destination"
-            name="destination"
+            type="location"
+            value={destination}
+            onChange={setDestination}
             placeholder="Où souhaitez-vous séjourner?"
-            icon={MapPin}
             required
           />
         </div>

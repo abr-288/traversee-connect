@@ -1,11 +1,9 @@
 import { useState } from "react";
-import { Calendar as CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { useEventSearch } from "@/hooks/useEventSearch";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
-import { UnifiedForm, UnifiedDatePicker, UnifiedSubmitButton } from "@/components/forms";
-import { EventLocationAutocomplete } from "@/components/EventLocationAutocomplete";
+import { UnifiedForm, UnifiedAutocomplete, UnifiedDatePicker, UnifiedSubmitButton } from "@/components/forms";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface EventSearchFormProps {
@@ -57,14 +55,14 @@ export const EventSearchForm = ({ onResults }: EventSearchFormProps) => {
       <CardContent className="pt-6">
         <UnifiedForm onSubmit={handleSearch} variant="search" loading={loading}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground" htmlFor="location">Localisation</label>
-              <EventLocationAutocomplete
-                value={location}
-                onChange={setLocation}
-                placeholder="Paris, Londres..."
-              />
-            </div>
+            <UnifiedAutocomplete
+              label="Localisation"
+              type="location"
+              value={location}
+              onChange={setLocation}
+              placeholder="Paris, Londres..."
+              required
+            />
 
             <UnifiedDatePicker
               label="Date"
