@@ -36,9 +36,10 @@ const Hotels = () => {
   const [filterDestination, setFilterDestination] = useState("");
   const [filterStars, setFilterStars] = useState("all");
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState("popular");
+  const [sortBy, setSortBy] = useState("price-low");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const [hasSearched, setHasSearched] = useState(false);
+  const itemsPerPage = 9;
   
   // Comparison state
   const [selectedHotels, setSelectedHotels] = useState<any[]>([]);
@@ -53,6 +54,7 @@ const Hotels = () => {
     const rooms = searchParams.get("rooms");
 
     if (destination && checkIn && checkOut && adults) {
+      setHasSearched(true);
       handleSearch(
         destination,
         checkIn,
