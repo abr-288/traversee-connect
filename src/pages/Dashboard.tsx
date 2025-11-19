@@ -40,6 +40,7 @@ const Dashboard = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [userProfile, setUserProfile] = useState<{ full_name: string; email: string } | null>(null);
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
@@ -55,6 +56,19 @@ const Dashboard = () => {
         navigate("/auth");
         return;
       }
+      
+      // Fetch user profile
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", user.id)
+        .maybeSingle();
+      
+      setUserProfile({
+        full_name: profileData?.full_name || "Utilisateur",
+        email: user.email || "",
+      });
+      
       fetchBookings();
       loadNotifications();
     };
@@ -157,6 +171,12 @@ const Dashboard = () => {
 
   const handleConfirmBooking = async (id: string) => {
     try {
+      // Get booking details first to check payment status
+      const booking = bookings.find((b) => b.id === id);
+      if (!booking) {
+        throw new Error("Réservation introuvable");
+      }
+
       const { error } = await supabase
         .from("bookings")
         .update({ status: "confirmed" })
@@ -164,7 +184,21 @@ const Dashboard = () => {
 
       if (error) throw error;
 
-      // Send confirmation email with PDF
+      // Check if payment is pending
+      if (booking.payment_status === "pending") {
+        toast({
+          title: "Confirmation réussie",
+          description: "Redirection vers le paiement...",
+        });
+        
+        // Redirect to payment page
+        setTimeout(() => {
+          navigate(`/payment?bookingId=${id}`);
+        }, 1000);
+        return;
+      }
+
+      // Send confirmation email with PDF only if payment is complete
       try {
         await supabase.functions.invoke("send-booking-pdf-email", {
           body: { bookingId: id },
@@ -275,9 +309,16 @@ const Dashboard = () => {
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-background via-background to-primary/5">
       <Navbar />
       <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
           <div>
-            <h1 className="text-4xl font-bold mb-2">Mon Tableau de Bord</h1>
+            <div className="flex items-center gap-3 mb-2">
+              <h1 className="text-4xl font-bold">Mon Tableau de Bord</h1>
+            </div>
+            {userProfile && (
+              <p className="text-lg font-semibold text-primary mb-1">
+                Bienvenue, {userProfile.full_name} 👋
+              </p>
+            )}
             <p className="text-muted-foreground">
               Gérez vos réservations et suivez vos voyages
             </p>
