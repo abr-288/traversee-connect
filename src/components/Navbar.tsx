@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, User, LogOut, LayoutDashboard, Plane, Hotel, PlaneTakeoff, Train, Calendar, Car, HelpCircle } from "lucide-react";
+import { Menu, X, User, LogOut, LayoutDashboard, Plane, Hotel, PlaneTakeoff, Train, Calendar, Car, HelpCircle, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
+import { usePWA } from "@/hooks/usePWA";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import logoDark from "@/assets/logo-dark.png";
@@ -14,6 +15,7 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { isAdmin, loading: roleLoading } = useUserRole();
+  const { isInstallable, isInstalled, install } = usePWA();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -33,6 +35,13 @@ const Navbar = () => {
     await supabase.auth.signOut();
     toast.success(t("nav.logoutSuccess"));
     navigate("/");
+  };
+
+  const handleInstall = async () => {
+    const success = await install();
+    if (success) {
+      toast.success("Application installée avec succès !");
+    }
   };
 
   return (
@@ -84,6 +93,21 @@ const Navbar = () => {
               <div className="h-4 w-px bg-white/20"></div>
               
               <LanguageSwitcher />
+              
+              {isInstallable && !isInstalled && (
+                <>
+                  <div className="h-4 w-px bg-white/20"></div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={handleInstall}
+                    className="gap-1 text-[11px] text-secondary hover:bg-white/10 font-semibold"
+                  >
+                    <Download className="w-3 h-3" />
+                    Installer
+                  </Button>
+                </>
+              )}
               
               {isLoggedIn ? (
                 <>
