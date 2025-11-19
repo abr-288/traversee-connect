@@ -31,14 +31,14 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <section className="relative min-h-[600px] md:min-h-[850px] flex items-center pt-16 md:pt-20">
+    <section className="relative min-h-[600px] md:min-h-[850px] flex items-center pt-16 md:pt-20 overflow-hidden">
       {/* Background Image Carousel with Overlay */}
       <div className="absolute inset-0 z-0">
         {HERO_SLIDES.map((slide, index) => (
           <div
             key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === currentSlide ? "opacity-100" : "opacity-0"
+            className={`absolute inset-0 transition-all duration-1000 ${
+              index === currentSlide ? "opacity-100 scale-100" : "opacity-0 scale-105"
             }`}
           >
             <img
@@ -49,21 +49,33 @@ const HeroSection = () => {
           </div>
         ))}
         <div className="absolute inset-0 gradient-hero" />
+        <div className="absolute inset-0 gradient-mesh opacity-60" />
+        
+        {/* Animated particles/shapes */}
+        <div className="absolute top-20 left-10 w-72 h-72 bg-secondary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '0s' }} />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
       </div>
 
       {/* Content */}
       <div className="container relative z-10 mx-auto px-4 py-8 md:py-16">
         <div className="max-w-4xl mx-auto text-center mb-8 md:mb-14">
-          <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold text-white mb-3 md:mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold text-white mb-3 md:mb-6 animate-slide-up-fade drop-shadow-2xl" style={{ animationDelay: '0.1s' }}>
             {t('hero.title')}
           </h1>
-          <p className="text-base md:text-xl lg:text-2xl text-white/95 mb-6 md:mb-10 font-normal animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
+          <p className="text-base md:text-xl lg:text-2xl text-white/95 mb-6 md:mb-10 font-normal animate-slide-up-fade drop-shadow-lg" style={{ animationDelay: '0.3s' }}>
             {t('hero.subtitle')}
           </p>
+          
+          {/* Decorative elements */}
+          <div className="flex justify-center gap-2 animate-slide-up-fade" style={{ animationDelay: '0.5s' }}>
+            <div className="w-20 h-1 bg-secondary rounded-full" />
+            <div className="w-1 h-1 bg-secondary rounded-full mt-0" />
+            <div className="w-1 h-1 bg-secondary rounded-full mt-0" />
+          </div>
         </div>
 
         {/* Search Card - Avec système UnifiedForm */}
-        <div className="max-w-6xl mx-auto bg-background rounded-lg md:rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+        <div className="max-w-6xl mx-auto glass rounded-2xl md:rounded-3xl shadow-xl hover:shadow-2xl overflow-hidden animate-scale-in border-2 border-white/20 hover-lift" style={{ animationDelay: '0.6s' }}>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="w-full h-auto p-0 bg-background border-b flex justify-start overflow-x-auto rounded-none gap-0">
               <TabsTrigger 
