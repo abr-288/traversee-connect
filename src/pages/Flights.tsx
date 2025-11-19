@@ -119,7 +119,7 @@ const Flights = () => {
     };
 
     runSearch();
-  }, [searchParams, searchFlights]);
+  }, [searchParams]);
 
   const handleBook = (flight: MappedFlight) => {
     setSelectedFlight(flight);
