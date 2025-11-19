@@ -311,6 +311,110 @@
     "index": {
       "aiTitle": "Planifiez votre voyage avec l'IA",
       "aiSubtitle": "Obtenez des recommandations personnalisées pour votre prochaine destination"
+    },
+    "flights": {
+      "title": "Rechercher des vols",
+      "subtitle": "Comparez et réservez les meilleurs vols aux meilleurs prix",
+      "filters": {
+        "title": "Filtres",
+        "price": "Prix",
+        "duration": "Durée max",
+        "hours": "heures",
+        "stops": "Escales",
+        "all": "Toutes",
+        "direct": "Direct",
+        "oneStop": "1 escale",
+        "airlines": "Compagnies",
+        "sortBy": "Trier par",
+        "cheapest": "Moins cher",
+        "fastest": "Plus rapide",
+        "earliest": "Plus tôt"
+      },
+      "results": {
+        "showing": "Affichage de",
+        "of": "sur",
+        "flights": "vols",
+        "noResults": "Aucun résultat",
+        "noResultsDesc": "Modifiez vos critères de recherche",
+        "duration": "Durée",
+        "stops": "escales",
+        "direct": "Direct"
+      }
+    },
+    "hotels": {
+      "title": "Rechercher des hôtels",
+      "subtitle": "Trouvez l'hébergement parfait pour votre séjour",
+      "filters": {
+        "title": "Filtres",
+        "destination": "Destination",
+        "allDestinations": "Toutes destinations",
+        "stars": "Étoiles",
+        "allStars": "Toutes",
+        "amenities": "Équipements",
+        "wifi": "WiFi",
+        "restaurant": "Restaurant",
+        "parking": "Parking",
+        "price": "Prix par nuit",
+        "sortBy": "Trier par",
+        "priceLow": "Prix croissant",
+        "priceHigh": "Prix décroissant",
+        "rating": "Note",
+        "stars": "Étoiles"
+      },
+      "results": {
+        "showing": "Affichage de",
+        "to": "à",
+        "of": "sur",
+        "hotels": "hôtels",
+        "night": "par nuit",
+        "reviews": "avis",
+        "noResults": "Aucun résultat",
+        "noResultsDesc": "Modifiez vos critères de recherche",
+        "compare": "Comparer",
+        "comparing": "Comparaison en cours",
+        "viewComparison": "Voir la comparaison"
+      }
+    },
+    "support": {
+      "title": "Centre d'Assistance",
+      "subtitle": "Nous sommes là pour vous aider 24h/24 et 7j/7",
+      "contact": {
+        "phone": "Téléphone",
+        "phoneDesc": "Disponible 24/7",
+        "email": "Email",
+        "emailDesc": "Réponse sous 24h",
+        "chat": "Chat en direct",
+        "chatDesc": "Réponse immédiate"
+      },
+      "form": {
+        "title": "Envoyez-nous un message",
+        "name": "Nom complet",
+        "email": "Email",
+        "reference": "Référence réservation (optionnel)",
+        "subject": "Sujet",
+        "message": "Votre message",
+        "send": "Envoyer",
+        "sending": "Envoi..."
+      },
+      "faq": {
+        "title": "Questions Fréquentes",
+        "q1": "Comment puis-je modifier ma réservation ?",
+        "a1": "Vous pouvez modifier votre réservation en vous connectant à votre compte et en accédant à 'Mes Réservations'. Cliquez sur la réservation concernée et sélectionnez 'Modifier'. Notez que des frais peuvent s'appliquer selon les conditions tarifaires.",
+        "q2": "Quels sont les moyens de paiement acceptés ?",
+        "a2": "Nous acceptons les cartes bancaires (Visa, Mastercard), Mobile Money (Orange Money, MTN Money, Moov Money), et les virements bancaires. Le paiement en espèces est possible dans nos agences.",
+        "q3": "Comment obtenir un remboursement ?",
+        "a3": "Les demandes de remboursement doivent être soumises via votre compte dans un délai de 24h après l'annulation. Le délai de traitement est de 7 à 14 jours ouvrables selon votre banque.",
+        "q4": "Puis-je voyager avec des enfants ?",
+        "a4": "Oui, les enfants sont les bienvenus. Des tarifs réduits sont disponibles pour les enfants de moins de 12 ans. Certains services offrent la gratuité pour les enfants de moins de 2 ans.",
+        "q5": "Quels documents sont nécessaires pour voyager ?",
+        "a5": "Pour les vols internationaux, un passeport valide est obligatoire. Selon la destination, un visa peut être requis. Pour les vols domestiques, une carte d'identité suffit. Consultez notre guide des destinations pour plus d'informations.",
+        "q6": "Que faire en cas de retard ou d'annulation de vol ?",
+        "a6": "En cas de retard ou d'annulation, contactez immédiatement notre service client disponible 24/7. Nous vous assisterons pour trouver une solution alternative ou traiter votre remboursement."
+      },
+      "hours": {
+        "title": "Horaires d'ouverture",
+        "247": "Service disponible 24h/24 et 7j/7"
+      }
     }
   }
 }

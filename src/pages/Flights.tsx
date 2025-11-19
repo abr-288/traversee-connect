@@ -14,6 +14,7 @@ import { Slider } from "@/components/ui/slider";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "react-i18next";
 
 interface MappedFlight {
   id: string;
@@ -33,6 +34,7 @@ interface MappedFlight {
 }
 
 const Flights = () => {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const { searchFlights, loading, error } = useFlightSearch();
   const [flights, setFlights] = useState<MappedFlight[]>([]);
@@ -217,10 +219,10 @@ const Flights = () => {
           <div className="relative z-10 container mx-auto px-4 py-12">
             <div className="text-center mb-8 animate-fade-in">
               <h1 className="text-4xl md:text-6xl font-bold mb-4 text-white drop-shadow-lg">
-                Rechercher des vols
+                {t("pages.flights.title")}
               </h1>
               <p className="text-lg md:text-xl text-white/95 drop-shadow-md max-w-2xl mx-auto">
-                Comparez et réservez les meilleurs vols aux meilleurs prix
+                {t("pages.flights.subtitle")}
               </p>
             </div>
             

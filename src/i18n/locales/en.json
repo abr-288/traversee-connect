@@ -311,6 +311,110 @@
     "index": {
       "aiTitle": "Plan your trip with AI",
       "aiSubtitle": "Get personalized recommendations for your next destination"
+    },
+    "flights": {
+      "title": "Search Flights",
+      "subtitle": "Compare and book the best flights at the best prices",
+      "filters": {
+        "title": "Filters",
+        "price": "Price",
+        "duration": "Max duration",
+        "hours": "hours",
+        "stops": "Stops",
+        "all": "All",
+        "direct": "Direct",
+        "oneStop": "1 stop",
+        "airlines": "Airlines",
+        "sortBy": "Sort by",
+        "cheapest": "Cheapest",
+        "fastest": "Fastest",
+        "earliest": "Earliest"
+      },
+      "results": {
+        "showing": "Showing",
+        "of": "of",
+        "flights": "flights",
+        "noResults": "No results",
+        "noResultsDesc": "Modify your search criteria",
+        "duration": "Duration",
+        "stops": "stops",
+        "direct": "Direct"
+      }
+    },
+    "hotels": {
+      "title": "Search Hotels",
+      "subtitle": "Find the perfect accommodation for your stay",
+      "filters": {
+        "title": "Filters",
+        "destination": "Destination",
+        "allDestinations": "All destinations",
+        "stars": "Stars",
+        "allStars": "All",
+        "amenities": "Amenities",
+        "wifi": "WiFi",
+        "restaurant": "Restaurant",
+        "parking": "Parking",
+        "price": "Price per night",
+        "sortBy": "Sort by",
+        "priceLow": "Price ascending",
+        "priceHigh": "Price descending",
+        "rating": "Rating",
+        "stars": "Stars"
+      },
+      "results": {
+        "showing": "Showing",
+        "to": "to",
+        "of": "of",
+        "hotels": "hotels",
+        "night": "per night",
+        "reviews": "reviews",
+        "noResults": "No results",
+        "noResultsDesc": "Modify your search criteria",
+        "compare": "Compare",
+        "comparing": "Comparing",
+        "viewComparison": "View comparison"
+      }
+    },
+    "support": {
+      "title": "Support Center",
+      "subtitle": "We're here to help you 24/7",
+      "contact": {
+        "phone": "Phone",
+        "phoneDesc": "Available 24/7",
+        "email": "Email",
+        "emailDesc": "Response within 24h",
+        "chat": "Live Chat",
+        "chatDesc": "Immediate response"
+      },
+      "form": {
+        "title": "Send us a message",
+        "name": "Full name",
+        "email": "Email",
+        "reference": "Booking reference (optional)",
+        "subject": "Subject",
+        "message": "Your message",
+        "send": "Send",
+        "sending": "Sending..."
+      },
+      "faq": {
+        "title": "Frequently Asked Questions",
+        "q1": "How can I modify my booking?",
+        "a1": "You can modify your booking by logging into your account and accessing 'My Bookings'. Click on the relevant booking and select 'Modify'. Note that fees may apply depending on fare conditions.",
+        "q2": "What payment methods are accepted?",
+        "a2": "We accept credit cards (Visa, Mastercard), Mobile Money (Orange Money, MTN Money, Moov Money), and bank transfers. Cash payment is possible at our agencies.",
+        "q3": "How can I get a refund?",
+        "a3": "Refund requests must be submitted through your account within 24h after cancellation. Processing time is 7 to 14 business days depending on your bank.",
+        "q4": "Can I travel with children?",
+        "a4": "Yes, children are welcome. Reduced rates are available for children under 12. Some services offer free travel for children under 2.",
+        "q5": "What documents are needed for travel?",
+        "a5": "For international flights, a valid passport is mandatory. Depending on the destination, a visa may be required. For domestic flights, an ID card is sufficient. Check our destination guide for more information.",
+        "q6": "What to do in case of flight delay or cancellation?",
+        "a6": "In case of delay or cancellation, contact our customer service immediately available 24/7. We will assist you in finding an alternative solution or processing your refund."
+      },
+      "hours": {
+        "title": "Opening Hours",
+        "247": "Service available 24/7"
+      }
     }
   }
 }

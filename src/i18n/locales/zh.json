@@ -311,6 +311,110 @@
     "index": {
       "aiTitle": "用AI规划您的旅行",
       "aiSubtitle": "获取您下一个目的地的个性化推荐"
+    },
+    "flights": {
+      "title": "搜索航班",
+      "subtitle": "比较并预订最优价格的航班",
+      "filters": {
+        "title": "筛选",
+        "price": "价格",
+        "duration": "最长时长",
+        "hours": "小时",
+        "stops": "中转",
+        "all": "全部",
+        "direct": "直飞",
+        "oneStop": "1次中转",
+        "airlines": "航空公司",
+        "sortBy": "排序",
+        "cheapest": "最便宜",
+        "fastest": "最快",
+        "earliest": "最早"
+      },
+      "results": {
+        "showing": "显示",
+        "of": "共",
+        "flights": "个航班",
+        "noResults": "无结果",
+        "noResultsDesc": "修改搜索条件",
+        "duration": "时长",
+        "stops": "次中转",
+        "direct": "直飞"
+      }
+    },
+    "hotels": {
+      "title": "搜索酒店",
+      "subtitle": "为您的住宿找到完美的住处",
+      "filters": {
+        "title": "筛选",
+        "destination": "目的地",
+        "allDestinations": "所有目的地",
+        "stars": "星级",
+        "allStars": "全部",
+        "amenities": "设施",
+        "wifi": "WiFi",
+        "restaurant": "餐厅",
+        "parking": "停车场",
+        "price": "每晚价格",
+        "sortBy": "排序",
+        "priceLow": "价格升序",
+        "priceHigh": "价格降序",
+        "rating": "评分",
+        "stars": "星级"
+      },
+      "results": {
+        "showing": "显示",
+        "to": "至",
+        "of": "共",
+        "hotels": "家酒店",
+        "night": "每晚",
+        "reviews": "条评价",
+        "noResults": "无结果",
+        "noResultsDesc": "修改搜索条件",
+        "compare": "比较",
+        "comparing": "比较中",
+        "viewComparison": "查看比较"
+      }
+    },
+    "support": {
+      "title": "帮助中心",
+      "subtitle": "我们全天候为您服务",
+      "contact": {
+        "phone": "电话",
+        "phoneDesc": "全天候服务",
+        "email": "邮箱",
+        "emailDesc": "24小时内回复",
+        "chat": "在线聊天",
+        "chatDesc": "即时回复"
+      },
+      "form": {
+        "title": "给我们留言",
+        "name": "全名",
+        "email": "邮箱",
+        "reference": "预订参考号（可选）",
+        "subject": "主题",
+        "message": "您的留言",
+        "send": "发送",
+        "sending": "发送中..."
+      },
+      "faq": {
+        "title": "常见问题",
+        "q1": "如何修改我的预订？",
+        "a1": "您可以登录账户并访问\"我的预订\"来修改预订。点击相关预订并选择\"修改\"。请注意，根据票价条件可能会收取费用。",
+        "q2": "接受哪些支付方式？",
+        "a2": "我们接受信用卡（Visa、Mastercard）、移动支付（Orange Money、MTN Money、Moov Money）和银行转账。我们的门店也接受现金支付。",
+        "q3": "如何获得退款？",
+        "a3": "退款申请必须在取消后24小时内通过您的账户提交。根据您的银行，处理时间为7至14个工作日。",
+        "q4": "我可以带儿童旅行吗？",
+        "a4": "是的，欢迎儿童。12岁以下儿童享有优惠价格。某些服务为2岁以下儿童提供免费旅行。",
+        "q5": "旅行需要什么证件？",
+        "a5": "国际航班必须持有有效护照。根据目的地，可能需要签证。国内航班只需身份证。查看我们的目的地指南了解更多信息。",
+        "q6": "航班延误或取消怎么办？",
+        "a6": "如遇延误或取消，请立即联系我们全天候客服。我们将协助您寻找替代方案或处理退款。"
+      },
+      "hours": {
+        "title": "营业时间",
+        "247": "全天候服务"
+      }
     }
   }
 }

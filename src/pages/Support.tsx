@@ -10,8 +10,10 @@ import { useToast } from "@/hooks/use-toast";
 import { useNewsletterSubscribe } from "@/hooks/useNewsletterSubscribe";
 import { UnifiedForm, UnifiedFormField, UnifiedSubmitButton } from "@/components/forms";
 import { Textarea } from "@/components/ui/textarea";
+import { useTranslation } from "react-i18next";
 
 const Support = () => {
+  const { t } = useTranslation();
   const { sendMessage, loading: sendingMessage } = useSupportMessage();
   const { subscribe, loading: subscribing } = useNewsletterSubscribe();
   const { toast } = useToast();
@@ -58,28 +60,28 @@ const Support = () => {
   };
   const faqs = [
     {
-      question: "Comment puis-je modifier ma réservation ?",
-      answer: "Vous pouvez modifier votre réservation en vous connectant à votre compte et en accédant à 'Mes Réservations'. Cliquez sur la réservation concernée et sélectionnez 'Modifier'. Notez que des frais peuvent s'appliquer selon les conditions tarifaires."
+      question: t("pages.support.faq.q1"),
+      answer: t("pages.support.faq.a1")
     },
     {
-      question: "Quels sont les moyens de paiement acceptés ?",
-      answer: "Nous acceptons les cartes bancaires (Visa, Mastercard), Mobile Money (Orange Money, MTN Money, Moov Money), et les virements bancaires. Le paiement en espèces est possible dans nos agences."
+      question: t("pages.support.faq.q2"),
+      answer: t("pages.support.faq.a2")
     },
     {
-      question: "Comment obtenir un remboursement ?",
-      answer: "Les demandes de remboursement doivent être soumises via votre compte dans un délai de 24h après l'annulation. Le délai de traitement est de 7 à 14 jours ouvrables selon votre banque."
+      question: t("pages.support.faq.q3"),
+      answer: t("pages.support.faq.a3")
     },
     {
-      question: "Puis-je voyager avec des enfants ?",
-      answer: "Oui, les enfants sont les bienvenus. Des tarifs réduits sont disponibles pour les enfants de moins de 12 ans. Certains services offrent la gratuité pour les enfants de moins de 2 ans."
+      question: t("pages.support.faq.q4"),
+      answer: t("pages.support.faq.a4")
     },
     {
-      question: "Quels documents sont nécessaires pour voyager ?",
-      answer: "Pour les vols internationaux, un passeport valide est obligatoire. Selon la destination, un visa peut être requis. Pour les vols domestiques, une carte d'identité suffit. Consultez notre guide des destinations pour plus d'informations."
+      question: t("pages.support.faq.q5"),
+      answer: t("pages.support.faq.a5")
     },
     {
-      question: "Que faire en cas de retard ou d'annulation de vol ?",
-      answer: "En cas de retard ou d'annulation, contactez immédiatement notre service client disponible 24/7. Nous vous assisterons pour trouver une solution alternative ou traiter votre remboursement."
+      question: t("pages.support.faq.q6"),
+      answer: t("pages.support.faq.a6")
     }
   ];
 
@@ -89,9 +91,9 @@ const Support = () => {
       
       <main className="flex-1 container mx-auto px-4 py-8 mt-20">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-4">Centre d'Assistance</h1>
+          <h1 className="text-4xl font-bold mb-4">{t("pages.support.title")}</h1>
           <p className="text-muted-foreground text-lg">
-            Nous sommes là pour vous aider 24h/24 et 7j/7
+            {t("pages.support.subtitle")}
           </p>
         </div>
 
