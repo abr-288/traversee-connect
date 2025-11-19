@@ -156,7 +156,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send confirmation to customer via SMTP
     await smtpClient.send({
-      from: "B-Reserve Support <support@bossiz.com>",
+      from: "B-Reserve <noreply@bossiz.com>",
       to: sanitizedData.email,
       subject: "Confirmation de réception de votre message",
       html: confirmationHtml,

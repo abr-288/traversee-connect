@@ -111,7 +111,7 @@ const handler = async (req: Request): Promise<Response> => {
     `;
 
     await smtpClient.send({
-      from: "B-Reserve Newsletter <newsletter@bossiz.com>",
+      from: "B-Reserve <noreply@bossiz.com>",
       to: email,
       subject: "Bienvenue chez B-Reserve ! 🎉",
       html: welcomeHtml,

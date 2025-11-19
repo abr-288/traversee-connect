@@ -232,7 +232,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send invoice email via SMTP
     await smtpClient.send({
-      from: "B-Reserve Facturation <factures@bossiz.com>",
+      from: "B-Reserve Facturation <notifications@bossiz.com>",
       to: invoiceData.customerEmail,
       subject: `Facture ${invoiceData.invoiceNumber} - B-Reserve`,
       html: invoiceHTML,
