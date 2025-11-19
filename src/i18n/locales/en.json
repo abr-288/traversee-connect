@@ -69,7 +69,14 @@
     "readMore": "Read more"
   },
   "footer": {
-    "description": "Your trusted partner for all your travel needs",
+    "description": "Your trusted partner for unforgettable travels around the world.",
+    "services": "Our Services",
+    "flights": "Flights",
+    "hotels": "Hotels",
+    "flightHotel": "Flight + Hotel",
+    "cars": "Cars",
+    "stays": "Stays",
+    "activities": "Activities",
     "company": "Company",
     "about": "About",
     "careers": "Careers",
@@ -77,10 +84,20 @@
     "support": "Support",
     "help": "Help Center",
     "contact": "Contact",
+    "faq": "FAQ",
     "legal": "Legal",
     "privacy": "Privacy",
     "terms": "Terms",
-    "rights": "All rights reserved"
+    "rights": "All rights reserved",
+    "newsletter": {
+      "title": "Newsletter",
+      "description": "Get our latest offers and news",
+      "placeholder": "Your email",
+      "subscribe": "Subscribe",
+      "emailRequired": "Please enter your email",
+      "subscribeSuccess": "Subscription successful!",
+      "subscribeError": "Subscription error"
+    }
   },
   "boss": {
     "title": "Boss - Travel Assistant",
@@ -287,6 +304,13 @@
     "success": "Success",
     "error": "Error",
     "warning": "Warning",
-    "info": "Information"
+    "info": "Information",
+    "install": "Install app"
+  },
+  "pages": {
+    "index": {
+      "aiTitle": "Plan your trip with AI",
+      "aiSubtitle": "Get personalized recommendations for your next destination"
+    }
   }
 }

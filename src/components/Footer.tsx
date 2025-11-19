@@ -7,8 +7,10 @@ import logoLight from "@/assets/logo-light.png";
 import { useState } from "react";
 import { useNewsletterSubscribe } from "@/hooks/useNewsletterSubscribe";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 const Footer = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const { subscribe, loading } = useNewsletterSubscribe();
 
@@ -16,17 +18,17 @@ const Footer = () => {
     e.preventDefault();
     
     if (!email) {
-      toast.error("Veuillez entrer votre email");
+      toast.error(t("footer.newsletter.emailRequired"));
       return;
     }
 
     const result = await subscribe(email);
     
     if (result) {
-      toast.success(result.message || "Inscription réussie !");
+      toast.success(result.message || t("footer.newsletter.subscribeSuccess"));
       setEmail("");
     } else {
-      toast.error("Erreur lors de l'inscription");
+      toast.error(t("footer.newsletter.subscribeError"));
     }
   };
 
@@ -41,7 +43,7 @@ const Footer = () => {
               <span className="text-xl md:text-2xl font-bold text-white">Bossiz</span>
             </div>
             <p className="text-white/80 text-sm">
-              Votre partenaire de confiance pour des voyages inoubliables à travers le monde.
+              {t("footer.description")}
             </p>
             <div className="flex gap-2 md:gap-3 justify-center sm:justify-start">
               <Button size="icon" variant="outline" className="rounded-full h-8 w-8 md:h-10 md:w-10">
@@ -61,36 +63,36 @@ const Footer = () => {
 
           {/* Services */}
           <div className="text-center sm:text-left">
-            <h3 className="font-bold text-white mb-3 md:mb-4 text-sm md:text-base">Nos Services</h3>
+            <h3 className="font-bold text-white mb-3 md:mb-4 text-sm md:text-base">{t("footer.services")}</h3>
             <ul className="space-y-2 md:space-y-3 text-sm">
               <li>
                 <Link to="/flights" className="text-white/80 hover:text-secondary transition-smooth">
-                  Vols
+                  {t("footer.flights")}
                 </Link>
               </li>
               <li>
                 <Link to="/hotels" className="text-white/80 hover:text-secondary transition-smooth">
-                  Hôtels
+                  {t("footer.hotels")}
                 </Link>
               </li>
               <li>
                 <Link to="/flight-hotel" className="text-white/80 hover:text-secondary transition-smooth">
-                  Vol + Hôtel
+                  {t("footer.flightHotel")}
                 </Link>
               </li>
               <li>
                 <Link to="/cars" className="text-white/80 hover:text-secondary transition-smooth">
-                  Voitures
+                  {t("footer.cars")}
                 </Link>
               </li>
               <li>
                 <Link to="/stays" className="text-white/80 hover:text-secondary transition-smooth">
-                  Séjours
+                  {t("footer.stays")}
                 </Link>
               </li>
               <li>
                 <Link to="/activities" className="text-white/80 hover:text-secondary transition-smooth">
-                  Activités
+                  {t("footer.activities")}
                 </Link>
               </li>
             </ul>
@@ -98,31 +100,31 @@ const Footer = () => {
 
           {/* Support */}
           <div className="text-center sm:text-left">
-            <h3 className="font-bold text-white mb-3 md:mb-4 text-sm md:text-base">Assistance</h3>
+            <h3 className="font-bold text-white mb-3 md:mb-4 text-sm md:text-base">{t("footer.support")}</h3>
             <ul className="space-y-2 md:space-y-3 text-sm">
               <li>
                 <Link to="/support" className="text-white/80 hover:text-secondary transition-smooth">
-                  Centre d'aide
+                  {t("footer.help")}
                 </Link>
               </li>
               <li>
                 <Link to="/support" className="text-white/80 hover:text-secondary transition-smooth">
-                  FAQ
+                  {t("footer.faq")}
                 </Link>
               </li>
               <li>
                 <Link to="/support" className="text-white/80 hover:text-secondary transition-smooth">
-                  Nous Contacter
+                  {t("footer.contact")}
                 </Link>
               </li>
               <li>
                 <Link to="/dashboard" className="text-white/80 hover:text-secondary transition-smooth">
-                  Mes Réservations
+                  {t("booking.actions.viewDetails")}
                 </Link>
               </li>
               <li>
                 <Link to="/install" className="text-secondary hover:text-secondary/80 transition-smooth font-semibold">
-                  📱 Installer l'app
+                  📱 {t("common.install")}
                 </Link>
               </li>
             </ul>
@@ -130,14 +132,14 @@ const Footer = () => {
 
           {/* Newsletter */}
           <div className="text-center sm:text-left">
-            <h3 className="font-bold text-white mb-3 md:mb-4 text-sm md:text-base">Newsletter</h3>
+            <h3 className="font-bold text-white mb-3 md:mb-4 text-sm md:text-base">{t("footer.newsletter.title")}</h3>
             <p className="text-white/80 text-xs md:text-sm mb-3 md:mb-4">
-              Inscrivez-vous pour recevoir nos offres exclusives et nos dernières actualités.
+              {t("footer.newsletter.description")}
             </p>
             <form onSubmit={handleNewsletterSubmit} className="space-y-2">
               <div className="flex gap-2">
                 <Input 
-                  placeholder="Votre email" 
+                  placeholder={t("footer.newsletter.placeholder")}
                   type="email" 
                   className="flex-1 text-sm"
                   value={email}
@@ -149,7 +151,7 @@ const Footer = () => {
                 </Button>
               </div>
               <p className="text-xs text-white/70">
-                En vous inscrivant, vous acceptez notre politique de confidentialité.
+                {t("footer.privacy")}
               </p>
             </form>
           </div>
@@ -158,23 +160,23 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-primary-light flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
           <p className="text-white/80 text-sm">
-            © 2025 B-Reserve. Tous droits réservés.
+            © 2025 B-Reserve. {t("footer.rights")}.
           </p>
           <div className="flex flex-wrap justify-center gap-4 md:gap-6 text-sm">
             <Link to="/support" className="text-white/80 hover:text-secondary transition-smooth">
-              À propos
+              {t("footer.about")}
             </Link>
             <Link to="/support" className="text-white/80 hover:text-secondary transition-smooth">
-              Conditions générales
+              {t("footer.terms")}
             </Link>
             <Link to="/support" className="text-white/80 hover:text-secondary transition-smooth">
-              Confidentialité
+              {t("footer.privacy")}
             </Link>
             <Link to="/support" className="text-white/80 hover:text-secondary transition-smooth">
-              Aide
+              {t("footer.help")}
             </Link>
             <Link to="/install" className="text-secondary hover:text-secondary/80 transition-smooth font-semibold">
-              📱 Installer l'app
+              📱 {t("common.install")}
             </Link>
           </div>
         </div>

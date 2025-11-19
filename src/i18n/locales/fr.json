@@ -69,7 +69,14 @@
     "readMore": "Lire plus"
   },
   "footer": {
-    "description": "Votre partenaire de confiance pour tous vos besoins de voyage",
+    "description": "Votre partenaire de confiance pour des voyages inoubliables à travers le monde.",
+    "services": "Nos Services",
+    "flights": "Vols",
+    "hotels": "Hôtels",
+    "flightHotel": "Vol + Hôtel",
+    "cars": "Voitures",
+    "stays": "Séjours",
+    "activities": "Activités",
     "company": "Entreprise",
     "about": "À propos",
     "careers": "Carrières",
@@ -77,10 +84,20 @@
     "support": "Support",
     "help": "Centre d'aide",
     "contact": "Contact",
+    "faq": "FAQ",
     "legal": "Légal",
     "privacy": "Confidentialité",
     "terms": "Conditions",
-    "rights": "Tous droits réservés"
+    "rights": "Tous droits réservés",
+    "newsletter": {
+      "title": "Newsletter",
+      "description": "Recevez nos dernières offres et actualités",
+      "placeholder": "Votre email",
+      "subscribe": "S'abonner",
+      "emailRequired": "Veuillez entrer votre email",
+      "subscribeSuccess": "Inscription réussie !",
+      "subscribeError": "Erreur lors de l'inscription"
+    }
   },
   "boss": {
     "title": "Boss - Assistant de voyage",
@@ -287,6 +304,13 @@
     "success": "Succès",
     "error": "Erreur",
     "warning": "Attention",
-    "info": "Information"
+    "info": "Information",
+    "install": "Installer l'app"
+  },
+  "pages": {
+    "index": {
+      "aiTitle": "Planifiez votre voyage avec l'IA",
+      "aiSubtitle": "Obtenez des recommandations personnalisées pour votre prochaine destination"
+    }
   }
 }
