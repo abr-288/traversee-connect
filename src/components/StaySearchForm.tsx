@@ -4,7 +4,6 @@ import { MapPin } from "lucide-react";
 import { format } from "date-fns";
 import { UnifiedForm, UnifiedFormField, UnifiedDatePicker, UnifiedSubmitButton } from "@/components/forms";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
 
 export const StaySearchForm = () => {
   const navigate = useNavigate();
@@ -83,20 +82,22 @@ export const StaySearchForm = () => {
         </div>
       </div>
 
-      <div className="mt-4">
-        <Label>Type d'hébergement</Label>
-        <Select value={type} onValueChange={setType}>
-          <SelectTrigger>
-            <SelectValue placeholder="Tous les types" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tous les types</SelectItem>
-            <SelectItem value="hotel">Hôtel</SelectItem>
-            <SelectItem value="apartment">Appartement</SelectItem>
-            <SelectItem value="villa">Villa</SelectItem>
-            <SelectItem value="resort">Resort</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="mt-6">
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-foreground">Type d'hébergement</label>
+          <Select value={type} onValueChange={setType}>
+            <SelectTrigger className="h-11">
+              <SelectValue placeholder="Tous les types" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tous les types</SelectItem>
+              <SelectItem value="hotel">Hôtel</SelectItem>
+              <SelectItem value="apartment">Appartement</SelectItem>
+              <SelectItem value="villa">Villa</SelectItem>
+              <SelectItem value="resort">Resort</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
     </UnifiedForm>
   );

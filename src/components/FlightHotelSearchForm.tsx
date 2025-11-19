@@ -4,7 +4,6 @@ import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { UnifiedForm, UnifiedAutocomplete, UnifiedDatePicker, UnifiedFormField, UnifiedSubmitButton } from "@/components/forms";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
 
 interface FlightHotelSearchFormProps {
   onSearch: (params: {
@@ -127,7 +126,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
       </div>
 
       {/* Travelers & Class */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
         <UnifiedFormField
           label="Adultes"
           name="adults"
@@ -155,9 +154,9 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
           required
         />
         <div className="space-y-2">
-          <Label>Classe</Label>
+          <label className="text-sm font-medium text-foreground">Classe</label>
           <Select value={travelClass} onValueChange={setTravelClass}>
-            <SelectTrigger>
+            <SelectTrigger className="h-11">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

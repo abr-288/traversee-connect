@@ -4,7 +4,6 @@ import { MapPin } from "lucide-react";
 import { format } from "date-fns";
 import { UnifiedForm, UnifiedFormField, UnifiedDatePicker, UnifiedSubmitButton } from "@/components/forms";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
 
 export const ActivitySearchForm = () => {
   const navigate = useNavigate();
@@ -72,21 +71,23 @@ export const ActivitySearchForm = () => {
         </div>
       </div>
 
-      <div className="mt-4">
-        <Label>Catégorie</Label>
-        <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger>
-            <SelectValue placeholder="Toutes catégories" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Toutes catégories</SelectItem>
-            <SelectItem value="adventure">Aventure</SelectItem>
-            <SelectItem value="culture">Culture</SelectItem>
-            <SelectItem value="sports">Sports</SelectItem>
-            <SelectItem value="relaxation">Détente</SelectItem>
-            <SelectItem value="gastronomy">Gastronomie</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="mt-6">
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-foreground">Catégorie</label>
+          <Select value={category} onValueChange={setCategory}>
+            <SelectTrigger className="h-11">
+              <SelectValue placeholder="Toutes catégories" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Toutes catégories</SelectItem>
+              <SelectItem value="adventure">Aventure</SelectItem>
+              <SelectItem value="culture">Culture</SelectItem>
+              <SelectItem value="sports">Sports</SelectItem>
+              <SelectItem value="relaxation">Détente</SelectItem>
+              <SelectItem value="gastronomy">Gastronomie</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
     </UnifiedForm>
   );
