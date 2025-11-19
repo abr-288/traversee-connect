@@ -10,7 +10,7 @@ export const StaySearchForm = () => {
   const navigate = useNavigate();
   const [checkIn, setCheckIn] = useState<Date>();
   const [checkOut, setCheckOut] = useState<Date>();
-  const [type, setType] = useState("");
+  const [type, setType] = useState("all");
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,7 +28,7 @@ export const StaySearchForm = () => {
       ...(checkIn && { checkIn: format(checkIn, "yyyy-MM-dd") }),
       ...(checkOut && { checkOut: format(checkOut, "yyyy-MM-dd") }),
       guests,
-      ...(type && { type }),
+      ...(type && type !== "all" && { type }),
     });
 
     navigate(`/stays?${params.toString()}`);
