@@ -29,15 +29,15 @@ interface FlightBookingDialogProps {
   };
 }
 
-export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams }: FlightBookingDialogProps) => {
+export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams = null }: FlightBookingDialogProps) => {
   const [loading, setLoading] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const [formData, setFormData] = useState<any>(null);
   const [bookingId, setBookingId] = useState<string | null>(null);
   const navigate = useNavigate();
   
-  const departureDate = searchParams?.departureDate || flight.departureDate || new Date().toISOString().split('T')[0];
-  const returnDate = searchParams?.returnDate || flight.returnDate;
+  const departureDate = (searchParams && searchParams.departureDate) || flight.departureDate || new Date().toISOString().split('T')[0];
+  const returnDate = (searchParams && searchParams.returnDate) || flight.returnDate;
   const tripType = returnDate ? "Aller-retour" : "Aller simple";
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
