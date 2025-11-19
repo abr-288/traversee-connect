@@ -36,41 +36,62 @@ const SpecialOffers = () => {
           service={selectedService}
         />
       )}
-      <section className="py-20 bg-gradient-to-br from-primary/10 via-background to-secondary/10">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <Badge className="mb-4 gap-1 text-base px-4 py-2">
-              <Percent className="w-4 h-4" />
+      <section className="py-20 md:py-24 lg:py-28 bg-gradient-to-br from-primary/5 via-secondary/5 to-background relative overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 gradient-mesh opacity-40" />
+        <div className="absolute top-10 left-10 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-10 right-10 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '1.5s' }} />
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-14 md:mb-16 animate-slide-up-fade">
+            <Badge className="mb-6 gap-2 text-base px-6 py-3 bg-gradient-primary text-white border-0 shadow-primary animate-pulse-glow">
+              <Percent className="w-5 h-5" />
               {t('offers.limited')}
             </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gradient mb-6">
               {t('offers.title')}
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
               {t('offers.subtitle')}
             </p>
+            
+            {/* Decorative line */}
+            <div className="flex justify-center gap-2 mt-8">
+              <div className="w-20 h-1.5 bg-gradient-primary rounded-full" />
+              <div className="w-10 h-1.5 bg-secondary/50 rounded-full" />
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
             {specialOffers.map((offer, index) => (
               <Card
                 key={offer.id}
-                className="group relative overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-smooth animate-fade-in"
-                style={{ animationDelay: `${index * 0.1}s` }}
+                className="group relative overflow-hidden border-2 border-border/50 hover:border-secondary shadow-2xl hover:shadow-glow transition-all duration-500 animate-slide-up-fade hover-lift rounded-3xl bg-gradient-card"
+                style={{ animationDelay: `${index * 0.15}s` }}
               >
-                <div className="absolute top-4 right-4 z-10">
-                  <Badge className="bg-secondary text-secondary-foreground text-lg px-4 py-2 shadow-lg">
+                {/* Shine overlay */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20">
+                  <div className="absolute inset-0 animate-shimmer" />
+                </div>
+                
+                <div className="absolute top-6 right-6 z-10">
+                  <Badge className="gradient-primary text-white text-xl px-6 py-3 shadow-glow border-0 font-bold animate-pulse-glow">
                     -{offer.discount}%
                   </Badge>
                 </div>
 
-                <div className="relative h-64 overflow-hidden">
+                <div className="relative h-72 overflow-hidden rounded-t-3xl">
                   <img
                     src={offer.image_url || offer.images?.[0] || '/placeholder.svg'}
                     alt={offer.name}
-                    className="w-full h-full object-cover transition-smooth group-hover:scale-110"
+                    className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:rotate-2"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  
+                  {/* Floating icon */}
+                  <div className="absolute bottom-6 left-6 w-16 h-16 glass rounded-2xl flex items-center justify-center animate-float">
+                    <MapPin className="w-8 h-8 text-white" />
+                  </div>
                 </div>
 
                 <CardContent className="p-6 relative -mt-20 z-10">

@@ -60,18 +60,45 @@ const StatsSection = () => {
   ];
 
   return (
-    <section className="py-12 md:py-16 bg-gradient-to-br from-primary/5 via-background to-secondary/5">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
+    <section className="py-16 md:py-20 bg-gradient-to-br from-primary/5 via-background to-secondary/5 relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute top-0 left-0 w-full h-full opacity-30">
+        <div className="absolute top-10 left-10 w-64 h-64 bg-secondary/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-10 right-10 w-80 h-80 bg-primary/10 rounded-full blur-3xl" />
+      </div>
+      
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
           {statsData.map((stat, index) => (
             <div
               key={index}
-              className="text-center p-4 md:p-6 rounded-xl bg-background/60 backdrop-blur-sm border border-border/50 hover:shadow-lg transition-smooth hover:scale-105 animate-fade-in"
+              className="group text-center p-6 md:p-8 rounded-2xl glass hover:glass-dark hover:shadow-glow transition-all duration-500 hover:scale-110 animate-slide-up-fade hover-lift relative overflow-hidden"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <stat.icon className={`w-10 h-10 md:w-12 md:h-12 mx-auto mb-3 md:mb-4 ${stat.color}`} />
-              <div className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-1 md:mb-2">{stat.value}</div>
-              <div className="text-xs md:text-sm text-muted-foreground">{t(stat.labelKey)}</div>
+              {/* Shine effect on hover */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                <div className="absolute inset-0 animate-shimmer" />
+              </div>
+              
+              {/* Icon with glow effect */}
+              <div className="relative mb-4">
+                <div className={`w-16 h-16 md:w-20 md:h-20 mx-auto rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center group-hover:animate-pulse-glow transition-all`}>
+                  <stat.icon className={`w-8 h-8 md:w-10 md:h-10 ${stat.color} group-hover:scale-110 transition-transform`} />
+                </div>
+              </div>
+              
+              {/* Value with count animation */}
+              <div className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-2 group-hover:text-gradient transition-all">
+                {stat.value}
+              </div>
+              
+              {/* Label */}
+              <div className="text-sm md:text-base text-muted-foreground group-hover:text-foreground transition-colors">
+                {t(stat.labelKey)}
+              </div>
+              
+              {/* Bottom accent line */}
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-primary transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
             </div>
           ))}
         </div>

@@ -37,28 +37,44 @@ const FeaturedServices = () => {
   const displayServices = services.slice(0, 8);
 
   return (
-    <section className="py-12 md:py-16 lg:py-20 bg-background">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-8 md:mb-12">
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-3 md:mb-4">
+    <section className="py-16 md:py-20 lg:py-24 bg-gradient-to-b from-background via-muted/20 to-background relative overflow-hidden">
+      {/* Background mesh gradient */}
+      <div className="absolute inset-0 gradient-mesh opacity-40" />
+      
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="text-center mb-10 md:mb-16 animate-slide-up-fade">
+          <div className="inline-block mb-4">
+            <span className="px-4 py-2 rounded-full bg-secondary/10 text-secondary text-sm font-semibold">
+              ✨ Nos Meilleures Offres
+            </span>
+          </div>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gradient mb-4 md:mb-6">
             Services en Vedette
           </h2>
-          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
+          <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
             Découvrez nos meilleures offres sélectionnées pour vous
           </p>
+          
+          {/* Decorative underline */}
+          <div className="flex justify-center gap-2 mt-6">
+            <div className="w-16 h-1 bg-gradient-primary rounded-full" />
+            <div className="w-8 h-1 bg-secondary/50 rounded-full" />
+          </div>
         </div>
 
-        <div className="mb-6 md:mb-8 flex flex-wrap justify-center gap-2 md:gap-3">
-          {serviceTypes.map((type) => (
+        <div className="mb-8 md:mb-12 flex flex-wrap justify-center gap-3 md:gap-4">
+          {serviceTypes.map((type, idx) => (
             <Button
               key={type.label}
               variant={selectedType === type.value ? "default" : "outline"}
               onClick={() => setSelectedType(type.value)}
-              className="gap-1.5 md:gap-2 text-xs md:text-sm h-8 md:h-10"
-              size="sm"
+              className={`gap-2 text-sm md:text-base h-10 md:h-12 px-4 md:px-6 rounded-xl hover:scale-105 transition-spring shadow-md hover:shadow-xl animate-slide-up-fade ${
+                selectedType === type.value ? 'gradient-primary text-primary-foreground shadow-primary' : ''
+              }`}
+              style={{ animationDelay: `${idx * 0.05}s` }}
             >
-              <type.icon className="w-3 h-3 md:w-4 md:h-4" />
-              <span className="hidden sm:inline">{type.label}</span>
+              <type.icon className="w-4 h-4 md:w-5 md:h-5" />
+              <span>{type.label}</span>
             </Button>
           ))}
         </div>
@@ -72,14 +88,14 @@ const FeaturedServices = () => {
             <p className="text-muted-foreground">Aucun service disponible pour le moment</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
             {displayServices.map((service, index) => {
               const ServiceIcon = getServiceIcon(service.type);
               return (
                 <Card
                   key={service.id}
-                  className="group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-smooth cursor-pointer animate-fade-in"
-                  style={{ animationDelay: `${index * 0.05}s` }}
+                  className="group overflow-hidden border-2 border-border/50 hover:border-secondary/50 shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer animate-slide-up-fade hover-lift rounded-2xl bg-gradient-card relative"
+                  style={{ animationDelay: `${index * 0.08}s` }}
                   onClick={() => {
                     const routes: Record<string, string> = {
                       flight: '/flights',
@@ -91,7 +107,12 @@ const FeaturedServices = () => {
                     navigate(routes[service.type] || '/');
                   }}
                 >
-                  <div className="relative h-40 md:h-48 overflow-hidden">
+                  {/* Shine effect overlay */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-10">
+                    <div className="absolute inset-0 animate-shimmer" />
+                  </div>
+                  
+                  <div className="relative h-48 md:h-56 overflow-hidden">
                     <img
                       src={service.image_url || service.images?.[0] || '/placeholder.svg'}
                       alt={service.name}
