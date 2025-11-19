@@ -12,7 +12,8 @@
     "myAccount": "我的账户",
     "admin": "管理",
     "logout": "登出",
-    "logoutSuccess": "登出成功"
+    "logoutSuccess": "登出成功",
+    "dashboard": "控制面板"
   },
   "hero": {
     "title": "随时随地旅行，一键预订",
@@ -32,6 +33,7 @@
     "roundTrip": "往返",
     "multiCity": "多城市",
     "class": {
+      "title": "座位等级",
       "economy": "经济舱",
       "premium": "超值经济舱",
       "business": "商务舱",
@@ -45,10 +47,7 @@
     "search": "搜索",
     "results": "个结果",
     "book": "预订",
-    "seatsAvailable": "个座位可用",
-    "class": {
-      "title": "座位等级"
-    }
+    "seatsAvailable": "个座位可用"
   },
   "features": {
     "title": "为什么选择B-Reserve？",
@@ -88,5 +87,206 @@
     "welcome": "您好！我是Boss，您的旅行助手。我能帮您什么？",
     "placeholder": "提出您的问题...",
     "response": "我可以帮助您预订航班、酒店、火车和活动。我能为您做什么？"
+  },
+  "dashboard": {
+    "title": "我的控制面板",
+    "welcome": "欢迎",
+    "subtitle": "管理您的预订并跟踪您的旅行",
+    "stats": {
+      "totalBookings": "总预订",
+      "pending": "待处理",
+      "confirmed": "已确认",
+      "completed": "已完成",
+      "totalSpent": "总花费"
+    },
+    "tabs": {
+      "all": "全部",
+      "pending": "待处理",
+      "confirmed": "已确认",
+      "completed": "已完成",
+      "calendar": "日历"
+    },
+    "noBookings": {
+      "title": "暂无预订",
+      "description": "开始计划您的下一次旅行",
+      "action": "探索目的地"
+    },
+    "reminders": {
+      "title": "即将到来的提醒",
+      "departingTomorrow": "明天出发！",
+      "departingIn": "出发时间"
+    }
+  },
+  "booking": {
+    "reference": "参考编号",
+    "status": {
+      "pending": "待处理",
+      "confirmed": "已确认",
+      "cancelled": "已取消",
+      "completed": "已完成"
+    },
+    "payment": {
+      "paid": "已支付",
+      "pending": "待支付",
+      "failed": "失败",
+      "refunded": "已退款"
+    },
+    "actions": {
+      "confirm": "确认",
+      "cancel": "取消",
+      "edit": "编辑",
+      "delete": "删除",
+      "exportPDF": "导出PDF",
+      "viewDetails": "查看详情"
+    },
+    "dialogs": {
+      "delete": {
+        "title": "删除预订",
+        "description": "您确定要删除此预订吗？此操作不可逆。",
+        "cancel": "取消",
+        "confirm": "删除"
+      },
+      "cancel": {
+        "title": "取消预订",
+        "description": "您确定要取消此预订吗？将根据我们的政策处理退款。",
+        "cancel": "不，保留",
+        "confirm": "是的，取消"
+      }
+    },
+    "details": {
+      "traveler": "旅客",
+      "email": "邮箱",
+      "phone": "电话",
+      "guests": "旅客人数",
+      "destination": "目的地",
+      "departure": "出发日期",
+      "return": "返程日期",
+      "totalPrice": "总金额",
+      "paymentStatus": "支付状态",
+      "serviceType": "服务类型"
+    }
+  },
+  "payment": {
+    "title": "支付",
+    "subtitle": "完成支付以完成您的预订",
+    "bookingDetails": "预订详情",
+    "reference": "参考编号",
+    "amount": "金额",
+    "paymentInfo": "支付信息",
+    "method": "支付方式",
+    "methods": {
+      "wave": "Wave (移动钱包)",
+      "orangeMoney": "Orange Money",
+      "mtn": "MTN移动钱包",
+      "moov": "Moov Money",
+      "card": "信用卡/借记卡",
+      "bankTransfer": "银行转账"
+    },
+    "customerInfo": "客户信息",
+    "fullName": "全名",
+    "email": "邮箱",
+    "phone": "电话",
+    "phoneNote": "此号码将用于移动支付",
+    "address": "地址",
+    "city": "城市",
+    "payButton": "支付",
+    "processing": "处理中...",
+    "securedBy": "由CinetPay提供安全支付",
+    "errors": {
+      "missingFields": "请填写所有必填字段",
+      "invalidPhone": "无效的电话号码（至少8位数字）",
+      "invalidEmail": "无效的电子邮件地址",
+      "alreadyPaid": "支付已完成",
+      "bookingNotFound": "找不到预订或访问被拒绝",
+      "bookingCancelled": "此预订已被取消，无法支付",
+      "paymentFailed": "支付处理错误"
+    },
+    "success": {
+      "title": "支付成功",
+      "description": "您的支付已成功处理",
+      "emailSent": "确认邮件已发送"
+    }
+  },
+  "notifications": {
+    "title": "通知",
+    "noNotifications": "暂无通知",
+    "markAllRead": "全部标记为已读",
+    "types": {
+      "success": "成功",
+      "info": "信息",
+      "warning": "警告",
+      "error": "错误"
+    }
+  },
+  "calendar": {
+    "title": "预订日历",
+    "filterByType": "按类型筛选",
+    "filterByStatus": "按状态筛选",
+    "all": "全部",
+    "selectDate": "选择日期查看预订",
+    "bookingsOn": "预订日期",
+    "noBookings": "此日期暂无预订"
+  },
+  "profile": {
+    "title": "我的资料",
+    "personalInfo": "个人信息",
+    "fullName": "全名",
+    "email": "邮箱",
+    "phone": "电话",
+    "save": "保存",
+    "cancel": "取消",
+    "passwordChange": "更改密码",
+    "currentPassword": "当前密码",
+    "newPassword": "新密码",
+    "confirmPassword": "确认密码"
+  },
+  "auth": {
+    "login": "登录",
+    "signup": "注册",
+    "email": "电子邮件地址",
+    "password": "密码",
+    "rememberMe": "记住我",
+    "forgotPassword": "忘记密码？",
+    "noAccount": "还没有账户？",
+    "hasAccount": "已有账户？",
+    "signupNow": "立即注册",
+    "loginNow": "登录",
+    "welcomeBack": "欢迎回来",
+    "createAccount": "创建账户",
+    "fullName": "全名"
+  },
+  "errors": {
+    "generic": "发生错误",
+    "networkError": "网络错误",
+    "unauthorized": "未授权",
+    "notFound": "未找到",
+    "serverError": "服务器错误"
+  },
+  "common": {
+    "loading": "加载中...",
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "close": "关闭",
+    "confirm": "确认",
+    "yes": "是",
+    "no": "否",
+    "back": "返回",
+    "next": "下一步",
+    "previous": "上一步",
+    "submit": "提交",
+    "search": "搜索",
+    "filter": "筛选",
+    "sort": "排序",
+    "export": "导出",
+    "download": "下载",
+    "upload": "上传",
+    "required": "必填",
+    "optional": "可选",
+    "success": "成功",
+    "error": "错误",
+    "warning": "警告",
+    "info": "信息"
   }
 }
