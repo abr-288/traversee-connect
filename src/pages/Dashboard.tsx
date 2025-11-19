@@ -137,7 +137,13 @@ const Dashboard = () => {
       const pending = data?.filter((b) => b.status === "pending").length || 0;
       const confirmed = data?.filter((b) => b.status === "confirmed").length || 0;
       const completed = data?.filter((b) => b.status === "completed").length || 0;
-      const totalSpent = data?.reduce((sum, b) => sum + Number(b.total_price), 0) || 0;
+      const totalSpent = data.reduce((sum, booking) => {
+        // Count only paid bookings, regardless of booking status
+        if (booking.payment_status === "paid") {
+          return sum + Number(booking.total_price);
+        }
+        return sum;
+      }, 0);
 
       setStats({ total, pending, confirmed, completed, totalSpent });
 
@@ -177,12 +183,25 @@ const Dashboard = () => {
         throw new Error("Réservation introuvable");
       }
 
+      // Update booking status with updated_at timestamp
       const { error } = await supabase
         .from("bookings")
-        .update({ status: "confirmed" })
+        .update({ 
+          status: "confirmed",
+          updated_at: new Date().toISOString()
+        })
         .eq("id", id);
 
       if (error) throw error;
+
+      // Update local state immediately for better UX
+      setBookings(prevBookings => 
+        prevBookings.map(b => 
+          b.id === id 
+            ? { ...b, status: "confirmed", updated_at: new Date().toISOString() } 
+            : b
+        )
+      );
 
       // Check if payment is pending
       if (booking.payment_status === "pending") {
@@ -191,7 +210,9 @@ const Dashboard = () => {
           description: "Redirection vers le paiement...",
         });
         
-        // Redirect to payment page
+        // Refresh bookings and redirect
+        await fetchBookings();
+        
         setTimeout(() => {
           navigate(`/payment?bookingId=${id}`);
         }, 1000);
@@ -203,27 +224,33 @@ const Dashboard = () => {
         await supabase.functions.invoke("send-booking-pdf-email", {
           body: { bookingId: id },
         });
+        
+        toast({
+          title: "Succès",
+          description: "Réservation confirmée et email envoyé",
+        });
       } catch (emailError) {
         console.error("Error sending confirmation email:", emailError);
-        // Don't fail the confirmation if email fails
+        toast({
+          title: "Réservation confirmée",
+          description: "Email non envoyé. Vous pouvez le télécharger manuellement.",
+        });
       }
-
-      toast({
-        title: "Succès",
-        description: "Réservation confirmée et email envoyé",
-      });
 
       addNotification({
         type: "success",
         title: "Réservation confirmée",
-        message: "Votre réservation a été confirmée et un email de confirmation a été envoyé",
+        message: booking.payment_status === "paid" 
+          ? "Votre réservation a été confirmée et un email de confirmation a été envoyé"
+          : "Votre réservation a été confirmée. Veuillez procéder au paiement.",
       });
 
       fetchBookings();
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Error confirming booking:", error);
       toast({
         title: "Erreur",
-        description: "Impossible de confirmer",
+        description: error.message || "Impossible de confirmer la réservation",
         variant: "destructive",
       });
     }
@@ -231,29 +258,59 @@ const Dashboard = () => {
 
   const handleCancelBooking = async (id: string) => {
     try {
+      const booking = bookings.find((b) => b.id === id);
+      if (!booking) {
+        throw new Error("Réservation introuvable");
+      }
+
+      // Update booking status and set payment status to refunded if it was paid
+      const updateData: any = { 
+        status: "cancelled",
+        updated_at: new Date().toISOString()
+      };
+
+      // If payment was completed, initiate refund process
+      if (booking.payment_status === "paid") {
+        updateData.payment_status = "refunded";
+      }
+
       const { error } = await supabase
         .from("bookings")
-        .update({ status: "cancelled" })
+        .update(updateData)
         .eq("id", id);
 
       if (error) throw error;
 
+      // Update local state immediately
+      setBookings(prevBookings => 
+        prevBookings.map(b => 
+          b.id === id 
+            ? { ...b, ...updateData } 
+            : b
+        )
+      );
+
       toast({
         title: "Annulation réussie",
-        description: "Réservation annulée",
+        description: booking.payment_status === "paid" 
+          ? "Réservation annulée. Remboursement en cours."
+          : "Réservation annulée avec succès",
       });
 
       addNotification({
         type: "info",
         title: "Réservation annulée",
-        message: "Remboursement sous 5-7 jours",
+        message: booking.payment_status === "paid" 
+          ? "Remboursement sous 5-7 jours ouvrés"
+          : "Votre réservation a été annulée",
       });
 
       fetchBookings();
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Error cancelling booking:", error);
       toast({
         title: "Erreur",
-        description: "Impossible d'annuler",
+        description: error.message || "Impossible d'annuler la réservation",
         variant: "destructive",
       });
     }
@@ -268,20 +325,45 @@ const Dashboard = () => {
 
   const handleDeleteBooking = async (id: string) => {
     try {
+      const booking = bookings.find((b) => b.id === id);
+      if (!booking) {
+        throw new Error("Réservation introuvable");
+      }
+
+      // Prevent deletion of confirmed or completed bookings with paid status
+      if ((booking.status === "confirmed" || booking.status === "completed") && booking.payment_status === "paid") {
+        toast({
+          title: "Suppression impossible",
+          description: "Impossible de supprimer une réservation payée. Veuillez l'annuler d'abord.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const { error } = await supabase.from("bookings").delete().eq("id", id);
 
       if (error) throw error;
 
+      // Update local state immediately
+      setBookings(prevBookings => prevBookings.filter(b => b.id !== id));
+
       toast({
         title: "Suppression réussie",
-        description: "Réservation supprimée",
+        description: "Réservation supprimée définitivement",
+      });
+
+      addNotification({
+        type: "info",
+        title: "Réservation supprimée",
+        message: "La réservation a été supprimée de votre historique",
       });
 
       fetchBookings();
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Error deleting booking:", error);
       toast({
         title: "Erreur",
-        description: "Impossible de supprimer",
+        description: error.message || "Impossible de supprimer la réservation",
         variant: "destructive",
       });
     }

@@ -40,21 +40,54 @@ export default function Payment() {
 
   const loadBooking = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Non authentifié",
+          description: "Veuillez vous connecter pour continuer",
+          variant: "destructive",
+        });
+        navigate("/auth");
+        return;
+      }
+
       const { data, error } = await supabase
         .from("bookings")
-        .select("*")
+        .select("*, services(name, type, location)")
         .eq("id", bookingId)
-        .single();
+        .eq("user_id", user.id) // Security: Only load user's own bookings
+        .maybeSingle();
 
       if (error) throw error;
 
       if (!data) {
         toast({
           title: "Erreur",
-          description: "Réservation introuvable",
+          description: "Réservation introuvable ou accès refusé",
           variant: "destructive",
         });
-        navigate("/dashboard?tab=bookings");
+        navigate("/dashboard");
+        return;
+      }
+
+      // Check if payment already completed
+      if (data.payment_status === "paid") {
+        toast({
+          title: "Paiement déjà effectué",
+          description: "Cette réservation a déjà été payée",
+        });
+        navigate("/dashboard");
+        return;
+      }
+
+      // Check if booking is cancelled
+      if (data.status === "cancelled") {
+        toast({
+          title: "Réservation annulée",
+          description: "Cette réservation a été annulée",
+          variant: "destructive",
+        });
+        navigate("/dashboard");
         return;
       }
 
@@ -62,13 +95,14 @@ export default function Payment() {
       setCustomerName(data.customer_name || "");
       setCustomerEmail(data.customer_email || "");
       setCustomerPhone(data.customer_phone || "");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error loading booking:", error);
       toast({
         title: "Erreur",
-        description: "Impossible de charger la réservation",
+        description: error.message || "Impossible de charger la réservation",
         variant: "destructive",
       });
+      navigate("/dashboard");
     } finally {
       setLoading(false);
     }
@@ -82,12 +116,14 @@ export default function Payment() {
           .from("profiles")
           .select("*")
           .eq("id", user.id)
-          .single();
+          .maybeSingle();
 
         if (profile) {
           if (!customerName) setCustomerName(profile.full_name || "");
           if (!customerPhone) setCustomerPhone(profile.phone || "");
           if (!customerEmail) setCustomerEmail(user.email || "");
+        } else if (!customerEmail) {
+          setCustomerEmail(user.email || "");
         }
       }
     } catch (error) {
@@ -108,12 +144,12 @@ export default function Payment() {
       return;
     }
 
-    // Phone validation
+    // Phone validation - more flexible for international formats
     const phoneRegex = /^[\d\s\-\+\(\)]{8,}$/;
     if (!phoneRegex.test(customerPhone)) {
       toast({
         title: "Erreur",
-        description: "Numéro de téléphone invalide",
+        description: "Numéro de téléphone invalide (minimum 8 chiffres)",
         variant: "destructive",
       });
       return;
@@ -130,6 +166,9 @@ export default function Payment() {
       return;
     }
 
+    // Prevent double processing
+    if (processing) return;
+
     setProcessing(true);
 
     try {
@@ -137,6 +176,38 @@ export default function Payment() {
       console.log("Booking ID:", bookingId);
       console.log("Amount:", booking.total_price, booking.currency);
       console.log("Method:", paymentMethod);
+
+      // Double-check booking status before payment
+      const { data: currentBooking, error: checkError } = await supabase
+        .from("bookings")
+        .select("payment_status, status")
+        .eq("id", bookingId)
+        .maybeSingle();
+
+      if (checkError) throw checkError;
+
+      if (!currentBooking) {
+        throw new Error("Réservation introuvable");
+      }
+
+      if (currentBooking.payment_status === "paid") {
+        toast({
+          title: "Paiement déjà effectué",
+          description: "Cette réservation a déjà été payée",
+        });
+        navigate("/dashboard");
+        return;
+      }
+
+      if (currentBooking.status === "cancelled") {
+        toast({
+          title: "Réservation annulée",
+          description: "Cette réservation a été annulée et ne peut être payée",
+          variant: "destructive",
+        });
+        navigate("/dashboard");
+        return;
+      }
 
       const { data, error } = await supabase.functions.invoke("process-payment", {
         body: {
@@ -171,13 +242,13 @@ export default function Payment() {
 
       console.log("✅ Redirecting to:", data.payment_url);
 
-      // Redirect to CinetPay payment page
+      // Redirect to payment provider page
       window.location.href = data.payment_url;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Payment error:", error);
       toast({
         title: "Erreur de paiement",
-        description: error instanceof Error ? error.message : "Une erreur s'est produite",
+        description: error.message || "Une erreur s'est produite lors du traitement du paiement",
         variant: "destructive",
       });
       setProcessing(false);
