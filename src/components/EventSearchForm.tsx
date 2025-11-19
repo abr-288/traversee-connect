@@ -5,12 +5,14 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
 import { UnifiedForm, UnifiedAutocomplete, UnifiedDatePicker, UnifiedSubmitButton } from "@/components/forms";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTranslation } from "react-i18next";
 
 interface EventSearchFormProps {
   onResults: (results: any) => void;
 }
 
 export const EventSearchForm = ({ onResults }: EventSearchFormProps) => {
+  const { t } = useTranslation();
   const [location, setLocation] = useState("");
   const [date, setDate] = useState<Date>();
   const [category, setCategory] = useState("all");
@@ -22,8 +24,8 @@ export const EventSearchForm = ({ onResults }: EventSearchFormProps) => {
 
     if (!location.trim()) {
       toast({
-        title: "Erreur",
-        description: "Veuillez entrer une localisation",
+        title: t("errors.generic"),
+        description: t("search.location"),
         variant: "destructive",
       });
       return;
@@ -38,13 +40,13 @@ export const EventSearchForm = ({ onResults }: EventSearchFormProps) => {
     if (results?.success) {
       onResults(results);
       toast({
-        title: "Recherche réussie",
-        description: `${results.events?.length || 0} événements trouvés`,
+        title: t("common.success"),
+        description: `${results.events?.length || 0} ${t("search.results")}`,
       });
     } else {
       toast({
-        title: "Erreur",
-        description: "Impossible de rechercher les événements",
+        title: t("errors.generic"),
+        description: t("errors.networkError"),
         variant: "destructive",
       });
     }
@@ -56,29 +58,29 @@ export const EventSearchForm = ({ onResults }: EventSearchFormProps) => {
         <UnifiedForm onSubmit={handleSearch} variant="search" loading={loading}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
             <UnifiedAutocomplete
-              label="Localisation"
+              label={t("search.location")}
               type="location"
               value={location}
               onChange={setLocation}
-              placeholder="Paris, Londres..."
+              placeholder={t("search.cityOrAirport")}
               required
             />
 
             <UnifiedDatePicker
-              label="Date"
+              label={t("search.date")}
               value={date}
               onChange={setDate}
               minDate={new Date()}
             />
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground" htmlFor="category">Catégorie</label>
+              <label className="text-sm font-medium text-foreground" htmlFor="category">{t("search.category")}</label>
               <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger className="h-11">
-                  <SelectValue placeholder="Toutes catégories" />
+                  <SelectValue placeholder={t("search.allCategories")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Toutes catégories</SelectItem>
+                  <SelectItem value="all">{t("search.allCategories")}</SelectItem>
                   <SelectItem value="music">Musique</SelectItem>
                   <SelectItem value="sports">Sport</SelectItem>
                   <SelectItem value="theater">Théâtre</SelectItem>
@@ -90,7 +92,7 @@ export const EventSearchForm = ({ onResults }: EventSearchFormProps) => {
           </div>
 
           <UnifiedSubmitButton loading={loading} fullWidth className="mt-6">
-            Rechercher des événements
+            {t("search.search")}
           </UnifiedSubmitButton>
         </UnifiedForm>
       </CardContent>

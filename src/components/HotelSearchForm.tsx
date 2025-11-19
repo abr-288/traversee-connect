@@ -8,12 +8,14 @@ import {
   UnifiedPassengerSelector,
   UnifiedSubmitButton 
 } from "@/components/forms";
+import { useTranslation } from "react-i18next";
 
 /**
  * HotelSearchForm - Recherche d'hôtels avec UnifiedForm
  * Design premium type Booking/Hotels.com avec identité Bossiz
  */
 export const HotelSearchForm = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [destination, setDestination] = useState("");
   const [checkIn, setCheckIn] = useState<Date>();
@@ -50,11 +52,11 @@ export const HotelSearchForm = () => {
         {/* Destination */}
         <div className="lg:col-span-4">
           <UnifiedAutocomplete
-            label="Destination"
+            label={t("search.destination")}
             type="hotel"
             value={destination}
             onChange={(value) => setDestination(value)}
-            placeholder="Ville, région ou pays"
+            placeholder={t("search.cityRegionCountry")}
             required
           />
         </div>
@@ -62,7 +64,7 @@ export const HotelSearchForm = () => {
         {/* Check-in */}
         <div className="lg:col-span-3">
           <UnifiedDatePicker
-            label="Arrivée"
+            label={t("search.checkIn")}
             value={checkIn}
             onChange={setCheckIn}
             minDate={new Date()}
@@ -73,7 +75,7 @@ export const HotelSearchForm = () => {
         {/* Check-out */}
         <div className="lg:col-span-3">
           <UnifiedDatePicker
-            label="Départ"
+            label={t("search.checkOut")}
             value={checkOut}
             onChange={setCheckOut}
             minDate={checkIn || new Date()}
@@ -84,7 +86,7 @@ export const HotelSearchForm = () => {
         {/* Guests & Rooms */}
         <div className="lg:col-span-2">
           <UnifiedPassengerSelector
-            label="Voyageurs"
+            label={t("search.guests")}
             value={passengers}
             onChange={(value) => setPassengers({ 
               adults: value.adults,
@@ -101,7 +103,7 @@ export const HotelSearchForm = () => {
       {/* Submit Button */}
       <div className="mt-6">
         <UnifiedSubmitButton variant="search">
-          Rechercher des hôtels
+          {t("search.search")}
         </UnifiedSubmitButton>
       </div>
     </UnifiedForm>

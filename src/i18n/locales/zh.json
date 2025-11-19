@@ -47,7 +47,20 @@
     "search": "搜索",
     "results": "个结果",
     "book": "预订",
-    "seatsAvailable": "个座位可用"
+    "seatsAvailable": "个座位可用",
+    "destination": "目的地",
+    "location": "地点",
+    "date": "日期",
+    "time": "时间",
+    "category": "类别",
+    "allCategories": "所有类别",
+    "cityOrAirport": "城市或机场",
+    "cityRegionCountry": "城市、地区或国家",
+    "guests": "旅客",
+    "duration": "时长",
+    "days": "天",
+    "type": "类型",
+    "searching": "搜索中..."
   },
   "features": {
     "title": "为什么选择B-Reserve？",

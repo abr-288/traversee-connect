@@ -47,7 +47,20 @@
     "search": "Rechercher",
     "results": "résultats trouvés",
     "book": "Réserver",
-    "seatsAvailable": "places disponibles"
+    "seatsAvailable": "places disponibles",
+    "destination": "Destination",
+    "location": "Lieu",
+    "date": "Date",
+    "time": "Heure",
+    "category": "Catégorie",
+    "allCategories": "Toutes catégories",
+    "cityOrAirport": "Ville ou aéroport",
+    "cityRegionCountry": "Ville, région ou pays",
+    "guests": "Voyageurs",
+    "duration": "Durée",
+    "days": "jours",
+    "type": "Type",
+    "searching": "Recherche en cours..."
   },
   "features": {
     "title": "Pourquoi Choisir B-Reserve?",

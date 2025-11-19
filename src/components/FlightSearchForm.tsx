@@ -12,12 +12,14 @@ import {
   UnifiedDatePicker,
   UnifiedSubmitButton 
 } from "@/components/forms";
+import { useTranslation } from "react-i18next";
 
 /**
  * FlightSearchForm - Recherche de vols avec UnifiedForm
  * Design premium type Opodo/Booking avec identité Bossiz
  */
 export const FlightSearchForm = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [tripType, setTripType] = useState<"roundtrip" | "oneway">("roundtrip");
   const [from, setFrom] = useState("");
@@ -59,8 +61,8 @@ export const FlightSearchForm = () => {
       {/* Trip Type Selector */}
       <div className="flex gap-3 mb-6">
         {[
-          { value: "roundtrip", label: "Aller-retour" },
-          { value: "oneway", label: "Aller simple" }
+          { value: "roundtrip", label: t("search.roundTrip") },
+          { value: "oneway", label: t("search.oneWay") }
         ].map(({ value, label }) => (
           <motion.button
             key={value}
@@ -85,11 +87,11 @@ export const FlightSearchForm = () => {
         {/* From */}
         <div className="md:col-span-3">
           <UnifiedAutocomplete
-            label="Départ"
+            label={t("search.departure")}
             type="airport"
             value={from}
             onChange={(value) => setFrom(value)}
-            placeholder="Ville ou aéroport"
+            placeholder={t("search.cityOrAirport")}
             required
           />
         </div>
@@ -110,11 +112,11 @@ export const FlightSearchForm = () => {
         {/* To */}
         <div className="md:col-span-3">
           <UnifiedAutocomplete
-            label="Arrivée"
+            label={t("search.to")}
             type="airport"
             value={to}
             onChange={(value) => setTo(value)}
-            placeholder="Ville ou aéroport"
+            placeholder={t("search.cityOrAirport")}
             required
           />
         </div>
@@ -122,7 +124,7 @@ export const FlightSearchForm = () => {
         {/* Departure Date */}
         <div className="md:col-span-2">
           <UnifiedDatePicker
-            label="Départ"
+            label={t("search.departure")}
             value={departureDate}
             onChange={setDepartureDate}
             minDate={new Date()}
@@ -134,7 +136,7 @@ export const FlightSearchForm = () => {
         {tripType === "roundtrip" && (
           <div className="md:col-span-2">
             <UnifiedDatePicker
-              label="Retour"
+              label={t("search.return")}
               value={returnDate}
               onChange={setReturnDate}
               minDate={departureDate || new Date()}
@@ -148,7 +150,7 @@ export const FlightSearchForm = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
         <div className="space-y-2">
           <label className="text-sm font-medium text-foreground">
-            Adultes
+            {t("search.adults")}
           </label>
           <Select value={adults} onValueChange={setAdults}>
             <SelectTrigger className="h-11">
@@ -157,7 +159,7 @@ export const FlightSearchForm = () => {
             <SelectContent>
               {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
                 <SelectItem key={num} value={num.toString()}>
-                  {num} adulte{num > 1 ? 's' : ''}
+                  {num} {num > 1 ? t("search.adults").toLowerCase() : t("search.adults").toLowerCase().slice(0, -1)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -165,7 +167,7 @@ export const FlightSearchForm = () => {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">Enfants</label>
+          <label className="text-sm font-medium text-foreground">{t("search.children")}</label>
           <Select value={children} onValueChange={setChildren}>
             <SelectTrigger className="h-11">
               <SelectValue />
@@ -173,7 +175,7 @@ export const FlightSearchForm = () => {
             <SelectContent>
               {[0, 1, 2, 3, 4, 5, 6].map((num) => (
                 <SelectItem key={num} value={num.toString()}>
-                  {num} enfant{num > 1 ? 's' : ''}
+                  {num}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -181,16 +183,16 @@ export const FlightSearchForm = () => {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">Classe</label>
+          <label className="text-sm font-medium text-foreground">{t("search.class.title")}</label>
           <Select value={travelClass} onValueChange={setTravelClass}>
             <SelectTrigger className="h-11">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ECONOMY">Économique</SelectItem>
-              <SelectItem value="PREMIUM_ECONOMY">Économique Premium</SelectItem>
-              <SelectItem value="BUSINESS">Affaires</SelectItem>
-              <SelectItem value="FIRST">Première</SelectItem>
+              <SelectItem value="ECONOMY">{t("search.class.economy")}</SelectItem>
+              <SelectItem value="PREMIUM_ECONOMY">{t("search.class.premium")}</SelectItem>
+              <SelectItem value="BUSINESS">{t("search.class.business")}</SelectItem>
+              <SelectItem value="FIRST">{t("search.class.first")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -199,7 +201,7 @@ export const FlightSearchForm = () => {
       {/* Submit Button */}
       <div className="mt-6">
         <UnifiedSubmitButton variant="search">
-          Rechercher des vols
+          {t("search.search")}
         </UnifiedSubmitButton>
       </div>
     </UnifiedForm>
