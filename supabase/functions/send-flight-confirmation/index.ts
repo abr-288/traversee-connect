@@ -1,10 +1,20 @@
 import { serve } from "https://deno.land/std@0.208.0/http/server.ts";
-import { Resend } from "https://esm.sh/resend@2.0.0";
+import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { encode } from "https://deno.land/std@0.208.0/encoding/base64.ts";
 import { generateQRCodeSVG, generateTicketHTML } from "./_utils.ts";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const smtpClient = new SMTPClient({
+  connection: {
+    hostname: Deno.env.get("SMTP_HOST")!,
+    port: Number(Deno.env.get("SMTP_PORT")),
+    tls: true,
+    auth: {
+      username: Deno.env.get("SMTP_USERNAME")!,
+      password: Deno.env.get("SMTP_PASSWORD")!,
+    },
+  },
+});
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -285,20 +295,22 @@ const handler = async (req: Request): Promise<Response> => {
 
     const ticketBase64 = encode(new TextEncoder().encode(ticketHtml).buffer);
 
-    const emailResponse = await resend.emails.send({
+    const emailResponse = await smtpClient.send({
       from: "B-Reserve <reservations@bossiz.com>",
-      to: [customerEmail],
+      to: customerEmail,
       subject: `✈️ Confirmation de vol ${flight.from} → ${flight.to}`,
       html: emailHtml,
       attachments: [
         {
           filename: `billet-vol-${bookingId.substring(0, 8)}.html`,
           content: ticketBase64,
+          encoding: "base64",
+          contentType: "text/html",
         },
       ],
     });
 
-    console.log("Email sent successfully with ticket attachment:", emailResponse);
+    console.log("Email sent successfully via SMTP with ticket attachment");
 
     return new Response(JSON.stringify({ success: true, emailResponse }), {
       status: 200,

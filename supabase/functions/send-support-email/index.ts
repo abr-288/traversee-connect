@@ -1,8 +1,18 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "https://esm.sh/resend@2.0.0";
+import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
 import { validateSupportMessage, sanitizeString } from "../_shared/validation.ts";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const smtpClient = new SMTPClient({
+  connection: {
+    hostname: Deno.env.get("SMTP_HOST")!,
+    port: Number(Deno.env.get("SMTP_PORT")),
+    tls: true,
+    auth: {
+      username: Deno.env.get("SMTP_USERNAME")!,
+      password: Deno.env.get("SMTP_PASSWORD")!,
+    },
+  },
+});
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -105,11 +115,11 @@ const handler = async (req: Request): Promise<Response> => {
       </html>
     `;
 
-    // Send to support team
-    await resend.emails.send({
+    // Send to support team via SMTP
+    await smtpClient.send({
       from: "B-Reserve Support <support@bossiz.com>",
-      to: ["support@bossiz.com"],
-      reply_to: sanitizedData.email,
+      to: "support@bossiz.com",
+      replyTo: sanitizedData.email,
       subject: `[Support] ${sanitizedData.subject}`,
       html: emailHtml,
     });
@@ -144,14 +154,15 @@ const handler = async (req: Request): Promise<Response> => {
       </html>
     `;
 
-    await resend.emails.send({
+    // Send confirmation to customer via SMTP
+    await smtpClient.send({
       from: "B-Reserve Support <support@bossiz.com>",
-      to: [sanitizedData.email],
+      to: sanitizedData.email,
       subject: "Confirmation de réception de votre message",
       html: confirmationHtml,
     });
 
-    console.log("Support emails sent successfully");
+    console.log("Support emails sent successfully via SMTP");
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
