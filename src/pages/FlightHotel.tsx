@@ -51,28 +51,38 @@ const FlightHotel = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       
-      <main className="flex-1 container mx-auto px-4 py-8 mt-20">
-        <div className="relative min-h-[60vh] flex items-center justify-center overflow-hidden rounded-3xl mb-12">
-          <img 
-            src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05" 
-            alt="Vol + Hotel" 
-            className="absolute inset-0 w-full h-full object-cover rounded-3xl"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-transparent rounded-3xl"></div>
-          <div className="relative z-10 container mx-auto px-4 text-center">
-            <div className="mb-8 animate-fade-in">
-              <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">Forfaits Vol + Hôtel</h1>
-              <p className="text-lg md:text-xl text-white/95 drop-shadow-md max-w-2xl mx-auto">
+      <main className="flex-1 mt-20">
+        <section className="relative bg-gradient-to-br from-primary via-primary-light to-secondary py-16 md:py-20">
+          {/* Background avec overlay */}
+          <div className="absolute inset-0 z-0">
+            <img
+              src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05"
+              alt="Forfaits Vol + Hôtel"
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/90 via-primary-light/85 to-secondary/90 z-[1]" />
+
+          <div className="container relative z-10 mx-auto px-4">
+            {/* Titre */}
+            <div className="text-center mb-8">
+              <h1 className="text-3xl md:text-5xl font-bold text-white mb-3 animate-fade-in">
+                Forfaits Vol + Hôtel
+              </h1>
+              <p className="text-lg md:text-xl text-white/95 animate-fade-in">
                 Réservez votre vol et votre hébergement en un seul forfait et économisez jusqu'à 30%
               </p>
             </div>
-            <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+
+            {/* Formulaire de recherche */}
+            <div className="max-w-6xl mx-auto animate-scale-in">
               <FlightHotelSearchForm onSearch={handleSearch} />
             </div>
           </div>
-        </div>
+        </section>
 
-        {loading && (
+        <div className="container mx-auto px-4 py-8">
+          {loading && (
           <div className="flex justify-center items-center py-20">
             <Loader2 className="w-12 h-12 animate-spin text-primary" />
           </div>
@@ -287,6 +297,7 @@ const FlightHotel = () => {
             )}
           </div>
         )}
+        </div>
       </main>
 
       {selectedFlight && selectedHotel && (
