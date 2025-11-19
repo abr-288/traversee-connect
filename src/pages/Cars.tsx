@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { PageBanner } from "@/components/PageBanner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -264,18 +263,21 @@ const Cars = () => {
       <Navbar />
       
       {/* Hero Banner */}
-      <div className="relative py-32 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
+      <div className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
         <img 
-          src="/src/assets/hero-slide-2.jpg" 
-          alt="Car Rental" 
-          className="absolute inset-0 w-full h-full object-cover opacity-40"
+          src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d" 
+          alt="Location de voitures" 
+          className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="relative z-10 container mx-auto px-4">
-          <div className="text-center mb-10">
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">Location de voitures</h1>
-            <p className="text-2xl md:text-3xl text-white/95 font-medium">Louez une voiture adaptée à vos besoins</p>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background"></div>
+        <div className="relative z-10 container mx-auto px-4 py-12">
+          <div className="text-center mb-8 animate-fade-in">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">Location de voitures</h1>
+            <p className="text-lg md:text-xl text-white/95 drop-shadow-md max-w-2xl mx-auto">Louez une voiture adaptée à vos besoins</p>
           </div>
-          <CarSearchForm />
+          <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <CarSearchForm />
+          </div>
         </div>
       </div>
       
