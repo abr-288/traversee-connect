@@ -24,9 +24,10 @@ serve(async (req) => {
     // Utiliser la recherche de villes mondiales
     const cities = searchCities(query, 10);
     
+    // Ne pas formatter le nom avec le code ici, laisser le composant React le faire
     const suggestions = type === "train"
       ? cities.map(city => ({
-          name: city.code ? `${city.name} (${city.code})` : city.name,
+          name: city.name,
           code: city.code || city.name.substring(0, 3).toUpperCase(),
           country: city.country,
           type: "airport",
@@ -37,7 +38,7 @@ serve(async (req) => {
           }).join('-') : undefined
         }))
       : cities.map(city => ({
-          name: city.code ? `${city.name} (${city.code})` : city.name,
+          name: city.name,
           code: city.code || city.name.substring(0, 3).toUpperCase(),
           country: city.country,
           type: "airport",
