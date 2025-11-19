@@ -79,7 +79,7 @@ export const ActivitySearchForm = () => {
             <SelectValue placeholder="Toutes catégories" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Toutes catégories</SelectItem>
+            <SelectItem value="all">Toutes catégories</SelectItem>
             <SelectItem value="adventure">Aventure</SelectItem>
             <SelectItem value="culture">Culture</SelectItem>
             <SelectItem value="sports">Sports</SelectItem>

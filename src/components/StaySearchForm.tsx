@@ -90,7 +90,7 @@ export const StaySearchForm = () => {
             <SelectValue placeholder="Tous les types" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Tous les types</SelectItem>
+            <SelectItem value="all">Tous les types</SelectItem>
             <SelectItem value="hotel">Hôtel</SelectItem>
             <SelectItem value="apartment">Appartement</SelectItem>
             <SelectItem value="villa">Villa</SelectItem>
