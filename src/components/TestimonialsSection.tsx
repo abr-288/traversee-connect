@@ -1,44 +1,47 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, Quote } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-
-const testimonials = [
-  {
-    id: 1,
-    name: "Kouadio Marie",
-    role: "Voyageuse Régulière",
-    rating: 5,
-    comment: "Une plateforme exceptionnelle ! J'ai réservé mon séjour à Grand-Bassam en quelques clics. Service impeccable et hôtel magnifique.",
-    avatar: "KM",
-  },
-  {
-    id: 2,
-    name: "Jean-Baptiste Koffi",
-    role: "Entrepreneur",
-    rating: 5,
-    comment: "Le meilleur service de réservation que j'ai utilisé. Les prix sont compétitifs et le support client est très réactif.",
-    avatar: "JK",
-  },
-  {
-    id: 3,
-    name: "Aminata Traoré",
-    role: "Guide Touristique",
-    rating: 5,
-    comment: "Je recommande vivement ! La variété des options et la simplicité du processus de réservation sont remarquables.",
-    avatar: "AT",
-  },
-];
+import { useTranslation } from "react-i18next";
 
 const TestimonialsSection = () => {
+  const { t } = useTranslation();
+  
+  const testimonials = [
+    {
+      id: 1,
+      name: "Kouadio Marie",
+      roleKey: "testimonials.traveler",
+      rating: 5,
+      commentKey: "testimonials.comment1",
+      avatar: "KM",
+    },
+    {
+      id: 2,
+      name: "Jean-Baptiste Koffi",
+      roleKey: "testimonials.entrepreneur",
+      rating: 5,
+      commentKey: "testimonials.comment2",
+      avatar: "JK",
+    },
+    {
+      id: 3,
+      name: "Aminata Traoré",
+      roleKey: "testimonials.guide",
+      rating: 5,
+      commentKey: "testimonials.comment3",
+      avatar: "AT",
+    },
+  ];
+
   return (
     <section className="py-20 bg-accent/20">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Ce Que Disent Nos Clients
+            {t('testimonials.title')}
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Des milliers de voyageurs satisfaits partagent leurs expériences
+            {t('testimonials.subtitle')}
           </p>
         </div>
 
@@ -56,7 +59,7 @@ const TestimonialsSection = () => {
                   ))}
                 </div>
 
-                <p className="text-muted-foreground mb-6 italic">"{testimonial.comment}"</p>
+                <p className="text-muted-foreground mb-6 italic">"{t(testimonial.commentKey)}"</p>
 
                 <div className="flex items-center gap-4">
                   <Avatar className="w-12 h-12 bg-primary">
@@ -66,7 +69,7 @@ const TestimonialsSection = () => {
                   </Avatar>
                   <div>
                     <p className="font-semibold text-foreground">{testimonial.name}</p>
-                    <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                    <p className="text-sm text-muted-foreground">{t(testimonial.roleKey)}</p>
                   </div>
                 </div>
               </CardContent>

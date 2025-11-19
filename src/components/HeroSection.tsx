@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Hotel, Car, Plane } from "lucide-react";
 import heroSlide1 from "@/assets/hero-slide-1.jpg";
@@ -18,6 +19,7 @@ const HERO_SLIDES = [heroSlide1, heroSlide2, heroSlide3, heroSlide4, heroSlide5]
  * Design Opodo/Booking avec système UnifiedForm
  */
 const HeroSection = () => {
+  const { t } = useTranslation();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [activeTab, setActiveTab] = useState("flight");
 
@@ -53,10 +55,10 @@ const HeroSection = () => {
       <div className="container relative z-10 mx-auto px-4 py-8 md:py-16">
         <div className="max-w-4xl mx-auto text-center mb-8 md:mb-14">
           <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold text-white mb-3 md:mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            Voyagez partout, réservez en un clic
+            {t('hero.title')}
           </h1>
           <p className="text-base md:text-xl lg:text-2xl text-white/95 mb-6 md:mb-10 font-normal animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
-            Trouvez les meilleures offres pour vos vols, hôtels, trains et bien plus encore
+            {t('hero.subtitle')}
           </p>
         </div>
 
@@ -69,14 +71,14 @@ const HeroSection = () => {
                 className="gap-1.5 md:gap-2 py-3 md:py-4 px-3 md:px-6 rounded-none data-[state=active]:bg-background data-[state=active]:border-b-2 data-[state=active]:border-secondary flex-shrink-0"
               >
                 <Plane className="w-4 h-4 md:w-5 md:h-5" />
-                <span className="text-xs md:text-base">Vols</span>
+                <span className="text-xs md:text-base">{t('nav.flights')}</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="hotel" 
                 className="gap-1.5 md:gap-2 py-3 md:py-4 px-3 md:px-6 rounded-none data-[state=active]:bg-background data-[state=active]:border-b-2 data-[state=active]:border-secondary flex-shrink-0"
               >
                 <Hotel className="w-4 h-4 md:w-5 md:h-5" />
-                <span className="text-xs md:text-base">Hôtels</span>
+                <span className="text-xs md:text-base">{t('nav.hotels')}</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="flight-hotel" 
@@ -84,14 +86,14 @@ const HeroSection = () => {
               >
                 <Plane className="w-3 h-3 md:w-4 md:h-4" />
                 <Hotel className="w-3 h-3 md:w-4 md:h-4" />
-                <span className="text-xs md:text-base">Vol+Hôtel</span>
+                <span className="text-xs md:text-base">{t('nav.flightHotel')}</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="car" 
                 className="gap-1.5 md:gap-2 py-3 md:py-4 px-3 md:px-6 rounded-none data-[state=active]:bg-background data-[state=active]:border-b-2 data-[state=active]:border-secondary flex-shrink-0"
               >
                 <Car className="w-4 h-4 md:w-5 md:h-5" />
-                <span className="text-xs md:text-base">Voitures</span>
+                <span className="text-xs md:text-base">{t('nav.carRental')}</span>
               </TabsTrigger>
             </TabsList>
 

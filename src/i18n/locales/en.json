@@ -71,15 +71,53 @@
     "easyBooking": "Easy Booking",
     "easyBookingDesc": "Simple booking process",
     "securePayment": "Secure Payment",
-    "securePaymentDesc": "100% secure transactions"
+    "securePaymentDesc": "100% secure transactions",
+    "secureBooking": {
+      "title": "Secure Booking",
+      "description": "100% secure payments with data protection"
+    },
+    "bestPrices": {
+      "title": "Best Prices Guaranteed",
+      "description": "We guarantee you the best rates on the market"
+    },
+    "support247": {
+      "title": "24/7 Support",
+      "description": "Our team is available at all times to help you"
+    }
   },
   "destinations": {
     "title": "Popular Destinations",
-    "explore": "Explore"
+    "subtitle": "Explore our most popular destinations and live unforgettable experiences",
+    "explore": "Explore",
+    "book": "Book",
+    "perNight": "per night",
+    "reviews": "reviews",
+    "viewAll": "View All Destinations"
   },
   "testimonials": {
     "title": "What Our Customers Say",
-    "readMore": "Read more"
+    "subtitle": "Thousands of satisfied travelers share their experiences",
+    "readMore": "Read more",
+    "traveler": "Regular Traveler",
+    "entrepreneur": "Entrepreneur",
+    "guide": "Tour Guide",
+    "comment1": "An exceptional platform! I booked my stay in Grand-Bassam in just a few clicks. Impeccable service and magnificent hotel.",
+    "comment2": "The best booking service I've used. Prices are competitive and customer support is very responsive.",
+    "comment3": "I highly recommend! The variety of options and the simplicity of the booking process are remarkable."
+  },
+  "offers": {
+    "title": "Exclusive Promotions",
+    "subtitle": "Take advantage of our best offers before they expire!",
+    "limited": "Limited Offers",
+    "expiresIn": "Expires in",
+    "days": "days",
+    "bookNow": "Book now"
+  },
+  "stats": {
+    "bookings": "Bookings",
+    "destinations": "Destinations",
+    "services": "Available Services",
+    "rating": "Average Rating"
   },
   "footer": {
     "description": "Your trusted partner for unforgettable travels around the world.",

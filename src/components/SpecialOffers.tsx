@@ -3,11 +3,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Percent, MapPin, Star, ArrowRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useServices } from "@/hooks/useServices";
 import { useNavigate } from "react-router-dom";
 import { BookingDialog } from "@/components/BookingDialog";
 
 const SpecialOffers = () => {
+  const { t } = useTranslation();
   const { services, loading } = useServices();
   const navigate = useNavigate();
   const [selectedService, setSelectedService] = useState<any>(null);
@@ -39,13 +41,13 @@ const SpecialOffers = () => {
           <div className="text-center mb-12">
             <Badge className="mb-4 gap-1 text-base px-4 py-2">
               <Percent className="w-4 h-4" />
-              Offres Limitées
+              {t('offers.limited')}
             </Badge>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Promotions Exclusives
+              {t('offers.title')}
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Profitez de nos meilleures offres avant qu'elles n'expirent !
+              {t('offers.subtitle')}
             </p>
           </div>
 
@@ -88,7 +90,7 @@ const SpecialOffers = () => {
                       </div>
                       <div className="flex items-center gap-2 text-secondary">
                         <Clock className="w-4 h-4" />
-                        <span className="text-sm font-medium">Expire dans {offer.expiresIn}j</span>
+                        <span className="text-sm font-medium">{t('offers.expiresIn')} {offer.expiresIn}j</span>
                       </div>
                     </div>
 
@@ -118,7 +120,7 @@ const SpecialOffers = () => {
                         setDialogOpen(true);
                       }}
                     >
-                      Réserver Maintenant
+                      {t('offers.bookNow')}
                       <ArrowRight className="w-4 h-4" />
                     </Button>
                   </div>

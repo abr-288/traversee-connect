@@ -40,7 +40,7 @@ const Navbar = () => {
   const handleInstall = async () => {
     const success = await install();
     if (success) {
-      toast.success("Application installée avec succès !");
+      toast.success(t("common.install") + " " + t("common.success"));
     }
   };
 
