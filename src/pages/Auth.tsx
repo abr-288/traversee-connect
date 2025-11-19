@@ -2,12 +2,11 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import { Plane } from "lucide-react";
+import { UnifiedForm, UnifiedFormField, UnifiedSubmitButton } from "@/components/forms";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -179,35 +178,27 @@ const Auth = () => {
         </CardHeader>
         <CardContent>
           {showUpdatePassword ? (
-            <div className="space-y-4">
-              <form onSubmit={handleUpdatePassword} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="new-password">Nouveau mot de passe</Label>
-                  <Input
-                    id="new-password"
-                    name="password"
-                    type="password"
-                    placeholder="••••••••"
-                    required
-                    minLength={6}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="confirm-password">Confirmer le mot de passe</Label>
-                  <Input
-                    id="confirm-password"
-                    name="confirmPassword"
-                    type="password"
-                    placeholder="••••••••"
-                    required
-                    minLength={6}
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Mise à jour..." : "Mettre à jour le mot de passe"}
-                </Button>
-              </form>
-            </div>
+            <UnifiedForm onSubmit={handleUpdatePassword} variant="auth" loading={loading}>
+              <UnifiedFormField
+                label="Nouveau mot de passe"
+                name="password"
+                type="password"
+                placeholder="••••••••"
+                required
+                minLength={6}
+              />
+              <UnifiedFormField
+                label="Confirmer le mot de passe"
+                name="confirmPassword"
+                type="password"
+                placeholder="••••••••"
+                required
+                minLength={6}
+              />
+              <UnifiedSubmitButton loading={loading} fullWidth>
+                Mettre à jour le mot de passe
+              </UnifiedSubmitButton>
+            </UnifiedForm>
           ) : showResetPassword ? (
             <div className="space-y-4">
               <Button
@@ -217,21 +208,18 @@ const Auth = () => {
               >
                 ← Retour à la connexion
               </Button>
-              <form onSubmit={handleResetPassword} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="reset-email">Email</Label>
-                  <Input
-                    id="reset-email"
-                    name="email"
-                    type="email"
-                    placeholder="votre@email.com"
-                    required
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Envoi..." : "Réinitialiser le mot de passe"}
-                </Button>
-              </form>
+              <UnifiedForm onSubmit={handleResetPassword} variant="auth" loading={loading}>
+                <UnifiedFormField
+                  label="Email"
+                  name="email"
+                  type="email"
+                  placeholder="votre@email.com"
+                  required
+                />
+                <UnifiedSubmitButton loading={loading} fullWidth>
+                  Réinitialiser le mot de passe
+                </UnifiedSubmitButton>
+              </UnifiedForm>
             </div>
           ) : (
             <Tabs defaultValue="signin" className="w-full">
@@ -241,30 +229,24 @@ const Auth = () => {
               </TabsList>
 
               <TabsContent value="signin">
-                <form onSubmit={handleSignIn} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="signin-email">Email</Label>
-                    <Input
-                      id="signin-email"
-                      name="email"
-                      type="email"
-                      placeholder="votre@email.com"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signin-password">Mot de passe</Label>
-                    <Input
-                      id="signin-password"
-                      name="password"
-                      type="password"
-                      placeholder="••••••••"
-                      required
-                    />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Connexion..." : "Se connecter"}
-                  </Button>
+                <UnifiedForm onSubmit={handleSignIn} variant="auth" loading={loading}>
+                  <UnifiedFormField
+                    label="Email"
+                    name="email"
+                    type="email"
+                    placeholder="votre@email.com"
+                    required
+                  />
+                  <UnifiedFormField
+                    label="Mot de passe"
+                    name="password"
+                    type="password"
+                    placeholder="••••••••"
+                    required
+                  />
+                  <UnifiedSubmitButton loading={loading} fullWidth>
+                    Se connecter
+                  </UnifiedSubmitButton>
                   <button
                     type="button"
                     onClick={() => setShowResetPassword(true)}
@@ -272,46 +254,37 @@ const Auth = () => {
                   >
                     Mot de passe oublié ?
                   </button>
-                </form>
+                </UnifiedForm>
               </TabsContent>
 
             <TabsContent value="signup">
-              <form onSubmit={handleSignUp} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signup-name">Nom complet</Label>
-                  <Input
-                    id="signup-name"
-                    name="fullName"
-                    type="text"
-                    placeholder="Jean Dupont"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
-                  <Input
-                    id="signup-email"
-                    name="email"
-                    type="email"
-                    placeholder="votre@email.com"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password">Mot de passe</Label>
-                  <Input
-                    id="signup-password"
-                    name="password"
-                    type="password"
-                    placeholder="••••••••"
-                    required
-                    minLength={6}
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Inscription..." : "S'inscrire"}
-                </Button>
-              </form>
+              <UnifiedForm onSubmit={handleSignUp} variant="auth" loading={loading}>
+                <UnifiedFormField
+                  label="Nom complet"
+                  name="fullName"
+                  type="text"
+                  placeholder="Jean Dupont"
+                  required
+                />
+                <UnifiedFormField
+                  label="Email"
+                  name="email"
+                  type="email"
+                  placeholder="votre@email.com"
+                  required
+                />
+                <UnifiedFormField
+                  label="Mot de passe"
+                  name="password"
+                  type="password"
+                  placeholder="••••••••"
+                  required
+                  minLength={6}
+                />
+                <UnifiedSubmitButton loading={loading} fullWidth>
+                  S'inscrire
+                </UnifiedSubmitButton>
+              </UnifiedForm>
             </TabsContent>
             </Tabs>
           )}
