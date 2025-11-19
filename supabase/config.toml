@@ -62,3 +62,6 @@ verify_jwt = true
 
 [functions.generate-booking-pdf]
 verify_jwt = true
+
+[functions.send-booking-pdf-email]
+verify_jwt = true
