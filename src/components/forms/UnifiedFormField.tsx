@@ -23,6 +23,8 @@ interface UnifiedFormFieldProps {
   id?: string;
   min?: number;
   max?: number;
+  minLength?: number;
+  maxLength?: number;
   defaultValue?: string | number;
 }
 
@@ -47,6 +49,8 @@ export const UnifiedFormField = ({
   id,
   min,
   max,
+  minLength,
+  maxLength,
   defaultValue,
 }: UnifiedFormFieldProps) => {
   const fieldId = id || name || `field-${Math.random()}`;
@@ -83,6 +87,8 @@ export const UnifiedFormField = ({
             onChange={onChange}
             required={required}
             disabled={disabled}
+            minLength={minLength}
+            maxLength={maxLength}
             className={cn(
               "min-h-[120px] resize-none",
               "border-2 border-input hover:border-primary/50 focus:border-primary",
@@ -107,6 +113,8 @@ export const UnifiedFormField = ({
               disabled={disabled}
               min={min}
               max={max}
+              minLength={minLength}
+              maxLength={maxLength}
               defaultValue={defaultValue}
               className={cn(
                 Icon && "pl-11",

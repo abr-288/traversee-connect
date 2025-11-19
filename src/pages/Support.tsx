@@ -2,14 +2,14 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Phone, Mail, MessageCircle, Clock, HelpCircle, Search } from "lucide-react";
+import { Phone, Mail, MessageCircle, Clock, HelpCircle } from "lucide-react";
 import { useSupportMessage } from "@/hooks/useSupportMessage";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNewsletterSubscribe } from "@/hooks/useNewsletterSubscribe";
+import { UnifiedForm, UnifiedFormField, UnifiedSubmitButton } from "@/components/forms";
+import { Textarea } from "@/components/ui/textarea";
 
 const Support = () => {
   const { sendMessage, loading: sendingMessage } = useSupportMessage();
@@ -173,62 +173,54 @@ const Support = () => {
                 <CardTitle>Envoyez-nous un message</CardTitle>
               </CardHeader>
               <CardContent>
-                <form className="space-y-4" onSubmit={handleSubmit}>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Nom complet</label>
-                    <Input 
-                      placeholder="Votre nom" 
-                      value={formData.name}
-                      onChange={(e) => setFormData({...formData, name: e.target.value})}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Email</label>
-                    <Input 
-                      type="email" 
-                      placeholder="votre@email.com"
-                      value={formData.email}
-                      onChange={(e) => setFormData({...formData, email: e.target.value})}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Numéro de réservation (optionnel)</label>
-                    <Input 
-                      placeholder="Ex: BK123456"
-                      value={formData.bookingReference}
-                      onChange={(e) => setFormData({...formData, bookingReference: e.target.value})}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Sujet</label>
-                    <Input 
-                      placeholder="Objet de votre demande"
-                      value={formData.subject}
-                      onChange={(e) => setFormData({...formData, subject: e.target.value})}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Message</label>
+                <UnifiedForm onSubmit={handleSubmit} variant="contact" loading={sendingMessage}>
+                  <UnifiedFormField
+                    label="Nom complet"
+                    name="name"
+                    placeholder="Votre nom"
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    required
+                  />
+                  <UnifiedFormField
+                    label="Email"
+                    name="email"
+                    type="email"
+                    placeholder="votre@email.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    required
+                  />
+                  <UnifiedFormField
+                    label="Numéro de réservation (optionnel)"
+                    name="bookingReference"
+                    placeholder="Ex: BK123456"
+                    value={formData.bookingReference}
+                    onChange={(e) => setFormData({...formData, bookingReference: e.target.value})}
+                  />
+                  <UnifiedFormField
+                    label="Sujet"
+                    name="subject"
+                    placeholder="Objet de votre demande"
+                    value={formData.subject}
+                    onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                    required
+                  />
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium block">Message</label>
                     <Textarea 
                       placeholder="Décrivez votre problème ou votre question..." 
                       rows={5}
                       value={formData.message}
                       onChange={(e) => setFormData({...formData, message: e.target.value})}
                       required
+                      className="w-full"
                     />
                   </div>
-                  <Button 
-                    className="w-full gradient-primary shadow-primary" 
-                    size="lg"
-                    type="submit"
-                    disabled={sendingMessage}
-                  >
-                    {sendingMessage ? "Envoi..." : "Envoyer le message"}
-                  </Button>
-                </form>
+                  <UnifiedSubmitButton loading={sendingMessage} fullWidth>
+                    Envoyer le message
+                  </UnifiedSubmitButton>
+                </UnifiedForm>
               </CardContent>
             </Card>
 
@@ -262,23 +254,20 @@ const Support = () => {
                 <p className="text-muted-foreground mb-6">
                   Recevez nos meilleures offres et conseils de voyage directement dans votre boîte mail
                 </p>
-                <form onSubmit={handleNewsletterSubmit} className="flex gap-4">
-                  <Input 
-                    type="email" 
+                <UnifiedForm onSubmit={handleNewsletterSubmit} variant="contact" loading={subscribing} className="flex gap-4">
+                  <UnifiedFormField
+                    name="email"
+                    type="email"
                     placeholder="Votre adresse email"
                     value={newsletterEmail}
                     onChange={(e) => setNewsletterEmail(e.target.value)}
                     required
                     className="flex-1"
                   />
-                  <Button 
-                    type="submit" 
-                    className="gradient-primary shadow-primary"
-                    disabled={subscribing}
-                  >
-                    {subscribing ? "Inscription..." : "S'inscrire"}
-                  </Button>
-                </form>
+                  <UnifiedSubmitButton loading={subscribing}>
+                    S'inscrire
+                  </UnifiedSubmitButton>
+                </UnifiedForm>
               </div>
             </CardContent>
           </Card>

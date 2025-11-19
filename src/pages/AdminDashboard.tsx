@@ -7,13 +7,12 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Users, Package, CreditCard, TrendingUp, Edit, Trash2, Plus } from "lucide-react";
+import { UnifiedForm, UnifiedFormField, UnifiedSubmitButton } from "@/components/forms";
 import {
   Table,
   TableBody,
@@ -352,20 +351,16 @@ const AdminDashboard = () => {
                           Remplissez les informations du service
                         </DialogDescription>
                       </DialogHeader>
-                      <form onSubmit={handleServiceSubmit} className="space-y-4">
+                      <UnifiedForm onSubmit={handleServiceSubmit} variant="booking">
+                        <UnifiedFormField
+                          label="Nom"
+                          name="name"
+                          defaultValue={selectedService?.name}
+                          required
+                        />
                         <div className="space-y-2">
-                          <Label htmlFor="name">Nom</Label>
-                          <Input
-                            id="name"
-                            name="name"
-                            defaultValue={selectedService?.name}
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="description">Description</Label>
+                          <label className="text-sm font-medium block">Description</label>
                           <Textarea
-                            id="description"
                             name="description"
                             defaultValue={selectedService?.description}
                             rows={3}
@@ -373,7 +368,7 @@ const AdminDashboard = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
-                            <Label htmlFor="type">Type</Label>
+                            <label className="text-sm font-medium block">Type</label>
                             <Select name="type" defaultValue={selectedService?.type} required>
                               <SelectTrigger>
                                 <SelectValue placeholder="Sélectionner" />
@@ -384,39 +379,33 @@ const AdminDashboard = () => {
                                 <SelectItem value="car">Voiture</SelectItem>
                                 <SelectItem value="tour">Tour</SelectItem>
                                 <SelectItem value="event">Événement</SelectItem>
-                                <SelectItem value="package">Package</SelectItem>
+                                <SelectItem value="flight_hotel">Package</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="price">Prix (FCFA)</Label>
-                            <Input
-                              id="price"
-                              name="price"
-                              type="number"
-                              defaultValue={selectedService?.price_per_unit}
-                              required
-                            />
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="location">Localisation</Label>
-                          <Input
-                            id="location"
-                            name="location"
-                            defaultValue={selectedService?.location}
+                          <UnifiedFormField
+                            label="Prix (FCFA)"
+                            name="price"
+                            type="number"
+                            defaultValue={selectedService?.price_per_unit}
                             required
                           />
                         </div>
-                        <div className="flex justify-end gap-2">
+                        <UnifiedFormField
+                          label="Localisation"
+                          name="location"
+                          defaultValue={selectedService?.location}
+                          required
+                        />
+                        <div className="flex justify-end gap-2 mt-6">
                           <Button type="button" variant="outline" onClick={() => setIsServiceDialogOpen(false)}>
                             Annuler
                           </Button>
-                          <Button type="submit">
+                          <UnifiedSubmitButton>
                             {selectedService ? "Modifier" : "Créer"}
-                          </Button>
+                          </UnifiedSubmitButton>
                         </div>
-                      </form>
+                      </UnifiedForm>
                     </DialogContent>
                   </Dialog>
                 </div>
