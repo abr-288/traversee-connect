@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { UnifiedForm, UnifiedAutocomplete, UnifiedFormField, UnifiedDatePicker, UnifiedSubmitButton } from "@/components/forms";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTranslation } from "react-i18next";
 
 export const ActivitySearchForm = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [location, setLocation] = useState("");
   const [date, setDate] = useState<Date>();
@@ -35,18 +37,18 @@ export const ActivitySearchForm = () => {
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div className="md:col-span-2">
           <UnifiedAutocomplete
-            label="Destination"
+            label={t("search.destination")}
             type="location"
             value={location}
             onChange={setLocation}
-            placeholder="Où cherchez-vous?"
+            placeholder={t("search.location")}
             required
           />
         </div>
 
         <div className="md:col-span-1">
           <UnifiedDatePicker
-            label="Date"
+            label={t("search.date")}
             value={date}
             onChange={setDate}
             minDate={new Date()}
@@ -55,7 +57,7 @@ export const ActivitySearchForm = () => {
 
         <div className="md:col-span-1">
           <UnifiedFormField
-            label="Participants"
+            label={t("search.guests")}
             name="guests"
             type="number"
             defaultValue="2"
@@ -66,20 +68,20 @@ export const ActivitySearchForm = () => {
 
         <div className="md:col-span-1 flex items-end">
           <UnifiedSubmitButton fullWidth>
-            Rechercher
+            {t("search.search")}
           </UnifiedSubmitButton>
         </div>
       </div>
 
       <div className="mt-6">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">Catégorie</label>
+          <label className="text-sm font-medium text-foreground">{t("search.category")}</label>
           <Select value={category} onValueChange={setCategory}>
             <SelectTrigger className="h-11">
-              <SelectValue placeholder="Toutes catégories" />
+              <SelectValue placeholder={t("search.allCategories")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Toutes catégories</SelectItem>
+              <SelectItem value="all">{t("search.allCategories")}</SelectItem>
               <SelectItem value="adventure">Aventure</SelectItem>
               <SelectItem value="culture">Culture</SelectItem>
               <SelectItem value="sports">Sports</SelectItem>

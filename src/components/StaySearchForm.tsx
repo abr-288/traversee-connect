@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { UnifiedForm, UnifiedAutocomplete, UnifiedFormField, UnifiedDatePicker, UnifiedSubmitButton } from "@/components/forms";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTranslation } from "react-i18next";
 
 export const StaySearchForm = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [destination, setDestination] = useState("");
   const [checkIn, setCheckIn] = useState<Date>();
@@ -37,18 +39,18 @@ export const StaySearchForm = () => {
       <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
         <div className="md:col-span-2">
           <UnifiedAutocomplete
-            label="Destination"
+            label={t("search.destination")}
             type="location"
             value={destination}
             onChange={setDestination}
-            placeholder="Où souhaitez-vous séjourner?"
+            placeholder={t("search.location")}
             required
           />
         </div>
 
         <div className="md:col-span-1">
           <UnifiedDatePicker
-            label="Arrivée"
+            label={t("search.checkIn")}
             value={checkIn}
             onChange={setCheckIn}
             minDate={new Date()}
@@ -57,7 +59,7 @@ export const StaySearchForm = () => {
 
         <div className="md:col-span-1">
           <UnifiedDatePicker
-            label="Départ"
+            label={t("search.checkOut")}
             value={checkOut}
             onChange={setCheckOut}
             minDate={checkIn || new Date()}
@@ -66,7 +68,7 @@ export const StaySearchForm = () => {
 
         <div className="md:col-span-1">
           <UnifiedFormField
-            label="Voyageurs"
+            label={t("search.guests")}
             name="guests"
             type="number"
             defaultValue="2"
@@ -77,20 +79,20 @@ export const StaySearchForm = () => {
 
         <div className="md:col-span-1 flex items-end">
           <UnifiedSubmitButton fullWidth>
-            Rechercher
+            {t("search.search")}
           </UnifiedSubmitButton>
         </div>
       </div>
 
       <div className="mt-6">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">Type d'hébergement</label>
+          <label className="text-sm font-medium text-foreground">{t("search.type")}</label>
           <Select value={type} onValueChange={setType}>
             <SelectTrigger className="h-11">
-              <SelectValue placeholder="Tous les types" />
+              <SelectValue placeholder={t("search.allCategories")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Tous les types</SelectItem>
+              <SelectItem value="all">{t("search.allCategories")}</SelectItem>
               <SelectItem value="hotel">Hôtel</SelectItem>
               <SelectItem value="apartment">Appartement</SelectItem>
               <SelectItem value="villa">Villa</SelectItem>
