@@ -91,9 +91,9 @@ serve(async (req) => {
     } else if (requestData.paymentMethod === 'mobile_money') {
       channels = 'MOBILE_MONEY';
     } else if (requestData.paymentMethod === 'wave') {
-      channels = 'WAVE'; // Wave has its own channel in CinetPay
+      channels = 'WALLET'; // Wave is a wallet payment in CinetPay
     } else if (requestData.paymentMethod === 'bank_transfer') {
-      channels = 'BANK_TRANSFER';
+      channels = 'CREDIT_CARD'; // Use CREDIT_CARD for bank transfers as fallback
     }
 
     // Split customer name
