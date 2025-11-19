@@ -12,7 +12,8 @@
     "myAccount": "Mon Compte",
     "admin": "Admin",
     "logout": "Déconnexion",
-    "logoutSuccess": "Déconnexion réussie"
+    "logoutSuccess": "Déconnexion réussie",
+    "dashboard": "Tableau de bord"
   },
   "hero": {
     "title": "Voyagez partout, réservez en un clic",
@@ -32,6 +33,7 @@
     "roundTrip": "Aller-retour",
     "multiCity": "Multi-destinations",
     "class": {
+      "title": "Classe",
       "economy": "Économique",
       "premium": "Premium",
       "business": "Affaires",
@@ -45,10 +47,7 @@
     "search": "Rechercher",
     "results": "résultats trouvés",
     "book": "Réserver",
-    "seatsAvailable": "places disponibles",
-    "class": {
-      "title": "Classe"
-    }
+    "seatsAvailable": "places disponibles"
   },
   "features": {
     "title": "Pourquoi Choisir B-Reserve?",
@@ -88,5 +87,206 @@
     "welcome": "Bonjour ! Je suis Boss, votre assistant de voyage. Comment puis-je vous aider ?",
     "placeholder": "Posez votre question...",
     "response": "Je suis là pour vous aider avec vos réservations de vols, hôtels, trains et événements. Comment puis-je vous assister ?"
+  },
+  "dashboard": {
+    "title": "Mon Tableau de Bord",
+    "welcome": "Bienvenue",
+    "subtitle": "Gérez vos réservations et suivez vos voyages",
+    "stats": {
+      "totalBookings": "Total Réservations",
+      "pending": "En Attente",
+      "confirmed": "Confirmées",
+      "completed": "Terminées",
+      "totalSpent": "Total Dépensé"
+    },
+    "tabs": {
+      "all": "Toutes",
+      "pending": "En attente",
+      "confirmed": "Confirmées",
+      "completed": "Terminées",
+      "calendar": "Calendrier"
+    },
+    "noBookings": {
+      "title": "Aucune réservation",
+      "description": "Commencez à planifier votre prochain voyage",
+      "action": "Explorer les destinations"
+    },
+    "reminders": {
+      "title": "Rappels à venir",
+      "departingTomorrow": "Départ demain !",
+      "departingIn": "Départ dans"
+    }
+  },
+  "booking": {
+    "reference": "Référence",
+    "status": {
+      "pending": "En attente",
+      "confirmed": "Confirmée",
+      "cancelled": "Annulée",
+      "completed": "Terminée"
+    },
+    "payment": {
+      "paid": "Payé",
+      "pending": "En attente",
+      "failed": "Échoué",
+      "refunded": "Remboursé"
+    },
+    "actions": {
+      "confirm": "Confirmer",
+      "cancel": "Annuler",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "exportPDF": "Exporter PDF",
+      "viewDetails": "Voir détails"
+    },
+    "dialogs": {
+      "delete": {
+        "title": "Supprimer la réservation",
+        "description": "Êtes-vous sûr de vouloir supprimer cette réservation ? Cette action est irréversible.",
+        "cancel": "Annuler",
+        "confirm": "Supprimer"
+      },
+      "cancel": {
+        "title": "Annuler la réservation",
+        "description": "Êtes-vous sûr de vouloir annuler cette réservation ? Un remboursement sera traité selon notre politique.",
+        "cancel": "Non, garder",
+        "confirm": "Oui, annuler"
+      }
+    },
+    "details": {
+      "traveler": "Voyageur",
+      "email": "Email",
+      "phone": "Téléphone",
+      "guests": "Voyageurs",
+      "destination": "Destination",
+      "departure": "Date de départ",
+      "return": "Date de retour",
+      "totalPrice": "Montant total",
+      "paymentStatus": "Statut paiement",
+      "serviceType": "Type de service"
+    }
+  },
+  "payment": {
+    "title": "Paiement",
+    "subtitle": "Complétez votre réservation en effectuant le paiement",
+    "bookingDetails": "Détails de la réservation",
+    "reference": "Référence",
+    "amount": "Montant",
+    "paymentInfo": "Informations de paiement",
+    "method": "Méthode de paiement",
+    "methods": {
+      "wave": "Wave (Mobile Money)",
+      "orangeMoney": "Orange Money",
+      "mtn": "MTN Mobile Money",
+      "moov": "Moov Money",
+      "card": "Carte bancaire",
+      "bankTransfer": "Virement bancaire"
+    },
+    "customerInfo": "Informations client",
+    "fullName": "Nom complet",
+    "email": "Email",
+    "phone": "Téléphone",
+    "phoneNote": "Ce numéro sera utilisé pour le paiement mobile",
+    "address": "Adresse",
+    "city": "Ville",
+    "payButton": "Payer",
+    "processing": "Traitement...",
+    "securedBy": "Paiement sécurisé par CinetPay",
+    "errors": {
+      "missingFields": "Veuillez remplir tous les champs obligatoires",
+      "invalidPhone": "Numéro de téléphone invalide (minimum 8 chiffres)",
+      "invalidEmail": "Adresse email invalide",
+      "alreadyPaid": "Paiement déjà effectué",
+      "bookingNotFound": "Réservation introuvable ou accès refusé",
+      "bookingCancelled": "Cette réservation a été annulée et ne peut être payée",
+      "paymentFailed": "Erreur lors du traitement du paiement"
+    },
+    "success": {
+      "title": "Paiement réussi",
+      "description": "Votre paiement a été traité avec succès",
+      "emailSent": "Un email de confirmation a été envoyé"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "noNotifications": "Aucune notification",
+    "markAllRead": "Tout marquer comme lu",
+    "types": {
+      "success": "Succès",
+      "info": "Information",
+      "warning": "Attention",
+      "error": "Erreur"
+    }
+  },
+  "calendar": {
+    "title": "Calendrier des réservations",
+    "filterByType": "Filtrer par type",
+    "filterByStatus": "Filtrer par statut",
+    "all": "Tous",
+    "selectDate": "Sélectionnez une date pour voir les réservations",
+    "bookingsOn": "Réservations le",
+    "noBookings": "Aucune réservation pour cette date"
+  },
+  "profile": {
+    "title": "Mon Profil",
+    "personalInfo": "Informations personnelles",
+    "fullName": "Nom complet",
+    "email": "Email",
+    "phone": "Téléphone",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "passwordChange": "Changer le mot de passe",
+    "currentPassword": "Mot de passe actuel",
+    "newPassword": "Nouveau mot de passe",
+    "confirmPassword": "Confirmer le mot de passe"
+  },
+  "auth": {
+    "login": "Connexion",
+    "signup": "Inscription",
+    "email": "Adresse email",
+    "password": "Mot de passe",
+    "rememberMe": "Se souvenir de moi",
+    "forgotPassword": "Mot de passe oublié ?",
+    "noAccount": "Pas encore de compte ?",
+    "hasAccount": "Vous avez déjà un compte ?",
+    "signupNow": "Inscrivez-vous maintenant",
+    "loginNow": "Connectez-vous",
+    "welcomeBack": "Bon retour",
+    "createAccount": "Créer un compte",
+    "fullName": "Nom complet"
+  },
+  "errors": {
+    "generic": "Une erreur s'est produite",
+    "networkError": "Erreur de connexion",
+    "unauthorized": "Non autorisé",
+    "notFound": "Non trouvé",
+    "serverError": "Erreur serveur"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "close": "Fermer",
+    "confirm": "Confirmer",
+    "yes": "Oui",
+    "no": "Non",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "submit": "Soumettre",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "export": "Exporter",
+    "download": "Télécharger",
+    "upload": "Téléverser",
+    "required": "Requis",
+    "optional": "Optionnel",
+    "success": "Succès",
+    "error": "Erreur",
+    "warning": "Attention",
+    "info": "Information"
   }
 }
