@@ -1,18 +1,17 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin } from "lucide-react";
 import { format } from "date-fns";
-import { UnifiedForm, UnifiedFormField, UnifiedDatePicker, UnifiedSubmitButton } from "@/components/forms";
+import { UnifiedForm, UnifiedAutocomplete, UnifiedFormField, UnifiedDatePicker, UnifiedSubmitButton } from "@/components/forms";
 
 export const TourSearchForm = () => {
   const navigate = useNavigate();
+  const [destination, setDestination] = useState("");
   const [date, setDate] = useState<Date>();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     
     const formData = new FormData(e.currentTarget as HTMLFormElement);
-    const destination = formData.get("destination") as string;
     const guests = formData.get("guests") as string;
     const duration = formData.get("duration") as string;
 
@@ -34,11 +33,12 @@ export const TourSearchForm = () => {
     <UnifiedForm onSubmit={handleSearch} variant="search" className="w-full max-w-5xl mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div className="md:col-span-2">
-          <UnifiedFormField
+          <UnifiedAutocomplete
             label="Destination"
-            name="destination"
+            type="location"
+            value={destination}
+            onChange={setDestination}
             placeholder="Où voulez-vous aller?"
-            icon={MapPin}
             required
           />
         </div>
