@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { NotificationCenter, Notification } from "@/components/dashboard/NotificationCenter";
 import { BookingCard } from "@/components/dashboard/BookingCard";
 import { UpcomingReminders } from "@/components/dashboard/UpcomingReminders";
+import { BookingCalendar } from "@/components/dashboard/BookingCalendar";
 
 interface Booking {
   id: string;
@@ -351,6 +352,7 @@ const Dashboard = () => {
             <TabsTrigger value="pending">En attente ({stats.pending})</TabsTrigger>
             <TabsTrigger value="confirmed">Confirmées ({stats.confirmed})</TabsTrigger>
             <TabsTrigger value="completed">Terminées ({stats.completed})</TabsTrigger>
+            <TabsTrigger value="calendar">📅 Calendrier</TabsTrigger>
           </TabsList>
 
           <TabsContent value="all" className="space-y-4">
@@ -430,6 +432,10 @@ const Dashboard = () => {
                   />
                 ))}
             </div>
+          </TabsContent>
+
+          <TabsContent value="calendar">
+            <BookingCalendar bookings={bookings} />
           </TabsContent>
         </Tabs>
       </main>
