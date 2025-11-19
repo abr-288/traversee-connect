@@ -71,15 +71,49 @@
     "easyBooking": "便捷预订",
     "easyBookingDesc": "简单的预订流程",
     "securePayment": "安全支付",
-    "securePaymentDesc": "100%安全交易"
+    "securePaymentDesc": "100%安全交易",
+    "secureBooking": {
+      "title": "安全预订",
+      "description": "100%安全支付，数据保护"
+    },
+    "support247": {
+      "title": "全天候支持",
+      "description": "我们的团队随时为您提供帮助"
+    }
   },
   "destinations": {
     "title": "热门目的地",
-    "explore": "探索"
+    "subtitle": "探索我们最受欢迎的目的地，体验难忘的经历",
+    "explore": "探索",
+    "book": "预订",
+    "perNight": "每晚",
+    "reviews": "条评价",
+    "viewAll": "查看所有目的地"
   },
   "testimonials": {
     "title": "客户评价",
-    "readMore": "阅读更多"
+    "subtitle": "数千名满意的旅客分享他们的体验",
+    "readMore": "阅读更多",
+    "traveler": "常旅客",
+    "entrepreneur": "企业家",
+    "guide": "导游",
+    "comment1": "一个非凡的平台！我只需几次点击就预订了在Grand-Bassam的住宿。服务无可挑剔，酒店也很棒。",
+    "comment2": "我使用过的最好的预订服务。价格有竞争力，客户支持反应迅速。",
+    "comment3": "强烈推荐！选项多样，预订流程简单明了。"
+  },
+  "offers": {
+    "title": "独家促销",
+    "subtitle": "在优惠到期之前享受我们的最佳优惠！",
+    "limited": "限时优惠",
+    "expiresIn": "有效期",
+    "days": "天",
+    "bookNow": "立即预订"
+  },
+  "stats": {
+    "bookings": "预订量",
+    "destinations": "目的地",
+    "services": "可用服务",
+    "rating": "平均评分"
   },
   "footer": {
     "description": "您值得信赖的旅行合作伙伴，带您环游世界。",

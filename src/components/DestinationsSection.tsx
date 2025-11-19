@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MapPin, Star, Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import hotelImg from "@/assets/destination-hotel.jpg";
 import safariImg from "@/assets/destination-safari.jpg";
 import cityImg from "@/assets/destination-city.jpg";
@@ -43,6 +44,7 @@ const destinations = [
 ];
 
 const DestinationsSection = () => {
+  const { t } = useTranslation();
   const [selectedDestination, setSelectedDestination] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const navigate = useNavigate();
@@ -89,10 +91,10 @@ const DestinationsSection = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-8 md:mb-12">
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-3 md:mb-4">
-            Destinations Populaires
+            {t('destinations.title')}
           </h2>
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
-            Explorez nos destinations les plus prisées et vivez des expériences inoubliables
+            {t('destinations.subtitle')}
           </p>
         </div>
 
@@ -133,7 +135,7 @@ const DestinationsSection = () => {
                   </div>
                   <div className="text-right">
                     <p className="text-2xl font-bold text-primary">{destination.price}</p>
-                    <p className="text-xs text-muted-foreground">FCFA / nuit</p>
+                    <p className="text-xs text-muted-foreground">FCFA / {t('destinations.perNight')}</p>
                   </div>
                 </div>
 
@@ -153,7 +155,7 @@ const DestinationsSection = () => {
                     setDialogOpen(true);
                   }}
                 >
-                  Réserver Maintenant
+                  {t('destinations.book')}
                 </Button>
               </CardContent>
             </Card>
@@ -168,7 +170,7 @@ const DestinationsSection = () => {
             className="gap-2"
             onClick={() => navigate('/stays')}
           >
-            Voir Toutes les Destinations
+            {t('destinations.viewAll')}
           </Button>
         </div>
       </div>

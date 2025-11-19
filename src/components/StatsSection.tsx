@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Users, MapPin, Star, Calendar } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 
 const StatsSection = () => {
+  const { t } = useTranslation();
   const [stats, setStats] = useState({
     totalServices: 0,
     totalBookings: 0,
@@ -34,25 +36,25 @@ const StatsSection = () => {
     {
       icon: Users,
       value: stats.totalBookings.toLocaleString(),
-      label: "Réservations",
+      labelKey: "stats.bookings",
       color: "text-primary"
     },
     {
       icon: MapPin,
       value: `${stats.destinations}+`,
-      label: "Destinations",
+      labelKey: "stats.destinations",
       color: "text-secondary"
     },
     {
       icon: Calendar,
       value: `${stats.totalServices}+`,
-      label: "Services Disponibles",
+      labelKey: "stats.services",
       color: "text-accent"
     },
     {
       icon: Star,
       value: stats.satisfaction.toFixed(1),
-      label: "Note Moyenne",
+      labelKey: "stats.rating",
       color: "text-secondary"
     }
   ];
@@ -69,7 +71,7 @@ const StatsSection = () => {
             >
               <stat.icon className={`w-10 h-10 md:w-12 md:h-12 mx-auto mb-3 md:mb-4 ${stat.color}`} />
               <div className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-1 md:mb-2">{stat.value}</div>
-              <div className="text-xs md:text-sm text-muted-foreground">{stat.label}</div>
+              <div className="text-xs md:text-sm text-muted-foreground">{t(stat.labelKey)}</div>
             </div>
           ))}
         </div>

@@ -71,15 +71,49 @@
     "easyBooking": "Réservation Facile",
     "easyBookingDesc": "Processus de réservation simple",
     "securePayment": "Paiement Sécurisé",
-    "securePaymentDesc": "Transactions 100% sécurisées"
+    "securePaymentDesc": "Transactions 100% sécurisées",
+    "secureBooking": {
+      "title": "Réservation Sécurisée",
+      "description": "Paiements 100% sécurisés avec protection des données"
+    },
+    "support247": {
+      "title": "Support 24/7",
+      "description": "Notre équipe est disponible à tout moment pour vous aider"
+    }
   },
   "destinations": {
     "title": "Destinations Populaires",
-    "explore": "Explorer"
+    "subtitle": "Explorez nos destinations les plus prisées et vivez des expériences inoubliables",
+    "explore": "Explorer",
+    "book": "Réserver",
+    "perNight": "par nuit",
+    "reviews": "avis",
+    "viewAll": "Voir Toutes les Destinations"
   },
   "testimonials": {
-    "title": "Ce Que Nos Clients Disent",
-    "readMore": "Lire plus"
+    "title": "Ce Que Disent Nos Clients",
+    "subtitle": "Des milliers de voyageurs satisfaits partagent leurs expériences",
+    "readMore": "Lire plus",
+    "traveler": "Voyageuse Régulière",
+    "entrepreneur": "Entrepreneur",
+    "guide": "Guide Touristique",
+    "comment1": "Une plateforme exceptionnelle ! J'ai réservé mon séjour à Grand-Bassam en quelques clics. Service impeccable et hôtel magnifique.",
+    "comment2": "Le meilleur service de réservation que j'ai utilisé. Les prix sont compétitifs et le support client est très réactif.",
+    "comment3": "Je recommande vivement ! La variété des options et la simplicité du processus de réservation sont remarquables."
+  },
+  "offers": {
+    "title": "Promotions Exclusives",
+    "subtitle": "Profitez de nos meilleures offres avant qu'elles n'expirent !",
+    "limited": "Offres Limitées",
+    "expiresIn": "Expire dans",
+    "days": "jours",
+    "bookNow": "Réserver Maintenant"
+  },
+  "stats": {
+    "bookings": "Réservations",
+    "destinations": "Destinations",
+    "services": "Services Disponibles",
+    "rating": "Note Moyenne"
   },
   "footer": {
     "description": "Votre partenaire de confiance pour des voyages inoubliables à travers le monde.",
