@@ -6,7 +6,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { UnifiedForm, UnifiedAutocomplete, UnifiedDatePicker, UnifiedFormField, UnifiedSubmitButton } from "@/components/forms";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
 
 interface TrainSearchFormProps {
   onResults?: (results: any) => void;
@@ -102,7 +101,7 @@ export const TrainSearchForm = ({ onResults }: TrainSearchFormProps) => {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
             <UnifiedFormField
               label="Adultes"
               name="adults"
@@ -121,9 +120,9 @@ export const TrainSearchForm = ({ onResults }: TrainSearchFormProps) => {
               max={9}
             />
             <div className="space-y-2">
-              <Label>Classe</Label>
+              <label className="text-sm font-medium text-foreground">Classe</label>
               <Select value={travelClass} onValueChange={setTravelClass}>
-                <SelectTrigger>
+                <SelectTrigger className="h-11">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -135,7 +134,7 @@ export const TrainSearchForm = ({ onResults }: TrainSearchFormProps) => {
             </div>
           </div>
 
-          <UnifiedSubmitButton loading={loading} fullWidth>
+          <UnifiedSubmitButton loading={loading} fullWidth className="mt-6">
             Rechercher des trains
           </UnifiedSubmitButton>
         </div>

@@ -7,7 +7,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { UnifiedForm, UnifiedDatePicker, UnifiedSubmitButton } from "@/components/forms";
 import { EventLocationAutocomplete } from "@/components/EventLocationAutocomplete";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
 
 interface EventSearchFormProps {
   onResults: (results: any) => void;
@@ -57,9 +56,9 @@ export const EventSearchForm = ({ onResults }: EventSearchFormProps) => {
     <Card className="w-full">
       <CardContent className="pt-6">
         <UnifiedForm onSubmit={handleSearch} variant="search" loading={loading}>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
             <div className="space-y-2">
-              <Label htmlFor="location">Localisation</Label>
+              <label className="text-sm font-medium text-foreground" htmlFor="location">Localisation</label>
               <EventLocationAutocomplete
                 value={location}
                 onChange={setLocation}
@@ -75,9 +74,9 @@ export const EventSearchForm = ({ onResults }: EventSearchFormProps) => {
             />
 
             <div className="space-y-2">
-              <Label htmlFor="category">Catégorie</Label>
+              <label className="text-sm font-medium text-foreground" htmlFor="category">Catégorie</label>
               <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger>
+                <SelectTrigger className="h-11">
                   <SelectValue placeholder="Toutes catégories" />
                 </SelectTrigger>
                 <SelectContent>
@@ -92,7 +91,7 @@ export const EventSearchForm = ({ onResults }: EventSearchFormProps) => {
             </div>
           </div>
 
-          <UnifiedSubmitButton loading={loading} fullWidth className="mt-4">
+          <UnifiedSubmitButton loading={loading} fullWidth className="mt-6">
             Rechercher des événements
           </UnifiedSubmitButton>
         </UnifiedForm>

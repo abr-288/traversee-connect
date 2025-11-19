@@ -145,13 +145,13 @@ export const FlightSearchForm = () => {
       </div>
 
       {/* Passengers & Class */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
         <div className="space-y-2">
-          <label className="text-sm font-semibold text-foreground">
+          <label className="text-sm font-medium text-foreground">
             Adultes
           </label>
           <Select value={adults} onValueChange={setAdults}>
-            <SelectTrigger className="h-12 border-2 hover:border-primary/50 transition-colors">
+            <SelectTrigger className="h-11">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -165,9 +165,9 @@ export const FlightSearchForm = () => {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-semibold text-foreground">Enfants</label>
+          <label className="text-sm font-medium text-foreground">Enfants</label>
           <Select value={children} onValueChange={setChildren}>
-            <SelectTrigger className="h-12 border-2 hover:border-primary/50 transition-colors">
+            <SelectTrigger className="h-11">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -181,9 +181,9 @@ export const FlightSearchForm = () => {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-semibold text-foreground">Classe</label>
+          <label className="text-sm font-medium text-foreground">Classe</label>
           <Select value={travelClass} onValueChange={setTravelClass}>
-            <SelectTrigger className="h-12 border-2 hover:border-primary/50 transition-colors">
+            <SelectTrigger className="h-11">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
