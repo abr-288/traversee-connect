@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 export const ActivitySearchForm = () => {
   const navigate = useNavigate();
   const [date, setDate] = useState<Date>();
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState("all");
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +26,7 @@ export const ActivitySearchForm = () => {
       location,
       ...(date && { date: format(date, "yyyy-MM-dd") }),
       guests,
-      ...(category && { category }),
+      ...(category && category !== "all" && { category }),
     });
 
     navigate(`/activities?${params.toString()}`);

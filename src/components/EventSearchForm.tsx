@@ -16,7 +16,7 @@ interface EventSearchFormProps {
 export const EventSearchForm = ({ onResults }: EventSearchFormProps) => {
   const [location, setLocation] = useState("");
   const [date, setDate] = useState<Date>();
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState("all");
   const { searchEvents, loading } = useEventSearch();
   const { toast } = useToast();
 
