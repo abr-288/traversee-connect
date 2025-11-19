@@ -247,6 +247,20 @@ const AdminDashboard = () => {
           </Card>
         </div>
 
+        {/* Quick Actions */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">Actions Rapides</h2>
+          <div className="flex gap-4">
+            <Button
+              onClick={() => navigate("/admin/email-templates")}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              📧 Gérer les Templates d'Emails
+            </Button>
+          </div>
+        </div>
+
         {/* Tabs */}
         <Tabs defaultValue="bookings" className="w-full">
           <TabsList>

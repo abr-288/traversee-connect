@@ -16,6 +16,7 @@ import Support from "./pages/Support";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminEmailTemplates from "./pages/AdminEmailTemplates";
 import Payment from "./pages/Payment";
 import BookingHistory from "./pages/BookingHistory";
 import Account from "./pages/Account";
@@ -52,6 +53,7 @@ const App = () => (
           <Route path="/destinations" element={<Destinations />} />
           <Route path="/install" element={<Install />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/email-templates" element={<AdminEmailTemplates />} />
           <Route path="/payment" element={<Payment />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
