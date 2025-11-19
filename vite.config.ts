@@ -17,8 +17,8 @@ export default defineConfig(({ mode }) => ({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'robots.txt'],
       manifest: {
-        name: 'Traversée Connect',
-        short_name: 'Traversée',
+        name: 'B-Reserve',
+        short_name: 'B-Reserve',
         description: 'Plateforme de réservation de voyages - Hôtels, vols, trains, voitures, circuits touristiques et événements',
         theme_color: '#0EA5E9',
         background_color: '#ffffff',
