@@ -429,5 +429,120 @@
         "247": "Service disponible 24h/24 et 7j/7"
       }
     }
+  },
+  "booking": {
+    "dialog": {
+      "flight": {
+        "title": "Réserver ce vol",
+        "description": "Remplissez les informations ci-dessous pour finaliser votre réservation",
+        "tripType": "Type de voyage",
+        "oneWay": "Aller simple",
+        "roundTrip": "Aller-retour",
+        "summary": "Récapitulatif de la réservation",
+        "flightDetails": "Détails du vol",
+        "passengerInfo": "Informations passager",
+        "confirmBooking": "Confirmer la réservation",
+        "backToForm": "Retour"
+      },
+      "hotel": {
+        "title": "Réserver",
+        "description": "Remplissez les informations ci-dessous pour finaliser votre réservation",
+        "rooms": "Nombre de chambres",
+        "adults": "Adultes",
+        "children": "Enfants"
+      },
+      "car": {
+        "title": "Réserver",
+        "description": "Remplissez les informations ci-dessous pour finaliser votre réservation",
+        "pickupInfo": "Informations de prise en charge",
+        "dropoffInfo": "Informations de retour",
+        "pickupDate": "Date de prise en charge",
+        "pickupTime": "Heure de prise en charge",
+        "pickupLocation": "Lieu de prise en charge",
+        "dropoffDate": "Date de retour",
+        "dropoffTime": "Heure de retour",
+        "dropoffLocation": "Lieu de retour",
+        "driverLicense": "Numéro de permis de conduire"
+      },
+      "generic": {
+        "title": "Réserver",
+        "description": "Remplissez les informations ci-dessous pour finaliser votre réservation",
+        "startDate": "Date de début",
+        "endDate": "Date de fin",
+        "guests": "Nombre de personnes"
+      }
+    },
+    "form": {
+      "passengers": "Nombre de passagers",
+      "customerInfo": "Informations du voyageur",
+      "customerName": "Nom complet",
+      "customerEmail": "Email",
+      "customerPhone": "Téléphone",
+      "passportNumber": "Numéro de passeport",
+      "passportIssueDate": "Date d'émission du passeport",
+      "passportExpiryDate": "Date d'expiration du passeport",
+      "notes": "Notes supplémentaires",
+      "specialRequests": "Demandes spéciales, préférences...",
+      "driverInfo": "Informations du conducteur"
+    },
+    "summary": {
+      "flightDetails": "Détails du vol",
+      "hotelDetails": "Détails de l'hôtel",
+      "carDetails": "Détails du véhicule",
+      "from": "De",
+      "to": "Vers",
+      "departure": "Départ",
+      "arrival": "Arrivée",
+      "class": "Classe",
+      "airline": "Compagnie",
+      "checkIn": "Arrivée",
+      "checkOut": "Départ",
+      "nights": "nuit(s)",
+      "location": "Lieu",
+      "category": "Catégorie",
+      "transmission": "Transmission",
+      "seats": "Places",
+      "pickupDate": "Date de prise en charge",
+      "dropoffDate": "Date de retour",
+      "days": "jour(s)",
+      "passengerInfo": "Informations du passager",
+      "totalPrice": "Prix total",
+      "modify": "Modifier",
+      "confirm": "Confirmer la réservation",
+      "confirming": "Confirmation...",
+      "downloadTicket": "Télécharger le billet",
+      "proceedToPayment": "Procéder au paiement",
+      "route": "Trajet",
+      "type": "Type",
+      "name": "Nom",
+      "email": "Email",
+      "phone": "Téléphone"
+    },
+    "validation": {
+      "checkInfo": "Veuillez vérifier vos informations",
+      "mustBeLoggedIn": "Vous devez être connecté pour réserver",
+      "selectDates": "Veuillez sélectionner les dates",
+      "selectCheckInOut": "Veuillez sélectionner les dates d'arrivée et de départ",
+      "checkOutAfterCheckIn": "La date de départ doit être après la date d'arrivée",
+      "dropoffAfterPickup": "La date de retour doit être après la date de prise en charge",
+      "confirmFirst": "Veuillez d'abord confirmer la réservation"
+    },
+    "success": {
+      "created": "Réservation créée",
+      "description": "Votre réservation a été créée avec succès",
+      "emailSent": "Email de confirmation envoyé",
+      "ticketGenerated": "Billet généré avec succès",
+      "ticketDownloaded": "Billet téléchargé avec succès"
+    },
+    "error": {
+      "createService": "Impossible de créer le service",
+      "createBooking": "Impossible de créer la réservation",
+      "sendEmail": "Erreur lors de l'envoi de l'email de confirmation",
+      "generateTicket": "Erreur lors de la génération du billet",
+      "downloadTicket": "Erreur lors du téléchargement du billet"
+    },
+    "loading": {
+      "generatingTicket": "Génération du billet..."
+    }
   }
 }
