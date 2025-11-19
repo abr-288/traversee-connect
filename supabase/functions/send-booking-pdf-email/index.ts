@@ -18,6 +18,50 @@ const generateQRCodeSVG = async (data: string): Promise<string> => {
   return await QRCode.toString(data, { type: "svg", width: 200 });
 };
 
+// Template colors based on service type
+const getTemplateColors = (serviceType: string) => {
+  const templates = {
+    flight: {
+      primary: "#192342", // Bleu foncé Bossiz
+      secondary: "#00F59B", // Vert clair Bossiz
+      accent: "#2d3e6f",
+      gradient: "linear-gradient(135deg, #192342 0%, #2d3e6f 100%)",
+    },
+    hotel: {
+      primary: "#00b894", // Vert turquoise
+      secondary: "#00F59B",
+      accent: "#00a389",
+      gradient: "linear-gradient(135deg, #00b894 0%, #00d2a0 100%)",
+    },
+    tour: {
+      primary: "#ff6b35", // Orange aventure
+      secondary: "#f7931e",
+      accent: "#ff8555",
+      gradient: "linear-gradient(135deg, #ff6b35 0%, #ff8555 100%)",
+    },
+    car: {
+      primary: "#2d3436", // Gris foncé
+      secondary: "#636e72",
+      accent: "#3d4446",
+      gradient: "linear-gradient(135deg, #2d3436 0%, #3d4446 100%)",
+    },
+    event: {
+      primary: "#6c5ce7", // Violet festif
+      secondary: "#a29bfe",
+      accent: "#7c6eee",
+      gradient: "linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%)",
+    },
+    flight_hotel: {
+      primary: "#192342",
+      secondary: "#00b894",
+      accent: "#2d3e6f",
+      gradient: "linear-gradient(135deg, #192342 0%, #00b894 100%)",
+    },
+  };
+  
+  return templates[serviceType as keyof typeof templates] || templates.flight;
+};
+
 const generatePDFHTML = (booking: any, qrCodeSvg: string): string => {
   const startDate = new Date(booking.start_date).toLocaleDateString("fr-FR", {
     day: "2-digit",
@@ -38,9 +82,20 @@ const generatePDFHTML = (booking: any, qrCodeSvg: string): string => {
       })
     : null;
 
-  const serviceType = booking.services?.type || "SERVICE";
+  const serviceType = booking.services?.type || "flight";
+  const colors = getTemplateColors(serviceType);
   const statusColor = booking.status === "confirmed" ? "#10b981" : booking.status === "pending" ? "#f59e0b" : "#64748b";
   const statusText = booking.status === "confirmed" ? "CONFIRMÉ" : booking.status === "pending" ? "EN ATTENTE" : booking.status.toUpperCase();
+  
+  // Service type labels in French
+  const serviceTypeLabels: Record<string, string> = {
+    flight: "VOL",
+    hotel: "HÔTEL",
+    tour: "CIRCUIT",
+    car: "LOCATION VOITURE",
+    event: "ÉVÉNEMENT",
+    flight_hotel: "VOL + HÔTEL"
+  };
 
   return `
     <!DOCTYPE html>
@@ -77,7 +132,7 @@ const generatePDFHTML = (booking: any, qrCodeSvg: string): string => {
           }
           .right-section {
             width: 280px;
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            background: ${colors.gradient};
             color: white;
             padding: 40px 30px;
             position: relative;
@@ -88,7 +143,7 @@ const generatePDFHTML = (booking: any, qrCodeSvg: string): string => {
           .logo {
             font-size: 28px;
             font-weight: 900;
-            color: #dc2626;
+            color: ${colors.primary};
             margin-bottom: 5px;
             letter-spacing: 1px;
           }
@@ -99,7 +154,7 @@ const generatePDFHTML = (booking: any, qrCodeSvg: string): string => {
             letter-spacing: 2px;
           }
           .booking-class {
-            background: #dc2626;
+            background: ${colors.primary};
             color: white;
             padding: 15px 25px;
             text-align: center;
@@ -205,28 +260,29 @@ const generatePDFHTML = (booking: any, qrCodeSvg: string): string => {
             font-weight: 600;
           }
           .price-section {
-            background: #fef3c7;
+            background: ${colors.secondary}22;
             padding: 20px;
             border-radius: 8px;
             margin-top: 30px;
+            border: 2px solid ${colors.secondary};
           }
           .price-label {
             font-size: 11px;
-            color: #92400e;
+            color: ${colors.primary};
             text-transform: uppercase;
             margin-bottom: 5px;
             font-weight: 600;
           }
           .price-value {
             font-size: 28px;
-            color: #dc2626;
+            color: ${colors.primary};
             font-weight: 900;
           }
           .footer-note {
             margin-top: 30px;
             padding: 15px;
             background: #f9fafb;
-            border-left: 4px solid #dc2626;
+            border-left: 4px solid ${colors.primary};
             font-size: 11px;
             color: #666;
             line-height: 1.6;
@@ -244,7 +300,7 @@ const generatePDFHTML = (booking: any, qrCodeSvg: string): string => {
               </div>
 
               <div class="booking-class">
-                ${serviceType.toUpperCase()}
+                ${serviceTypeLabels[serviceType] || serviceType.toUpperCase()}
               </div>
 
               <div class="info-row">
@@ -311,7 +367,7 @@ const generatePDFHTML = (booking: any, qrCodeSvg: string): string => {
               ` : ''}
             </div>
 
-            <!-- Section droite rouge -->
+            <!-- Section droite avec gradient personnalisé -->
             <div class="right-section">
               <div class="right-logo">B-RESERVE</div>
               
@@ -321,7 +377,7 @@ const generatePDFHTML = (booking: any, qrCodeSvg: string): string => {
 
               <div class="right-info">
                 <div class="right-label">Type de réservation</div>
-                <div class="right-value">${serviceType.toUpperCase()}</div>
+                <div class="right-value">${serviceTypeLabels[serviceType] || serviceType.toUpperCase()}</div>
               </div>
 
               ${endDate ? `
