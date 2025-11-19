@@ -2,8 +2,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { UnifiedForm, UnifiedAutocomplete, UnifiedFormField, UnifiedDatePicker, UnifiedSubmitButton } from "@/components/forms";
+import { useTranslation } from "react-i18next";
 
 export const TourSearchForm = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [destination, setDestination] = useState("");
   const [date, setDate] = useState<Date>();
@@ -34,18 +36,18 @@ export const TourSearchForm = () => {
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div className="md:col-span-2">
           <UnifiedAutocomplete
-            label="Destination"
+            label={t("search.destination")}
             type="location"
             value={destination}
             onChange={setDestination}
-            placeholder="Où voulez-vous aller?"
+            placeholder={t("search.location")}
             required
           />
         </div>
 
         <div className="md:col-span-1">
           <UnifiedDatePicker
-            label="Date de départ"
+            label={t("search.departure")}
             value={date}
             onChange={setDate}
             minDate={new Date()}
@@ -54,7 +56,7 @@ export const TourSearchForm = () => {
 
         <div className="md:col-span-1">
           <UnifiedFormField
-            label="Voyageurs"
+            label={t("search.guests")}
             name="guests"
             type="number"
             defaultValue="2"
@@ -65,7 +67,7 @@ export const TourSearchForm = () => {
 
         <div className="md:col-span-1 flex items-end">
           <UnifiedSubmitButton fullWidth>
-            Rechercher
+            {t("search.search")}
           </UnifiedSubmitButton>
         </div>
       </div>

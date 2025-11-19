@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { UnifiedForm, UnifiedAutocomplete, UnifiedDatePicker, UnifiedFormField, UnifiedSubmitButton } from "@/components/forms";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTranslation } from "react-i18next";
 
 interface FlightHotelSearchFormProps {
   onSearch: (params: {
@@ -19,6 +20,7 @@ interface FlightHotelSearchFormProps {
 }
 
 export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) => {
+  const { t } = useTranslation();
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
   const [departureDate, setDepartureDate] = useState<Date>();
@@ -62,10 +64,10 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="relative">
             <UnifiedAutocomplete
-              label="Départ"
+              label={t("search.departure")}
               value={origin}
               onChange={setOrigin}
-              placeholder="Ville de départ"
+              placeholder={t("search.cityOrAirport")}
               type="airport"
               required
             />
@@ -73,10 +75,10 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
 
           <div className="relative">
             <UnifiedAutocomplete
-              label="Destination"
+              label={t("search.destination")}
               value={destination}
               onChange={setDestination}
-              placeholder="Ville d'arrivée"
+              placeholder={t("search.cityOrAirport")}
               type="airport"
               required
             />
@@ -86,7 +88,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
               size="icon"
               onClick={handleSwap}
               className="absolute -left-3 top-1/2 -translate-y-1/2 z-10 hidden md:flex"
-              aria-label="Échanger origine et destination"
+              aria-label={t("search.from")}
             >
               <ArrowRightLeft className="h-4 w-4" />
             </Button>
@@ -96,7 +98,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
         {/* Ligne 2: Dates */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <UnifiedDatePicker
-            label="Date de départ"
+            label={t("search.departure")}
             value={departureDate}
             onChange={setDepartureDate}
             required
@@ -104,7 +106,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
           />
           
           <UnifiedDatePicker
-            label="Date de retour"
+            label={t("search.return")}
             value={returnDate}
             onChange={setReturnDate}
             required
@@ -115,7 +117,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
         {/* Ligne 3: Voyageurs et Options */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <UnifiedFormField
-            label="Adultes"
+            label={t("search.adults")}
             name="adults"
             type="number"
             defaultValue="1"
@@ -124,7 +126,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
             required
           />
           <UnifiedFormField
-            label="Enfants"
+            label={t("search.children")}
             name="children"
             type="number"
             defaultValue="0"
@@ -132,7 +134,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
             max={9}
           />
           <UnifiedFormField
-            label="Chambres"
+            label={t("search.rooms")}
             name="rooms"
             type="number"
             defaultValue="1"
@@ -141,16 +143,16 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
             required
           />
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Classe</label>
+            <label className="text-sm font-medium text-foreground">{t("search.class.title")}</label>
             <Select value={travelClass} onValueChange={setTravelClass}>
               <SelectTrigger className="h-11">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ECONOMY">Économique</SelectItem>
-                <SelectItem value="PREMIUM_ECONOMY">Économique Premium</SelectItem>
-                <SelectItem value="BUSINESS">Affaires</SelectItem>
-                <SelectItem value="FIRST">Première</SelectItem>
+                <SelectItem value="ECONOMY">{t("search.class.economy")}</SelectItem>
+                <SelectItem value="PREMIUM_ECONOMY">{t("search.class.premium")}</SelectItem>
+                <SelectItem value="BUSINESS">{t("search.class.business")}</SelectItem>
+                <SelectItem value="FIRST">{t("search.class.first")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -159,7 +161,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
         {/* Bouton de recherche */}
         <div className="pt-2">
           <UnifiedSubmitButton fullWidth>
-            Rechercher Vol + Hôtel
+            {t("search.search")}
           </UnifiedSubmitButton>
         </div>
       </div>
