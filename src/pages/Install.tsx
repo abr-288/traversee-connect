@@ -55,7 +55,7 @@ const Install = () => {
           <div className="text-center mb-12">
             <Smartphone className="w-20 h-20 mx-auto mb-6 text-primary" />
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Installez Traversée Connect
+              Installez B-Reserve
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Profitez d'une expérience optimale en installant notre application directement sur votre téléphone
@@ -70,7 +70,7 @@ const Install = () => {
                 </div>
                 <h2 className="text-2xl font-bold mb-2">Application déjà installée</h2>
                 <p className="text-muted-foreground">
-                  L'application Traversée Connect est déjà installée sur votre appareil.
+                  L'application B-Reserve est déjà installée sur votre appareil.
                 </p>
               </CardContent>
             </Card>

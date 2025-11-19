@@ -158,7 +158,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-primary-light flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
           <p className="text-white/80 text-sm">
-            © 2025 Traversée Connect. Tous droits réservés.
+            © 2025 B-Reserve. Tous droits réservés.
           </p>
           <div className="flex flex-wrap justify-center gap-4 md:gap-6 text-sm">
             <Link to="/support" className="text-white/80 hover:text-secondary transition-smooth">
