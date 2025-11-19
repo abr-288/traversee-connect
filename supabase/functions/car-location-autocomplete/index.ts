@@ -31,7 +31,8 @@ serve(async (req) => {
       const maxPrice = Math.round(carPrice * 1.8);
       
       return {
-        name: city.code ? `${city.name} ${city.code}` : city.name,
+        name: city.name,
+        code: city.code,
         type: city.code ? "airport" : "city",
         country: city.country,
         averagePrice: carPrice,
