@@ -21,6 +21,7 @@ import BookingHistory from "./pages/BookingHistory";
 import Account from "./pages/Account";
 import Help from "./pages/Help";
 import Destinations from "./pages/Destinations";
+import Install from "./pages/Install";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,6 +50,7 @@ const App = () => (
           <Route path="/account" element={<Account />} />
           <Route path="/help" element={<Help />} />
           <Route path="/destinations" element={<Destinations />} />
+          <Route path="/install" element={<Install />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/payment" element={<Payment />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
