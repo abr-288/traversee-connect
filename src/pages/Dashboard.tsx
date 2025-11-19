@@ -163,15 +163,25 @@ const Dashboard = () => {
 
       if (error) throw error;
 
+      // Send confirmation email with PDF
+      try {
+        await supabase.functions.invoke("send-booking-pdf-email", {
+          body: { bookingId: id },
+        });
+      } catch (emailError) {
+        console.error("Error sending confirmation email:", emailError);
+        // Don't fail the confirmation if email fails
+      }
+
       toast({
         title: "Succès",
-        description: "Réservation confirmée",
+        description: "Réservation confirmée et email envoyé",
       });
 
       addNotification({
         type: "success",
         title: "Réservation confirmée",
-        message: "Votre réservation a été confirmée",
+        message: "Votre réservation a été confirmée et un email de confirmation a été envoyé",
       });
 
       fetchBookings();
