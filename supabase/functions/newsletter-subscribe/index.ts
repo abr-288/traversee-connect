@@ -1,5 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { Resend } from "https://esm.sh/resend@2.0.0";
+
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -59,6 +62,50 @@ const handler = async (req: Request): Promise<Response> => {
       .insert([{ email }]);
 
     if (insertError) throw insertError;
+
+    // Send welcome email
+    const welcomeHtml = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; border-radius: 10px 10px 0 0; text-align: center; }
+            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+            .benefits { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; border-left: 4px solid #667eea; }
+            .benefit-item { margin: 10px 0; padding-left: 20px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>🎉 Bienvenue chez B-Reserve !</h1>
+            </div>
+            <div class="content">
+              <p>Merci de vous être inscrit à notre newsletter !</p>
+              <p>Vous recevrez désormais :</p>
+              <div class="benefits">
+                <div class="benefit-item">✈️ Les meilleures offres de vols</div>
+                <div class="benefit-item">🏨 Des promotions exclusives sur les hôtels</div>
+                <div class="benefit-item">🚗 Des réductions sur la location de voitures</div>
+                <div class="benefit-item">🎫 Des offres spéciales sur les événements</div>
+              </div>
+              <p>À très bientôt pour de nouvelles aventures !</p>
+              <p>Cordialement,<br>L'équipe B-Reserve</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+
+    await resend.emails.send({
+      from: "B-Reserve Newsletter <newsletter@bossiz.com>",
+      to: [email],
+      subject: "Bienvenue chez B-Reserve ! 🎉",
+      html: welcomeHtml,
+    });
 
     console.log("Newsletter subscription successful:", email);
 

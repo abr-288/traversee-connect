@@ -1,5 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { Resend } from "https://esm.sh/resend@2.0.0";
 import { validateSupportMessage, sanitizeString } from "../_shared/validation.ts";
+
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -57,17 +60,98 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Support message received from:", sanitizedData.name, sanitizedData.email);
 
-    // Log the support message (in production, integrate with email service)
-    console.log(`
-      New support message:
-      Name: ${sanitizedData.name}
-      Email: ${sanitizedData.email}
-      Booking Reference: ${sanitizedData.bookingReference || 'N/A'}
-      Subject: ${sanitizedData.subject}
-      Message: ${sanitizedData.message}
-    `);
+    // Send email to support team
+    const emailHtml = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0; }
+            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+            .field { margin: 15px 0; padding: 10px; background: white; border-radius: 5px; }
+            .label { font-weight: bold; color: #667eea; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>📧 Nouveau message du support</h1>
+            </div>
+            <div class="content">
+              <div class="field">
+                <span class="label">Nom :</span> ${sanitizedData.name}
+              </div>
+              <div class="field">
+                <span class="label">Email :</span> ${sanitizedData.email}
+              </div>
+              ${sanitizedData.bookingReference ? `
+                <div class="field">
+                  <span class="label">Référence de réservation :</span> ${sanitizedData.bookingReference}
+                </div>
+              ` : ''}
+              <div class="field">
+                <span class="label">Sujet :</span> ${sanitizedData.subject}
+              </div>
+              <div class="field">
+                <span class="label">Message :</span><br>
+                ${sanitizedData.message.replace(/\n/g, '<br>')}
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
 
-    console.log("Support email logged successfully");
+    // Send to support team
+    await resend.emails.send({
+      from: "B-Reserve Support <support@bossiz.com>",
+      to: ["support@bossiz.com"],
+      reply_to: sanitizedData.email,
+      subject: `[Support] ${sanitizedData.subject}`,
+      html: emailHtml,
+    });
+
+    // Send confirmation to customer
+    const confirmationHtml = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0; text-align: center; }
+            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>✅ Message bien reçu</h1>
+            </div>
+            <div class="content">
+              <p>Bonjour ${sanitizedData.name},</p>
+              <p>Nous avons bien reçu votre message concernant : <strong>${sanitizedData.subject}</strong></p>
+              <p>Notre équipe vous répondra dans les plus brefs délais.</p>
+              ${sanitizedData.bookingReference ? `<p>Référence de réservation : <strong>${sanitizedData.bookingReference}</strong></p>` : ''}
+              <p>Cordialement,<br>L'équipe B-Reserve</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+
+    await resend.emails.send({
+      from: "B-Reserve Support <support@bossiz.com>",
+      to: [sanitizedData.email],
+      subject: "Confirmation de réception de votre message",
+      html: confirmationHtml,
+    });
+
+    console.log("Support emails sent successfully");
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
