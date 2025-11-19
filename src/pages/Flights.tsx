@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { PageBanner } from "@/components/PageBanner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -349,147 +350,13 @@ const Flights = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       
-      {/* Hero Banner */}
-      <div className="relative py-16 md:py-32 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
-        <img 
-          src="/src/assets/hero-slide-1.jpg" 
-          alt="Flights" 
-          className="absolute inset-0 w-full h-full object-cover opacity-40"
-        />
-        <div className="relative z-10 container mx-auto px-4">
-          <div className="text-center mb-6 md:mb-10">
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-3 md:mb-6">Recherche de vols</h1>
-            <p className="text-lg md:text-2xl lg:text-3xl text-white/95 font-medium">Trouvez les meilleurs vols au meilleur prix</p>
-          </div>
-          
-          {/* Search Form - Opodo Style */}
-          <div className="max-w-6xl mx-auto bg-background rounded-xl shadow-2xl overflow-hidden p-4 md:p-6">
-            <div className="mb-4 flex flex-wrap gap-2 md:gap-3">
-              <button
-                onClick={() => setTripType("round-trip")}
-                className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-full text-xs md:text-sm transition-smooth ${
-                  tripType === "round-trip"
-                    ? "bg-secondary text-primary font-medium"
-                    : "bg-muted text-muted-foreground hover:bg-muted/80"
-                }`}
-              >
-                <ArrowRightLeft className="w-3 h-3" />
-                Aller-retour
-              </button>
-              <button
-                onClick={() => setTripType("one-way")}
-                className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-full text-xs md:text-sm transition-smooth ${
-                  tripType === "one-way"
-                    ? "bg-secondary text-primary font-medium"
-                    : "bg-muted text-muted-foreground hover:bg-muted/80"
-                }`}
-              >
-                <ArrowRight className="w-3 h-3" />
-                Aller simple
-              </button>
-            </div>
-            
-            <div className="flex flex-col lg:flex-row lg:items-end gap-0 lg:gap-0 bg-background rounded-lg overflow-hidden">
-              <div className="flex-1 p-3 md:p-4 border-b lg:border-b-0 lg:border-r border-border">
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">Départ de</label>
-                <CityAutocomplete
-                  placeholder="Ville ou aéroport"
-                  value={flightFrom}
-                  onChange={setFlightFrom}
-                  className="h-10 border-0 px-0 focus-visible:ring-0"
-                />
-              </div>
-              
-              <div className="flex-1 p-3 md:p-4 border-b lg:border-b-0 lg:border-r border-border">
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">Arrivée à</label>
-                <CityAutocomplete
-                  placeholder="Ville ou aéroport"
-                  value={flightTo}
-                  onChange={setFlightTo}
-                  className="h-10 border-0 px-0 focus-visible:ring-0"
-                />
-              </div>
-
-              <div className="flex-1 p-3 md:p-4 border-b lg:border-b-0 lg:border-r border-border">
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">Date de départ</label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="ghost" className="w-full h-10 justify-start text-left font-normal px-0 hover:bg-transparent">
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {flightDate ? format(flightDate, "dd/MM/yyyy") : "Sélectionner"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 z-50 bg-popover" align="start">
-                    <Calendar mode="single" selected={flightDate} onSelect={setFlightDate} initialFocus className="pointer-events-auto" />
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              {tripType === "round-trip" && (
-                <div className="flex-1 p-3 md:p-4 border-b lg:border-b-0 lg:border-r border-border">
-                  <label className="text-xs font-medium text-muted-foreground mb-1 block">Date de retour</label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="ghost" className="w-full h-10 justify-start text-left font-normal px-0 hover:bg-transparent">
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {flightReturnDate ? format(flightReturnDate, "dd/MM/yyyy") : "Sélectionner"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0 z-50 bg-popover" align="start">
-                      <Calendar mode="single" selected={flightReturnDate} onSelect={setFlightReturnDate} initialFocus className="pointer-events-auto" />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              )}
-
-              <div className="flex-1 p-3 md:p-4 border-b lg:border-b-0 lg:border-r border-border">
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">Passagers</label>
-                <TravelersSelector
-                  adults={flightAdults}
-                  children={flightChildren}
-                  onAdultsChange={setFlightAdults}
-                  onChildrenChange={setFlightChildren}
-                />
-              </div>
-
-              <Button 
-                onClick={() => {
-                  if (flightFrom && flightTo && flightDate) {
-                    handleSearch(
-                      flightFrom,
-                      flightTo,
-                      format(flightDate, "yyyy-MM-dd"),
-                      tripType === "round-trip" && flightReturnDate ? format(flightReturnDate, "yyyy-MM-dd") : undefined,
-                      flightAdults
-                    );
-                  }
-                }}
-                className="lg:w-auto w-full h-12 md:h-14 lg:h-16 px-6 md:px-8 bg-secondary text-primary hover:bg-secondary/90 text-sm md:text-base font-semibold gap-2 rounded-none lg:rounded-r-lg"
-              >
-                <Search className="w-4 h-4 md:w-5 md:h-5" />
-                Rechercher
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <main className="flex-1 container mx-auto px-4 py-6 md:py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 md:gap-8">
-          {/* Filtres Desktop */}
-          <aside className="hidden lg:block lg:col-span-1 space-y-6">
-            <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Filtres</h2>
-              
-              <div className="space-y-6">
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Départ</label>
-                  <Input 
-                    placeholder="Ville ou aéroport..." 
-                    value={filterOrigin}
-                    onChange={(e) => setFilterOrigin(e.target.value)}
-                  />
-                </div>
+      {/* Bannière avec tous les formulaires */}
+      <PageBanner 
+        title="Recherche de vols"
+        subtitle="Trouvez les meilleurs vols au meilleur prix"
+        defaultTab="flight"
+        backgroundImage="/src/assets/hero-slide-1.jpg"
+      />
 
                 <div>
                   <label className="text-sm font-medium mb-2 block">Arrivée</label>
