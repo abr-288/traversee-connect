@@ -1,8 +1,18 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { Resend } from "https://esm.sh/resend@2.0.0";
+import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const smtpClient = new SMTPClient({
+  connection: {
+    hostname: Deno.env.get("SMTP_HOST")!,
+    port: Number(Deno.env.get("SMTP_PORT")),
+    tls: true,
+    auth: {
+      username: Deno.env.get("SMTP_USERNAME")!,
+      password: Deno.env.get("SMTP_PASSWORD")!,
+    },
+  },
+});
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -100,14 +110,14 @@ const handler = async (req: Request): Promise<Response> => {
       </html>
     `;
 
-    await resend.emails.send({
+    await smtpClient.send({
       from: "B-Reserve Newsletter <newsletter@bossiz.com>",
-      to: [email],
+      to: email,
       subject: "Bienvenue chez B-Reserve ! 🎉",
       html: welcomeHtml,
     });
 
-    console.log("Newsletter subscription successful:", email);
+    console.log("Newsletter subscription successful via SMTP:", email);
 
     return new Response(
       JSON.stringify({ 
