@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Loader2, Clock, ArrowRight, Plane } from "lucide-react";
+import { Loader2, Clock, ArrowRight, Plane, SlidersHorizontal } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { FlightSearchForm } from "@/components/FlightSearchForm";
@@ -9,6 +9,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FlightBookingDialog } from "@/components/FlightBookingDialog";
 import { getAirlineName } from "@/utils/airlineNames";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 interface MappedFlight {
   id: string;
@@ -34,6 +39,13 @@ const Flights = () => {
   const [hasSearched, setHasSearched] = useState(false);
   const [selectedFlight, setSelectedFlight] = useState<MappedFlight | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  // Filters state
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000000]);
+  const [maxDuration, setMaxDuration] = useState<number>(24);
+  const [stopsFilter, setStopsFilter] = useState<string>("all");
+  const [selectedAirlines, setSelectedAirlines] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState<string>("cheapest");
 
   useEffect(() => {
     const from = searchParams.get("from");
@@ -114,6 +126,65 @@ const Flights = () => {
     setDialogOpen(true);
   };
 
+  // Get available airlines from flights
+  const availableAirlines = useMemo(() => {
+    return Array.from(new Set(flights.map(f => f.airline)));
+  }, [flights]);
+
+  // Toggle airline filter
+  const toggleAirline = (airline: string) => {
+    setSelectedAirlines(prev =>
+      prev.includes(airline) ? prev.filter(a => a !== airline) : [...prev, airline]
+    );
+  };
+
+  // Parse duration to hours
+  const parseDuration = (duration: string): number => {
+    const hours = parseInt(duration.match(/(\d+)H/)?.[1] || "0");
+    const minutes = parseInt(duration.match(/(\d+)M/)?.[1] || "0");
+    return hours + minutes / 60;
+  };
+
+  // Filter and sort flights
+  const filteredAndSortedFlights = useMemo(() => {
+    let result = [...flights];
+
+    // Price filter
+    result = result.filter(f => f.price >= priceRange[0] && f.price <= priceRange[1]);
+
+    // Duration filter
+    result = result.filter(f => parseDuration(f.duration) <= maxDuration);
+
+    // Stops filter
+    if (stopsFilter === "direct") {
+      result = result.filter(f => f.stops === 0);
+    } else if (stopsFilter === "1-stop") {
+      result = result.filter(f => f.stops === 1);
+    } else if (stopsFilter === "2+-stops") {
+      result = result.filter(f => f.stops >= 2);
+    }
+
+    // Airlines filter
+    if (selectedAirlines.length > 0) {
+      result = result.filter(f => selectedAirlines.includes(f.airline));
+    }
+
+    // Sort
+    switch (sortBy) {
+      case "cheapest":
+        result.sort((a, b) => a.price - b.price);
+        break;
+      case "fastest":
+        result.sort((a, b) => parseDuration(a.duration) - parseDuration(b.duration));
+        break;
+      case "earliest":
+        result.sort((a, b) => new Date(a.departureTime).getTime() - new Date(b.departureTime).getTime());
+        break;
+    }
+
+    return result;
+  }, [flights, priceRange, maxDuration, stopsFilter, selectedAirlines, sortBy]);
+
   const formatTime = (iso: string) => {
     if (!iso) return "";
     const d = new Date(iso);
@@ -185,52 +256,232 @@ const Flights = () => {
           )}
 
           {!loading && flights.length > 0 && (
-            <div className="space-y-4">
-              {flights.map((flight) => (
-                <Card key={flight.id} className="hover-scale">
-                  <CardHeader className="flex flex-row items-center justify-between gap-4">
-                    <div>
-                      <CardTitle className="flex items-center gap-2">
-                        <Plane className="w-5 h-5 text-primary" />
-                        <span>{flight.airline}</span>
-                      </CardTitle>
-                      <p className="text-sm text-muted-foreground">
-                        {flight.from} 
-                        <ArrowRight className="inline w-4 h-4 mx-1" />
-                        {flight.to} • {flight.travelClass}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-primary">
-                        {flight.price.toLocaleString()} FCFA
-                      </div>
-                      <p className="text-xs text-muted-foreground">par passager</p>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div className="flex items-center gap-6">
-                      <div>
-                        <div className="text-lg font-semibold">{formatTime(flight.departureTime)}</div>
-                        <p className="text-xs text-muted-foreground">Départ</p>
-                      </div>
-                      <div>
-                        <div className="text-lg font-semibold">{formatTime(flight.arrivalTime)}</div>
-                        <p className="text-xs text-muted-foreground">Arrivée</p>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Clock className="w-4 h-4" />
-                        <span>{formatDuration(flight.duration)}</span>
-                        <span>• {flight.stops === 0 ? "Direct" : `${flight.stops} escale(s)`}</span>
-                      </div>
-                    </div>
+            <>
+              {/* Filters Bar */}
+              <div className="mb-6 grid grid-cols-1 lg:grid-cols-12 gap-4">
+                {/* Desktop Filters */}
+                <div className="hidden lg:flex lg:col-span-9 gap-3">
+                  {/* Price Filter */}
+                  <div className="flex-1 space-y-2">
+                    <Label className="text-sm font-medium">
+                      Prix: {priceRange[0].toLocaleString()} - {priceRange[1].toLocaleString()} FCFA
+                    </Label>
+                    <Slider
+                      min={0}
+                      max={2000000}
+                      step={50000}
+                      value={priceRange}
+                      onValueChange={(value) => setPriceRange(value as [number, number])}
+                      className="w-full"
+                    />
+                  </div>
 
-                    <Button onClick={() => handleBook(flight)} className="w-full md:w-auto">
-                      Réserver ce vol
+                  {/* Stops Filter */}
+                  <div className="w-40">
+                    <Label className="text-sm font-medium mb-2 block">Escales</Label>
+                    <Select value={stopsFilter} onValueChange={setStopsFilter}>
+                      <SelectTrigger className="h-10">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Toutes</SelectItem>
+                        <SelectItem value="direct">Direct</SelectItem>
+                        <SelectItem value="1-stop">1 escale</SelectItem>
+                        <SelectItem value="2+-stops">2+ escales</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Duration Filter */}
+                  <div className="w-40">
+                    <Label className="text-sm font-medium mb-2 block">
+                      Durée max: {maxDuration}h
+                    </Label>
+                    <Slider
+                      min={1}
+                      max={24}
+                      step={1}
+                      value={[maxDuration]}
+                      onValueChange={(value) => setMaxDuration(value[0])}
+                    />
+                  </div>
+                </div>
+
+                {/* Mobile Filters Button */}
+                <div className="lg:hidden">
+                  <Sheet>
+                    <SheetTrigger asChild>
+                      <Button variant="outline" className="w-full">
+                        <SlidersHorizontal className="w-4 h-4 mr-2" />
+                        Filtres
+                      </Button>
+                    </SheetTrigger>
+                    <SheetContent side="left" className="overflow-y-auto">
+                      <SheetHeader>
+                        <SheetTitle>Filtrer les vols</SheetTitle>
+                      </SheetHeader>
+                      <div className="space-y-6 mt-6">
+                        <div>
+                          <Label className="text-sm font-medium mb-2 block">
+                            Prix: {priceRange[0].toLocaleString()} - {priceRange[1].toLocaleString()} FCFA
+                          </Label>
+                          <Slider
+                            min={0}
+                            max={2000000}
+                            step={50000}
+                            value={priceRange}
+                            onValueChange={(value) => setPriceRange(value as [number, number])}
+                          />
+                        </div>
+
+                        <div>
+                          <Label className="text-sm font-medium mb-2 block">Escales</Label>
+                          <Select value={stopsFilter} onValueChange={setStopsFilter}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">Toutes</SelectItem>
+                              <SelectItem value="direct">Direct</SelectItem>
+                              <SelectItem value="1-stop">1 escale</SelectItem>
+                              <SelectItem value="2+-stops">2+ escales</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div>
+                          <Label className="text-sm font-medium mb-2 block">
+                            Durée max: {maxDuration}h
+                          </Label>
+                          <Slider
+                            min={1}
+                            max={24}
+                            step={1}
+                            value={[maxDuration]}
+                            onValueChange={(value) => setMaxDuration(value[0])}
+                          />
+                        </div>
+
+                        <div>
+                          <Label className="text-sm font-medium mb-2 block">
+                            Compagnies ({selectedAirlines.length > 0 ? selectedAirlines.length : "Toutes"})
+                          </Label>
+                          <div className="space-y-2 max-h-48 overflow-y-auto">
+                            {availableAirlines.map((airline) => (
+                              <label key={airline} className="flex items-center gap-2 cursor-pointer">
+                                <Checkbox
+                                  checked={selectedAirlines.includes(airline)}
+                                  onCheckedChange={() => toggleAirline(airline)}
+                                />
+                                <span className="text-sm">{airline}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </SheetContent>
+                  </Sheet>
+                </div>
+
+                {/* Sort */}
+                <div className="lg:col-span-3">
+                  <Label className="text-sm font-medium mb-2 block">Trier par</Label>
+                  <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className="h-10">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cheapest">Prix croissant</SelectItem>
+                      <SelectItem value="fastest">Durée croissante</SelectItem>
+                      <SelectItem value="earliest">Départ le plus tôt</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Airlines Filter (Desktop) */}
+              <div className="hidden lg:block mb-6">
+                <Card className="p-4">
+                  <Label className="text-sm font-medium mb-3 block">
+                    Compagnies aériennes ({selectedAirlines.length > 0 ? selectedAirlines.length : "Toutes"})
+                  </Label>
+                  <div className="flex flex-wrap gap-3">
+                    {availableAirlines.map((airline) => (
+                      <label key={airline} className="flex items-center gap-2 cursor-pointer">
+                        <Checkbox
+                          checked={selectedAirlines.includes(airline)}
+                          onCheckedChange={() => toggleAirline(airline)}
+                        />
+                        <span className="text-sm">{airline}</span>
+                      </label>
+                    ))}
+                  </div>
+                  {selectedAirlines.length > 0 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="mt-3"
+                      onClick={() => setSelectedAirlines([])}
+                    >
+                      Réinitialiser
                     </Button>
-                  </CardContent>
+                  )}
                 </Card>
-              ))}
-            </div>
+              </div>
+
+              {/* Results count */}
+              <div className="mb-4 text-sm text-muted-foreground">
+                {filteredAndSortedFlights.length} vol(s) trouvé(s) sur {flights.length}
+              </div>
+
+              {/* Flights List */}
+              <div className="space-y-4">
+                {filteredAndSortedFlights.map((flight) => (
+                  <Card key={flight.id} className="hover-scale">
+                    <CardHeader className="flex flex-row items-center justify-between gap-4">
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          <Plane className="w-5 h-5 text-primary" />
+                          <span>{flight.airline}</span>
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                          {flight.from} 
+                          <ArrowRight className="inline w-4 h-4 mx-1" />
+                          {flight.to} • {flight.travelClass}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-primary">
+                          {flight.price.toLocaleString()} FCFA
+                        </div>
+                        <p className="text-xs text-muted-foreground">par passager</p>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                      <div className="flex items-center gap-6">
+                        <div>
+                          <div className="text-lg font-semibold">{formatTime(flight.departureTime)}</div>
+                          <p className="text-xs text-muted-foreground">Départ</p>
+                        </div>
+                        <div>
+                          <div className="text-lg font-semibold">{formatTime(flight.arrivalTime)}</div>
+                          <p className="text-xs text-muted-foreground">Arrivée</p>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Clock className="w-4 h-4" />
+                          <span>{formatDuration(flight.duration)}</span>
+                          <span>• {flight.stops === 0 ? "Direct" : `${flight.stops} escale(s)`}</span>
+                        </div>
+                      </div>
+
+                      <Button onClick={() => handleBook(flight)} className="w-full md:w-auto">
+                        Réserver ce vol
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </>
           )}
         </section>
       </main>
