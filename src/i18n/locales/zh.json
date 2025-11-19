@@ -69,7 +69,14 @@
     "readMore": "阅读更多"
   },
   "footer": {
-    "description": "您值得信赖的旅行合作伙伴",
+    "description": "您值得信赖的旅行合作伙伴，带您环游世界。",
+    "services": "我们的服务",
+    "flights": "航班",
+    "hotels": "酒店",
+    "flightHotel": "航班 + 酒店",
+    "cars": "租车",
+    "stays": "住宿",
+    "activities": "活动",
     "company": "公司",
     "about": "关于我们",
     "careers": "职业机会",
@@ -77,10 +84,20 @@
     "support": "客服",
     "help": "帮助中心",
     "contact": "联系我们",
+    "faq": "常见问题",
     "legal": "法律",
     "privacy": "隐私",
     "terms": "条款",
-    "rights": "版权所有"
+    "rights": "版权所有",
+    "newsletter": {
+      "title": "新闻通讯",
+      "description": "获取我们的最新优惠和资讯",
+      "placeholder": "您的邮箱",
+      "subscribe": "订阅",
+      "emailRequired": "请输入您的邮箱",
+      "subscribeSuccess": "订阅成功！",
+      "subscribeError": "订阅出错"
+    }
   },
   "boss": {
     "title": "Boss - 旅行助手",
@@ -287,6 +304,13 @@
     "success": "成功",
     "error": "错误",
     "warning": "警告",
-    "info": "信息"
+    "info": "信息",
+    "install": "安装应用"
+  },
+  "pages": {
+    "index": {
+      "aiTitle": "用AI规划您的旅行",
+      "aiSubtitle": "获取您下一个目的地的个性化推荐"
+    }
   }
 }

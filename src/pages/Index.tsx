@@ -10,8 +10,11 @@ import StatsSection from "@/components/StatsSection";
 import FeaturedServices from "@/components/FeaturedServices";
 import QuickSearch from "@/components/QuickSearch";
 import SpecialOffers from "@/components/SpecialOffers";
+import { useTranslation } from "react-i18next";
 
 const Index = () => {
+  const { t } = useTranslation();
+  
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -28,10 +31,10 @@ const Index = () => {
           <div className="container mx-auto max-w-4xl">
             <div className="text-center mb-6 md:mb-8">
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">
-                Planifiez votre voyage avec l'IA
+                {t("pages.index.aiTitle")}
               </h2>
               <p className="text-muted-foreground text-base md:text-lg px-4">
-                Obtenez des recommandations personnalisées pour votre prochaine destination
+                {t("pages.index.aiSubtitle")}
               </p>
             </div>
             <AITravelAdvisor />
