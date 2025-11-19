@@ -29,9 +29,10 @@ const Cars = () => {
   const [filterCategory, setFilterCategory] = useState("all");
   const [selectedTransmissions, setSelectedTransmissions] = useState<string[]>([]);
   const [selectedFuelTypes, setSelectedFuelTypes] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState("popular");
+  const [sortBy, setSortBy] = useState("price-low");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const [hasSearched, setHasSearched] = useState(false);
+  const itemsPerPage = 9;
 
   useEffect(() => {
     const location = searchParams.get("location");
@@ -39,6 +40,7 @@ const Cars = () => {
     const returnDate = searchParams.get("returnDate");
 
     if (location && pickupDate && returnDate) {
+      setHasSearched(true);
       handleSearch(location, pickupDate, returnDate);
     }
   }, [searchParams]);
