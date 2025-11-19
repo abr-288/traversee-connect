@@ -1,5 +1,9 @@
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { format, addDays, eachDayOfInterval } from "date-fns";
+import { fr } from "date-fns/locale";
+import { CalendarIcon } from "lucide-react";
+import { DateRange } from "react-day-picker";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -7,9 +11,12 @@ import { FlightSearchForm } from "@/components/FlightSearchForm";
 import { useFlightSearch } from "@/hooks/useFlightSearch";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { getAirlineName } from "@/utils/airlineNames";
 import { Loader2, TrendingDown, TrendingUp, Plane, ArrowRight } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
 
 interface FlightData {
   airline: string;
@@ -17,6 +24,12 @@ interface FlightData {
   price: number;
   duration: string;
   stops: number;
+  date?: string;
+}
+
+interface PriceByDate {
+  date: string;
+  [airline: string]: number | string;
 }
 
 const CHART_COLORS = [
@@ -36,6 +49,9 @@ const FlightComparison = () => {
   const { searchFlights, loading, error } = useFlightSearch();
   const [flights, setFlights] = useState<FlightData[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [flightsByDate, setFlightsByDate] = useState<Map<string, FlightData[]>>(new Map());
 
   useEffect(() => {
     const from = searchParams.get("from");
@@ -70,14 +86,73 @@ const FlightComparison = () => {
         const duration = firstItinerary?.duration || "N/A";
         const stops = (firstItinerary?.segments?.length || 1) - 1;
 
-        return { airline, airlineCode, price, duration, stops };
+        return { airline, airlineCode, price, duration, stops, date };
       });
       setFlights(mapped);
+      
+      // Store in map by date
+      const newMap = new Map(flightsByDate);
+      newMap.set(date, mapped);
+      setFlightsByDate(newMap);
     }
     };
 
     runSearch();
   }, [searchParams]);
+
+  const analyzeDateRange = async () => {
+    if (!dateRange?.from || !dateRange?.to) return;
+
+    const from = searchParams.get("from");
+    const to = searchParams.get("to");
+    const returnDate = searchParams.get("returnDate") || undefined;
+    const adults = parseInt(searchParams.get("adults") || "1", 10);
+    const children = parseInt(searchParams.get("children") || "0", 10);
+    const travelClass = searchParams.get("class") || "ECONOMY";
+
+    if (!from || !to) return;
+
+    setIsAnalyzing(true);
+    const dates = eachDayOfInterval({ start: dateRange.from, end: dateRange.to });
+    const newFlightsByDate = new Map<string, FlightData[]>();
+
+    for (const date of dates) {
+      const dateStr = format(date, "yyyy-MM-dd");
+      
+      const result = await searchFlights({
+        origin: from,
+        destination: to,
+        departureDate: dateStr,
+        returnDate,
+        adults,
+        children,
+        travelClass,
+      });
+
+      if (result?.success && Array.isArray(result.data)) {
+        const mapped: FlightData[] = result.data.map((offer: any) => {
+          const firstItinerary = offer.itineraries?.[0];
+          const airlineCode = offer.validatingAirlineCodes?.[0] || "XX";
+          const airline = getAirlineName(airlineCode);
+          const price = typeof offer.price === "object" ? parseFloat(offer.price.total) : offer.price || 0;
+          const duration = firstItinerary?.duration || "N/A";
+          const stops = (firstItinerary?.segments?.length || 1) - 1;
+
+          return { airline, airlineCode, price, duration, stops, date: dateStr };
+        });
+        newFlightsByDate.set(dateStr, mapped);
+      }
+    }
+
+    setFlightsByDate(newFlightsByDate);
+    
+    // Flatten all flights for stats
+    const allFlights: FlightData[] = [];
+    newFlightsByDate.forEach((flights) => allFlights.push(...flights));
+    setFlights(allFlights);
+    setHasSearched(true);
+    setIsAnalyzing(false);
+  };
 
   // Aggregate data by airline
   const airlineStats = useMemo(() => {
@@ -104,6 +179,38 @@ const FlightComparison = () => {
       avgPrice: Math.round(stat.prices.reduce((a: number, b: number) => a + b, 0) / stat.prices.length),
     })).sort((a: any, b: any) => a.avgPrice - b.avgPrice);
   }, [flights]);
+
+  // Price evolution by date
+  const priceEvolution = useMemo(() => {
+    if (flightsByDate.size === 0) return [];
+
+    const evolution: PriceByDate[] = [];
+    const sortedDates = Array.from(flightsByDate.keys()).sort();
+
+    sortedDates.forEach((date) => {
+      const dayFlights = flightsByDate.get(date) || [];
+      const dataPoint: PriceByDate = { date: format(new Date(date), "dd MMM", { locale: fr }) };
+
+      // Group by airline and get average price
+      const airlineGroups = dayFlights.reduce((acc, flight) => {
+        if (!acc[flight.airline]) acc[flight.airline] = [];
+        acc[flight.airline].push(flight.price);
+        return acc;
+      }, {} as Record<string, number[]>);
+
+      Object.entries(airlineGroups).forEach(([airline, prices]) => {
+        dataPoint[airline] = Math.round(prices.reduce((a, b) => a + b, 0) / prices.length);
+      });
+
+      evolution.push(dataPoint);
+    });
+
+    return evolution;
+  }, [flightsByDate]);
+
+  const topAirlines = useMemo(() => {
+    return airlineStats.slice(0, 5).map(stat => stat.airline);
+  }, [airlineStats]);
 
   const cheapestAirline = airlineStats[0];
   const mostExpensiveAirline = airlineStats[airlineStats.length - 1];
@@ -134,7 +241,74 @@ const FlightComparison = () => {
       {/* Results Section */}
       <div className="flex-1 bg-background py-12">
         <div className="container mx-auto px-4">
-          {loading && (
+          {/* Date Range Filter */}
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>Analyse Multi-Dates</CardTitle>
+              <CardDescription>
+                Sélectionnez une plage de dates pour analyser l'évolution des prix
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-end">
+                <div className="flex-1">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !dateRange && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {dateRange?.from ? (
+                          dateRange.to ? (
+                            <>
+                              {format(dateRange.from, "dd MMM yyyy", { locale: fr })} -{" "}
+                              {format(dateRange.to, "dd MMM yyyy", { locale: fr })}
+                            </>
+                          ) : (
+                            format(dateRange.from, "dd MMM yyyy", { locale: fr })
+                          )
+                        ) : (
+                          <span>Sélectionner une période</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        initialFocus
+                        mode="range"
+                        defaultMonth={dateRange?.from}
+                        selected={dateRange}
+                        onSelect={setDateRange}
+                        numberOfMonths={2}
+                        disabled={(date) => date < new Date()}
+                        className={cn("p-3 pointer-events-auto")}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <Button 
+                  onClick={analyzeDateRange}
+                  disabled={!dateRange?.from || !dateRange?.to || isAnalyzing}
+                  className="whitespace-nowrap"
+                >
+                  {isAnalyzing ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Analyse en cours...
+                    </>
+                  ) : (
+                    "Analyser les prix"
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {(loading || isAnalyzing) && (
             <div className="flex flex-col items-center justify-center py-20">
               <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
               <p className="text-lg text-muted-foreground">Analyse des prix en cours...</p>
@@ -208,9 +382,10 @@ const FlightComparison = () => {
 
               {/* Charts */}
               <Tabs defaultValue="bar" className="space-y-6">
-                <TabsList className="grid w-full max-w-md mx-auto grid-cols-3">
+                <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-4">
                   <TabsTrigger value="bar">Barres</TabsTrigger>
                   <TabsTrigger value="line">Courbes</TabsTrigger>
+                  <TabsTrigger value="evolution">Évolution</TabsTrigger>
                   <TabsTrigger value="pie">Camembert</TabsTrigger>
                 </TabsList>
 
@@ -248,6 +423,61 @@ const FlightComparison = () => {
                       </ResponsiveContainer>
                     </CardContent>
                   </Card>
+                </TabsContent>
+
+                <TabsContent value="evolution" className="space-y-6">
+                  {priceEvolution.length > 0 ? (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Évolution des Prix dans le Temps</CardTitle>
+                        <CardDescription>
+                          Tendance des tarifs pour les {flightsByDate.size} dates analysées
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <ResponsiveContainer width="100%" height={400}>
+                          <LineChart data={priceEvolution}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                            <XAxis 
+                              dataKey="date" 
+                              stroke="hsl(var(--foreground))"
+                            />
+                            <YAxis stroke="hsl(var(--foreground))" />
+                            <Tooltip 
+                              contentStyle={{ 
+                                backgroundColor: "hsl(var(--card))", 
+                                border: "1px solid hsl(var(--border))",
+                                borderRadius: "8px"
+                              }}
+                              formatter={(value: any) => `${value.toLocaleString()} XOF`}
+                            />
+                            <Legend />
+                            {topAirlines.map((airline, index) => (
+                              <Line
+                                key={airline}
+                                type="monotone"
+                                dataKey={airline}
+                                stroke={CHART_COLORS[index % CHART_COLORS.length]}
+                                strokeWidth={2}
+                                dot={{ r: 4 }}
+                                connectNulls
+                              />
+                            ))}
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <Card>
+                      <CardContent className="pt-6 text-center">
+                        <CalendarIcon className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                        <p className="text-lg font-medium mb-2">Aucune analyse multi-dates</p>
+                        <p className="text-muted-foreground">
+                          Utilisez le filtre de dates ci-dessus pour analyser l'évolution des prix
+                        </p>
+                      </CardContent>
+                    </Card>
+                  )}
                 </TabsContent>
 
                 <TabsContent value="line" className="space-y-6">
