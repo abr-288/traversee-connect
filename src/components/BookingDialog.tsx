@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
@@ -19,6 +20,7 @@ interface BookingDialogProps {
 }
 
 export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProps) => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
@@ -45,8 +47,8 @@ export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProp
       });
     } catch (error: any) {
       toast({
-        title: "Erreur de validation",
-        description: error.errors?.[0]?.message || "Veuillez vérifier vos informations",
+        title: t('error.title'),
+        description: error.errors?.[0]?.message || t('booking.validation.checkInfo'),
         variant: "destructive",
       });
       setLoading(false);
@@ -57,8 +59,8 @@ export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProp
 
     if (!user) {
       toast({
-        title: "Erreur",
-        description: "Vous devez être connecté pour réserver",
+        title: t('error.title'),
+        description: t('booking.validation.mustBeLoggedIn'),
         variant: "destructive",
       });
       setLoading(false);
@@ -89,8 +91,8 @@ export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProp
 
       if (serviceError) {
         toast({
-          title: "Erreur",
-          description: "Impossible de créer le service",
+          title: t('error.title'),
+          description: t('booking.error.createService'),
           variant: "destructive",
         });
         setLoading(false);
@@ -125,8 +127,8 @@ export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProp
     if (error) {
       console.error("Booking error:", error);
       toast({
-        title: "Erreur",
-        description: "Impossible de créer la réservation: " + error.message,
+        title: t('error.title'),
+        description: t('booking.error.createBooking') + ": " + error.message,
         variant: "destructive",
       });
       setLoading(false);
@@ -134,8 +136,8 @@ export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProp
     }
 
     toast({
-      title: "Réservation créée",
-      description: "Votre réservation a été créée avec succès",
+      title: t('booking.success.created'),
+      description: t('booking.success.description'),
     });
 
     onOpenChange(false);
@@ -146,9 +148,9 @@ export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProp
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Réserver {service.name}</DialogTitle>
+          <DialogTitle>{t('booking.dialog.generic.title')} {service.name}</DialogTitle>
           <DialogDescription>
-            Remplissez les informations ci-dessous pour finaliser votre réservation
+            {t('booking.dialog.generic.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -157,14 +159,14 @@ export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProp
             {/* Dates */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <UnifiedDatePicker
-                label="Date de début"
+                label={t('booking.dialog.generic.startDate')}
                 value={startDate}
                 onChange={setStartDate}
                 required
                 minDate={new Date()}
               />
               <UnifiedDatePicker
-                label="Date de fin"
+                label={t('booking.dialog.generic.endDate')}
                 value={endDate}
                 onChange={setEndDate}
                 minDate={startDate || new Date()}
@@ -173,7 +175,7 @@ export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProp
 
             {/* Guests */}
             <UnifiedFormField
-              label="Nombre de personnes"
+              label={t('booking.dialog.generic.guests')}
               name="guests"
               type="number"
               defaultValue="1"
@@ -183,10 +185,10 @@ export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProp
 
             {/* Customer Info */}
             <div className="space-y-4 pt-4 border-t">
-              <h3 className="font-semibold text-lg">Informations du voyageur</h3>
+              <h3 className="font-semibold text-lg">{t('booking.form.customerInfo')}</h3>
               
               <UnifiedFormField
-                label="Nom complet"
+                label={t('booking.form.customerName')}
                 name="customerName"
                 placeholder="John Doe"
                 required
@@ -194,14 +196,14 @@ export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProp
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <UnifiedFormField
-                  label="Email"
+                  label={t('booking.form.customerEmail')}
                   name="customerEmail"
                   type="email"
                   placeholder="john@example.com"
                   required
                 />
                 <UnifiedFormField
-                  label="Téléphone"
+                  label={t('booking.form.customerPhone')}
                   name="customerPhone"
                   type="tel"
                   placeholder="+225 XX XX XX XX XX"
@@ -210,15 +212,15 @@ export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProp
               </div>
 
               <UnifiedFormField
-                label="Notes supplémentaires"
+                label={t('booking.form.notes')}
                 name="notes"
                 type="textarea"
-                placeholder="Demandes spéciales, préférences..."
+                placeholder={t('booking.form.specialRequests')}
               />
             </div>
 
             <UnifiedSubmitButton variant="booking" loading={loading} fullWidth>
-              Confirmer la réservation
+              {t('booking.summary.confirm')}
             </UnifiedSubmitButton>
           </div>
         </UnifiedForm>

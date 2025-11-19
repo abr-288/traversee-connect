@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
@@ -18,6 +19,7 @@ interface HotelBookingDialogProps {
 }
 
 export const HotelBookingDialog = ({ open, onOpenChange, hotel }: HotelBookingDialogProps) => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [checkIn, setCheckIn] = useState<Date>();
   const [checkOut, setCheckOut] = useState<Date>();
@@ -45,7 +47,7 @@ export const HotelBookingDialog = ({ open, onOpenChange, hotel }: HotelBookingDi
         notes: notes || null,
       });
     } catch (error: any) {
-      toast.error(error.errors?.[0]?.message || "Veuillez vérifier vos informations");
+      toast.error(error.errors?.[0]?.message || t('booking.validation.checkInfo'));
       setLoading(false);
       return;
     }
@@ -53,13 +55,13 @@ export const HotelBookingDialog = ({ open, onOpenChange, hotel }: HotelBookingDi
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      toast.error("Vous devez être connecté pour réserver");
+      toast.error(t('booking.validation.mustBeLoggedIn'));
       setLoading(false);
       return;
     }
 
     if (!checkIn || !checkOut) {
-      toast.error("Veuillez sélectionner les dates d'arrivée et de départ");
+      toast.error(t('booking.validation.selectCheckInOut'));
       setLoading(false);
       return;
     }
@@ -68,7 +70,7 @@ export const HotelBookingDialog = ({ open, onOpenChange, hotel }: HotelBookingDi
     const nights = Math.max(1, Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)));
     
     if (nights < 1) {
-      toast.error("La date de départ doit être après la date d'arrivée");
+      toast.error(t('booking.validation.checkOutAfterCheckIn'));
       setLoading(false);
       return;
     }
@@ -90,7 +92,7 @@ export const HotelBookingDialog = ({ open, onOpenChange, hotel }: HotelBookingDi
 
     if (serviceError) {
       console.error("Service creation error:", serviceError);
-      toast.error("Erreur lors de la création du service: " + serviceError.message);
+      toast.error(t('booking.error.createService') + ": " + serviceError.message);
       setLoading(false);
       return;
     }

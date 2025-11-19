@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
@@ -20,6 +21,7 @@ interface CarBookingDialogProps {
 }
 
 export const CarBookingDialog = ({ open, onOpenChange, car }: CarBookingDialogProps) => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -52,7 +54,7 @@ export const CarBookingDialog = ({ open, onOpenChange, car }: CarBookingDialogPr
         notes: notes || null,
       });
     } catch (error: any) {
-      toast.error(error.errors?.[0]?.message || "Veuillez vérifier vos informations");
+      toast.error(error.errors?.[0]?.message || t('booking.validation.checkInfo'));
       setLoading(false);
       return;
     }
@@ -60,7 +62,7 @@ export const CarBookingDialog = ({ open, onOpenChange, car }: CarBookingDialogPr
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      toast.error("Vous devez être connecté pour réserver");
+      toast.error(t('booking.validation.mustBeLoggedIn'));
       setLoading(false);
       return;
     }
@@ -71,7 +73,7 @@ export const CarBookingDialog = ({ open, onOpenChange, car }: CarBookingDialogPr
     const days = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
     
     if (days < 1) {
-      toast.error("La date de retour doit être après la date de prise en charge");
+      toast.error(t('booking.validation.dropoffAfterPickup'));
       setLoading(false);
       return;
     }
@@ -92,7 +94,7 @@ export const CarBookingDialog = ({ open, onOpenChange, car }: CarBookingDialogPr
       .single();
 
     if (serviceError) {
-      toast.error("Erreur lors de la création du service");
+      toast.error(t('booking.error.createService'));
       setLoading(false);
       return;
     }
