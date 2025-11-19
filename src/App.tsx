@@ -8,6 +8,7 @@ import Hotels from "./pages/Hotels";
 import Tours from "./pages/Tours";
 import Cars from "./pages/Cars";
 import Flights from "./pages/Flights";
+import FlightComparison from "./pages/FlightComparison";
 import FlightHotel from "./pages/FlightHotel";
 import Trains from "./pages/Trains";
 import Events from "./pages/Events";
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/tours" element={<Tours />} />
           <Route path="/cars" element={<Cars />} />
           <Route path="/flights" element={<Flights />} />
+          <Route path="/flight-comparison" element={<FlightComparison />} />
           <Route path="/flight-hotel" element={<FlightHotel />} />
           <Route path="/trains" element={<Trains />} />
           <Route path="/events" element={<Events />} />
