@@ -24,13 +24,13 @@ const Index = () => {
         <SpecialOffers />
         
         {/* AI Travel Advisor Section */}
-        <section className="py-16 px-4 bg-muted/30">
+        <section className="py-12 md:py-16 px-4 bg-muted/30">
           <div className="container mx-auto max-w-4xl">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <div className="text-center mb-6 md:mb-8">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">
                 Planifiez votre voyage avec l'IA
               </h2>
-              <p className="text-muted-foreground text-lg">
+              <p className="text-muted-foreground text-base md:text-lg px-4">
                 Obtenez des recommandations personnalisées pour votre prochaine destination
               </p>
             </div>

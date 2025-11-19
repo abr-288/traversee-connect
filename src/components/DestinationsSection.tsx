@@ -85,13 +85,13 @@ const DestinationsSection = () => {
         service={selectedDestination}
       />
     )}
-    <section className="py-20 bg-muted/30">
+    <section className="py-12 md:py-16 lg:py-20 bg-muted/30">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+        <div className="text-center mb-8 md:mb-12">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-3 md:mb-4">
             Destinations Populaires
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
             Explorez nos destinations les plus prisées et vivez des expériences inoubliables
           </p>
         </div>
@@ -101,13 +101,13 @@ const DestinationsSection = () => {
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
             {displayDestinations.map((destination) => (
             <Card
               key={destination.id}
               className="group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-smooth cursor-pointer"
             >
-              <div className="relative h-64 overflow-hidden">
+              <div className="relative h-48 md:h-56 lg:h-64 overflow-hidden">
                 <img
                   src={destination.image}
                   alt={destination.title}
