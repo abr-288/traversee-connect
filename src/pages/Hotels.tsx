@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { PageBanner } from "@/components/PageBanner";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -404,18 +403,21 @@ const Hotels = () => {
       <Navbar />
       
       {/* Hero Banner */}
-      <div className="relative py-16 md:py-32 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
+      <div className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
         <img 
-          src="/src/assets/destination-hotel.jpg" 
+          src="https://images.unsplash.com/photo-1566073771259-6a8506099945" 
           alt="Hotels" 
-          className="absolute inset-0 w-full h-full object-cover opacity-40"
+          className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="relative z-10 container mx-auto px-4">
-          <div className="text-center mb-6 md:mb-10">
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-3 md:mb-6">Hôtels & Hébergements</h1>
-            <p className="text-lg md:text-2xl lg:text-3xl text-white/95 font-medium">Des hébergements de qualité partout dans le monde</p>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background"></div>
+        <div className="relative z-10 container mx-auto px-4 py-12">
+          <div className="text-center mb-8 animate-fade-in">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">Hôtels & Hébergements</h1>
+            <p className="text-lg md:text-xl text-white/95 drop-shadow-md max-w-2xl mx-auto">Des hébergements de qualité partout dans le monde</p>
           </div>
-          <HotelSearchForm />
+          <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <HotelSearchForm />
+          </div>
         </div>
       </div>
       
