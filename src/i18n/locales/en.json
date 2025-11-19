@@ -429,5 +429,120 @@
         "247": "Service available 24/7"
       }
     }
+  },
+  "booking": {
+    "dialog": {
+      "flight": {
+        "title": "Book this flight",
+        "description": "Fill in the information below to complete your booking",
+        "tripType": "Trip type",
+        "oneWay": "One way",
+        "roundTrip": "Round trip",
+        "summary": "Booking summary",
+        "flightDetails": "Flight details",
+        "passengerInfo": "Passenger information",
+        "confirmBooking": "Confirm booking",
+        "backToForm": "Back"
+      },
+      "hotel": {
+        "title": "Book",
+        "description": "Fill in the information below to complete your booking",
+        "rooms": "Number of rooms",
+        "adults": "Adults",
+        "children": "Children"
+      },
+      "car": {
+        "title": "Book",
+        "description": "Fill in the information below to complete your booking",
+        "pickupInfo": "Pickup information",
+        "dropoffInfo": "Drop-off information",
+        "pickupDate": "Pickup date",
+        "pickupTime": "Pickup time",
+        "pickupLocation": "Pickup location",
+        "dropoffDate": "Drop-off date",
+        "dropoffTime": "Drop-off time",
+        "dropoffLocation": "Drop-off location",
+        "driverLicense": "Driver's license number"
+      },
+      "generic": {
+        "title": "Book",
+        "description": "Fill in the information below to complete your booking",
+        "startDate": "Start date",
+        "endDate": "End date",
+        "guests": "Number of guests"
+      }
+    },
+    "form": {
+      "passengers": "Number of passengers",
+      "customerInfo": "Traveler information",
+      "customerName": "Full name",
+      "customerEmail": "Email",
+      "customerPhone": "Phone",
+      "passportNumber": "Passport number",
+      "passportIssueDate": "Passport issue date",
+      "passportExpiryDate": "Passport expiry date",
+      "notes": "Additional notes",
+      "specialRequests": "Special requests, preferences...",
+      "driverInfo": "Driver information"
+    },
+    "summary": {
+      "flightDetails": "Flight details",
+      "hotelDetails": "Hotel details",
+      "carDetails": "Car details",
+      "from": "From",
+      "to": "To",
+      "departure": "Departure",
+      "arrival": "Arrival",
+      "class": "Class",
+      "airline": "Airline",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "nights": "night(s)",
+      "location": "Location",
+      "category": "Category",
+      "transmission": "Transmission",
+      "seats": "Seats",
+      "pickupDate": "Pickup date",
+      "dropoffDate": "Drop-off date",
+      "days": "day(s)",
+      "passengerInfo": "Passenger information",
+      "totalPrice": "Total price",
+      "modify": "Modify",
+      "confirm": "Confirm booking",
+      "confirming": "Confirming...",
+      "downloadTicket": "Download ticket",
+      "proceedToPayment": "Proceed to payment",
+      "route": "Route",
+      "type": "Type",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone"
+    },
+    "validation": {
+      "checkInfo": "Please check your information",
+      "mustBeLoggedIn": "You must be logged in to book",
+      "selectDates": "Please select dates",
+      "selectCheckInOut": "Please select check-in and check-out dates",
+      "checkOutAfterCheckIn": "Check-out date must be after check-in date",
+      "dropoffAfterPickup": "Drop-off date must be after pickup date",
+      "confirmFirst": "Please confirm the booking first"
+    },
+    "success": {
+      "created": "Booking created",
+      "description": "Your booking has been created successfully",
+      "emailSent": "Confirmation email sent",
+      "ticketGenerated": "Ticket generated successfully",
+      "ticketDownloaded": "Ticket downloaded successfully"
+    },
+    "error": {
+      "createService": "Unable to create service",
+      "createBooking": "Unable to create booking",
+      "sendEmail": "Error sending confirmation email",
+      "generateTicket": "Error generating ticket",
+      "downloadTicket": "Error downloading ticket"
+    },
+    "loading": {
+      "generatingTicket": "Generating ticket..."
+    }
   }
 }

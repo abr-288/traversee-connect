@@ -180,12 +180,12 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
 
   const handleDownloadTicket = async () => {
     if (!bookingId) {
-      toast.error("Veuillez d'abord confirmer la réservation");
+      toast.error(t('booking.validation.confirmFirst'));
       return;
     }
 
     try {
-      toast.loading("Génération du billet...");
+      toast.loading(t('booking.loading.generatingTicket'));
       
       const { data, error } = await supabase.functions.invoke("generate-flight-ticket", {
         body: { bookingId },
@@ -203,10 +203,10 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
 
-      toast.success("Billet téléchargé avec succès!");
+      toast.success(t('booking.success.ticketDownloaded'));
     } catch (error: any) {
       console.error("Error downloading ticket:", error);
-      toast.error("Erreur lors du téléchargement du billet");
+      toast.error(t('booking.error.downloadTicket'));
     }
   };
 
@@ -216,7 +216,7 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Plane className="h-5 w-5 text-primary" />
-            {showSummary ? "Récapitulatif de votre réservation" : "Réserver votre vol"}
+            {showSummary ? t('booking.dialog.flight.summary') : t('booking.dialog.flight.title')}
           </DialogTitle>
           <DialogDescription>
             {flight.airline} • {flight.from} → {flight.to} • {flight.class} • {tripType}
@@ -229,31 +229,31 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
             <div className="bg-primary/5 border-2 border-primary/20 p-6 rounded-lg space-y-4">
               <h3 className="font-semibold text-lg flex items-center gap-2">
                 <Plane className="h-5 w-5 text-primary" />
-                Détails du vol
+                {t('booking.summary.flightDetails')}
               </h3>
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-muted-foreground text-sm">Compagnie</p>
+                  <p className="text-muted-foreground text-sm">{t('booking.summary.airline')}</p>
                   <p className="font-semibold">{flight.airline}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-sm">Classe</p>
+                  <p className="text-muted-foreground text-sm">{t('booking.summary.class')}</p>
                   <p className="font-semibold">{flight.class}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-sm">Trajet</p>
+                  <p className="text-muted-foreground text-sm">{t('booking.summary.route')}</p>
                   <p className="font-semibold">{flight.from} → {flight.to}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-sm">Type</p>
+                  <p className="text-muted-foreground text-sm">{t('booking.summary.type')}</p>
                   <p className="font-semibold">{tripType}</p>
                 </div>
               </div>
 
               <div className="border-t pt-4 grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-muted-foreground text-sm">Départ</p>
+                  <p className="text-muted-foreground text-sm">{t('booking.summary.departure')}</p>
                   <p className="font-semibold">{new Date(departureDate).toLocaleDateString('fr-FR', { 
                     weekday: 'long', 
                     year: 'numeric', 
@@ -264,7 +264,7 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
                 </div>
                 {returnDate && (
                   <div>
-                    <p className="text-muted-foreground text-sm">Retour</p>
+                    <p className="text-muted-foreground text-sm">{t('search.return')}</p>
                     <p className="font-semibold">{new Date(returnDate).toLocaleDateString('fr-FR', { 
                       weekday: 'long', 
                       year: 'numeric', 
@@ -278,26 +278,26 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
             </div>
 
             <div className="bg-muted/30 p-6 rounded-lg space-y-3">
-              <h3 className="font-semibold text-lg">Informations passager</h3>
+              <h3 className="font-semibold text-lg">{t('booking.summary.passengerInfo')}</h3>
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  <p className="text-muted-foreground">Nom</p>
+                  <p className="text-muted-foreground">{t('booking.summary.name')}</p>
                   <p className="font-medium">{formData?.customerName}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Passagers</p>
+                  <p className="text-muted-foreground">{t('booking.form.passengers')}</p>
                   <p className="font-medium">{formData?.passengers}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Email</p>
+                  <p className="text-muted-foreground">{t('booking.summary.email')}</p>
                   <p className="font-medium">{formData?.customerEmail}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Téléphone</p>
+                  <p className="text-muted-foreground">{t('booking.summary.phone')}</p>
                   <p className="font-medium">{formData?.customerPhone}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Passeport</p>
+                  <p className="text-muted-foreground">{t('booking.form.passportNumber')}</p>
                   <p className="font-medium">{formData?.passportNumber}</p>
                 </div>
               </div>
@@ -305,7 +305,7 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
 
             <div className="bg-primary/10 p-6 rounded-lg">
               <div className="flex justify-between items-center">
-                <span className="text-lg font-semibold">Prix total</span>
+                <span className="text-lg font-semibold">{t('booking.summary.totalPrice')}</span>
                 <span className="text-2xl font-bold text-primary">
                   {(flight.price * formData?.passengers).toLocaleString()} FCFA
                 </span>
@@ -315,25 +315,25 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
             <div className="flex gap-3">
               <Button variant="outline" onClick={handleBackToForm} className="flex-1">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Modifier
+                {t('booking.summary.modify')}
               </Button>
               
               {bookingId ? (
                 <>
                   <Button onClick={handleDownloadTicket} variant="outline" className="flex-1">
                     <Download className="h-4 w-4 mr-2" />
-                    Télécharger le billet
+                    {t('booking.summary.downloadTicket')}
                   </Button>
                   <Button 
                     onClick={() => navigate(`/payment?bookingId=${bookingId}`)}
                     className="flex-1"
                   >
-                    Procéder au paiement
+                    {t('booking.summary.proceedToPayment')}
                   </Button>
                 </>
               ) : (
                 <Button onClick={handleConfirmBooking} disabled={loading} className="flex-1">
-                  {loading ? "Confirmation..." : "Confirmer la réservation"}
+                  {loading ? t('booking.summary.confirming') : t('booking.summary.confirm')}
                 </Button>
               )}
             </div>
