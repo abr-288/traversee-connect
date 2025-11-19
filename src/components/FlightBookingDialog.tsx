@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,7 @@ interface FlightBookingDialogProps {
 }
 
 export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams = null }: FlightBookingDialogProps) => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const [formData, setFormData] = useState<any>(null);
@@ -38,7 +40,7 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
   
   const departureDate = (searchParams && searchParams.departureDate) || flight.departureDate || new Date().toISOString().split('T')[0];
   const returnDate = (searchParams && searchParams.returnDate) || flight.returnDate;
-  const tripType = returnDate ? "Aller-retour" : "Aller simple";
+  const tripType = returnDate ? t('booking.dialog.flight.roundTrip') : t('booking.dialog.flight.oneWay');
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -62,7 +64,7 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
         notes: notes || null,
       });
     } catch (error: any) {
-      toast.error(error.errors?.[0]?.message || "Veuillez vérifier vos informations");
+      toast.error(error.errors?.[0]?.message || t('booking.validation.checkInfo'));
       return;
     }
 
@@ -90,7 +92,7 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      toast.error("Vous devez être connecté pour réserver");
+      toast.error(t('booking.validation.mustBeLoggedIn'));
       setLoading(false);
       return;
     }

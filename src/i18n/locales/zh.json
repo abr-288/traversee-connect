@@ -429,5 +429,105 @@
         "247": "全天候服务"
       }
     }
+  },
+  "booking": {
+    "dialog": {
+      "flight": {
+        "title": "预订此航班",
+        "description": "填写以下信息以完成您的预订",
+        "tripType": "旅行类型",
+        "oneWay": "单程",
+        "roundTrip": "往返",
+        "summary": "预订摘要"
+      },
+      "hotel": {
+        "title": "预订",
+        "description": "填写以下信息以完成您的预订",
+        "rooms": "房间数",
+        "adults": "成人",
+        "children": "儿童"
+      },
+      "car": {
+        "title": "预订",
+        "description": "填写以下信息以完成您的预订",
+        "pickupInfo": "取车信息",
+        "dropoffInfo": "还车信息",
+        "pickupDate": "取车日期",
+        "pickupTime": "取车时间",
+        "pickupLocation": "取车地点",
+        "dropoffDate": "还车日期",
+        "dropoffTime": "还车时间",
+        "dropoffLocation": "还车地点",
+        "driverLicense": "驾驶执照号码"
+      },
+      "generic": {
+        "title": "预订",
+        "description": "填写以下信息以完成您的预订",
+        "startDate": "开始日期",
+        "endDate": "结束日期",
+        "guests": "人数"
+      }
+    },
+    "form": {
+      "passengers": "乘客人数",
+      "customerInfo": "旅客信息",
+      "customerName": "全名",
+      "customerEmail": "电子邮件",
+      "customerPhone": "电话",
+      "passportNumber": "护照号码",
+      "passportIssueDate": "护照签发日期",
+      "passportExpiryDate": "护照到期日期",
+      "notes": "附加说明",
+      "specialRequests": "特殊要求、偏好...",
+      "driverInfo": "驾驶员信息"
+    },
+    "summary": {
+      "flightDetails": "航班详情",
+      "hotelDetails": "酒店详情",
+      "carDetails": "车辆详情",
+      "from": "从",
+      "to": "到",
+      "departure": "出发",
+      "arrival": "到达",
+      "class": "舱位",
+      "airline": "航空公司",
+      "checkIn": "入住",
+      "checkOut": "退房",
+      "nights": "晚",
+      "location": "地点",
+      "category": "类别",
+      "transmission": "变速器",
+      "seats": "座位",
+      "pickupDate": "取车日期",
+      "dropoffDate": "还车日期",
+      "days": "天",
+      "passengerInfo": "乘客信息",
+      "totalPrice": "总价",
+      "modify": "修改",
+      "confirm": "确认预订",
+      "confirming": "确认中...",
+      "downloadTicket": "下载票据",
+      "proceedToPayment": "前往付款"
+    },
+    "validation": {
+      "checkInfo": "请检查您的信息",
+      "mustBeLoggedIn": "您必须登录才能预订",
+      "selectDates": "请选择日期",
+      "selectCheckInOut": "请选择入住和退房日期",
+      "checkOutAfterCheckIn": "退房日期必须在入住日期之后",
+      "dropoffAfterPickup": "还车日期必须在取车日期之后"
+    },
+    "success": {
+      "created": "预订已创建",
+      "description": "您的预订已成功创建",
+      "emailSent": "确认邮件已发送",
+      "ticketGenerated": "票据生成成功"
+    },
+    "error": {
+      "createService": "无法创建服务",
+      "createBooking": "无法创建预订",
+      "sendEmail": "发送确认邮件时出错",
+      "generateTicket": "生成票据时出错"
+    }
   }
 }
