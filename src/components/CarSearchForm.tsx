@@ -7,12 +7,14 @@ import {
   UnifiedDatePicker,
   UnifiedSubmitButton 
 } from "@/components/forms";
+import { useTranslation } from "react-i18next";
 
 /**
  * CarSearchForm - Recherche de voitures avec UnifiedForm
  * Design premium type Rentalcars/Kayak avec identité Bossiz
  */
 export const CarSearchForm = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [location, setLocation] = useState("");
   const [pickupDate, setPickupDate] = useState<Date>();
@@ -40,11 +42,11 @@ export const CarSearchForm = () => {
         {/* Ligne 1: Lieu de prise en charge */}
         <div className="grid grid-cols-1 gap-4">
           <UnifiedAutocomplete
-            label="Lieu de prise en charge"
+            label={t("search.pickup")}
             type="location"
             value={location}
             onChange={(value) => setLocation(value)}
-            placeholder="Ville ou aéroport"
+            placeholder={t("search.cityOrAirport")}
             required
           />
         </div>
@@ -52,7 +54,7 @@ export const CarSearchForm = () => {
         {/* Ligne 2: Dates */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <UnifiedDatePicker
-            label="Prise en charge"
+            label={t("search.pickup")}
             value={pickupDate}
             onChange={setPickupDate}
             minDate={new Date()}
@@ -60,7 +62,7 @@ export const CarSearchForm = () => {
           />
 
           <UnifiedDatePicker
-            label="Retour"
+            label={t("search.dropoff")}
             value={returnDate}
             onChange={setReturnDate}
             minDate={pickupDate || new Date()}
@@ -71,7 +73,7 @@ export const CarSearchForm = () => {
         {/* Bouton de recherche */}
         <div className="pt-2">
           <UnifiedSubmitButton fullWidth>
-            Rechercher des voitures
+            {t("search.search")}
           </UnifiedSubmitButton>
         </div>
       </div>
