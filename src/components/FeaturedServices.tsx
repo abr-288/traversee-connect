@@ -6,6 +6,7 @@ import { MapPin, Star, Loader2, Plane, Hotel, Car, Calendar } from "lucide-react
 import { useServices } from "@/hooks/useServices";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Price } from "@/components/ui/price";
 
 type ServiceType = "car" | "event" | "flight" | "flight_hotel" | "hotel" | "tour";
 
@@ -149,9 +150,8 @@ const FeaturedServices = () => {
                       </div>
                       <div className="text-right">
                         <p className="text-lg font-bold text-primary">
-                          {new Intl.NumberFormat('fr-FR').format(Number(service.price_per_unit))}
+                          <Price amount={Number(service.price_per_unit)} fromCurrency={service.currency} showLoader />
                         </p>
-                        <p className="text-xs text-muted-foreground">{service.currency}</p>
                       </div>
                     </div>
                   </CardContent>

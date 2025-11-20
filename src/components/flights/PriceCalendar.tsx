@@ -2,6 +2,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format, addDays, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
+import { Price } from "@/components/ui/price";
 
 interface PriceCalendarProps {
   departureDate: string;
@@ -44,7 +45,7 @@ export const PriceCalendar = ({ departureDate, prices = {}, currency = "€", on
                   <span className={`text-lg font-semibold mt-1 ${
                     isSelected ? "text-primary" : "text-foreground"
                   }`}>
-                    {price} {currency}
+                    <Price amount={price} fromCurrency={currency} />
                   </span>
                 </button>
               );

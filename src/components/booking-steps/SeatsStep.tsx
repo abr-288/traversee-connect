@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { UnifiedSubmitButton } from "@/components/forms/UnifiedSubmitButton";
 import { useState } from "react";
+import { Price } from "@/components/ui/price";
 
 interface Seat {
   id: string;
@@ -182,7 +183,7 @@ export const SeatsStep = ({
             <div className="mt-4 p-3 bg-primary/5 rounded-lg">
               <p className="text-sm text-muted-foreground">Total sièges</p>
               <p className="text-xl font-bold text-primary">
-                {getTotalSeatsPrice().toLocaleString()} FCFA
+                <Price amount={getTotalSeatsPrice()} fromCurrency="XOF" showLoader />
               </p>
             </div>
           )}

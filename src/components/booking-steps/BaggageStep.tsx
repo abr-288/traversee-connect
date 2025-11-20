@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { UnifiedSubmitButton } from "@/components/forms/UnifiedSubmitButton";
+import { Price } from "@/components/ui/price";
 
 interface BaggageOption {
   id: string;
@@ -127,7 +128,7 @@ export const BaggageStep = ({
 
                   <div className="flex items-center justify-between mt-4">
                     <div className="text-2xl font-bold text-primary">
-                      {option.price === 0 ? "Gratuit" : `${option.price.toLocaleString()} FCFA`}
+                      {option.price === 0 ? "Gratuit" : <Price amount={option.price} fromCurrency="XOF" showLoader />}
                     </div>
                     {!option.included && (
                       <div className="flex items-center gap-2">
@@ -225,7 +226,7 @@ export const BaggageStep = ({
           <div className="flex justify-between items-center">
             <span className="text-lg font-semibold">Total bagages supplémentaires</span>
             <span className="text-2xl font-bold text-primary">
-              {getTotalBaggagePrice().toLocaleString()} FCFA
+              <Price amount={getTotalBaggagePrice()} fromCurrency="XOF" showLoader />
             </span>
           </div>
         </Card>

@@ -9,6 +9,7 @@ import { Plane, Download, ArrowLeft, Users, Briefcase, Luggage, X, Check, Info, 
 import { bookingSchema } from "@/lib/validation";
 import { UnifiedForm, UnifiedFormField, UnifiedSubmitButton } from "@/components/forms";
 import { Card } from "@/components/ui/card";
+import { Price } from "@/components/ui/price";
 
 interface FlightBookingDialogProps {
   open: boolean;
@@ -425,7 +426,7 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
                       className="w-full"
                       size="lg"
                     >
-                      Continuer pour {flight.price.toLocaleString()} FCFA
+                      Continuer pour <Price amount={flight.price} fromCurrency="XOF" />
                     </Button>
 
                     <button className="w-full text-center text-sm text-primary mt-3 flex items-center justify-center gap-1">
@@ -492,7 +493,7 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
                       className="w-full"
                       size="lg"
                     >
-                      Continuer pour {(flight.price + 25000).toLocaleString()} FCFA
+                      Continuer pour <Price amount={flight.price + 25000} fromCurrency="XOF" />
                     </Button>
 
                     <button className="w-full text-center text-sm text-primary mt-3 flex items-center justify-center gap-1">
@@ -687,7 +688,7 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
               <div className="flex justify-between items-center">
                 <span className="text-lg font-semibold">{t('booking.summary.totalPrice')}</span>
                 <span className="text-2xl font-bold text-primary">
-                  {(flight.price * formData?.passengers).toLocaleString()} FCFA
+                  <Price amount={flight.price * formData?.passengers} fromCurrency="XOF" showLoader />
                 </span>
               </div>
             </div>
