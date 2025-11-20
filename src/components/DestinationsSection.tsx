@@ -10,36 +10,96 @@ import { BookingDialog } from "@/components/BookingDialog";
 import { useNavigate } from "react-router-dom";
 import { useServices } from "@/hooks/useServices";
 
-const destinations = [
+const worldDestinations = [
   {
     id: 1,
-    title: "Hôtels de Luxe",
-    location: "Grand-Bassam",
-    image: hotelImg,
+    title: "Paris",
+    location: "France",
+    image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80",
     rating: 4.9,
-    reviews: 245,
-    price: "75 000",
-    description: "Séjournez dans des hôtels 5 étoiles avec vue sur l'océan",
+    reviews: 3245,
+    price: "450 000",
+    description: "La ville lumière, capitale de la mode et de la gastronomie",
   },
   {
     id: 2,
-    title: "Safari Nature",
-    location: "Parc National de Taï",
-    image: safariImg,
-    rating: 4.8,
-    reviews: 189,
-    price: "120 000",
-    description: "Découvrez la faune sauvage dans son habitat naturel",
+    title: "Dubaï",
+    location: "Émirats Arabes Unis",
+    image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80",
+    rating: 4.9,
+    reviews: 2890,
+    price: "550 000",
+    description: "Luxe et modernité dans le désert, shopping et architecture futuriste",
   },
   {
     id: 3,
-    title: "Découverte Urbaine",
-    location: "Abidjan",
-    image: cityImg,
+    title: "Maldives",
+    location: "Océan Indien",
+    image: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80",
+    rating: 5.0,
+    reviews: 1876,
+    price: "780 000",
+    description: "Paradis tropical avec plages de sable blanc et eaux cristallines",
+  },
+  {
+    id: 4,
+    title: "Tokyo",
+    location: "Japon",
+    image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80",
+    rating: 4.8,
+    reviews: 2567,
+    price: "520 000",
+    description: "Mélange unique de tradition et de technologie ultra-moderne",
+  },
+  {
+    id: 5,
+    title: "Bali",
+    location: "Indonésie",
+    image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80",
+    rating: 4.9,
+    reviews: 3102,
+    price: "380 000",
+    description: "Îles paradisiaques, temples anciens et rizières en terrasses",
+  },
+  {
+    id: 6,
+    title: "New York",
+    location: "États-Unis",
+    image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800&q=80",
     rating: 4.7,
-    reviews: 312,
-    price: "45 000",
-    description: "Explorez la capitale économique et ses attractions",
+    reviews: 4123,
+    price: "620 000",
+    description: "La ville qui ne dort jamais, capitale culturelle et économique",
+  },
+  {
+    id: 7,
+    title: "Rome",
+    location: "Italie",
+    image: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=800&q=80",
+    rating: 4.8,
+    reviews: 2934,
+    price: "420 000",
+    description: "La ville éternelle, berceau de la civilisation occidentale",
+  },
+  {
+    id: 8,
+    title: "Barcelone",
+    location: "Espagne",
+    image: "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=800&q=80",
+    rating: 4.8,
+    reviews: 2645,
+    price: "390 000",
+    description: "Architecture de Gaudí, plages méditerranéennes et vie nocturne",
+  },
+  {
+    id: 9,
+    title: "Bangkok",
+    location: "Thaïlande",
+    image: "https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=800&q=80",
+    rating: 4.7,
+    reviews: 2187,
+    price: "340 000",
+    description: "Temples dorés, street food légendaire et marchés flottants",
   },
 ];
 
@@ -50,33 +110,14 @@ const DestinationsSection = () => {
   const navigate = useNavigate();
   const { services, loading } = useServices();
 
-  // Fallback destinations statiques avec format booking
-  const fallbackDestinations = destinations.map(dest => ({
+  // Utiliser les destinations mondiales
+  const displayDestinations = worldDestinations.map(dest => ({
     ...dest,
     name: dest.title,
     price_per_unit: parseFloat(dest.price.replace(/\s/g, '')),
     currency: 'FCFA',
-    type: 'hotel'
+    type: 'tour'
   }));
-
-  // Transformer les services en format destinations
-  const destinationsFromServices = services.slice(0, 6).map(service => ({
-    id: service.id,
-    title: service.name,
-    location: service.location,
-    image: service.image_url || service.images?.[0] || cityImg,
-    rating: Number(service.rating) || 4.5,
-    reviews: service.total_reviews || 0,
-    price: new Intl.NumberFormat('fr-FR').format(Number(service.price_per_unit)),
-    description: service.description || `Découvrez ${service.name}`,
-    type: service.type,
-    // Données pour le booking
-    name: service.name,
-    price_per_unit: Number(service.price_per_unit),
-    currency: service.currency || 'FCFA'
-  }));
-
-  const displayDestinations = destinationsFromServices.length > 0 ? destinationsFromServices : fallbackDestinations;
 
   return (
     <>
@@ -114,13 +155,8 @@ const DestinationsSection = () => {
           </div>
         </div>
 
-        {loading ? (
-          <div className="flex justify-center items-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
-            {displayDestinations.map((destination, index) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
+          {displayDestinations.slice(0, 9).map((destination, index) => (
             <Card
               key={destination.id}
               className="group overflow-hidden border-2 border-border/50 hover:border-primary/50 shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer animate-slide-up-fade hover-lift rounded-2xl relative bg-gradient-card"
@@ -182,15 +218,14 @@ const DestinationsSection = () => {
               </CardContent>
             </Card>
             ))}
-          </div>
-        )}
+        </div>
 
         <div className="text-center mt-12">
           <Button 
             variant="outline" 
             size="lg" 
             className="gap-2"
-            onClick={() => navigate('/stays')}
+            onClick={() => navigate('/destinations')}
           >
             {t('destinations.viewAll')}
           </Button>
