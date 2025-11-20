@@ -119,7 +119,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link to="/dashboard" className="text-white/80 hover:text-secondary transition-smooth">
-                  {t("booking.actions.viewDetails")}
+                  Tableau de bord
                 </Link>
               </li>
               <li>
