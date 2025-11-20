@@ -16,6 +16,27 @@ serve(async (req) => {
 
     console.log('Converting currency:', { from, to, amount });
 
+    // Normalize currency codes - FCFA is not ISO standard, use XOF
+    const normalizedFrom = from === 'FCFA' ? 'XOF' : from;
+    const normalizedTo = to === 'FCFA' ? 'XOF' : to;
+
+    // If same currency, return amount as-is
+    if (normalizedFrom === normalizedTo) {
+      return new Response(
+        JSON.stringify({
+          success: true,
+          data: {
+            from: normalizedFrom,
+            to: normalizedTo,
+            amount,
+            converted: amount,
+            rate: 1.0,
+          }
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const rapidApiKey = Deno.env.get('RAPIDAPI_KEY');
     
     // Try RapidAPI TripAdvisor first (tripadvisor16.p.rapidapi.com)
@@ -65,7 +86,7 @@ serve(async (req) => {
 
     // Fallback to ExchangeRate-API (free, no API key required)
     const response = await fetch(
-      `https://api.exchangerate-api.com/v4/latest/${from}`
+      `https://api.exchangerate-api.com/v4/latest/${normalizedFrom}`
     );
 
     if (!response.ok) {
@@ -76,11 +97,11 @@ serve(async (req) => {
 
     const data = await response.json();
     
-    if (!data.rates || !data.rates[to]) {
-      throw new Error(`Currency ${to} not found in rates`);
+    if (!data.rates || !data.rates[normalizedTo]) {
+      throw new Error(`Currency ${normalizedTo} not found in rates`);
     }
 
-    const rate = data.rates[to];
+    const rate = data.rates[normalizedTo];
     const converted = amount * rate;
 
     console.log('Currency conversion successful (ExchangeRate-API):', { rate, converted });
@@ -89,8 +110,8 @@ serve(async (req) => {
       JSON.stringify({
         success: true,
         data: {
-          from,
-          to,
+          from: normalizedFrom,
+          to: normalizedTo,
           amount,
           converted: parseFloat(converted.toFixed(2)),
           rate: parseFloat(rate.toFixed(6)),
