@@ -18,6 +18,7 @@ import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminEmailTemplates from "./pages/AdminEmailTemplates";
 import Payment from "./pages/Payment";
+import Confirmation from "./pages/Confirmation";
 import BookingHistory from "./pages/BookingHistory";
 import Account from "./pages/Account";
 import Help from "./pages/Help";
@@ -55,6 +56,7 @@ const App = () => (
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/email-templates" element={<AdminEmailTemplates />} />
           <Route path="/payment" element={<Payment />} />
+          <Route path="/confirmation" element={<Confirmation />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

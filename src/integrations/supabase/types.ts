@@ -23,6 +23,7 @@ export type Database = {
           customer_name: string
           customer_phone: string
           end_date: string | null
+          external_ref: string | null
           guests: number
           id: string
           notes: string | null
@@ -42,6 +43,7 @@ export type Database = {
           customer_name: string
           customer_phone: string
           end_date?: string | null
+          external_ref?: string | null
           guests?: number
           id?: string
           notes?: string | null
@@ -61,6 +63,7 @@ export type Database = {
           customer_name?: string
           customer_phone?: string
           end_date?: string | null
+          external_ref?: string | null
           guests?: number
           id?: string
           notes?: string | null
@@ -138,6 +141,53 @@ export type Database = {
           subscribed_at?: string
         }
         Relationships: []
+      }
+      passengers: {
+        Row: {
+          booking_id: string
+          created_at: string | null
+          date_of_birth: string | null
+          document_number: string | null
+          document_type: string | null
+          first_name: string
+          id: string
+          last_name: string
+          nationality: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          booking_id: string
+          created_at?: string | null
+          date_of_birth?: string | null
+          document_number?: string | null
+          document_type?: string | null
+          first_name: string
+          id?: string
+          last_name: string
+          nationality?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          booking_id?: string
+          created_at?: string | null
+          date_of_birth?: string | null
+          document_number?: string | null
+          document_type?: string | null
+          first_name?: string
+          id?: string
+          last_name?: string
+          nationality?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "passengers_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payments: {
         Row: {

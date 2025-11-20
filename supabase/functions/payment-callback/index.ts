@@ -165,6 +165,27 @@ serve(async (req) => {
         console.error('⚠️ Invoice generation error:', invoiceErr);
       }
     }
+    
+    // Trigger PNR creation job asynchronously
+    if (bookingId && paymentStatus === 'ACCEPTED') {
+      console.log('Triggering PNR creation for booking:', bookingId);
+      
+      try {
+        // Call create-pnr function asynchronously
+        fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/create-pnr`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+          },
+          body: JSON.stringify({ booking_id: bookingId }),
+        }).catch(err => {
+          console.error('⚠️ Failed to trigger PNR creation:', err);
+        });
+      } catch (pnrErr) {
+        console.error('⚠️ PNR creation trigger error:', pnrErr);
+      }
+    }
 
     console.log('=== PAYMENT CALLBACK END ===');
 
