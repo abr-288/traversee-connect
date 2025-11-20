@@ -148,7 +148,7 @@ export const CarBookingDialog = ({ open, onOpenChange, car }: CarBookingDialogPr
 
         <UnifiedForm onSubmit={handleSubmit} variant="booking" loading={loading}>
           <div className="space-y-6">
-            {/* Pickup Info */}
+            {/* Informations de prise en charge */}
             <div className="space-y-4">
               <h3 className="font-semibold text-lg">Lieu et horaire de prise en charge</h3>
               <UnifiedFormField
