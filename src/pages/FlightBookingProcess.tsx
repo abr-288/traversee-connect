@@ -18,7 +18,7 @@ interface Passenger {
   lastName: string;
   dateOfBirth: string;
   nationality: string;
-  documentType: string;
+  documentType: "passport" | "id_card";
   documentNumber: string;
 }
 

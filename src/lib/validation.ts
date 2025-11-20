@@ -88,6 +88,47 @@ export const supportMessageSchema = z.object({
     .max(2000, "Message must be less than 2000 characters"),
 });
 
+// Passenger validation schema
+export const passengerSchema = z.object({
+  firstName: z.string()
+    .trim()
+    .min(2, "Le prénom doit contenir au moins 2 caractères")
+    .max(50, "Le prénom doit contenir moins de 50 caractères")
+    .regex(/^[a-zA-ZÀ-ÿ\s\-']+$/, "Le prénom ne peut contenir que des lettres"),
+  lastName: z.string()
+    .trim()
+    .min(2, "Le nom doit contenir au moins 2 caractères")
+    .max(50, "Le nom doit contenir moins de 50 caractères")
+    .regex(/^[a-zA-ZÀ-ÿ\s\-']+$/, "Le nom ne peut contenir que des lettres"),
+  dateOfBirth: z.string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "La date doit être au format AAAA-MM-JJ")
+    .refine((date) => {
+      const birthDate = new Date(date);
+      const today = new Date();
+      const age = today.getFullYear() - birthDate.getFullYear();
+      return age >= 0 && age <= 120;
+    }, "Date de naissance invalide"),
+  nationality: z.string()
+    .trim()
+    .min(2, "La nationalité est requise"),
+  documentType: z.enum(["passport", "id_card"], {
+    errorMap: () => ({ message: "Type de document invalide" }),
+  }),
+  documentNumber: z.string()
+    .trim()
+    .min(5, "Le numéro de document doit contenir au moins 5 caractères")
+    .max(30, "Le numéro de document doit contenir moins de 30 caractères")
+    .regex(/^[A-Z0-9\-]+$/i, "Le numéro ne peut contenir que des lettres, chiffres et tirets"),
+});
+
+// Multi-passenger form validation schema
+export const passengersFormSchema = z.object({
+  passengers: z.array(passengerSchema).min(1, "Au moins un passager est requis"),
+  termsAccepted: z.boolean().refine((val) => val === true, {
+    message: "Vous devez accepter les conditions générales",
+  }),
+});
+
 // Payment validation schema
 export const paymentSchema = z.object({
   bookingId: z.string().uuid("Invalid booking ID"),

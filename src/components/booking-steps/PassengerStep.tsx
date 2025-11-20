@@ -1,20 +1,31 @@
 import { motion } from "framer-motion";
 import { User, Users, Calendar, Globe } from "lucide-react";
-import { UnifiedForm } from "@/components/forms/UnifiedForm";
-import { UnifiedFormField } from "@/components/forms/UnifiedFormField";
-import { UnifiedSubmitButton } from "@/components/forms/UnifiedSubmitButton";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { passengersFormSchema } from "@/lib/validation";
+import { z } from "zod";
 import { CountryCodeSelect } from "@/components/CountryCodeSelect";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 interface Passenger {
   firstName: string;
   lastName: string;
   dateOfBirth: string;
   nationality: string;
-  documentType: string;
+  documentType: "passport" | "id_card";
   documentNumber: string;
 }
 
@@ -26,6 +37,8 @@ interface PassengerStepProps {
   onNext: () => void;
 }
 
+type PassengersFormValues = z.infer<typeof passengersFormSchema>;
+
 export const PassengerStep = ({
   passengers,
   onPassengersChange,
@@ -35,24 +48,34 @@ export const PassengerStep = ({
 }: PassengerStepProps) => {
   const totalPassengers = adultsCount + childrenCount;
 
-  const handlePassengerChange = (index: number, field: keyof Passenger, value: string) => {
-    const newPassengers = [...passengers];
-    if (!newPassengers[index]) {
-      newPassengers[index] = {
+  // Initialize form with react-hook-form and zod validation
+  const form = useForm<PassengersFormValues>({
+    resolver: zodResolver(passengersFormSchema),
+    mode: "onChange", // Validation en temps réel
+    defaultValues: {
+      passengers: Array.from({ length: totalPassengers }, (_, i) => passengers[i] || {
         firstName: "",
         lastName: "",
         dateOfBirth: "",
         nationality: "",
         documentType: "passport",
         documentNumber: "",
-      };
-    }
-    newPassengers[index] = { ...newPassengers[index], [field]: value };
-    onPassengersChange(newPassengers);
-  };
+      }),
+      termsAccepted: false,
+    },
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (data: PassengersFormValues) => {
+    // Cast the validated data to Passenger[] type
+    const validatedPassengers: Passenger[] = data.passengers.map(p => ({
+      firstName: p.firstName || "",
+      lastName: p.lastName || "",
+      dateOfBirth: p.dateOfBirth || "",
+      nationality: p.nationality || "",
+      documentType: p.documentType || "passport",
+      documentNumber: p.documentNumber || "",
+    }));
+    onPassengersChange(validatedPassengers);
     onNext();
   };
 
@@ -69,8 +92,8 @@ export const PassengerStep = ({
         </p>
       </div>
 
-      <UnifiedForm onSubmit={handleSubmit} variant="booking">
-        <div className="space-y-6">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
           {/* Passager principal */}
           <Card className="p-6 border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
             <div className="flex items-center gap-3 mb-6">
@@ -84,59 +107,127 @@ export const PassengerStep = ({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <UnifiedFormField
-                label="Prénom"
-                icon={User}
-                value={passengers[0]?.firstName || ""}
-                onChange={(e) => handlePassengerChange(0, "firstName", e.target.value)}
-                required
-                placeholder="Prénom"
+              <FormField
+                control={form.control}
+                name="passengers.0.firstName"
+                render={({ field, fieldState }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <User className="w-4 h-4 text-primary" />
+                      Prénom *
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Prénom"
+                        className="h-12 border-2"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
               />
-              <UnifiedFormField
-                label="Nom"
-                icon={User}
-                value={passengers[0]?.lastName || ""}
-                onChange={(e) => handlePassengerChange(0, "lastName", e.target.value)}
-                required
-                placeholder="Nom"
+              
+              <FormField
+                control={form.control}
+                name="passengers.0.lastName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <User className="w-4 h-4 text-primary" />
+                      Nom *
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Nom"
+                        className="h-12 border-2"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
               />
-              <UnifiedFormField
-                label="Date de naissance"
-                type="date"
-                icon={Calendar}
-                value={passengers[0]?.dateOfBirth || ""}
-                onChange={(e) => handlePassengerChange(0, "dateOfBirth", e.target.value)}
-                required
+
+              <FormField
+                control={form.control}
+                name="passengers.0.dateOfBirth"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-primary" />
+                      Date de naissance *
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="date"
+                        className="h-12 border-2"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
               />
-              <div className="space-y-2">
-                <Label>Nationalité</Label>
-                <CountryCodeSelect
-                  value={passengers[0]?.nationality || ""}
-                  onValueChange={(value) => handlePassengerChange(0, "nationality", value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Type de document</Label>
-                <Select
-                  value={passengers[0]?.documentType || "passport"}
-                  onValueChange={(value) => handlePassengerChange(0, "documentType", value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="passport">Passeport</SelectItem>
-                    <SelectItem value="id_card">Carte d'identité</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <UnifiedFormField
-                label="Numéro de document"
-                icon={Globe}
-                value={passengers[0]?.documentNumber || ""}
-                onChange={(e) => handlePassengerChange(0, "documentNumber", e.target.value)}
-                required
-                placeholder="Ex: 123456789"
+
+              <FormField
+                control={form.control}
+                name="passengers.0.nationality"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nationalité *</FormLabel>
+                    <FormControl>
+                      <CountryCodeSelect
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="passengers.0.documentType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Type de document *</FormLabel>
+                    <FormControl>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger className="h-12 border-2">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="passport">Passeport</SelectItem>
+                          <SelectItem value="id_card">Carte d'identité</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="passengers.0.documentNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <Globe className="w-4 h-4 text-primary" />
+                      Numéro de document *
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Ex: 123456789"
+                        className="h-12 border-2"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
               />
             </div>
           </Card>
@@ -158,59 +249,127 @@ export const PassengerStep = ({
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <UnifiedFormField
-                      label="Prénom"
-                      icon={User}
-                      value={passengers[index]?.firstName || ""}
-                      onChange={(e) => handlePassengerChange(index, "firstName", e.target.value)}
-                      required
-                      placeholder="Prénom"
+                    <FormField
+                      control={form.control}
+                      name={`passengers.${index}.firstName`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            <User className="w-4 h-4 text-primary" />
+                            Prénom *
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="Prénom"
+                              className="h-12 border-2"
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs" />
+                        </FormItem>
+                      )}
                     />
-                    <UnifiedFormField
-                      label="Nom"
-                      icon={User}
-                      value={passengers[index]?.lastName || ""}
-                      onChange={(e) => handlePassengerChange(index, "lastName", e.target.value)}
-                      required
-                      placeholder="Nom"
+
+                    <FormField
+                      control={form.control}
+                      name={`passengers.${index}.lastName`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            <User className="w-4 h-4 text-primary" />
+                            Nom *
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="Nom"
+                              className="h-12 border-2"
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs" />
+                        </FormItem>
+                      )}
                     />
-                    <UnifiedFormField
-                      label="Date de naissance"
-                      type="date"
-                      icon={Calendar}
-                      value={passengers[index]?.dateOfBirth || ""}
-                      onChange={(e) => handlePassengerChange(index, "dateOfBirth", e.target.value)}
-                      required
+
+                    <FormField
+                      control={form.control}
+                      name={`passengers.${index}.dateOfBirth`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            <Calendar className="w-4 h-4 text-primary" />
+                            Date de naissance *
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="date"
+                              className="h-12 border-2"
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs" />
+                        </FormItem>
+                      )}
                     />
-                    <div className="space-y-2">
-                      <Label>Nationalité</Label>
-                      <CountryCodeSelect
-                        value={passengers[index]?.nationality || ""}
-                        onValueChange={(value) => handlePassengerChange(index, "nationality", value)}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Type de document</Label>
-                      <Select
-                        value={passengers[index]?.documentType || "passport"}
-                        onValueChange={(value) => handlePassengerChange(index, "documentType", value)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="passport">Passeport</SelectItem>
-                          <SelectItem value="id_card">Carte d'identité</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <UnifiedFormField
-                      label="Numéro de document"
-                      icon={Globe}
-                      value={passengers[index]?.documentNumber || ""}
-                      onChange={(e) => handlePassengerChange(index, "documentNumber", e.target.value)}
-                      required
-                      placeholder="Ex: 123456789"
+
+                    <FormField
+                      control={form.control}
+                      name={`passengers.${index}.nationality`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Nationalité *</FormLabel>
+                          <FormControl>
+                            <CountryCodeSelect
+                              value={field.value}
+                              onValueChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs" />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name={`passengers.${index}.documentType`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Type de document *</FormLabel>
+                          <FormControl>
+                            <Select value={field.value} onValueChange={field.onChange}>
+                              <SelectTrigger className="h-12 border-2">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="passport">Passeport</SelectItem>
+                                <SelectItem value="id_card">Carte d'identité</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage className="text-xs" />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name={`passengers.${index}.documentNumber`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            <Globe className="w-4 h-4 text-primary" />
+                            Numéro de document *
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="Ex: 123456789"
+                              className="h-12 border-2"
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs" />
+                        </FormItem>
+                      )}
                     />
                   </div>
                 </Card>
@@ -218,23 +377,38 @@ export const PassengerStep = ({
             </div>
           )}
 
-          <div className="flex items-start space-x-2 p-4 bg-muted/50 rounded-lg">
-            <Checkbox id="terms" required />
-            <label
-              htmlFor="terms"
-              className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              J'accepte les conditions générales de vente et la politique de confidentialité de B-reserve
-            </label>
-          </div>
-        </div>
+          <FormField
+            control={form.control}
+            name="termsAccepted"
+            render={({ field }) => (
+              <FormItem className="flex items-start space-x-2 p-4 bg-muted/50 rounded-lg">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel className="text-sm font-normal cursor-pointer">
+                    J'accepte les conditions générales de vente et la politique de confidentialité de B-reserve
+                  </FormLabel>
+                  <FormMessage className="text-xs" />
+                </div>
+              </FormItem>
+            )}
+          />
 
-        <div className="mt-8">
-          <UnifiedSubmitButton variant="booking" fullWidth>
-            Continuer vers les bagages
-          </UnifiedSubmitButton>
-        </div>
-      </UnifiedForm>
+          <div className="mt-8">
+            <Button
+              type="submit"
+              className="w-full h-14 text-lg font-semibold bg-primary hover:bg-primary/90"
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting ? "Vérification..." : "Continuer vers les bagages"}
+            </Button>
+          </div>
+        </form>
+      </Form>
     </motion.div>
   );
 };
