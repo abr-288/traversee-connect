@@ -13,14 +13,47 @@ serve(async (req) => {
   try {
     const { origin, destination, departureDate, returnDate, adults, children = 0, travelClass = 'ECONOMY' } = await req.json();
 
+    // Validation des paramètres requis
+    if (!origin || !destination || !departureDate) {
+      console.error('Missing required parameters:', { origin, destination, departureDate });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Les paramètres origin, destination et departureDate sont requis',
+          data: [],
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
     // Extract IATA codes from strings like "Dakar (DSS)" or just "DSS"
     const extractIataCode = (location: string): string => {
+      if (!location || location.trim() === '') return '';
       const match = location.match(/\(([A-Z]{3})\)/);
       return match ? match[1] : location.replace(/[^A-Z]/g, '').substring(0, 3);
     };
 
     const originCode = extractIataCode(origin);
     const destinationCode = extractIataCode(destination);
+
+    // Validation des codes IATA extraits
+    if (!originCode || originCode.length !== 3 || !destinationCode || destinationCode.length !== 3) {
+      console.error('Invalid IATA codes:', { originCode, destinationCode, origin, destination });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Codes IATA invalides. Veuillez sélectionner des aéroports valides.',
+          data: [],
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
 
     console.log('Searching flights:', { origin: originCode, destination: destinationCode, departureDate, returnDate, adults, children, travelClass });
 

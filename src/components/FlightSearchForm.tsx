@@ -39,13 +39,16 @@ export const FlightSearchForm = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!from || !to || !departureDate) {
+    // Validation stricte des champs requis
+    if (!from || from.trim() === '' || !to || to.trim() === '' || !departureDate) {
+      console.error('Validation failed:', { from, to, departureDate });
+      // Afficher un message d'erreur à l'utilisateur
       return;
     }
 
     const params = new URLSearchParams({
-      from,
-      to,
+      from: from.trim(),
+      to: to.trim(),
       date: format(departureDate, "yyyy-MM-dd"),
       ...(tripType === "roundtrip" && returnDate && { returnDate: format(returnDate, "yyyy-MM-dd") }),
       adults,

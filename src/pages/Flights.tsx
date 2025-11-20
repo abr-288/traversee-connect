@@ -55,7 +55,9 @@ const Flights = () => {
     const children = parseInt(searchParams.get("children") || "0", 10);
     const travelClass = searchParams.get("class") || "ECONOMY";
 
-    if (!from || !to || !date || Number.isNaN(adults)) {
+    // Validation stricte incluant les chaînes vides
+    if (!from || from.trim() === '' || !to || to.trim() === '' || !date || Number.isNaN(adults)) {
+      console.error('Paramètres de recherche invalides:', { from, to, date, adults });
       return;
     }
 
