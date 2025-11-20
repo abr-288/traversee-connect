@@ -26,6 +26,8 @@ import Destinations from "./pages/Destinations";
 import Install from "./pages/Install";
 import NotFound from "./pages/NotFound";
 import FlightBookingProcess from "./pages/FlightBookingProcess";
+import Activities from "./pages/Activities";
+import Stays from "./pages/Stays";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +61,8 @@ const App = () => (
           <Route path="/payment" element={<Payment />} />
           <Route path="/confirmation" element={<Confirmation />} />
           <Route path="/booking-process" element={<FlightBookingProcess />} />
+          <Route path="/activities" element={<Activities />} />
+          <Route path="/stays" element={<Stays />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
