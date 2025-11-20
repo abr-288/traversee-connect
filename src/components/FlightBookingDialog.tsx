@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Plane, Download, ArrowLeft, Users, Briefcase, Luggage, X, Check, Info } from "lucide-react";
+import { Plane, Download, ArrowLeft, Users, Briefcase, Luggage, X, Check, Info, Clock, MapPin, Calendar } from "lucide-react";
 import { bookingSchema } from "@/lib/validation";
 import { UnifiedForm, UnifiedFormField, UnifiedSubmitButton } from "@/components/forms";
 import { Card } from "@/components/ui/card";
@@ -232,128 +232,158 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
         {currentStep === 'fareSelection' && (
           <div className="h-full flex flex-col">
             {/* Header */}
-            <div className="p-6 border-b bg-background sticky top-0 z-10">
+            <div className="p-6 border-b bg-gradient-to-r from-primary/10 to-primary/5 sticky top-0 z-10">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">Informations relatives au voyage</h2>
-                <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)}>
+                <div>
+                  <h2 className="text-2xl font-bold text-foreground">Informations relatives au voyage</h2>
+                  <p className="text-sm text-muted-foreground mt-1">B-reserve by Bossiz</p>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)} className="hover:bg-background/50">
                   <X className="h-5 w-5" />
                 </Button>
               </div>
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  <span>1</span>
+              <div className="flex items-center gap-6 text-sm">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Users className="h-4 w-4 text-primary" />
+                  <span className="font-medium">1 Passager</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Briefcase className="h-4 w-4" />
-                  <span>0</span>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Briefcase className="h-4 w-4 text-primary" />
+                  <span className="font-medium">Bagage cabine</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Luggage className="h-4 w-4" />
-                  <span>0</span>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Luggage className="h-4 w-4 text-primary" />
+                  <span className="font-medium">Bagage en soute</span>
                 </div>
               </div>
             </div>
 
             <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-0">
               {/* Left Side - Flight Details */}
-              <div className="p-6 bg-muted/30">
+              <div className="p-8 bg-gradient-to-b from-muted/30 to-background">
                 <div className="space-y-6">
-                  {/* Route Header */}
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-semibold">{flight.from} → {flight.to}</h3>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Plane className="h-4 w-4" />
-                      <span>2 h 50 min</span>
-                    </div>
-                  </div>
-
-                  {/* Flight Timeline */}
-                  <Card className="p-4">
-                    {/* Departure */}
-                    <div className="flex items-start gap-4">
-                      <div className="flex flex-col items-center">
-                        <div className="text-2xl font-bold">{formatTime(flight.departure)}</div>
-                        <div className="text-xs text-muted-foreground">ven. 21 nov.</div>
+                  {/* Airline Header */}
+                  <Card className="p-5 bg-gradient-to-r from-primary/10 to-background border-primary/30 shadow-sm">
+                    <div className="flex items-center gap-4">
+                      <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center ring-2 ring-primary/20">
+                        <Plane className="h-7 w-7 text-primary" />
                       </div>
                       <div className="flex-1">
-                        <div className="font-semibold">{flight.from} · DSS</div>
-                        <div className="text-sm text-muted-foreground">Blaise Diagne International Airport</div>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Compagnie aérienne</p>
+                        <p className="text-xl font-bold text-foreground">{flight.airline}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">Vol · Classe {flight.class}</p>
                       </div>
                     </div>
+                  </Card>
 
-                    {/* Duration Line */}
-                    <div className="flex items-center gap-2 my-4 pl-12">
-                      <div className="flex items-center gap-2 text-sm">
-                        <div className="h-12 w-[2px] bg-border" />
-                        <span className="text-muted-foreground">2 h 50 min</span>
-                        <Plane className="h-4 w-4 text-primary" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-primary" />
-                          <span className="text-sm font-medium text-primary">{flight.airline}</span>
+                  {/* Itinerary Card */}
+                  <Card className="p-6 shadow-sm">
+                    <div className="flex items-center gap-2 mb-6">
+                      <MapPin className="h-5 w-5 text-primary" />
+                      <h3 className="font-bold text-lg">Itinéraire détaillé</h3>
+                    </div>
+                    
+                    <div className="space-y-6">
+                      {/* Departure */}
+                      <div className="relative pl-8 border-l-2 border-primary/40">
+                        <div className="absolute -left-[9px] top-0 h-4 w-4 rounded-full bg-primary border-4 border-background shadow-sm"></div>
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 mb-1">
+                            <div className="px-2 py-0.5 bg-primary/10 text-primary text-xs font-semibold rounded">Départ</div>
+                            <Calendar className="h-3 w-3 text-muted-foreground" />
+                            <span className="text-xs text-muted-foreground font-medium">
+                              {new Date(departureDate).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                            </span>
+                          </div>
+                          <div className="flex items-baseline gap-3">
+                            <p className="text-3xl font-bold text-foreground">{formatTime(flight.departure)}</p>
+                            <Clock className="h-4 w-4 text-muted-foreground" />
+                          </div>
+                          <p className="text-base font-semibold">{flight.from}</p>
+                          <p className="text-sm text-muted-foreground">Aéroport international</p>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Arrival with Stopover */}
-                    <div className="flex items-start gap-4">
-                      <div className="flex flex-col items-center">
-                        <div className="text-2xl font-bold">{formatTime(flight.arrival)}</div>
-                        <div className="text-xs text-muted-foreground">ven. 21 nov.</div>
-                      </div>
-                      <div className="flex-1">
-                        <div className="font-semibold">{flight.to} · ABJ</div>
-                        <div className="text-sm text-muted-foreground">Aéroport international Félix-Houphouët-Boigny</div>
-                        <div className="mt-2 flex items-start gap-2 text-amber-600 bg-amber-50 dark:bg-amber-950/30 p-3 rounded-lg">
-                          <span className="text-lg">⭐</span>
-                          <div className="flex-1">
-                            <div className="font-medium">Astuce « ville cachée » :</div>
-                            <div className="text-sm">Bamako est la destination finale de cet itinéraire, mais vous vous arrêterez dans la ville d&apos;escale.</div>
+                      {/* Flight Duration */}
+                      <div className="pl-8 border-l-2 border-dashed border-border">
+                        <div className="flex items-center gap-3 py-2">
+                          <Clock className="h-5 w-5 text-primary" />
+                          <div>
+                            <p className="text-sm font-semibold">Durée totale du vol</p>
+                            <p className="text-xs text-muted-foreground">Temps de trajet estimé</p>
+                          </div>
+                        </div>
+                        
+                        {/* Stopover Warning if needed */}
+                        <div className="mt-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 rounded-lg p-4">
+                          <div className="flex items-start gap-3">
+                            <Info className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                            <div>
+                              <p className="text-sm font-semibold text-amber-900 dark:text-amber-100">
+                                Vol avec escale
+                              </p>
+                              <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
+                                Ce vol peut comporter une ou plusieurs escales. Les détails précis des escales et temps d'attente seront communiqués lors de la confirmation.
+                              </p>
+                            </div>
                           </div>
                         </div>
                       </div>
+
+                      {/* Arrival */}
+                      <div className="relative pl-8 border-l-2 border-primary/40">
+                        <div className="absolute -left-[9px] top-0 h-4 w-4 rounded-full bg-primary border-4 border-background shadow-sm"></div>
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 mb-1">
+                            <div className="px-2 py-0.5 bg-primary/10 text-primary text-xs font-semibold rounded">Arrivée</div>
+                            <Calendar className="h-3 w-3 text-muted-foreground" />
+                            <span className="text-xs text-muted-foreground font-medium">
+                              {new Date(departureDate).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                            </span>
+                          </div>
+                          <div className="flex items-baseline gap-3">
+                            <p className="text-3xl font-bold text-foreground">{formatTime(flight.arrival)}</p>
+                            <Clock className="h-4 w-4 text-muted-foreground" />
+                          </div>
+                          <p className="text-base font-semibold">{flight.to}</p>
+                          <p className="text-sm text-muted-foreground">Aéroport international</p>
+                        </div>
+                      </div>
                     </div>
                   </Card>
 
-                  {/* Stopover Info */}
-                  <Card className="p-4 bg-background">
-                    <div className="font-medium mb-2">Bamako · BKO</div>
-                    <div className="text-sm text-muted-foreground">Mali</div>
-                  </Card>
-
-                  {/* Share */}
-                  <Card className="p-4">
+                  {/* Price Card */}
+                  <Card className="p-5 bg-gradient-to-br from-primary/15 to-primary/5 border-primary/30 shadow-sm">
                     <div className="flex items-center justify-between">
-                      <span className="font-medium">Vous voyagez avec quelqu&apos;un ?</span>
-                      <Button variant="ghost" size="sm" className="flex items-center gap-2">
-                        <span>↗</span>
-                        <span>Partager</span>
-                      </Button>
-                    </div>
-                    <div className="text-sm text-muted-foreground mt-1">
-                      Partagez les informations relatives à votre itinéraire
+                      <div>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Prix du billet</p>
+                        <p className="text-sm text-muted-foreground">Par passager</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-3xl font-bold text-primary">{flight.price.toLocaleString()}</p>
+                        <p className="text-sm text-muted-foreground">FCFA</p>
+                      </div>
                     </div>
                   </Card>
                 </div>
               </div>
 
               {/* Right Side - Fare Options */}
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-6">Sélectionnez une option de réservation</h3>
+              <div className="p-8 bg-background">
+                <h3 className="text-2xl font-bold mb-2">Sélectionnez une option de réservation</h3>
+                <p className="text-sm text-muted-foreground mb-8">Choisissez l'option qui correspond le mieux à vos besoins</p>
                 
                 <div className="space-y-4">
                   {/* Basic Fare */}
-                  <Card className="p-6 hover:border-primary transition-colors">
-                    <div className="flex items-start gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-full bg-teal-500 flex items-center justify-center text-white font-bold">
-                        K
+                  <Card className="p-6 hover:border-primary/50 hover:shadow-md transition-all">
+                    <div className="flex items-start gap-4 mb-5">
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center border border-primary/20">
+                        <Briefcase className="h-6 w-6 text-primary" />
                       </div>
                       <div className="flex-1">
-                        <h4 className="text-xl font-semibold mb-2">Basic</h4>
-                        <p className="text-sm text-muted-foreground">
-                          Seulement le billet d&apos;avion, rien d&apos;autre. Vous pouvez choisir des services supplémentaires plus tard, mais vous ferez des économies si vous les ajoutez maintenant.
+                        <h4 className="text-xl font-bold mb-2">Tarif Basic</h4>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          L'essentiel pour votre voyage. Billet d'avion uniquement avec bagage cabine inclus.
                         </p>
                       </div>
                     </div>
@@ -375,10 +405,10 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
 
                     <Button 
                       onClick={() => handleSelectFare('basic')}
-                      className="w-full bg-slate-600 hover:bg-slate-700"
+                      className="w-full"
                       size="lg"
                     >
-                      Continuer pour un montant de {flight.price.toLocaleString()} €
+                      Continuer pour {flight.price.toLocaleString()} FCFA
                     </Button>
 
                     <button className="w-full text-center text-sm text-primary mt-3 flex items-center justify-center gap-1">
@@ -405,15 +435,18 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
                   </Card>
 
                   {/* Benefits Fare */}
-                  <Card className="p-6 border-2 border-primary hover:border-primary/80 transition-colors">
-                    <div className="flex items-start gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-full bg-teal-500 flex items-center justify-center text-white font-bold">
-                        K
+                  <Card className="p-6 border-2 border-primary hover:border-primary/90 hover:shadow-lg transition-all bg-gradient-to-br from-primary/5 to-background">
+                    <div className="flex items-start gap-4 mb-5">
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md">
+                        <Check className="h-6 w-6 text-primary-foreground" />
                       </div>
                       <div className="flex-1">
-                        <h4 className="text-xl font-semibold mb-2">Benefits</h4>
-                        <p className="text-sm text-muted-foreground">
-                          Obtenez un remboursement instantané en crédit sur votre compte Kiwi.com si des annulations ou des retards imputables à la compagnie aérienne
+                        <div className="flex items-center gap-2 mb-2">
+                          <h4 className="text-xl font-bold">Tarif Benefits</h4>
+                          <span className="px-2 py-0.5 bg-primary/10 text-primary text-xs font-bold rounded">RECOMMANDÉ</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          Voyage en toute sérénité avec des avantages exclusifs et une protection complète.
                         </p>
                       </div>
                     </div>
@@ -421,15 +454,19 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
                     <div className="space-y-3 mb-6">
                       <div className="flex items-start gap-2 text-sm">
                         <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                        <span>Bagages et sièges moins chers</span>
+                        <span className="font-medium">Bagages et sièges à tarifs préférentiels</span>
                       </div>
                       <div className="flex items-start gap-2 text-sm">
                         <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                        <span>Remboursement instantané en crédit Kiwi.com en cas d&apos;annulation de la compagnie aérienne</span>
+                        <span className="font-medium">Remboursement instantané en cas d&apos;annulation par la compagnie</span>
                       </div>
                       <div className="flex items-start gap-2 text-sm">
                         <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                        <span>Informations en direct concernant les retards et les portes d&apos;embarquement</span>
+                        <span className="font-medium">Informations en temps réel (retards, portes d&apos;embarquement)</span>
+                      </div>
+                      <div className="flex items-start gap-2 text-sm">
+                        <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                        <span className="font-medium">Assistance prioritaire 24/7</span>
                       </div>
                     </div>
 
@@ -438,7 +475,7 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
                       className="w-full"
                       size="lg"
                     >
-                      Continuer pour un montant de {(flight.price + 50).toLocaleString()} €
+                      Continuer pour {(flight.price + 25000).toLocaleString()} FCFA
                     </Button>
 
                     <button className="w-full text-center text-sm text-primary mt-3 flex items-center justify-center gap-1">
