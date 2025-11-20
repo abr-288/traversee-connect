@@ -2,12 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Plane, Download, ArrowLeft } from "lucide-react";
+import { Plane, Download, ArrowLeft, Users, Briefcase, Luggage, X, Check, Info } from "lucide-react";
 import { bookingSchema } from "@/lib/validation";
 import { UnifiedForm, UnifiedFormField, UnifiedSubmitButton } from "@/components/forms";
+import { Card } from "@/components/ui/card";
 
 interface FlightBookingDialogProps {
   open: boolean;
@@ -33,7 +34,8 @@ interface FlightBookingDialogProps {
 export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams = null }: FlightBookingDialogProps) => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
-  const [showSummary, setShowSummary] = useState(false);
+  const [currentStep, setCurrentStep] = useState<'fareSelection' | 'booking' | 'summary'>('fareSelection');
+  const [selectedFare, setSelectedFare] = useState<'basic' | 'benefits' | null>(null);
   const [formData, setFormData] = useState<any>(null);
   const [bookingId, setBookingId] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -79,7 +81,7 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
       passportExpiryDate,
       notes,
     });
-    setShowSummary(true);
+    setCurrentStep('summary');
   };
 
   const handleConfirmBooking = async () => {
@@ -175,7 +177,21 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
   };
 
   const handleBackToForm = () => {
-    setShowSummary(false);
+    setCurrentStep('booking');
+  };
+
+  const handleSelectFare = (fare: 'basic' | 'benefits') => {
+    setSelectedFare(fare);
+    setCurrentStep('booking');
+  };
+
+  const formatTime = (isoString: string) => {
+    try {
+      const date = new Date(isoString);
+      return date.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+    } catch {
+      return isoString;
+    }
   };
 
   const handleDownloadTicket = async () => {
@@ -211,19 +227,329 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Plane className="h-5 w-5 text-primary" />
-            {showSummary ? t('booking.dialog.flight.summary') : t('booking.dialog.flight.title')}
-          </DialogTitle>
-          <DialogDescription>
-            {flight.airline} • {flight.from} → {flight.to} • {flight.class} • {tripType}
-          </DialogDescription>
-        </DialogHeader>
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="right" className="w-full sm:max-w-[95vw] p-0 overflow-y-auto">
+        {currentStep === 'fareSelection' && (
+          <div className="h-full flex flex-col">
+            {/* Header */}
+            <div className="p-6 border-b bg-background sticky top-0 z-10">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold">Informations relatives au voyage</h2>
+                <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)}>
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  <span>1</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Briefcase className="h-4 w-4" />
+                  <span>0</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Luggage className="h-4 w-4" />
+                  <span>0</span>
+                </div>
+              </div>
+            </div>
 
-        {showSummary ? (
+            <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-0">
+              {/* Left Side - Flight Details */}
+              <div className="p-6 bg-muted/30">
+                <div className="space-y-6">
+                  {/* Route Header */}
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-semibold">{flight.from} → {flight.to}</h3>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Plane className="h-4 w-4" />
+                      <span>2 h 50 min</span>
+                    </div>
+                  </div>
+
+                  {/* Flight Timeline */}
+                  <Card className="p-4">
+                    {/* Departure */}
+                    <div className="flex items-start gap-4">
+                      <div className="flex flex-col items-center">
+                        <div className="text-2xl font-bold">{formatTime(flight.departure)}</div>
+                        <div className="text-xs text-muted-foreground">ven. 21 nov.</div>
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-semibold">{flight.from} · DSS</div>
+                        <div className="text-sm text-muted-foreground">Blaise Diagne International Airport</div>
+                      </div>
+                    </div>
+
+                    {/* Duration Line */}
+                    <div className="flex items-center gap-2 my-4 pl-12">
+                      <div className="flex items-center gap-2 text-sm">
+                        <div className="h-12 w-[2px] bg-border" />
+                        <span className="text-muted-foreground">2 h 50 min</span>
+                        <Plane className="h-4 w-4 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-primary" />
+                          <span className="text-sm font-medium text-primary">{flight.airline}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Arrival with Stopover */}
+                    <div className="flex items-start gap-4">
+                      <div className="flex flex-col items-center">
+                        <div className="text-2xl font-bold">{formatTime(flight.arrival)}</div>
+                        <div className="text-xs text-muted-foreground">ven. 21 nov.</div>
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-semibold">{flight.to} · ABJ</div>
+                        <div className="text-sm text-muted-foreground">Aéroport international Félix-Houphouët-Boigny</div>
+                        <div className="mt-2 flex items-start gap-2 text-amber-600 bg-amber-50 dark:bg-amber-950/30 p-3 rounded-lg">
+                          <span className="text-lg">⭐</span>
+                          <div className="flex-1">
+                            <div className="font-medium">Astuce « ville cachée » :</div>
+                            <div className="text-sm">Bamako est la destination finale de cet itinéraire, mais vous vous arrêterez dans la ville d&apos;escale.</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+
+                  {/* Stopover Info */}
+                  <Card className="p-4 bg-background">
+                    <div className="font-medium mb-2">Bamako · BKO</div>
+                    <div className="text-sm text-muted-foreground">Mali</div>
+                  </Card>
+
+                  {/* Share */}
+                  <Card className="p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">Vous voyagez avec quelqu&apos;un ?</span>
+                      <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                        <span>↗</span>
+                        <span>Partager</span>
+                      </Button>
+                    </div>
+                    <div className="text-sm text-muted-foreground mt-1">
+                      Partagez les informations relatives à votre itinéraire
+                    </div>
+                  </Card>
+                </div>
+              </div>
+
+              {/* Right Side - Fare Options */}
+              <div className="p-6">
+                <h3 className="text-xl font-semibold mb-6">Sélectionnez une option de réservation</h3>
+                
+                <div className="space-y-4">
+                  {/* Basic Fare */}
+                  <Card className="p-6 hover:border-primary transition-colors">
+                    <div className="flex items-start gap-3 mb-4">
+                      <div className="w-10 h-10 rounded-full bg-teal-500 flex items-center justify-center text-white font-bold">
+                        K
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-xl font-semibold mb-2">Basic</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Seulement le billet d&apos;avion, rien d&apos;autre. Vous pouvez choisir des services supplémentaires plus tard, mais vous ferez des économies si vous les ajoutez maintenant.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3 mb-6">
+                      <div className="flex items-start gap-2 text-sm">
+                        <X className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                        <span className="line-through text-muted-foreground">Bagages et sièges moins chers</span>
+                      </div>
+                      <div className="flex items-start gap-2 text-sm">
+                        <X className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                        <span className="line-through text-muted-foreground">Remboursement instantané en crédit Kiwi.com en cas d&apos;annulation de la compagnie aérienne</span>
+                      </div>
+                      <div className="flex items-start gap-2 text-sm">
+                        <X className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                        <span className="line-through text-muted-foreground">Informations en direct concernant les retards et les portes d&apos;embarquement</span>
+                      </div>
+                    </div>
+
+                    <Button 
+                      onClick={() => handleSelectFare('basic')}
+                      className="w-full bg-slate-600 hover:bg-slate-700"
+                      size="lg"
+                    >
+                      Continuer pour un montant de {flight.price.toLocaleString()} €
+                    </Button>
+
+                    <button className="w-full text-center text-sm text-primary mt-3 flex items-center justify-center gap-1">
+                      <span>+</span>
+                      <span className="underline">Afficher les détails</span>
+                    </button>
+
+                    <div className="mt-4 space-y-2">
+                      <div className="flex items-start gap-2 text-sm">
+                        <Info className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+                        <span className="text-muted-foreground">Vol annulé ou retardé</span>
+                      </div>
+                      <div className="text-xs text-muted-foreground ml-6">
+                        Cela dépend des règles de la compagnie aérienne et des lois applicables
+                      </div>
+                      <div className="flex items-start gap-2 text-sm mt-3">
+                        <Info className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+                        <span className="text-muted-foreground">Annulez ou modifiez votre voyage</span>
+                      </div>
+                      <div className="text-xs text-muted-foreground ml-6">
+                        Cela dépend des règles de la compagnie aérienne
+                      </div>
+                    </div>
+                  </Card>
+
+                  {/* Benefits Fare */}
+                  <Card className="p-6 border-2 border-primary hover:border-primary/80 transition-colors">
+                    <div className="flex items-start gap-3 mb-4">
+                      <div className="w-10 h-10 rounded-full bg-teal-500 flex items-center justify-center text-white font-bold">
+                        K
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-xl font-semibold mb-2">Benefits</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Obtenez un remboursement instantané en crédit sur votre compte Kiwi.com si des annulations ou des retards imputables à la compagnie aérienne
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3 mb-6">
+                      <div className="flex items-start gap-2 text-sm">
+                        <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                        <span>Bagages et sièges moins chers</span>
+                      </div>
+                      <div className="flex items-start gap-2 text-sm">
+                        <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                        <span>Remboursement instantané en crédit Kiwi.com en cas d&apos;annulation de la compagnie aérienne</span>
+                      </div>
+                      <div className="flex items-start gap-2 text-sm">
+                        <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                        <span>Informations en direct concernant les retards et les portes d&apos;embarquement</span>
+                      </div>
+                    </div>
+
+                    <Button 
+                      onClick={() => handleSelectFare('benefits')}
+                      className="w-full"
+                      size="lg"
+                    >
+                      Continuer pour un montant de {(flight.price + 50).toLocaleString()} €
+                    </Button>
+
+                    <button className="w-full text-center text-sm text-primary mt-3 flex items-center justify-center gap-1">
+                      <span>+</span>
+                      <span className="underline">Afficher les détails</span>
+                    </button>
+                  </Card>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentStep === 'booking' && (
+          <div className="p-6">
+            <SheetHeader className="mb-6">
+              <SheetTitle className="flex items-center gap-2">
+                <Plane className="h-5 w-5 text-primary" />
+                {t('booking.dialog.flight.title')}
+              </SheetTitle>
+              <p className="text-sm text-muted-foreground">
+                {flight.airline} • {flight.from} → {flight.to} • {flight.class} • {tripType}
+              </p>
+              {selectedFare && (
+                <p className="text-sm font-medium text-primary">
+                  Option sélectionnée: {selectedFare === 'basic' ? 'Basic' : 'Benefits'}
+                </p>
+              )}
+            </SheetHeader>
+
+            <UnifiedForm onSubmit={handleFormSubmit} variant="booking" loading={loading}>
+              <div className="space-y-6">
+                <UnifiedFormField
+                  label="Nombre de passagers"
+                  name="passengers"
+                  type="number"
+                  defaultValue="1"
+                  min={1}
+                  required
+                />
+
+                <div className="space-y-4 pt-4 border-t">
+                  <h3 className="font-semibold text-lg">Informations du passager principal</h3>
+                  
+                  <UnifiedFormField
+                    label="Nom complet"
+                    name="customerName"
+                    placeholder="Nom tel qu'inscrit sur le passeport"
+                    required
+                  />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <UnifiedFormField
+                      label="Email"
+                      name="customerEmail"
+                      type="email"
+                      placeholder="email@example.com"
+                      required
+                    />
+                    <UnifiedFormField
+                      label="Téléphone"
+                      name="customerPhone"
+                      type="tel"
+                      placeholder="+225 XX XX XX XX XX"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-4 pt-4 border-t">
+                  <h3 className="font-semibold text-lg">Informations du passeport</h3>
+                  
+                  <UnifiedFormField
+                    label="Numéro de passeport"
+                    name="passportNumber"
+                    placeholder="ABC123456"
+                    required
+                  />
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <UnifiedFormField
+                      label="Date de délivrance"
+                      name="passportIssueDate"
+                      type="date"
+                      required
+                    />
+                    <UnifiedFormField
+                      label="Date d'expiration"
+                      name="passportExpiryDate"
+                      type="date"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <UnifiedFormField
+                  label="Demandes spéciales"
+                  name="notes"
+                  type="textarea"
+                  placeholder="Préférences de siège, régime alimentaire, assistance spéciale..."
+                />
+
+                <UnifiedSubmitButton variant="booking" loading={loading} fullWidth>
+                  Continuer vers le récapitulatif
+                </UnifiedSubmitButton>
+              </div>
+            </UnifiedForm>
+          </div>
+        )}
+
+        {currentStep === 'summary' && (
           // Summary View
           <div className="space-y-6">
             <div className="bg-primary/5 border-2 border-primary/20 p-6 rounded-lg space-y-4">
@@ -338,87 +664,8 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
               )}
             </div>
           </div>
-        ) : (
-          // Booking Form
-          <UnifiedForm onSubmit={handleFormSubmit} variant="booking" loading={loading}>
-            <div className="space-y-6">
-              <UnifiedFormField
-                label="Nombre de passagers"
-                name="passengers"
-                type="number"
-                defaultValue="1"
-                min={1}
-                required
-              />
-
-              <div className="space-y-4 pt-4 border-t">
-                <h3 className="font-semibold text-lg">Informations du passager principal</h3>
-                
-                <UnifiedFormField
-                  label="Nom complet"
-                  name="customerName"
-                  placeholder="Nom tel qu'inscrit sur le passeport"
-                  required
-                />
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <UnifiedFormField
-                    label="Email"
-                    name="customerEmail"
-                    type="email"
-                    placeholder="email@example.com"
-                    required
-                  />
-                  <UnifiedFormField
-                    label="Téléphone"
-                    name="customerPhone"
-                    type="tel"
-                    placeholder="+225 XX XX XX XX XX"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-4 pt-4 border-t">
-                <h3 className="font-semibold text-lg">Informations du passeport</h3>
-                
-                <UnifiedFormField
-                  label="Numéro de passeport"
-                  name="passportNumber"
-                  placeholder="ABC123456"
-                  required
-                />
-
-                <div className="grid grid-cols-2 gap-4">
-                  <UnifiedFormField
-                    label="Date de délivrance"
-                    name="passportIssueDate"
-                    type="date"
-                    required
-                  />
-                  <UnifiedFormField
-                    label="Date d'expiration"
-                    name="passportExpiryDate"
-                    type="date"
-                    required
-                  />
-                </div>
-              </div>
-
-              <UnifiedFormField
-                label="Demandes spéciales"
-                name="notes"
-                type="textarea"
-                placeholder="Préférences de siège, régime alimentaire, assistance spéciale..."
-              />
-
-              <UnifiedSubmitButton variant="booking" loading={loading} fullWidth>
-                Continuer vers le récapitulatif
-              </UnifiedSubmitButton>
-            </div>
-          </UnifiedForm>
         )}
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 };
