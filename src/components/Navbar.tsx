@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import logoDark from "@/assets/logo-dark.png";
 import logoLight from "@/assets/logo-light.png";
 import LanguageSwitcher from "./LanguageSwitcher";
+import CurrencySelector from "./CurrencySelector";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -93,6 +94,10 @@ const Navbar = () => {
               <div className="h-4 w-px bg-white/20"></div>
               
               <LanguageSwitcher />
+              
+              <div className="h-4 w-px bg-white/20"></div>
+              
+              <CurrencySelector />
               
               {isInstallable && !isInstalled && (
                 <>
@@ -221,6 +226,9 @@ const Navbar = () => {
               <div className="flex flex-col gap-2 px-4 pt-4 border-t border-primary-light">
                 <div className="w-full mb-2">
                   <LanguageSwitcher />
+                </div>
+                <div className="w-full mb-2">
+                  <CurrencySelector />
                 </div>
                 {isLoggedIn ? (
                   <>
