@@ -21,6 +21,7 @@ import { format, isSameDay, parseISO, startOfMonth, endOfMonth } from "date-fns"
 import { fr } from "date-fns/locale";
 import { Calendar as CalendarIcon, Filter, MapPin, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Price } from "@/components/ui/price";
 
 interface Booking {
   id: string;
@@ -263,7 +264,7 @@ export const BookingCalendar = ({ bookings }: BookingCalendarProps) => {
                         {booking.guests} voyageur{booking.guests > 1 ? "s" : ""}
                       </span>
                       <span className="font-semibold">
-                        {Number(booking.total_price).toLocaleString()} {booking.currency}
+                        <Price amount={Number(booking.total_price)} fromCurrency={booking.currency} />
                       </span>
                     </div>
                   </div>
@@ -335,7 +336,7 @@ export const BookingCalendar = ({ bookings }: BookingCalendarProps) => {
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Montant total</label>
                   <p className="font-semibold">
-                    {Number(selectedBooking.total_price).toLocaleString()} {selectedBooking.currency}
+                    <Price amount={Number(selectedBooking.total_price)} fromCurrency={selectedBooking.currency} showLoader />
                   </p>
                 </div>
                 <div className="col-span-2">

@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { useServices } from "@/hooks/useServices";
 import { useNavigate } from "react-router-dom";
 import { BookingDialog } from "@/components/BookingDialog";
+import { Price } from "@/components/ui/price";
 
 const SpecialOffers = () => {
   const { t } = useTranslation();
@@ -117,14 +118,15 @@ const SpecialOffers = () => {
 
                     <div className="flex items-baseline gap-2 mb-4">
                       <span className="text-2xl font-bold text-primary">
-                        {new Intl.NumberFormat('fr-FR').format(
-                          Number(offer.price_per_unit) * (1 - offer.discount / 100)
-                        )}
+                        <Price 
+                          amount={Number(offer.price_per_unit) * (1 - offer.discount / 100)} 
+                          fromCurrency={offer.currency}
+                          showLoader 
+                        />
                       </span>
                       <span className="text-sm text-muted-foreground line-through">
-                        {new Intl.NumberFormat('fr-FR').format(Number(offer.price_per_unit))}
+                        <Price amount={Number(offer.price_per_unit)} fromCurrency={offer.currency} />
                       </span>
-                      <span className="text-xs text-muted-foreground">{offer.currency}</span>
                     </div>
 
                     <Button

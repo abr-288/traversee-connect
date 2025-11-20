@@ -9,6 +9,7 @@ import { useState } from "react";
 import { useCreateBooking } from "@/hooks/useCreateBooking";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { Price } from "@/components/ui/price";
 
 interface Passenger {
   firstName: string;
@@ -241,25 +242,31 @@ export const SummaryStep = ({
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
                 <span>Vol ({adultsCount + childrenCount} passagers)</span>
-                <span className="font-medium">{getBasePrice().toLocaleString()} FCFA</span>
+                <span className="font-medium">
+                  <Price amount={getBasePrice()} fromCurrency="XOF" />
+                </span>
               </div>
               {getBaggagePrice() > 0 && (
                 <div className="flex justify-between text-sm">
                   <span>Bagages</span>
-                  <span className="font-medium">{getBaggagePrice().toLocaleString()} FCFA</span>
+                  <span className="font-medium">
+                    <Price amount={getBaggagePrice()} fromCurrency="XOF" />
+                  </span>
                 </div>
               )}
               {getSeatsPrice() > 0 && (
                 <div className="flex justify-between text-sm">
                   <span>Sièges</span>
-                  <span className="font-medium">{getSeatsPrice().toLocaleString()} FCFA</span>
+                  <span className="font-medium">
+                    <Price amount={getSeatsPrice()} fromCurrency="XOF" />
+                  </span>
                 </div>
               )}
               <Separator />
               <div className="flex justify-between items-center">
                 <span className="font-semibold text-lg">Total</span>
                 <span className="font-bold text-2xl text-primary">
-                  {getTotalPrice().toLocaleString()} FCFA
+                  <Price amount={getTotalPrice()} fromCurrency="XOF" showLoader />
                 </span>
               </div>
             </div>

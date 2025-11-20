@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { MapPin, Calendar, Users, MoreVertical, Edit, Trash2, CheckCircle, XCircle, FileDown, Loader2 } from "lucide-react";
 import { useBookingPDF } from "@/hooks/useBookingPDF";
+import { Price } from "@/components/ui/price";
 
 interface Booking {
   id: string;
@@ -190,7 +191,7 @@ export const BookingCard = ({ booking, onConfirm, onCancel, onEdit, onDelete }: 
               <Badge variant="outline">{getPaymentLabel(booking.payment_status)}</Badge>
             </div>
             <div className="text-lg font-bold">
-              {Number(booking.total_price).toLocaleString()} {booking.currency}
+              <Price amount={Number(booking.total_price)} fromCurrency={booking.currency} showLoader />
             </div>
           </div>
         </CardContent>

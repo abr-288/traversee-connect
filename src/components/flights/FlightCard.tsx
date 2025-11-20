@@ -1,6 +1,7 @@
 import { Plane } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Price } from "@/components/ui/price";
 
 interface FlightCardProps {
   airline: string;
@@ -87,7 +88,9 @@ export const FlightCard = ({
             <div className="text-xs text-muted-foreground line-through">
               1 siège disponible à ce prix
             </div>
-            <div className="text-3xl font-bold">{price.toLocaleString()} {currency}</div>
+            <div className="text-3xl font-bold">
+              <Price amount={price} fromCurrency={currency} showLoader />
+            </div>
           </div>
           <Button 
             onClick={onSelect}
