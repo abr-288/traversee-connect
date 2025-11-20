@@ -25,6 +25,7 @@ import Help from "./pages/Help";
 import Destinations from "./pages/Destinations";
 import Install from "./pages/Install";
 import NotFound from "./pages/NotFound";
+import FlightBookingProcess from "./pages/FlightBookingProcess";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +58,7 @@ const App = () => (
           <Route path="/admin/email-templates" element={<AdminEmailTemplates />} />
           <Route path="/payment" element={<Payment />} />
           <Route path="/confirmation" element={<Confirmation />} />
+          <Route path="/booking-process" element={<FlightBookingProcess />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
