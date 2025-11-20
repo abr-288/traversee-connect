@@ -182,7 +182,24 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
 
   const handleSelectFare = (fare: 'basic' | 'benefits') => {
     setSelectedFare(fare);
-    setCurrentStep('booking');
+    // Navigate to booking process page with flight data
+    const params = new URLSearchParams({
+      id: flight.id,
+      airline: flight.airline,
+      from: flight.from,
+      to: flight.to,
+      departure: flight.departure,
+      arrival: flight.arrival,
+      price: flight.price.toString(),
+      class: flight.class,
+      fare: fare,
+      departureDate: departureDate,
+    });
+    if (returnDate) {
+      params.append('returnDate', returnDate);
+    }
+    navigate(`/booking-process?${params.toString()}`);
+    onOpenChange(false);
   };
 
   const formatTime = (isoString: string) => {
