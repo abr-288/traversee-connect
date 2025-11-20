@@ -12,6 +12,7 @@ interface UnifiedSubmitButtonProps {
   className?: string;
   icon?: LucideIcon;
   fullWidth?: boolean;
+  onClick?: () => void;
 }
 
 /**
@@ -26,6 +27,7 @@ export const UnifiedSubmitButton = ({
   className,
   icon,
   fullWidth = true,
+  onClick,
 }: UnifiedSubmitButtonProps) => {
   const getDefaultIcon = (): LucideIcon => {
     switch (variant) {
@@ -55,8 +57,9 @@ export const UnifiedSubmitButton = ({
       className={cn(!fullWidth && "inline-block")}
     >
       <Button
-        type="submit"
+        type={onClick ? "button" : "submit"}
         disabled={disabled || loading}
+        onClick={onClick}
         className={cn(
           "h-12 font-semibold text-base",
           "transition-all duration-300",
