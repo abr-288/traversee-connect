@@ -65,3 +65,9 @@ verify_jwt = true
 
 [functions.send-booking-pdf-email]
 verify_jwt = true
+
+[functions.create-booking]
+verify_jwt = true
+
+[functions.create-pnr]
+verify_jwt = false
