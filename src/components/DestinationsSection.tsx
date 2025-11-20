@@ -100,22 +100,31 @@ const DestinationsSection = () => {
 
                   <p className="text-muted-foreground text-sm mb-4">{destination.description}</p>
 
-                  <Button 
-                    className="w-full gradient-primary shadow-primary"
-                    onClick={() => {
-                      setSelectedDestination({
-                        id: destination.id,
-                        name: destination.name,
-                        price_per_unit: parseInt(destination.price.replace(/\s/g, '')),
-                        currency: "FCFA",
-                        type: "stay",
-                        location: destination.location
-                      });
-                      setDialogOpen(true);
-                    }}
-                  >
-                    {t('destinations.book')}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => navigate(`/destinations/${destination.id}`)}
+                    >
+                      Voir détails
+                    </Button>
+                    <Button 
+                      className="flex-1 gradient-primary shadow-primary"
+                      onClick={() => {
+                        setSelectedDestination({
+                          id: destination.id,
+                          name: destination.name,
+                          price_per_unit: parseInt(destination.price.replace(/\s/g, '')),
+                          currency: "FCFA",
+                          type: "stay",
+                          location: destination.location
+                        });
+                        setDialogOpen(true);
+                      }}
+                    >
+                      {t('destinations.book')}
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))}

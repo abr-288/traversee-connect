@@ -28,6 +28,7 @@ import NotFound from "./pages/NotFound";
 import FlightBookingProcess from "./pages/FlightBookingProcess";
 import Activities from "./pages/Activities";
 import Stays from "./pages/Stays";
+import DestinationDetail from "./pages/DestinationDetail";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +56,7 @@ const App = () => (
           <Route path="/account" element={<Account />} />
           <Route path="/help" element={<Help />} />
           <Route path="/destinations" element={<Destinations />} />
+          <Route path="/destinations/:id" element={<DestinationDetail />} />
           <Route path="/install" element={<Install />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/email-templates" element={<AdminEmailTemplates />} />
