@@ -106,8 +106,8 @@ function getMockFlights(origin: string, destination: string, departureDate: stri
           duration: 'PT4H30M',
         }],
         price: {
-          grandTotal: '450.00',
-          currency: 'EUR',
+          grandTotal: '185000',
+          currency: 'XOF',
         },
         validatingAirlineCodes: ['AF'],
         travelerPricings: [{
@@ -135,8 +135,8 @@ function getMockFlights(origin: string, destination: string, departureDate: stri
           duration: 'PT4H30M',
         }],
         price: {
-          grandTotal: '380.00',
-          currency: 'EUR',
+          grandTotal: '165000',
+          currency: 'XOF',
         },
         validatingAirlineCodes: ['ET'],
         travelerPricings: [{
