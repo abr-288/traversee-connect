@@ -13,7 +13,16 @@ serve(async (req) => {
   try {
     const { origin, destination, departureDate, returnDate, adults, children = 0, travelClass = 'ECONOMY' } = await req.json();
 
-    console.log('Searching flights:', { origin, destination, departureDate, returnDate, adults, children, travelClass });
+    // Extract IATA codes from strings like "Dakar (DSS)" or just "DSS"
+    const extractIataCode = (location: string): string => {
+      const match = location.match(/\(([A-Z]{3})\)/);
+      return match ? match[1] : location.replace(/[^A-Z]/g, '').substring(0, 3);
+    };
+
+    const originCode = extractIataCode(origin);
+    const destinationCode = extractIataCode(destination);
+
+    console.log('Searching flights:', { origin: originCode, destination: destinationCode, departureDate, returnDate, adults, children, travelClass });
 
     const amadeusKey = Deno.env.get('AMADEUS_API_KEY');
     const amadeusSecret = Deno.env.get('AMADEUS_API_SECRET');
@@ -27,17 +36,17 @@ serve(async (req) => {
 
     // Amadeus API
     if (amadeusKey && amadeusSecret) {
-      apiPromises.push(searchAmadeus(origin, destination, departureDate, returnDate, adults, children, travelClass, amadeusKey, amadeusSecret));
+      apiPromises.push(searchAmadeus(originCode, destinationCode, departureDate, returnDate, adults, children, travelClass, amadeusKey, amadeusSecret));
     }
 
     // Sabre API
     if (sabreUserId && sabrePassword) {
-      apiPromises.push(searchSabre(origin, destination, departureDate, returnDate, adults, children, travelClass, sabreUserId, sabrePassword));
+      apiPromises.push(searchSabre(originCode, destinationCode, departureDate, returnDate, adults, children, travelClass, sabreUserId, sabrePassword));
     }
 
     if (apiPromises.length === 0) {
       console.log('No API credentials configured, returning mock data');
-      return getMockFlights(origin, destination, departureDate, returnDate, adults, travelClass);
+      return getMockFlights(originCode, destinationCode, departureDate, returnDate, adults, travelClass);
     }
 
     // Wait for all API calls to complete
@@ -56,7 +65,7 @@ serve(async (req) => {
     // If no results, return mock data
     if (results.length === 0) {
       console.log('No results from API, returning mock data');
-      return getMockFlights(origin, destination, departureDate, returnDate, adults, travelClass);
+      return getMockFlights(originCode, destinationCode, departureDate, returnDate, adults, travelClass);
     }
 
     return new Response(
