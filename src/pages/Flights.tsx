@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import { useSearchParams, Link } from "react-router-dom";
+import { Loader2, TrendingUp } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { FlightSearchForm } from "@/components/FlightSearchForm";
@@ -11,6 +11,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PriceCalendar } from "@/components/flights/PriceCalendar";
 import { FlightFilters } from "@/components/flights/FlightFilters";
 import { FlightCard } from "@/components/flights/FlightCard";
+import { Button } from "@/components/ui/button";
 
 interface MappedFlight {
   id: string;
@@ -168,6 +169,20 @@ const Flights = () => {
       <div className="relative bg-primary py-16">
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary-dark to-primary opacity-90" />
         <div className="container mx-auto px-4 relative z-10">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-4xl font-bold text-primary-foreground mb-2">Recherche de vols</h1>
+              <p className="text-primary-foreground/80">Trouvez les meilleurs prix pour votre voyage</p>
+            </div>
+            {hasSearched && (
+              <Link to={`/flight-comparison?${searchParams.toString()}`}>
+                <Button variant="secondary" className="gap-2">
+                  <TrendingUp className="h-4 w-4" />
+                  Comparer les prix
+                </Button>
+              </Link>
+            )}
+          </div>
           <FlightSearchForm />
         </div>
       </div>
