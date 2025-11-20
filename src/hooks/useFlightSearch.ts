@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export interface FlightSearchParams {
@@ -15,7 +15,7 @@ export const useFlightSearch = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const searchFlights = async (params: FlightSearchParams) => {
+  const searchFlights = useCallback(async (params: FlightSearchParams) => {
     setLoading(true);
     setError(null);
 
@@ -35,7 +35,7 @@ export const useFlightSearch = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   return { searchFlights, loading, error };
 };
