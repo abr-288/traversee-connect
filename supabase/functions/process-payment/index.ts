@@ -51,10 +51,10 @@ serve(async (req) => {
     console.log('Customer:', requestData.customerInfo.name);
 
     // Validate input
-    if (!requestData.bookingId || !requestData.amount || !requestData.currency || !requestData.paymentMethod) {
+    if (!requestData.bookingId || requestData.amount === undefined || requestData.amount === null || !requestData.currency || !requestData.paymentMethod) {
       throw new Error('Missing required fields');
     }
-
+ 
     if (requestData.amount <= 0) {
       throw new Error('Invalid amount');
     }
