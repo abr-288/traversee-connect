@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { LazyImage } from "@/components/ui/lazy-image";
 import { MapPin, Star, Loader2, Users, Calendar, Wifi, Coffee, Utensils, Waves, Mountain, Building2, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -77,9 +78,9 @@ const DestinationsSection = () => {
                 </div>
                 
                 <div className="relative h-48 md:h-56 lg:h-64 overflow-hidden">
-                  <img
+                  <LazyImage
                     src={destination.image}
-                    alt={destination.name}
+                    alt={`Destination ${destination.name} - ${destination.location}`}
                     className="w-full h-full object-cover transition-smooth group-hover:scale-110"
                   />
                   
