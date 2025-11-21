@@ -43,10 +43,9 @@ serve(async (req) => {
 
     const requestData = validation.data!;
     
-    console.log('Booking ID:', requestData.bookingId);
-    console.log('Amount:', requestData.amount, requestData.currency);
+    // Security: Log minimal non-sensitive information only
+    console.log('Payment request validated');
     console.log('Method:', requestData.paymentMethod);
-    console.log('Customer:', sanitizeString(requestData.customerInfo.name, 50));
 
     // Get CinetPay credentials
     const cinetpayApiKey = Deno.env.get('CINETPAY_API_KEY');
@@ -68,7 +67,7 @@ serve(async (req) => {
         formattedPhone = '+' + formattedPhone;
       }
     }
-    console.log('Phone formatted (sanitized)');
+    console.log('Customer data formatted');
 
     // Generate unique transaction ID
     const transactionId = `TXN-${requestData.bookingId}-${Date.now()}`;
@@ -121,10 +120,9 @@ serve(async (req) => {
       }),
     };
 
-    console.log('=== CINETPAY REQUEST ===');
-    console.log('Transaction ID:', transactionId);
-    console.log('Amount:', cinetpayPayload.amount, cinetpayPayload.currency);
+    console.log('=== CINETPAY REQUEST INITIATED ===');
     console.log('Channels:', channels);
+    console.log('Currency:', cinetpayPayload.currency);
 
     // Call CinetPay API
     const cinetpayResponse = await fetch('https://api-checkout.cinetpay.com/v2/payment', {
@@ -138,18 +136,19 @@ serve(async (req) => {
 
     const cinetpayData = await cinetpayResponse.json();
     
-    console.log('=== CINETPAY RESPONSE ===');
-    console.log('Status:', cinetpayResponse.status);
-    console.log('Code:', cinetpayData.code);
-    console.log('Has payment URL:', !!cinetpayData.data?.payment_url);
+    console.log('=== CINETPAY RESPONSE RECEIVED ===');
+    console.log('HTTP Status:', cinetpayResponse.status);
+    console.log('Response Code:', cinetpayData.code);
+    console.log('Payment URL Present:', !!cinetpayData.data?.payment_url);
     
     if (cinetpayData.code !== '201') {
-      console.error('❌ CinetPay error code:', cinetpayData.code);
-      throw new Error(cinetpayData.message || 'Payment creation failed');
+      console.error('❌ Payment creation failed with code:', cinetpayData.code);
+      // Do not log the full error message as it may contain sensitive data
+      throw new Error('Payment creation failed');
     }
 
     if (!cinetpayData.data?.payment_url) {
-      console.error('❌ No payment URL in response');
+      console.error('❌ Payment URL missing in response');
       throw new Error('No payment URL received');
     }
 
@@ -177,12 +176,13 @@ serve(async (req) => {
       .single();
 
     if (paymentError) {
-      console.error('❌ Database error:', paymentError);
+      console.error('❌ Database error occurred');
+      // Do not log the full error as it may contain sensitive data
       throw new Error('Failed to save payment record');
     }
 
-    console.log('✅ Payment record created:', payment.id);
-    console.log('=== PAYMENT REQUEST END ===');
+    console.log('✅ Payment record created successfully');
+    console.log('=== PAYMENT REQUEST COMPLETED ===');
 
     return new Response(
       JSON.stringify({
@@ -197,11 +197,14 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error('❌ ERROR in process-payment:', error);
+    // Security: Only log error type, not details which may contain sensitive data
+    console.error('❌ Payment processing error:', error instanceof Error ? error.constructor.name : 'Unknown');
+    
+    // Return generic error message to client
     return new Response(
       JSON.stringify({
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : 'Payment processing failed',
       }),
       {
         status: 500,
