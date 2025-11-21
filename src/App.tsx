@@ -29,6 +29,7 @@ const Payment = lazy(() => import("./pages/Payment"));
 const Confirmation = lazy(() => import("./pages/Confirmation"));
 const FlightComparison = lazy(() => import("./pages/FlightComparison"));
 const FlightBookingProcess = lazy(() => import("./pages/FlightBookingProcess"));
+const UnifiedBookingProcess = lazy(() => import("./pages/UnifiedBookingProcess"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminOverview"));
 const AdminBookings = lazy(() => import("./pages/admin/AdminBookings"));
 const AdminServices = lazy(() => import("./pages/admin/AdminServices"));
@@ -84,6 +85,7 @@ const App = () => (
               <Route path="/confirmation" element={<Confirmation />} />
               <Route path="/flight-comparison" element={<FlightComparison />} />
               <Route path="/booking-process" element={<FlightBookingProcess />} />
+              <Route path="/booking/:serviceType" element={<UnifiedBookingProcess />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/bookings" element={<AdminBookings />} />
               <Route path="/admin/services" element={<AdminServices />} />

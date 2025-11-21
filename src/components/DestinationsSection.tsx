@@ -3,16 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Star, Loader2, Users, Calendar, Wifi, Coffee, Utensils, Waves, Mountain, Building2, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
-import { BookingDialog } from "@/components/BookingDialog";
 import { useNavigate } from "react-router-dom";
 import { useDestinations } from "@/hooks/useDestinations";
 
 
 const DestinationsSection = () => {
   const { t } = useTranslation();
-  const [selectedDestination, setSelectedDestination] = useState<any>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
   const navigate = useNavigate();
   const { data: destinations, isLoading } = useDestinations();
 
@@ -33,14 +29,6 @@ const DestinationsSection = () => {
   };
 
   return (
-    <>
-    {selectedDestination && (
-      <BookingDialog 
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        service={selectedDestination}
-      />
-    )}
     <section className="py-16 md:py-20 lg:py-24 bg-gradient-to-b from-muted/20 via-background to-muted/30 relative overflow-hidden">
       {/* Decorative background */}
       <div className="absolute inset-0 gradient-mesh opacity-30" />
@@ -207,15 +195,15 @@ const DestinationsSection = () => {
                     <Button 
                       className="flex-1 gradient-primary shadow-primary hover:shadow-xl transition-all"
                       onClick={() => {
-                        setSelectedDestination({
-                          id: destination.id,
+                        const params = new URLSearchParams({
+                          type: 'stay',
                           name: destination.name,
-                          price_per_unit: parseInt(destination.price.replace(/\s/g, '')),
-                          currency: "FCFA",
-                          type: "stay",
-                          location: destination.location
+                          price: destination.price.replace(/\s/g, ''),
+                          currency: 'FCFA',
+                          location: destination.location,
+                          serviceId: destination.id,
                         });
-                        setDialogOpen(true);
+                        navigate(`/booking/stay?${params.toString()}`);
                       }}
                     >
                       {t('destinations.book')}
@@ -239,7 +227,6 @@ const DestinationsSection = () => {
         </div>
       </div>
     </section>
-    </>
   );
 };
 
