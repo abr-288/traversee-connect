@@ -2,135 +2,21 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MapPin, Clock, Users, Star, Tag } from "lucide-react";
-import { useState } from "react";
+import { MapPin, Clock, Star, Tag, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
 import { BookingDialog } from "@/components/BookingDialog";
 import { ActivitySearchForm } from "@/components/ActivitySearchForm";
 import { Price } from "@/components/ui/price";
+import { useActivitySearch } from "@/hooks/useActivitySearch";
 
 const Activities = () => {
   const [selectedActivity, setSelectedActivity] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const { activities, loading, searchActivities } = useActivitySearch();
 
-  const activities = [
-    {
-      id: 1,
-      name: "Visite Guidée d'Abidjan",
-      location: "Abidjan",
-      image: "https://images.unsplash.com/photo-1583338505874-0cd6e2b57407",
-      duration: "4 heures",
-      groupSize: "2-15 personnes",
-      category: "Culture",
-      rating: 4.7,
-      reviews: 234,
-      price: 15000,
-      description: "Découvrez les quartiers emblématiques d'Abidjan avec un guide local"
-    },
-    {
-      id: 2,
-      name: "Cours de Cuisine Ivoirienne",
-      location: "Abidjan, Cocody",
-      image: "https://images.unsplash.com/photo-1556910103-1c02745aae4d",
-      duration: "3 heures",
-      groupSize: "4-10 personnes",
-      category: "Gastronomie",
-      rating: 4.9,
-      reviews: 156,
-      price: 25000,
-      description: "Apprenez à préparer des plats traditionnels ivoiriens"
-    },
-    {
-      id: 3,
-      name: "Sortie en Bateau Lagune Ébrié",
-      location: "Lagune Ébrié",
-      image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19",
-      duration: "2 heures",
-      groupSize: "2-20 personnes",
-      category: "Nature",
-      rating: 4.6,
-      reviews: 189,
-      price: 20000,
-      description: "Croisière relaxante sur la lagune avec vue sur la skyline"
-    },
-    {
-      id: 4,
-      name: "Randonnée Cascade de Man",
-      location: "Man",
-      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4",
-      duration: "6 heures",
-      groupSize: "5-12 personnes",
-      category: "Aventure",
-      rating: 4.8,
-      reviews: 98,
-      price: 35000,
-      description: "Trek à travers la forêt jusqu'aux cascades spectaculaires"
-    },
-    {
-      id: 5,
-      name: "Atelier Batik et Tissage",
-      location: "Korhogo",
-      image: "https://images.unsplash.com/photo-1522202757859-7472b0973c69",
-      duration: "3 heures",
-      groupSize: "3-8 personnes",
-      category: "Artisanat",
-      rating: 4.7,
-      reviews: 67,
-      price: 18000,
-      description: "Initiez-vous aux techniques traditionnelles de tissage Sénoufo"
-    },
-    {
-      id: 6,
-      name: "Safari Photo Parc de la Comoé",
-      location: "Parc de la Comoé",
-      image: "https://images.unsplash.com/photo-1516426122078-c23e76319801",
-      duration: "8 heures",
-      groupSize: "2-6 personnes",
-      category: "Safari",
-      rating: 4.9,
-      reviews: 143,
-      price: 85000,
-      description: "Safari photo avec guide naturaliste dans la plus grande réserve"
-    },
-    {
-      id: 7,
-      name: "Dégustation Chocolat à Adzopé",
-      location: "Adzopé",
-      image: "https://images.unsplash.com/photo-1511381939415-e44015466834",
-      duration: "4 heures",
-      groupSize: "4-15 personnes",
-      category: "Gastronomie",
-      rating: 4.8,
-      reviews: 112,
-      price: 28000,
-      description: "Visite de plantation et dégustation de chocolat ivoirien"
-    },
-    {
-      id: 8,
-      name: "Plongée Sous-Marine Assinie",
-      location: "Assinie",
-      image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5",
-      duration: "3 heures",
-      groupSize: "2-8 personnes",
-      category: "Sports nautiques",
-      rating: 4.6,
-      reviews: 87,
-      price: 45000,
-      description: "Exploration des fonds marins avec instructeur certifié"
-    },
-    {
-      id: 9,
-      name: "Concert Zouglou Live",
-      location: "Abidjan, Marcory",
-      image: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a",
-      duration: "3 heures",
-      groupSize: "Illimité",
-      category: "Musique",
-      rating: 4.7,
-      reviews: 278,
-      price: 12000,
-      description: "Soirée musicale avec les meilleurs artistes Zouglou"
-    }
-  ];
+  useEffect(() => {
+    searchActivities();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -153,13 +39,21 @@ const Activities = () => {
       </div>
       
       <main className="flex-1 container mx-auto px-4 py-8">
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {activities.map((activity) => (
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        ) : activities.length === 0 ? (
+          <div className="text-center py-20">
+            <p className="text-xl text-muted-foreground">Aucune activité disponible</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {activities.map((activity) => (
             <Card key={activity.id} className="overflow-hidden hover:shadow-lg transition-all group">
               <div className="relative h-48 overflow-hidden">
                 <img 
-                  src={activity.image} 
+                  src={activity.image_url || 'https://images.unsplash.com/photo-1583338505874-0cd6e2b57407'} 
                   alt={activity.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
@@ -180,17 +74,15 @@ const Activities = () => {
                     <MapPin className="w-4 h-4" />
                     {activity.location}
                   </div>
-                  <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                    {activity.description}
-                  </p>
+                  {activity.description && (
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                      {activity.description}
+                    </p>
+                  )}
                   <div className="flex items-center gap-4 text-sm">
                     <span className="flex items-center gap-1">
                       <Clock className="w-4 h-4 text-primary" />
                       {activity.duration}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Users className="w-4 h-4 text-primary" />
-                      {activity.groupSize}
                     </span>
                   </div>
                 </div>
@@ -199,8 +91,8 @@ const Activities = () => {
                   <div>
                     <p className="text-xs text-muted-foreground">À partir de</p>
                     <Price 
-                      amount={activity.price} 
-                      fromCurrency="XOF"
+                      amount={activity.price_per_unit} 
+                      fromCurrency={activity.currency}
                       className="text-2xl font-bold text-primary"
                       showLoader={true}
                     />
@@ -209,10 +101,10 @@ const Activities = () => {
                     className="gradient-primary shadow-primary"
                     onClick={() => {
                       setSelectedActivity({
-                        id: activity.id.toString(),
+                        id: activity.id,
                         name: activity.name,
-                        price_per_unit: activity.price,
-                        currency: "FCFA",
+                        price_per_unit: activity.price_per_unit,
+                        currency: activity.currency,
                         type: "activity",
                         location: activity.location
                       });
@@ -224,8 +116,9 @@ const Activities = () => {
                 </div>
               </CardContent>
             </Card>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </main>
 
       {selectedActivity && (

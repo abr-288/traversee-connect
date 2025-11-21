@@ -2,92 +2,23 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MapPin, Calendar, Users, Star, Sparkles } from "lucide-react";
+import { MapPin, Calendar, Star, Sparkles, Loader2 } from "lucide-react";
 import { WeatherWidget } from "@/components/WeatherWidget";
 import { CurrencyConverter } from "@/components/CurrencyConverter";
 import { StaySearchForm } from "@/components/StaySearchForm";
 import { BookingDialog } from "@/components/BookingDialog";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Price } from "@/components/ui/price";
+import { useStaySearch } from "@/hooks/useStaySearch";
 
 const Stays = () => {
   const [selectedStay, setSelectedStay] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const { stays, loading, searchStays } = useStaySearch();
   
-  const stays = [
-    {
-      id: 1,
-      name: "Safari au Parc de la Comoé",
-      location: "Parc National de la Comoé",
-      image: "https://images.unsplash.com/photo-1516426122078-c23e76319801",
-      duration: "3 jours / 2 nuits",
-      type: "Safari & Nature",
-      rating: 4.8,
-      reviews: 124,
-      price: 245000,
-      highlights: ["Safari guidé", "Hébergement en lodge", "Repas inclus", "Guide francophone"]
-    },
-    {
-      id: 2,
-      name: "Séjour Balnéaire à Assinie",
-      location: "Assinie-Mafia",
-      image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19",
-      duration: "5 jours / 4 nuits",
-      type: "Plage & Détente",
-      rating: 4.9,
-      reviews: 256,
-      price: 320000,
-      highlights: ["Resort 4 étoiles", "Plage privée", "Sports nautiques", "All inclusive"]
-    },
-    {
-      id: 3,
-      name: "Découverte de Man",
-      location: "Man, Région des Montagnes",
-      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4",
-      duration: "4 jours / 3 nuits",
-      type: "Culture & Aventure",
-      rating: 4.7,
-      reviews: 89,
-      price: 185000,
-      highlights: ["Cascades", "Villages authentiques", "Randonnée", "Hébergement local"]
-    },
-    {
-      id: 4,
-      name: "Week-end à Grand-Bassam",
-      location: "Grand-Bassam",
-      image: "https://images.unsplash.com/photo-1506929562872-bb421503ef21",
-      duration: "2 jours / 1 nuit",
-      type: "Patrimoine UNESCO",
-      rating: 4.6,
-      reviews: 178,
-      price: 95000,
-      highlights: ["Ville historique", "Plage", "Musée colonial", "Restaurants locaux"]
-    },
-    {
-      id: 5,
-      name: "Retraite Spirituelle à Yamoussoukro",
-      location: "Yamoussoukro",
-      image: "https://images.unsplash.com/photo-1609137144813-7d9921338f24",
-      duration: "3 jours / 2 nuits",
-      type: "Culture & Spiritualité",
-      rating: 4.5,
-      reviews: 67,
-      price: 125000,
-      highlights: ["Basilique Notre-Dame", "Palais présidentiel", "Lac aux caïmans", "Guide culturel"]
-    },
-    {
-      id: 6,
-      name: "Aventure en Forêt à Taï",
-      location: "Parc National de Taï",
-      image: "https://images.unsplash.com/photo-1511497584788-876760111969",
-      duration: "4 jours / 3 nuits",
-      type: "Écotourisme",
-      rating: 4.9,
-      reviews: 45,
-      price: 295000,
-      highlights: ["Forêt primaire UNESCO", "Observation chimpanzés", "Trekking guidé", "Écotourisme"]
-    }
-  ];
+  useEffect(() => {
+    searchStays();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -117,12 +48,21 @@ const Stays = () => {
           <CurrencyConverter />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {stays.map((stay) => (
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        ) : stays.length === 0 ? (
+          <div className="text-center py-20">
+            <p className="text-xl text-muted-foreground">Aucun séjour disponible</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {stays.map((stay) => (
             <Card key={stay.id} className="overflow-hidden hover:shadow-lg transition-all group">
               <div className="relative h-48 overflow-hidden">
                 <img 
-                  src={stay.image} 
+                  src={stay.image_url || 'https://images.unsplash.com/photo-1516426122078-c23e76319801'} 
                   alt={stay.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
@@ -167,8 +107,8 @@ const Stays = () => {
                   <div>
                     <p className="text-xs text-muted-foreground">À partir de</p>
                     <Price 
-                      amount={stay.price} 
-                      fromCurrency="XOF"
+                      amount={stay.price_per_unit} 
+                      fromCurrency={stay.currency}
                       className="text-2xl font-bold text-primary"
                       showLoader={true}
                     />
@@ -177,10 +117,10 @@ const Stays = () => {
                     className="gradient-primary shadow-primary"
                     onClick={() => {
                       setSelectedStay({
-                        id: stay.id.toString(),
+                        id: stay.id,
                         name: stay.name,
-                        price_per_unit: stay.price,
-                        currency: "FCFA",
+                        price_per_unit: stay.price_per_unit,
+                        currency: stay.currency,
                         type: "stay",
                         location: stay.location
                       });
@@ -192,8 +132,9 @@ const Stays = () => {
                 </div>
               </CardContent>
             </Card>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </main>
 
       {selectedStay && (
