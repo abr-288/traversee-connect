@@ -254,6 +254,7 @@ export const FlightSearchForm = () => {
           <div className="space-y-1">
             <UnifiedDatePicker
               label={t("search.departure")}
+              placeholder={t("flights.departureDate")}
               value={departureDate}
               onChange={(date) => {
                 setDepartureDate(date);
@@ -276,6 +277,7 @@ export const FlightSearchForm = () => {
             <div className="space-y-1">
               <UnifiedDatePicker
                 label={t("search.return")}
+                placeholder={t("flights.returnDate")}
                 value={returnDate}
                 onChange={(date) => {
                   setReturnDate(date);
