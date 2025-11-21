@@ -145,6 +145,36 @@ export type Database = {
           },
         ]
       }
+      dashboard_preferences: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          layout_name: string
+          updated_at: string | null
+          user_id: string
+          widgets_config: Json
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          layout_name?: string
+          updated_at?: string | null
+          user_id: string
+          widgets_config?: Json
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          layout_name?: string
+          updated_at?: string | null
+          user_id?: string
+          widgets_config?: Json
+        }
+        Relationships: []
+      }
       email_templates: {
         Row: {
           created_at: string | null
