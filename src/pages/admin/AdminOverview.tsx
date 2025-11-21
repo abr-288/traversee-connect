@@ -1,11 +1,16 @@
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { StatsCards } from "@/components/admin/StatsCards";
 import { RevenueChart } from "@/components/admin/RevenueChart";
+import { BookingsByServiceChart } from "@/components/admin/BookingsByServiceChart";
+import { GeographicDistributionChart } from "@/components/admin/GeographicDistributionChart";
+import { ConversionMetrics } from "@/components/admin/ConversionMetrics";
 import { useAdminStats } from "@/hooks/useAdminStats";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { RefreshCw } from "lucide-react";
 
 const COLORS = {
   pending: "#f59e0b",
@@ -15,7 +20,7 @@ const COLORS = {
 };
 
 const AdminOverview = () => {
-  const { stats, loading } = useAdminStats();
+  const { stats, loading, refetch } = useAdminStats();
 
   if (loading) {
     return (
@@ -36,9 +41,26 @@ const AdminOverview = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground">Vue d'ensemble de votre plateforme</p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+            <p className="text-muted-foreground">Vue d'ensemble de votre plateforme - Temps réel</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Badge variant="secondary" className="gap-2">
+              <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
+              Temps réel
+            </Badge>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => refetch()}
+              disabled={loading}
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+              Actualiser
+            </Button>
+          </div>
         </div>
 
         <StatsCards
@@ -48,16 +70,23 @@ const AdminOverview = () => {
           totalUsers={stats.totalUsers}
         />
 
+        <ConversionMetrics stats={stats} />
+
         <div className="grid gap-4 md:grid-cols-2">
           <RevenueChart data={stats.revenueByMonth} />
+          <BookingsByServiceChart data={stats.bookingsByService} />
+        </div>
 
+        <GeographicDistributionChart data={stats.geographicData} />
+
+        <div className="grid gap-4 md:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Répartition des Réservations</CardTitle>
-              <CardDescription>Par statut</CardDescription>
+              <CardTitle>Répartition par Statut</CardTitle>
+              <CardDescription>Distribution des réservations</CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={350}>
+              <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
                     data={stats.bookingsByStatus}
@@ -79,36 +108,36 @@ const AdminOverview = () => {
               </ResponsiveContainer>
             </CardContent>
           </Card>
-        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Réservations Récentes</CardTitle>
-            <CardDescription>Les 10 dernières réservations</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {stats.recentBookings.map((booking) => (
-                <div key={booking.id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
-                    <p className="font-medium">{booking.customer_name}</p>
-                    <p className="text-sm text-muted-foreground">{booking.customer_email}</p>
+          <Card>
+            <CardHeader>
+              <CardTitle>Réservations Récentes</CardTitle>
+              <CardDescription>Les 10 dernières réservations</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {stats.recentBookings.map((booking) => (
+                  <div key={booking.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div>
+                      <p className="font-medium">{booking.customer_name}</p>
+                      <p className="text-sm text-muted-foreground">{booking.customer_email}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold">{Number(booking.total_price).toLocaleString()} XOF</p>
+                      <Badge variant={
+                        booking.status === "confirmed" ? "default" :
+                        booking.status === "pending" ? "secondary" :
+                        booking.status === "completed" ? "outline" : "destructive"
+                      }>
+                        {booking.status}
+                      </Badge>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-semibold">{Number(booking.total_price).toLocaleString()} FCFA</p>
-                    <Badge variant={
-                      booking.status === "confirmed" ? "default" :
-                      booking.status === "pending" ? "secondary" :
-                      booking.status === "completed" ? "outline" : "destructive"
-                    }>
-                      {booking.status}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </AdminLayout>
   );
