@@ -12,6 +12,7 @@ import { NotificationCenter, Notification } from "@/components/dashboard/Notific
 import { BookingCard } from "@/components/dashboard/BookingCard";
 import { UpcomingReminders } from "@/components/dashboard/UpcomingReminders";
 import { BookingCalendar } from "@/components/dashboard/BookingCalendar";
+import { CurrencyDebugPanel } from "@/components/CurrencyDebugPanel";
 
 interface Booking {
   id: string;
@@ -413,7 +414,7 @@ const Dashboard = () => {
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
@@ -461,6 +462,8 @@ const Dashboard = () => {
               <div className="text-2xl font-bold">{stats.totalSpent.toLocaleString()} FCFA</div>
             </CardContent>
           </Card>
+
+          <CurrencyDebugPanel />
         </div>
 
         <div className="mb-8">

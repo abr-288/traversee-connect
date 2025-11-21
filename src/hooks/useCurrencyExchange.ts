@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getCachedConversion, setCachedConversion } from "@/lib/currencyCache";
 
 export interface ExchangeData {
   from: string;
@@ -22,6 +23,21 @@ export const useCurrencyExchange = () => {
     setError(null);
 
     try {
+      // Check cache first
+      const cached = getCachedConversion(from, to, amount);
+      if (cached) {
+        setLoading(false);
+        return {
+          from,
+          to,
+          amount,
+          converted: cached.converted,
+          rate: cached.rate,
+        };
+      }
+
+      // Cache miss - call API
+      console.log('Cache miss - fetching from API:', { from, to, amount });
       const { data, error: functionError } = await supabase.functions.invoke('currency-exchange', {
         body: { from, to, amount }
       });
@@ -32,7 +48,12 @@ export const useCurrencyExchange = () => {
         throw new Error(data.error || 'Failed to convert currency');
       }
 
-      return data.data;
+      const result = data.data;
+
+      // Store in cache for future use
+      setCachedConversion(from, to, amount, result.rate, result.converted);
+
+      return result;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Une erreur est survenue';
       setError(errorMessage);
