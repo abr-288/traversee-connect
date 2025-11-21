@@ -13,6 +13,8 @@ import { BookingCard } from "@/components/dashboard/BookingCard";
 import { UpcomingReminders } from "@/components/dashboard/UpcomingReminders";
 import { BookingCalendar } from "@/components/dashboard/BookingCalendar";
 import { CurrencyDebugPanel } from "@/components/CurrencyDebugPanel";
+import { OfflineIndicator } from "@/components/OfflineIndicator";
+import { useOfflineBookings } from "@/hooks/useOfflineBookings";
 
 interface Booking {
   id: string;
@@ -39,10 +41,9 @@ interface Booking {
 const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [userProfile, setUserProfile] = useState<{ full_name: string; email: string } | null>(null);
+  const [userProfile, setUserProfile] = useState<{ full_name: string; email: string; id: string } | null>(null);
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
@@ -50,6 +51,16 @@ const Dashboard = () => {
     completed: 0,
     totalSpent: 0,
   });
+
+  // Use offline bookings hook
+  const { 
+    bookings, 
+    loading: bookingsLoading, 
+    isOnline, 
+    isSyncing, 
+    storageStats,
+    syncPendingChanges 
+  } = useOfflineBookings(userProfile?.id);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -67,16 +78,51 @@ const Dashboard = () => {
         .maybeSingle();
       
       setUserProfile({
+        id: user.id,
         full_name: profileData?.full_name || "Utilisateur",
         email: user.email || "",
       });
       
-      fetchBookings();
+      setLoading(false);
       loadNotifications();
     };
 
     checkAuth();
   }, [navigate]);
+
+  // Update stats when bookings change
+  useEffect(() => {
+    const total = bookings?.length || 0;
+    const pending = bookings?.filter((b) => b.status === "pending").length || 0;
+    const confirmed = bookings?.filter((b) => b.status === "confirmed").length || 0;
+    const completed = bookings?.filter((b) => b.status === "completed").length || 0;
+    const totalSpent = bookings?.reduce((sum, booking) => {
+      if (booking.payment_status === "paid") {
+        return sum + Number(booking.total_price);
+      }
+      return sum;
+    }, 0) || 0;
+
+    setStats({ total, pending, confirmed, completed, totalSpent });
+
+    // Check for upcoming bookings and create notifications
+    bookings?.forEach((booking) => {
+      const startDate = new Date(booking.start_date);
+      const today = new Date();
+      const diffDays = Math.ceil((startDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      
+      if (diffDays === 1 && booking.status === "confirmed") {
+        const existingNotif = notifications.find(n => n.message.includes(booking.id));
+        if (!existingNotif && booking.services) {
+          addNotification({
+            type: "warning",
+            title: "Départ demain !",
+            message: `Votre ${booking.services.name} commence demain`,
+          });
+        }
+      }
+    });
+  }, [bookings]);
 
   const loadNotifications = () => {
     const saved = localStorage.getItem("dashboard_notifications");
@@ -113,79 +159,13 @@ const Dashboard = () => {
     localStorage.removeItem("dashboard_notifications");
   };
 
-  const fetchBookings = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data, error } = await supabase
-        .from("bookings")
-        .select(`
-          *,
-          services (
-            name,
-            type,
-            location
-          )
-        `)
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false});
-
-      if (error) throw error;
-
-      setBookings(data || []);
-
-      const total = data?.length || 0;
-      const pending = data?.filter((b) => b.status === "pending").length || 0;
-      const confirmed = data?.filter((b) => b.status === "confirmed").length || 0;
-      const completed = data?.filter((b) => b.status === "completed").length || 0;
-      const totalSpent = data.reduce((sum, booking) => {
-        // Count only paid bookings, regardless of booking status
-        if (booking.payment_status === "paid") {
-          return sum + Number(booking.total_price);
-        }
-        return sum;
-      }, 0);
-
-      setStats({ total, pending, confirmed, completed, totalSpent });
-
-      data?.forEach((booking) => {
-        const startDate = new Date(booking.start_date);
-        const today = new Date();
-        const diffDays = Math.ceil((startDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-        
-        if (diffDays === 1 && booking.status === "confirmed") {
-          const existingNotif = notifications.find(n => n.message.includes(booking.id));
-          if (!existingNotif) {
-            addNotification({
-              type: "warning",
-              title: "Départ demain !",
-              message: `Votre ${booking.services.name} commence demain`,
-            });
-          }
-        }
-      });
-    } catch (error) {
-      console.error("Error fetching bookings:", error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger vos réservations",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleConfirmBooking = async (id: string) => {
     try {
-      // Get booking details first to check payment status
       const booking = bookings.find((b) => b.id === id);
       if (!booking) {
         throw new Error("Réservation introuvable");
       }
 
-      // Update booking status with updated_at timestamp
       const { error } = await supabase
         .from("bookings")
         .update({ 
@@ -196,24 +176,11 @@ const Dashboard = () => {
 
       if (error) throw error;
 
-      // Update local state immediately for better UX
-      setBookings(prevBookings => 
-        prevBookings.map(b => 
-          b.id === id 
-            ? { ...b, status: "confirmed", updated_at: new Date().toISOString() } 
-            : b
-        )
-      );
-
-      // Check if payment is pending
       if (booking.payment_status === "pending") {
         toast({
           title: "Confirmation réussie",
           description: "Redirection vers le paiement...",
         });
-        
-        // Refresh bookings and redirect
-        await fetchBookings();
         
         setTimeout(() => {
           navigate(`/payment?bookingId=${id}`);
@@ -221,7 +188,6 @@ const Dashboard = () => {
         return;
       }
 
-      // Send confirmation email with PDF only if payment is complete
       try {
         await supabase.functions.invoke("send-booking-pdf-email", {
           body: { bookingId: id },
@@ -246,8 +212,6 @@ const Dashboard = () => {
           ? "Votre réservation a été confirmée et un email de confirmation a été envoyé"
           : "Votre réservation a été confirmée. Veuillez procéder au paiement.",
       });
-
-      fetchBookings();
     } catch (error: any) {
       console.error("Error confirming booking:", error);
       toast({
@@ -265,13 +229,11 @@ const Dashboard = () => {
         throw new Error("Réservation introuvable");
       }
 
-      // Update booking status and set payment status to refunded if it was paid
       const updateData: any = { 
         status: "cancelled",
         updated_at: new Date().toISOString()
       };
 
-      // If payment was completed, initiate refund process
       if (booking.payment_status === "paid") {
         updateData.payment_status = "refunded";
       }
@@ -282,15 +244,6 @@ const Dashboard = () => {
         .eq("id", id);
 
       if (error) throw error;
-
-      // Update local state immediately
-      setBookings(prevBookings => 
-        prevBookings.map(b => 
-          b.id === id 
-            ? { ...b, ...updateData } 
-            : b
-        )
-      );
 
       toast({
         title: "Annulation réussie",
@@ -306,8 +259,6 @@ const Dashboard = () => {
           ? "Remboursement sous 5-7 jours ouvrés"
           : "Votre réservation a été annulée",
       });
-
-      fetchBookings();
     } catch (error: any) {
       console.error("Error cancelling booking:", error);
       toast({
@@ -332,7 +283,6 @@ const Dashboard = () => {
         throw new Error("Réservation introuvable");
       }
 
-      // Prevent deletion of confirmed or completed bookings with paid status
       if ((booking.status === "confirmed" || booking.status === "completed") && booking.payment_status === "paid") {
         toast({
           title: "Suppression impossible",
@@ -346,9 +296,6 @@ const Dashboard = () => {
 
       if (error) throw error;
 
-      // Update local state immediately
-      setBookings(prevBookings => prevBookings.filter(b => b.id !== id));
-
       toast({
         title: "Suppression réussie",
         description: "Réservation supprimée définitivement",
@@ -359,8 +306,6 @@ const Dashboard = () => {
         title: "Réservation supprimée",
         message: "La réservation a été supprimée de votre historique",
       });
-
-      fetchBookings();
     } catch (error: any) {
       console.error("Error deleting booking:", error);
       toast({
@@ -373,7 +318,7 @@ const Dashboard = () => {
 
   const handleViewDetails = (id: string) => {
     const booking = bookings.find((b) => b.id === id);
-    if (booking) {
+    if (booking && booking.services) {
       toast({
         title: booking.services.name,
         description: `Départ le ${new Date(booking.start_date).toLocaleDateString("fr-FR")}`,
@@ -381,7 +326,7 @@ const Dashboard = () => {
     }
   };
 
-  if (loading) {
+  if (loading || bookingsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -413,6 +358,13 @@ const Dashboard = () => {
             onClearAll={clearAllNotifications}
           />
         </div>
+
+        <OfflineIndicator 
+          isOnline={isOnline}
+          isSyncing={isSyncing}
+          storageStats={storageStats}
+          onSync={syncPendingChanges}
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
           <Card className="hover:shadow-lg transition-shadow">
@@ -500,10 +452,10 @@ const Dashboard = () => {
                   <BookingCard
                     key={booking.id}
                     booking={booking}
-                    onConfirm={handleConfirmBooking}
-                    onCancel={handleCancelBooking}
-                    onEdit={handleEditBooking}
-                    onDelete={handleDeleteBooking}
+                    onConfirm={() => handleConfirmBooking(booking.id)}
+                    onCancel={() => handleCancelBooking(booking.id)}
+                    onEdit={() => handleEditBooking(booking)}
+                    onDelete={() => handleDeleteBooking(booking.id)}
                   />
                 ))}
               </div>
@@ -513,15 +465,15 @@ const Dashboard = () => {
           <TabsContent value="pending" className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {bookings
-                .filter((b) => b.status === "pending")
+                .filter((booking) => booking.status === "pending")
                 .map((booking) => (
                   <BookingCard
                     key={booking.id}
                     booking={booking}
-                    onConfirm={handleConfirmBooking}
-                    onCancel={handleCancelBooking}
-                    onEdit={handleEditBooking}
-                    onDelete={handleDeleteBooking}
+                    onConfirm={() => handleConfirmBooking(booking.id)}
+                    onCancel={() => handleCancelBooking(booking.id)}
+                    onEdit={() => handleEditBooking(booking)}
+                    onDelete={() => handleDeleteBooking(booking.id)}
                   />
                 ))}
             </div>
@@ -530,15 +482,15 @@ const Dashboard = () => {
           <TabsContent value="confirmed" className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {bookings
-                .filter((b) => b.status === "confirmed")
+                .filter((booking) => booking.status === "confirmed")
                 .map((booking) => (
                   <BookingCard
                     key={booking.id}
                     booking={booking}
-                    onConfirm={handleConfirmBooking}
-                    onCancel={handleCancelBooking}
-                    onEdit={handleEditBooking}
-                    onDelete={handleDeleteBooking}
+                    onConfirm={() => handleConfirmBooking(booking.id)}
+                    onCancel={() => handleCancelBooking(booking.id)}
+                    onEdit={() => handleEditBooking(booking)}
+                    onDelete={() => handleDeleteBooking(booking.id)}
                   />
                 ))}
             </div>
@@ -547,15 +499,15 @@ const Dashboard = () => {
           <TabsContent value="completed" className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {bookings
-                .filter((b) => b.status === "completed")
+                .filter((booking) => booking.status === "completed")
                 .map((booking) => (
                   <BookingCard
                     key={booking.id}
                     booking={booking}
-                    onConfirm={handleConfirmBooking}
-                    onCancel={handleCancelBooking}
-                    onEdit={handleEditBooking}
-                    onDelete={handleDeleteBooking}
+                    onConfirm={() => handleConfirmBooking(booking.id)}
+                    onCancel={() => handleCancelBooking(booking.id)}
+                    onEdit={() => handleEditBooking(booking)}
+                    onDelete={() => handleDeleteBooking(booking.id)}
                   />
                 ))}
             </div>
