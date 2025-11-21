@@ -46,8 +46,10 @@ export const UnifiedDatePicker = ({
               !value && "text-muted-foreground"
             )}
           >
-            {Icon && <Icon className="mr-2 h-4 w-4" />}
-            {value ? format(value, "PPP", { locale: fr }) : placeholder}
+            {Icon && <Icon className="mr-2 h-4 w-4 flex-shrink-0" />}
+            <span className="truncate">
+              {value ? format(value, "PPP", { locale: fr }) : placeholder}
+            </span>
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
