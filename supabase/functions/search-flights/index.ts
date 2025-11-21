@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { flightSearchSchema, validateData, createValidationErrorResponse } from "../_shared/zodValidation.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,23 +12,20 @@ serve(async (req) => {
   }
 
   try {
-    const { origin, destination, departureDate, returnDate, adults, children = 0, travelClass = 'ECONOMY' } = await req.json();
+    const body = await req.json();
 
-    // Validation des paramètres requis
-    if (!origin || !destination || !departureDate) {
-      console.error('Missing required parameters:', { origin, destination, departureDate });
-      return new Response(
-        JSON.stringify({
-          success: false,
-          error: 'Les paramètres origin, destination et departureDate sont requis',
-          data: [],
-        }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      );
+    // Validate request with Zod
+    const validation = validateData(flightSearchSchema, body);
+    
+    if (!validation.success) {
+      return createValidationErrorResponse(validation.errors!, corsHeaders);
     }
+
+    const { origin, destination, departureDate, returnDate, adults, children, travelClass } = validation.data!;
+
+    // children and travelClass have defaults from schema, ensure they're not undefined
+    const finalChildren = children ?? 0;
+    const finalTravelClass = travelClass || 'ECONOMY';
 
     // Extract IATA codes from strings like "Dakar (DSS)" or just "DSS"
     const extractIataCode = (location: string): string => {
@@ -55,7 +53,7 @@ serve(async (req) => {
       );
     }
 
-    console.log('Searching flights:', { origin: originCode, destination: destinationCode, departureDate, returnDate, adults, children, travelClass });
+    console.log('Searching flights:', { origin: originCode, destination: destinationCode, departureDate, returnDate, adults, children: finalChildren, travelClass: finalTravelClass });
 
     const amadeusKey = Deno.env.get('AMADEUS_API_KEY');
     const amadeusSecret = Deno.env.get('AMADEUS_API_SECRET');
@@ -69,17 +67,17 @@ serve(async (req) => {
 
     // Amadeus API
     if (amadeusKey && amadeusSecret) {
-      apiPromises.push(searchAmadeus(originCode, destinationCode, departureDate, returnDate, adults, children, travelClass, amadeusKey, amadeusSecret));
+      apiPromises.push(searchAmadeus(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, amadeusKey, amadeusSecret));
     }
 
     // Sabre API
     if (sabreUserId && sabrePassword) {
-      apiPromises.push(searchSabre(originCode, destinationCode, departureDate, returnDate, adults, children, travelClass, sabreUserId, sabrePassword));
+      apiPromises.push(searchSabre(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, sabreUserId, sabrePassword));
     }
 
     if (apiPromises.length === 0) {
       console.log('No API credentials configured, returning mock data');
-      return getMockFlights(originCode, destinationCode, departureDate, returnDate, adults, travelClass);
+      return getMockFlights(originCode, destinationCode, departureDate, returnDate, adults, finalTravelClass);
     }
 
     // Wait for all API calls to complete
@@ -98,7 +96,7 @@ serve(async (req) => {
     // If no results, return mock data
     if (results.length === 0) {
       console.log('No results from API, returning mock data');
-      return getMockFlights(originCode, destinationCode, departureDate, returnDate, adults, travelClass);
+      return getMockFlights(originCode, destinationCode, departureDate, returnDate, adults, finalTravelClass);
     }
 
     return new Response(
