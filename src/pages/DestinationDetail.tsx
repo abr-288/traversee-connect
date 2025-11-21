@@ -95,23 +95,23 @@ const DestinationDetail = () => {
 
   return (
     <div className="min-h-screen bg-background">
-        {/* Header */}
-        <div className="bg-gradient-to-b from-primary/10 to-background border-b">
-          <div className="container mx-auto px-4 py-6">
-            <Button
-              variant="ghost"
-              onClick={() => navigate("/")}
-              className="mb-4"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Retour
-            </Button>
-          </div>
+      {/* Header */}
+      <div className="bg-gradient-to-b from-primary/10 to-background border-b">
+        <div className="container mx-auto px-4 py-6">
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/")}
+            className="mb-4"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Retour
+          </Button>
         </div>
+      </div>
 
-        {/* Gallery Section */}
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      {/* Gallery Section */}
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Main Image */}
             <div className="space-y-4">
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-2xl">
@@ -476,7 +476,6 @@ const DestinationDetail = () => {
           </Tabs>
         </div>
       </div>
-    </div>
   );
 };
 
