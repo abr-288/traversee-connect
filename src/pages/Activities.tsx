@@ -6,6 +6,7 @@ import { MapPin, Clock, Users, Star, Tag } from "lucide-react";
 import { useState } from "react";
 import { BookingDialog } from "@/components/BookingDialog";
 import { ActivitySearchForm } from "@/components/ActivitySearchForm";
+import { Price } from "@/components/ui/price";
 
 const Activities = () => {
   const [selectedActivity, setSelectedActivity] = useState<any>(null);
@@ -197,9 +198,12 @@ const Activities = () => {
                 <div className="flex items-center justify-between pt-4 border-t border-border">
                   <div>
                     <p className="text-xs text-muted-foreground">À partir de</p>
-                    <p className="text-2xl font-bold text-primary">
-                      {activity.price.toLocaleString()} <span className="text-sm">FCFA</span>
-                    </p>
+                    <Price 
+                      amount={activity.price} 
+                      fromCurrency="XOF"
+                      className="text-2xl font-bold text-primary"
+                      showLoader={true}
+                    />
                   </div>
                   <Button 
                     className="gradient-primary shadow-primary"
