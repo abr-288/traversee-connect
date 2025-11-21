@@ -31,6 +31,10 @@ const FlightComparison = lazy(() => import("./pages/FlightComparison"));
 const FlightBookingProcess = lazy(() => import("./pages/FlightBookingProcess"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminOverview"));
 const AdminBookings = lazy(() => import("./pages/admin/AdminBookings"));
+const AdminServices = lazy(() => import("./pages/admin/AdminServices"));
+const AdminActivities = lazy(() => import("./pages/admin/AdminActivities"));
+const AdminStays = lazy(() => import("./pages/admin/AdminStays"));
+const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
 const AdminEmailTemplates = lazy(() => import("./pages/AdminEmailTemplates"));
 const Help = lazy(() => import("./pages/Help"));
 const Support = lazy(() => import("./pages/Support"));
@@ -82,6 +86,10 @@ const App = () => (
               <Route path="/booking-process" element={<FlightBookingProcess />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/bookings" element={<AdminBookings />} />
+              <Route path="/admin/services" element={<AdminServices />} />
+              <Route path="/admin/activities" element={<AdminActivities />} />
+              <Route path="/admin/stays" element={<AdminStays />} />
+              <Route path="/admin/users" element={<AdminUsers />} />
               <Route path="/admin/email-templates" element={<AdminEmailTemplates />} />
               <Route path="/help" element={<Help />} />
               <Route path="/support" element={<Support />} />
