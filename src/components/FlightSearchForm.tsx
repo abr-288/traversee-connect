@@ -214,13 +214,13 @@ export const FlightSearchForm = () => {
         </div>
 
         {/* Swap Button */}
-        <div className="md:col-span-1 flex items-end justify-center pb-2">
+        <div className="md:col-span-1 flex items-center justify-center pt-6">
           <Button
             type="button"
             variant="outline"
             size="icon"
             onClick={handleSwap}
-            className="h-12 w-12 rounded-full border-2 hover:border-primary hover:bg-primary/5 transition-all"
+            className="h-12 w-12 rounded-full border-2 hover:border-primary hover:bg-primary/5 transition-all shadow-md"
           >
             <ArrowRightLeft className="h-5 w-5" />
           </Button>
