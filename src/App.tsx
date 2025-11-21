@@ -1,77 +1,92 @@
+import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
-import Index from "./pages/Index";
-import Hotels from "./pages/Hotels";
-import Tours from "./pages/Tours";
-import Cars from "./pages/Cars";
-import Flights from "./pages/Flights";
-import FlightComparison from "./pages/FlightComparison";
-import FlightHotel from "./pages/FlightHotel";
-import Trains from "./pages/Trains";
-import Events from "./pages/Events";
-import Support from "./pages/Support";
-import Auth from "./pages/Auth";
-import Dashboard from "./pages/Dashboard";
-import AdminDashboard from "./pages/AdminDashboard";
-import AdminEmailTemplates from "./pages/AdminEmailTemplates";
-import Payment from "./pages/Payment";
-import Confirmation from "./pages/Confirmation";
-import BookingHistory from "./pages/BookingHistory";
-import Account from "./pages/Account";
-import Help from "./pages/Help";
-import Destinations from "./pages/Destinations";
-import Install from "./pages/Install";
-import NotFound from "./pages/NotFound";
-import FlightBookingProcess from "./pages/FlightBookingProcess";
-import Activities from "./pages/Activities";
-import Stays from "./pages/Stays";
-import DestinationDetail from "./pages/DestinationDetail";
+import { Loader2 } from "lucide-react";
+
+// Lazy load route components for code splitting
+const Index = lazy(() => import("./pages/Index"));
+const Flights = lazy(() => import("./pages/Flights"));
+const Hotels = lazy(() => import("./pages/Hotels"));
+const Cars = lazy(() => import("./pages/Cars"));
+const Tours = lazy(() => import("./pages/Tours"));
+const Destinations = lazy(() => import("./pages/Destinations"));
+const DestinationDetail = lazy(() => import("./pages/DestinationDetail"));
+const Activities = lazy(() => import("./pages/Activities"));
+const Stays = lazy(() => import("./pages/Stays"));
+const Events = lazy(() => import("./pages/Events"));
+const Trains = lazy(() => import("./pages/Trains"));
+const FlightHotel = lazy(() => import("./pages/FlightHotel"));
+const Auth = lazy(() => import("./pages/Auth"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const BookingHistory = lazy(() => import("./pages/BookingHistory"));
+const Account = lazy(() => import("./pages/Account"));
+const Payment = lazy(() => import("./pages/Payment"));
+const Confirmation = lazy(() => import("./pages/Confirmation"));
+const FlightComparison = lazy(() => import("./pages/FlightComparison"));
+const FlightBookingProcess = lazy(() => import("./pages/FlightBookingProcess"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AdminEmailTemplates = lazy(() => import("./pages/AdminEmailTemplates"));
+const Help = lazy(() => import("./pages/Help"));
+const Support = lazy(() => import("./pages/Support"));
+const Install = lazy(() => import("./pages/Install"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
+
+// Loading fallback component
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="flex flex-col items-center gap-4">
+      <Loader2 className="w-12 h-12 animate-spin text-primary" />
+      <p className="text-muted-foreground">Chargement...</p>
+    </div>
+  </div>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <CurrencyProvider>
-      <BrowserRouter>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/home" element={<Index />} />
-          <Route path="/hotels" element={<Hotels />} />
-          <Route path="/tours" element={<Tours />} />
-          <Route path="/cars" element={<Cars />} />
-          <Route path="/flights" element={<Flights />} />
-          <Route path="/flight-comparison" element={<FlightComparison />} />
-          <Route path="/flight-hotel" element={<FlightHotel />} />
-          <Route path="/trains" element={<Trains />} />
-          <Route path="/events" element={<Events />} />
-          <Route path="/support" element={<Support />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/booking-history" element={<BookingHistory />} />
-          <Route path="/account" element={<Account />} />
-          <Route path="/help" element={<Help />} />
-          <Route path="/destinations" element={<Destinations />} />
-          <Route path="/destinations/:id" element={<DestinationDetail />} />
-          <Route path="/install" element={<Install />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/email-templates" element={<AdminEmailTemplates />} />
-          <Route path="/payment" element={<Payment />} />
-          <Route path="/confirmation" element={<Confirmation />} />
-          <Route path="/booking-process" element={<FlightBookingProcess />} />
-          <Route path="/activities" element={<Activities />} />
-          <Route path="/stays" element={<Stays />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-          </Routes>
-        </TooltipProvider>
-      </BrowserRouter>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/home" element={<Index />} />
+              <Route path="/flights" element={<Flights />} />
+              <Route path="/hotels" element={<Hotels />} />
+              <Route path="/cars" element={<Cars />} />
+              <Route path="/tours" element={<Tours />} />
+              <Route path="/destinations" element={<Destinations />} />
+              <Route path="/destinations/:id" element={<DestinationDetail />} />
+              <Route path="/activities" element={<Activities />} />
+              <Route path="/stays" element={<Stays />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/trains" element={<Trains />} />
+              <Route path="/flight-hotel" element={<FlightHotel />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/booking-history" element={<BookingHistory />} />
+              <Route path="/account" element={<Account />} />
+              <Route path="/payment" element={<Payment />} />
+              <Route path="/confirmation" element={<Confirmation />} />
+              <Route path="/flight-comparison" element={<FlightComparison />} />
+              <Route path="/booking-process" element={<FlightBookingProcess />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/email-templates" element={<AdminEmailTemplates />} />
+              <Route path="/help" element={<Help />} />
+              <Route path="/support" element={<Support />} />
+              <Route path="/install" element={<Install />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </TooltipProvider>
     </CurrencyProvider>
   </QueryClientProvider>
 );

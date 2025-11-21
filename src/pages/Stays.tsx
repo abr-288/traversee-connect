@@ -10,6 +10,7 @@ import { BookingDialog } from "@/components/BookingDialog";
 import { useState, useEffect } from "react";
 import { Price } from "@/components/ui/price";
 import { useStaySearch } from "@/hooks/useStaySearch";
+import { LazyImage } from "@/components/ui/lazy-image";
 
 const Stays = () => {
   const [selectedStay, setSelectedStay] = useState<any>(null);
@@ -61,7 +62,7 @@ const Stays = () => {
             {stays.map((stay) => (
             <Card key={stay.id} className="overflow-hidden hover:shadow-lg transition-all group">
               <div className="relative h-48 overflow-hidden">
-                <img 
+                <LazyImage 
                   src={stay.image_url || 'https://images.unsplash.com/photo-1516426122078-c23e76319801'} 
                   alt={stay.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -257,3 +257,6 @@ export const BookingCard = ({ booking, onConfirm, onCancel, onEdit, onDelete }: 
     </>
   );
 };
+
+// Memoize to prevent unnecessary re-renders
+export default memo(BookingCard);

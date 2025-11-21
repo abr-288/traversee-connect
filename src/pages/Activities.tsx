@@ -8,6 +8,7 @@ import { BookingDialog } from "@/components/BookingDialog";
 import { ActivitySearchForm } from "@/components/ActivitySearchForm";
 import { Price } from "@/components/ui/price";
 import { useActivitySearch } from "@/hooks/useActivitySearch";
+import { LazyImage } from "@/components/ui/lazy-image";
 
 const Activities = () => {
   const [selectedActivity, setSelectedActivity] = useState<any>(null);
@@ -52,7 +53,7 @@ const Activities = () => {
             {activities.map((activity) => (
             <Card key={activity.id} className="overflow-hidden hover:shadow-lg transition-all group">
               <div className="relative h-48 overflow-hidden">
-                <img 
+                <LazyImage 
                   src={activity.image_url || 'https://images.unsplash.com/photo-1583338505874-0cd6e2b57407'} 
                   alt={activity.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"

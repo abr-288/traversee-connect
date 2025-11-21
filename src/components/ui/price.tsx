@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { usePrice } from '@/hooks/usePrice';
 import { Loader2 } from 'lucide-react';
 
@@ -9,7 +10,7 @@ interface PriceProps {
   showLoader?: boolean;
 }
 
-export const Price = ({ 
+export const Price = memo(({ 
   amount, 
   fromCurrency = 'XOF', 
   className = '', 
@@ -28,4 +29,4 @@ export const Price = ({
   }
 
   return <span className={className}>{formattedPrice}</span>;
-};
+});
