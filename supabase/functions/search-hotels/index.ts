@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { hotelSearchSchema, validateData, createValidationErrorResponse } from "../_shared/zodValidation.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -109,7 +110,16 @@ serve(async (req) => {
   }
 
   try {
-    const { location, checkIn, checkOut, adults, children, rooms } = await req.json();
+    const body = await req.json();
+
+    // Validate request with Zod
+    const validation = validateData(hotelSearchSchema, body);
+    
+    if (!validation.success) {
+      return createValidationErrorResponse(validation.errors!, corsHeaders);
+    }
+
+    const { location, checkIn, checkOut, adults, children, rooms } = validation.data!;
     console.log('Search hotels for:', { location, checkIn, checkOut, adults, children, rooms });
 
     const RAPIDAPI_KEY = Deno.env.get('RAPIDAPI_KEY');

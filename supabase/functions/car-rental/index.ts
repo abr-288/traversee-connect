@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.208.0/http/server.ts";
+import { carRentalSchema, validateData, createValidationErrorResponse } from "../_shared/zodValidation.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,7 +12,20 @@ serve(async (req) => {
   }
 
   try {
-    const { pickupLocation, dropoffLocation, pickupDate, dropoffDate, pickupTime = '10:00', dropoffTime = '10:00' } = await req.json();
+    const body = await req.json();
+
+    // Validate request with Zod
+    const validation = validateData(carRentalSchema, body);
+    
+    if (!validation.success) {
+      return createValidationErrorResponse(validation.errors!, corsHeaders);
+    }
+
+    const { pickupLocation, dropoffLocation, pickupDate, dropoffDate, pickupTime, dropoffTime } = validation.data!;
+    
+    // pickupTime and dropoffTime have defaults from schema, but TypeScript needs explicit values
+    const finalPickupTime = pickupTime || '10:00';
+    const finalDropoffTime = dropoffTime || '10:00';
     
     console.log('Searching car rentals:', { pickupLocation, dropoffLocation, pickupDate, dropoffDate });
 
@@ -30,8 +44,8 @@ serve(async (req) => {
         pick_up_longitude: '0',
         drop_off_latitude: '0',
         drop_off_longitude: '0',
-        pick_up_time: pickupTime.replace(':', '%3A'),
-        drop_off_time: dropoffTime.replace(':', '%3A'),
+        pick_up_time: finalPickupTime.replace(':', '%3A'),
+        drop_off_time: finalDropoffTime.replace(':', '%3A'),
         driver_age: '30',
         currency_code: 'XOF',
         location: pickupLocation,
