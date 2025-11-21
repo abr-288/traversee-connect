@@ -15,6 +15,9 @@ interface Destination {
   reviews: number;
   price: string;
   description: string;
+  category?: string;
+  amenities?: string[];
+  highlights?: string[];
 }
 
 serve(async (req) => {
@@ -56,17 +59,25 @@ serve(async (req) => {
     let destinations: Destination[] = [];
 
     if (data && data.data && Array.isArray(data.data)) {
-      destinations = data.data.slice(0, 12).map((item: any, index: number) => ({
-        id: item.dest_id || `dest-${index}`,
-        name: item.name || item.city_name || 'Unknown',
-        location: item.country || item.region || 'Unknown',
-        country: item.country || 'Unknown',
-        image: item.image_url || getDefaultImage(index),
-        rating: parseFloat(item.rating || (4.5 + Math.random() * 0.5).toFixed(1)),
-        reviews: item.nr_hotels ? item.nr_hotels * 10 : Math.floor(1500 + Math.random() * 3000),
-        price: Math.floor(300000 + Math.random() * 500000).toString(),
-        description: item.description || `Découvrez ${item.name || 'cette destination'} et ses merveilles`
-      }));
+      destinations = data.data.slice(0, 12).map((item: any, index: number) => {
+        const destName = item.name || item.city_name || 'Unknown';
+        const category = getCategoryFromName(destName);
+        
+        return {
+          id: item.dest_id || `dest-${index}`,
+          name: destName,
+          location: item.country || item.region || 'Unknown',
+          country: item.country || 'Unknown',
+          image: item.image_url || getDefaultImage(index),
+          rating: parseFloat(item.rating || (4.5 + Math.random() * 0.5).toFixed(1)),
+          reviews: item.nr_hotels ? item.nr_hotels * 10 : Math.floor(1500 + Math.random() * 3000),
+          price: Math.floor(300000 + Math.random() * 500000).toString(),
+          description: item.description || `Découvrez ${destName} et ses merveilles`,
+          category,
+          amenities: getAmenitiesForCategory(category),
+          highlights: getHighlightsForDestination(destName, category)
+        };
+      });
     }
 
     // If no destinations from API, use fallback
@@ -104,7 +115,10 @@ function getFallbackDestinations(): Destination[] {
       rating: 4.9,
       reviews: 3245,
       price: "450000",
-      description: "La ville lumière, capitale de la mode et de la gastronomie"
+      description: "La ville lumière, capitale de la mode et de la gastronomie",
+      category: "Ville",
+      amenities: ["WiFi gratuit", "Restaurant", "Bar", "Spa"],
+      highlights: ["Tour Eiffel", "Musée du Louvre", "Quartier Montmartre"]
     },
     {
       id: "2",
@@ -115,7 +129,10 @@ function getFallbackDestinations(): Destination[] {
       rating: 4.9,
       reviews: 2890,
       price: "550000",
-      description: "Luxe et modernité dans le désert, shopping et architecture futuriste"
+      description: "Luxe et modernité dans le désert, shopping et architecture futuriste",
+      category: "Ville",
+      amenities: ["Piscine", "WiFi gratuit", "Climatisation", "Spa de luxe"],
+      highlights: ["Burj Khalifa", "Mall of Emirates", "Desert Safari"]
     },
     {
       id: "3",
@@ -126,7 +143,10 @@ function getFallbackDestinations(): Destination[] {
       rating: 5.0,
       reviews: 1876,
       price: "780000",
-      description: "Paradis tropical avec plages de sable blanc et eaux cristallines"
+      description: "Paradis tropical avec plages de sable blanc et eaux cristallines",
+      category: "Plage",
+      amenities: ["Plage privée", "Snorkeling", "Restaurant", "Spa"],
+      highlights: ["Bungalows sur pilotis", "Plongée sous-marine", "Couchers de soleil"]
     },
     {
       id: "4",
@@ -137,7 +157,10 @@ function getFallbackDestinations(): Destination[] {
       rating: 4.8,
       reviews: 2567,
       price: "520000",
-      description: "Mélange unique de tradition et de technologie ultra-moderne"
+      description: "Mélange unique de tradition et de technologie ultra-moderne",
+      category: "Ville",
+      amenities: ["WiFi gratuit", "Restaurant japonais", "Onsen", "Salle de fitness"],
+      highlights: ["Temples traditionnels", "Quartier Shibuya", "Cuisine authentique"]
     },
     {
       id: "5",
@@ -148,7 +171,10 @@ function getFallbackDestinations(): Destination[] {
       rating: 4.9,
       reviews: 3102,
       price: "380000",
-      description: "Îles paradisiaques, temples anciens et rizières en terrasses"
+      description: "Îles paradisiaques, temples anciens et rizières en terrasses",
+      category: "Plage",
+      amenities: ["Piscine à débordement", "Yoga", "Restaurant bio", "Spa balinais"],
+      highlights: ["Rizières d'Ubud", "Temples sacrés", "Plages paradisiaques"]
     },
     {
       id: "6",
@@ -159,7 +185,10 @@ function getFallbackDestinations(): Destination[] {
       rating: 4.7,
       reviews: 4123,
       price: "620000",
-      description: "La ville qui ne dort jamais, capitale culturelle et économique"
+      description: "La ville qui ne dort jamais, capitale culturelle et économique",
+      category: "Ville",
+      amenities: ["WiFi gratuit", "Concierge 24/7", "Bar lounge", "Salle de gym"],
+      highlights: ["Statue de la Liberté", "Times Square", "Central Park"]
     },
     {
       id: "7",
@@ -170,7 +199,10 @@ function getFallbackDestinations(): Destination[] {
       rating: 4.8,
       reviews: 2934,
       price: "420000",
-      description: "La ville éternelle, berceau de la civilisation occidentale"
+      description: "La ville éternelle, berceau de la civilisation occidentale",
+      category: "Ville",
+      amenities: ["WiFi gratuit", "Restaurant italien", "Bar à vin", "Terrasse panoramique"],
+      highlights: ["Colisée", "Vatican", "Fontaine de Trevi"]
     },
     {
       id: "8",
@@ -181,7 +213,10 @@ function getFallbackDestinations(): Destination[] {
       rating: 4.8,
       reviews: 2645,
       price: "390000",
-      description: "Architecture de Gaudí, plages méditerranéennes et vie nocturne"
+      description: "Architecture de Gaudí, plages méditerranéennes et vie nocturne",
+      category: "Plage",
+      amenities: ["Piscine sur le toit", "WiFi gratuit", "Restaurant tapas", "Café-bar"],
+      highlights: ["Sagrada Familia", "Parc Güell", "Plages de Barceloneta"]
     },
     {
       id: "9",
@@ -192,9 +227,50 @@ function getFallbackDestinations(): Destination[] {
       rating: 4.7,
       reviews: 2187,
       price: "340000",
-      description: "Temples dorés, street food légendaire et marchés flottants"
+      description: "Temples dorés, street food légendaire et marchés flottants",
+      category: "Ville",
+      amenities: ["WiFi gratuit", "Restaurant thaï", "Massage traditionnel", "Piscine"],
+      highlights: ["Grand Palais", "Marchés flottants", "Street food"]
     }
   ];
+}
+
+function getCategoryFromName(name: string): string {
+  const nameLower = name.toLowerCase();
+  if (nameLower.includes('plage') || nameLower.includes('beach') || nameLower.includes('mer') || 
+      nameLower.includes('maldives') || nameLower.includes('bali') || nameLower.includes('barcelone')) {
+    return 'Plage';
+  }
+  if (nameLower.includes('montagne') || nameLower.includes('mountain') || nameLower.includes('alpes')) {
+    return 'Montagne';
+  }
+  return 'Ville';
+}
+
+function getAmenitiesForCategory(category: string): string[] {
+  const commonAmenities = ['WiFi gratuit', 'Restaurant'];
+  
+  if (category === 'Plage') {
+    return [...commonAmenities, 'Piscine', 'Spa', 'Plage privée'];
+  } else if (category === 'Montagne') {
+    return [...commonAmenities, 'Cheminée', 'Vue panoramique', 'Ski'];
+  } else {
+    return [...commonAmenities, 'Bar', 'Concierge', 'Salle de fitness'];
+  }
+}
+
+function getHighlightsForDestination(name: string, category: string): string[] {
+  const highlights: string[] = [];
+  
+  if (category === 'Plage') {
+    highlights.push('Plages paradisiaques', 'Sports nautiques', 'Couchers de soleil');
+  } else if (category === 'Montagne') {
+    highlights.push('Vues panoramiques', 'Randonnées', 'Air pur');
+  } else {
+    highlights.push('Sites historiques', 'Gastronomie locale', 'Vie culturelle');
+  }
+  
+  return highlights;
 }
 
 function getDefaultImage(index: number): string {

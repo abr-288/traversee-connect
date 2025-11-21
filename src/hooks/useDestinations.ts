@@ -11,6 +11,9 @@ export interface Destination {
   reviews: number;
   price: string;
   description: string;
+  category?: string;
+  amenities?: string[];
+  highlights?: string[];
 }
 
 export const useDestinations = () => {

@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MapPin, Star, Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { MapPin, Star, Loader2, Users, Calendar, Wifi, Coffee, Utensils, Waves, Mountain, Building2, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { BookingDialog } from "@/components/BookingDialog";
@@ -14,6 +15,22 @@ const DestinationsSection = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const navigate = useNavigate();
   const { data: destinations, isLoading } = useDestinations();
+
+  const getDestinationIcon = (name: string) => {
+    const nameLower = name.toLowerCase();
+    if (nameLower.includes('plage') || nameLower.includes('beach') || nameLower.includes('mer')) return Waves;
+    if (nameLower.includes('montagne') || nameLower.includes('mountain')) return Mountain;
+    if (nameLower.includes('ville') || nameLower.includes('city')) return Building2;
+    return Sparkles;
+  };
+
+  const getAmenityIcon = (amenity: string) => {
+    const amenityLower = amenity.toLowerCase();
+    if (amenityLower.includes('wifi')) return Wifi;
+    if (amenityLower.includes('restaurant') || amenityLower.includes('repas')) return Utensils;
+    if (amenityLower.includes('café') || amenityLower.includes('coffee')) return Coffee;
+    return Sparkles;
+  };
 
   return (
     <>
@@ -57,7 +74,10 @@ const DestinationsSection = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
-            {destinations?.slice(0, 9).map((destination, index) => (
+            {destinations?.slice(0, 9).map((destination, index) => {
+              const DestinationIcon = getDestinationIcon(destination.name);
+              
+              return (
               <Card
                 key={destination.id}
                 className="group overflow-hidden border-2 border-border/50 hover:border-primary/50 shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer animate-slide-up-fade hover-lift rounded-2xl relative bg-gradient-card"
@@ -74,42 +94,118 @@ const DestinationsSection = () => {
                     alt={destination.name}
                     className="w-full h-full object-cover transition-smooth group-hover:scale-110"
                   />
-                  <div className="absolute top-4 right-4 bg-background/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1">
+                  
+                  {/* Gradient overlay pour meilleure lisibilité */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  
+                  {/* Badge catégorie */}
+                  <div className="absolute top-4 left-4 z-10">
+                    <Badge className="bg-primary/90 backdrop-blur-sm text-primary-foreground gap-1.5 px-3 py-1.5">
+                      <DestinationIcon className="w-3.5 h-3.5" />
+                      {destination.category || 'Séjour'}
+                    </Badge>
+                  </div>
+                  
+                  {/* Rating */}
+                  <div className="absolute top-4 right-4 bg-background/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 z-10">
                     <Star className="w-4 h-4 fill-secondary text-secondary" />
                     <span className="font-semibold text-sm">{destination.rating}</span>
                     <span className="text-xs text-muted-foreground">({destination.reviews})</span>
                   </div>
+                  
+                  {/* Info en bas de l'image */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
+                    <div className="flex items-center gap-2 text-white">
+                      <MapPin className="w-4 h-4" />
+                      <span className="text-sm font-medium">{destination.location}</span>
+                    </div>
+                  </div>
                 </div>
 
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-smooth">
-                        {destination.name}
-                      </h3>
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <MapPin className="w-4 h-4" />
-                        <span className="text-sm">{destination.location}</span>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-2xl font-bold text-primary">{destination.price}</p>
-                      <p className="text-xs text-muted-foreground">FCFA / {t('destinations.perNight')}</p>
+                <CardContent className="p-6 space-y-4">
+                  {/* Titre et Prix */}
+                  <div className="flex items-start justify-between gap-4">
+                    <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-smooth flex-1">
+                      {destination.name}
+                    </h3>
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-2xl font-bold text-primary whitespace-nowrap">{destination.price}</p>
+                      <p className="text-xs text-muted-foreground whitespace-nowrap">FCFA / {t('destinations.perNight')}</p>
                     </div>
                   </div>
 
-                  <p className="text-muted-foreground text-sm mb-4">{destination.description}</p>
+                  {/* Description */}
+                  <p className="text-muted-foreground text-sm line-clamp-2 leading-relaxed">
+                    {destination.description}
+                  </p>
 
-                  <div className="flex gap-2">
+                  {/* Équipements/Commodités */}
+                  {destination.amenities && destination.amenities.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                        Équipements
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {destination.amenities.slice(0, 4).map((amenity: string, idx: number) => {
+                          const AmenityIcon = getAmenityIcon(amenity);
+                          return (
+                            <Badge 
+                              key={idx} 
+                              variant="outline" 
+                              className="gap-1.5 text-xs bg-muted/50 hover:bg-muted"
+                            >
+                              <AmenityIcon className="w-3 h-3" />
+                              {amenity}
+                            </Badge>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Points forts */}
+                  {destination.highlights && destination.highlights.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                        Points forts
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {destination.highlights.slice(0, 3).map((highlight: string, idx: number) => (
+                          <Badge 
+                            key={idx} 
+                            variant="secondary"
+                            className="text-xs"
+                          >
+                            ✓ {highlight}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Informations supplémentaires */}
+                  <div className="flex items-center gap-4 pt-2 border-t border-border/50">
+                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                      <Users className="w-4 h-4" />
+                      <span className="text-xs">Jusqu'à 4 personnes</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                      <Calendar className="w-4 h-4" />
+                      <span className="text-xs">Annulation flexible</span>
+                    </div>
+                  </div>
+
+                  {/* Boutons d'action */}
+                  <div className="flex gap-2 pt-2">
                     <Button 
                       variant="outline"
-                      className="flex-1"
+                      className="flex-1 hover:bg-primary/5 hover:text-primary hover:border-primary transition-all"
                       onClick={() => navigate(`/destinations/${destination.id}`)}
                     >
                       Voir détails
                     </Button>
                     <Button 
-                      className="flex-1 gradient-primary shadow-primary"
+                      className="flex-1 gradient-primary shadow-primary hover:shadow-xl transition-all"
                       onClick={() => {
                         setSelectedDestination({
                           id: destination.id,
@@ -127,7 +223,7 @@ const DestinationsSection = () => {
                   </div>
                 </CardContent>
               </Card>
-            ))}
+            )})}
           </div>
         )}
 
