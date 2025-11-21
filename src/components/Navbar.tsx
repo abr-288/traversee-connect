@@ -1,7 +1,15 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, User, LogOut, LayoutDashboard, Plane, Hotel, PlaneTakeoff, Train, Calendar, Car, HelpCircle, Download } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Menu, X, User, LogOut, LayoutDashboard, Plane, Hotel, PlaneTakeoff, Train, Calendar, Car, HelpCircle, Download, UserCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
 import { usePWA } from "@/hooks/usePWA";
@@ -117,24 +125,42 @@ const Navbar = () => {
               {isLoggedIn ? (
                 <>
                   <div className="h-4 w-px bg-white/20"></div>
-                  {isAdmin && (
-                    <Link to="/admin">
-                      <Button variant="ghost" size="sm" className="gap-0.5 text-[11px] text-white hover:bg-white/10 whitespace-nowrap">
-                        <LayoutDashboard className="w-3 h-3" />
-                        {t("nav.admin")}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="gap-1 text-[11px] text-white hover:bg-white/10 whitespace-nowrap">
+                        <UserCircle2 className="w-4 h-4" />
+                        <span className="hidden lg:inline">{t("nav.myAccount")}</span>
                       </Button>
-                    </Link>
-                  )}
-                  <Link to="/dashboard">
-                    <Button variant="ghost" size="sm" className="gap-0.5 text-[11px] text-white hover:bg-white/10 whitespace-nowrap">
-                      <User className="w-3 h-3" />
-                      {t("nav.myAccount")}
-                    </Button>
-                  </Link>
-                  <Button variant="ghost" size="sm" className="gap-0.5 text-[11px] text-white hover:bg-white/10 whitespace-nowrap" onClick={handleLogout}>
-                    <LogOut className="w-3 h-3" />
-                    {t("nav.logout")}
-                  </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48 bg-background border-border z-50">
+                      <DropdownMenuLabel className="text-foreground">
+                        {t("nav.myAccount")}
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      {isAdmin && (
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin" className="flex items-center gap-2 cursor-pointer">
+                            <LayoutDashboard className="w-4 h-4" />
+                            {t("nav.admin")}
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuItem asChild>
+                        <Link to="/dashboard" className="flex items-center gap-2 cursor-pointer">
+                          <User className="w-4 h-4" />
+                          {t("nav.myAccount")}
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem 
+                        onClick={handleLogout}
+                        className="flex items-center gap-2 cursor-pointer text-destructive focus:text-destructive"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        {t("nav.logout")}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </>
               ) : (
                 <>
