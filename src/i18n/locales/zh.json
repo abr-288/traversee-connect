@@ -20,6 +20,18 @@
     "subtitle": "为您的航班、酒店、火车等找到最优惠的价格",
     "search": "搜索"
   },
+  "flights": {
+    "from": "从哪里出发？",
+    "to": "去哪里？",
+    "departure": "出发",
+    "arrival": "到达",
+    "departureDate": "出发日期",
+    "returnDate": "返回日期",
+    "passengers": "乘客",
+    "roundtrip": "往返",
+    "oneway": "单程",
+    "search": "搜索"
+  },
   "search": {
     "from": "出发地",
     "to": "目的地",
