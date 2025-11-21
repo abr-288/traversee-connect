@@ -26,6 +26,7 @@ interface Booking {
   currency: string;
   status: string;
   payment_status: string;
+  external_ref: string | null;
   created_at: string;
   services: {
     name: string;
