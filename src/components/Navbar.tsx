@@ -55,38 +55,38 @@ const Navbar = () => {
             <span className="text-xl font-bold text-white">Bossiz</span>
           </Link>
 
-          <div className="hidden md:flex items-center flex-1 pl-32">
+          <div className="hidden md:flex items-center flex-1 justify-between pl-8">
             {/* Navigation Principale */}
-            <div className="flex items-center gap-6">
-              <Link to="/flights" className="text-white hover:text-secondary transition-smooth text-sm font-medium flex items-center gap-1.5">
+            <div className="flex items-center gap-4 lg:gap-6">
+              <Link to="/flights" className="text-white hover:text-secondary transition-smooth text-sm font-medium flex items-center gap-1.5 whitespace-nowrap">
                 <Plane className="w-3.5 h-3.5" />
                 {t("nav.flights")}
               </Link>
-              <Link to="/hotels" className="text-white hover:text-secondary transition-smooth text-sm font-medium flex items-center gap-1.5">
+              <Link to="/hotels" className="text-white hover:text-secondary transition-smooth text-sm font-medium flex items-center gap-1.5 whitespace-nowrap">
                 <Hotel className="w-3.5 h-3.5" />
                 {t("nav.hotels")}
               </Link>
-              <Link to="/flight-hotel" className="text-white hover:text-secondary transition-smooth text-sm font-medium flex items-center gap-1.5">
+              <Link to="/flight-hotel" className="text-white hover:text-secondary transition-smooth text-sm font-medium flex items-center gap-1.5 whitespace-nowrap">
                 <PlaneTakeoff className="w-3.5 h-3.5" />
                 {t("nav.flightHotel")}
               </Link>
-              <Link to="/trains" className="text-white hover:text-secondary transition-smooth text-sm font-medium flex items-center gap-1.5">
+              <Link to="/trains" className="text-white hover:text-secondary transition-smooth text-sm font-medium flex items-center gap-1.5 whitespace-nowrap">
                 <Train className="w-3.5 h-3.5" />
                 {t("nav.trains")}
               </Link>
-              <Link to="/events" className="text-white hover:text-secondary transition-smooth text-sm font-medium flex items-center gap-1.5">
+              <Link to="/events" className="text-white hover:text-secondary transition-smooth text-sm font-medium flex items-center gap-1.5 whitespace-nowrap">
                 <Calendar className="w-3.5 h-3.5" />
                 {t("nav.events")}
               </Link>
-              <Link to="/cars" className="text-white hover:text-secondary transition-smooth text-sm font-medium flex items-center gap-1.5">
+              <Link to="/cars" className="text-white hover:text-secondary transition-smooth text-sm font-medium flex items-center gap-1.5 whitespace-nowrap">
                 <Car className="w-3.5 h-3.5" />
                 {t("nav.carRental")}
               </Link>
             </div>
 
-            {/* Section Droite */}
-            <div className="ml-auto flex items-center gap-1">
-              <Link to="/support" className="text-white hover:text-secondary transition-smooth text-[11px] font-medium flex items-center gap-0.5">
+            {/* Section Droite - Toujours visible */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <Link to="/support" className="text-white hover:text-secondary transition-smooth text-[11px] font-medium flex items-center gap-0.5 whitespace-nowrap">
                 <HelpCircle className="w-2.5 h-2.5" />
                 {t("nav.support")}
               </Link>
@@ -106,7 +106,7 @@ const Navbar = () => {
                     variant="ghost" 
                     size="sm" 
                     onClick={handleInstall}
-                    className="gap-1 text-[11px] text-secondary hover:bg-white/10 font-semibold"
+                    className="gap-1 text-[11px] text-secondary hover:bg-white/10 font-semibold whitespace-nowrap"
                   >
                     <Download className="w-3 h-3" />
                     Installer
@@ -119,33 +119,34 @@ const Navbar = () => {
                   <div className="h-4 w-px bg-white/20"></div>
                   {isAdmin && (
                     <Link to="/admin">
-                      <Button variant="ghost" size="sm" className="gap-0.5 text-[11px] text-white hover:bg-white/10">
+                      <Button variant="ghost" size="sm" className="gap-0.5 text-[11px] text-white hover:bg-white/10 whitespace-nowrap">
                         <LayoutDashboard className="w-3 h-3" />
                         {t("nav.admin")}
                       </Button>
                     </Link>
                   )}
                   <Link to="/dashboard">
-                    <Button variant="ghost" size="sm" className="gap-0.25 text-[10px] text-white hover:bg-white/10">
-                      <User className="w-2.5 h-2.5" />
+                    <Button variant="ghost" size="sm" className="gap-0.5 text-[11px] text-white hover:bg-white/10 whitespace-nowrap">
+                      <User className="w-3 h-3" />
                       {t("nav.myAccount")}
                     </Button>
                   </Link>
-                  <Button variant="ghost" size="sm" className="gap-0.5 text-[11px] text-white hover:bg-white/10" onClick={handleLogout}>
+                  <Button variant="ghost" size="sm" className="gap-0.5 text-[11px] text-white hover:bg-white/10 whitespace-nowrap" onClick={handleLogout}>
                     <LogOut className="w-3 h-3" />
                     {t("nav.logout")}
                   </Button>
                 </>
               ) : (
                 <>
+                  <div className="h-4 w-px bg-white/20"></div>
                   <Link to="/auth">
-                    <Button variant="ghost" size="sm" className="gap-0.5 text-[11px] text-white hover:bg-white/10">
+                    <Button variant="ghost" size="sm" className="gap-0.5 text-[11px] text-white hover:bg-white/10 whitespace-nowrap">
                       <User className="w-3 h-3" />
                       {t("nav.login")}
                     </Button>
                   </Link>
                   <Link to="/auth">
-                    <Button size="sm" className="text-[11px] bg-secondary hover:bg-secondary/90 text-primary px-2">
+                    <Button size="sm" className="text-[11px] bg-secondary hover:bg-secondary/90 text-primary px-2 whitespace-nowrap">
                       {t("nav.signup")}
                     </Button>
                   </Link>
