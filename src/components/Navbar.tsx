@@ -268,12 +268,12 @@ const Navbar = () => {
                       </Link>
                     )}
                     <Link to="/dashboard" className="w-full">
-                      <Button variant="outline" className="w-full gap-1.5 text-sm text-white border-white/20 hover:bg-white/10">
+                      <Button className="w-full gap-1.5 text-sm bg-secondary hover:bg-secondary/90 text-primary">
                         <User className="w-3.5 h-3.5" />
                         {t("nav.myAccount")}
                       </Button>
                     </Link>
-                    <Button variant="outline" className="w-full gap-1.5 text-sm text-white border-white/20 hover:bg-white/10" onClick={handleLogout}>
+                    <Button className="w-full gap-1.5 text-sm bg-destructive hover:bg-destructive/90 text-destructive-foreground" onClick={handleLogout}>
                       <LogOut className="w-3.5 h-3.5" />
                       {t("nav.logout")}
                     </Button>
