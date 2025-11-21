@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { LazyImage } from "@/components/ui/lazy-image";
 import { Clock, Percent, MapPin, Star, ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useServices } from "@/hooks/useServices";
@@ -82,9 +83,9 @@ const SpecialOffers = () => {
                 </div>
 
                 <div className="relative h-72 overflow-hidden rounded-t-3xl">
-                  <img
+                  <LazyImage
                     src={offer.image_url || offer.images?.[0] || '/placeholder.svg'}
-                    alt={offer.name}
+                    alt={`Offre spéciale ${offer.name} à ${offer.location} avec -${offer.discount}% de réduction`}
                     className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:rotate-2"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
