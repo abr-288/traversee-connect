@@ -35,7 +35,7 @@ export function AdminSidebar() {
   };
 
   return (
-    <Sidebar className={collapsed ? "w-16" : "w-64"} collapsible>
+    <Sidebar className={collapsed ? "w-16" : "w-64"} collapsible="icon">
       <SidebarContent>
         <div className="p-4 border-b">
           <h2 className={`font-bold text-xl ${collapsed ? "text-center" : ""}`}>
