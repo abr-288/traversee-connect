@@ -1,50 +1,31 @@
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Download, Smartphone, Check } from "lucide-react";
+import { Download, Smartphone, Check, Wifi, Zap, Bell } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { usePWA } from "@/hooks/usePWA";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 const Install = () => {
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [isInstallable, setIsInstallable] = useState(false);
-  const [isInstalled, setIsInstalled] = useState(false);
-
-  useEffect(() => {
-    // Check if app is already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      setIsInstalled(true);
-    }
-
-    const handler = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-      setIsInstallable(true);
-    };
-
-    window.addEventListener('beforeinstallprompt', handler);
-
-    window.addEventListener('appinstalled', () => {
-      setIsInstalled(true);
-      setIsInstallable(false);
-    });
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handler);
-    };
-  }, []);
+  const { isInstallable, isInstalled, install } = usePWA();
+  const { isSupported, permission, requestPermission, subscribe, sendNotification } = usePushNotifications();
 
   const handleInstallClick = async () => {
-    if (!deferredPrompt) return;
-
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
-      setIsInstallable(false);
+    const success = await install();
+    if (success) {
+      console.log('App installed successfully');
     }
-    
-    setDeferredPrompt(null);
+  };
+
+  const handleEnableNotifications = async () => {
+    const granted = await requestPermission();
+    if (granted) {
+      await subscribe();
+      sendNotification('Notifications activées', {
+        body: 'Vous recevrez désormais des notifications pour vos réservations',
+        tag: 'welcome'
+      });
+    }
   };
 
   return (
@@ -129,15 +110,15 @@ const Install = () => {
                 <CardContent>
                   <ul className="space-y-3">
                     <li className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                      <Smartphone className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                       <span>Accès rapide depuis votre écran d'accueil</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                      <Wifi className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                       <span>Fonctionne même hors ligne</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                      <Zap className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                       <span>Chargement ultra-rapide</span>
                     </li>
                     <li className="flex items-start gap-3">
@@ -151,6 +132,47 @@ const Install = () => {
                   </ul>
                 </CardContent>
               </Card>
+
+              {isSupported && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Bell className="w-5 h-5" />
+                      Notifications push
+                    </CardTitle>
+                    <CardDescription>
+                      Restez informé de vos réservations et offres spéciales
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {permission === 'granted' ? (
+                      <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+                        <Check className="w-5 h-5" />
+                        <span>Notifications activées</span>
+                      </div>
+                    ) : permission === 'denied' ? (
+                      <div className="text-sm text-muted-foreground">
+                        Les notifications ont été refusées. Vous pouvez les réactiver dans les paramètres de votre navigateur.
+                      </div>
+                    ) : (
+                      <>
+                        <div className="text-sm text-muted-foreground">
+                          Activez les notifications pour recevoir :
+                          <ul className="mt-2 space-y-1 list-disc list-inside">
+                            <li>Confirmations de réservation</li>
+                            <li>Rappels de voyage</li>
+                            <li>Offres personnalisées</li>
+                          </ul>
+                        </div>
+                        <Button onClick={handleEnableNotifications} className="w-full">
+                          <Bell className="mr-2 h-5 w-5" />
+                          Activer les notifications
+                        </Button>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
             </div>
           )}
         </div>
