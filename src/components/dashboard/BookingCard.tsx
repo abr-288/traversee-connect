@@ -18,7 +18,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { MapPin, Calendar, Users, MoreVertical, Edit, Trash2, CheckCircle, XCircle, FileDown, Loader2 } from "lucide-react";
+import { MapPin, Calendar, Users, MoreVertical, Edit, Trash2, CheckCircle, XCircle, FileDown, Loader2, Ticket } from "lucide-react";
 import { useBookingPDF } from "@/hooks/useBookingPDF";
 import { Price } from "@/components/ui/price";
 
@@ -35,6 +35,7 @@ interface Booking {
   currency: string;
   status: string;
   payment_status: string;
+  external_ref: string | null;
   created_at: string;
   services: {
     name: string;
@@ -182,6 +183,16 @@ export const BookingCard = ({ booking, onConfirm, onCancel, onEdit, onDelete }: 
             <Users className="h-4 w-4 text-muted-foreground" />
             <span>{booking.guests} voyageur{booking.guests > 1 ? "s" : ""}</span>
           </div>
+
+          {booking.external_ref && (
+            <div className="flex items-center gap-2 p-3 bg-primary/5 rounded-lg border border-primary/20">
+              <Ticket className="h-5 w-5 text-primary" />
+              <div className="flex-1">
+                <p className="text-xs text-muted-foreground font-medium">Numéro de Réservation (PNR)</p>
+                <p className="text-lg font-bold text-primary tracking-wider">{booking.external_ref}</p>
+              </div>
+            </div>
+          )}
 
           <div className="flex items-center justify-between pt-4 border-t">
             <div className="flex gap-2">
