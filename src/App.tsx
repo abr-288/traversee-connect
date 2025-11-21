@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { Loader2 } from "lucide-react";
+import { NotificationPrompt } from "@/components/NotificationPrompt";
 
 // Lazy load route components for code splitting
 const Index = lazy(() => import("./pages/Index"));
@@ -53,6 +54,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <NotificationPrompt />
         <BrowserRouter>
           <Suspense fallback={<PageLoader />}>
             <Routes>
