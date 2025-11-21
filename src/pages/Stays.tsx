@@ -8,6 +8,7 @@ import { CurrencyConverter } from "@/components/CurrencyConverter";
 import { StaySearchForm } from "@/components/StaySearchForm";
 import { BookingDialog } from "@/components/BookingDialog";
 import { useState } from "react";
+import { Price } from "@/components/ui/price";
 
 const Stays = () => {
   const [selectedStay, setSelectedStay] = useState<any>(null);
@@ -165,9 +166,12 @@ const Stays = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs text-muted-foreground">À partir de</p>
-                    <p className="text-2xl font-bold text-primary">
-                      {stay.price.toLocaleString()} <span className="text-sm">FCFA</span>
-                    </p>
+                    <Price 
+                      amount={stay.price} 
+                      fromCurrency="XOF"
+                      className="text-2xl font-bold text-primary"
+                      showLoader={true}
+                    />
                   </div>
                   <Button 
                     className="gradient-primary shadow-primary"

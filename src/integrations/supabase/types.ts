@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      activities: {
+        Row: {
+          available: boolean | null
+          category: string
+          created_at: string
+          currency: string
+          description: string | null
+          duration: string
+          featured: boolean | null
+          highlights: string[] | null
+          id: string
+          image_url: string | null
+          included: string[] | null
+          location: string
+          name: string
+          price_per_unit: number
+          rating: number | null
+          reviews: number | null
+          updated_at: string
+        }
+        Insert: {
+          available?: boolean | null
+          category: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          duration: string
+          featured?: boolean | null
+          highlights?: string[] | null
+          id?: string
+          image_url?: string | null
+          included?: string[] | null
+          location: string
+          name: string
+          price_per_unit: number
+          rating?: number | null
+          reviews?: number | null
+          updated_at?: string
+        }
+        Update: {
+          available?: boolean | null
+          category?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          duration?: string
+          featured?: boolean | null
+          highlights?: string[] | null
+          id?: string
+          image_url?: string | null
+          included?: string[] | null
+          location?: string
+          name?: string
+          price_per_unit?: number
+          rating?: number | null
+          reviews?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           booking_details: Json | null
@@ -376,6 +436,63 @@ export type Database = {
           specifications?: Json | null
           total_reviews?: number | null
           type?: Database["public"]["Enums"]["service_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      stays: {
+        Row: {
+          available: boolean | null
+          created_at: string
+          currency: string
+          description: string | null
+          duration: string
+          featured: boolean | null
+          highlights: string[] | null
+          id: string
+          image_url: string | null
+          location: string
+          name: string
+          price_per_unit: number
+          rating: number | null
+          reviews: number | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          available?: boolean | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          duration: string
+          featured?: boolean | null
+          highlights?: string[] | null
+          id?: string
+          image_url?: string | null
+          location: string
+          name: string
+          price_per_unit: number
+          rating?: number | null
+          reviews?: number | null
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          available?: boolean | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          duration?: string
+          featured?: boolean | null
+          highlights?: string[] | null
+          id?: string
+          image_url?: string | null
+          location?: string
+          name?: string
+          price_per_unit?: number
+          rating?: number | null
+          reviews?: number | null
+          type?: string
           updated_at?: string
         }
         Relationships: []
