@@ -7,38 +7,45 @@ Le projet suit une architecture basée sur les fonctionnalités (features), où 
 ```
 src/
 ├── features/
-│   ├── flights/              # Domaine des vols
+│   ├── flights/              # Domaine des vols ✅
 │   │   ├── components/       # Composants UI spécifiques
 │   │   ├── hooks/           # Hooks métier
-│   │   ├── types/           # Types TypeScript
-│   │   ├── utils/           # Utilitaires
 │   │   └── index.ts         # Exports publics
 │   │
-│   ├── hotels/              # Domaine des hôtels
+│   ├── hotels/              # Domaine des hôtels ✅
 │   │   ├── components/
 │   │   ├── hooks/
 │   │   └── index.ts
 │   │
-│   ├── cars/                # Domaine des voitures
+│   ├── cars/                # Domaine des voitures ✅
 │   │   ├── components/
 │   │   ├── hooks/
 │   │   └── index.ts
 │   │
-│   ├── bookings/            # Domaine des réservations
+│   ├── bookings/            # Domaine des réservations ✅
+│   │   ├── components/
+│   │   └── index.ts
+│   │
+│   ├── auth/                # Domaine de l'authentification ✅
+│   │   ├── hooks/
+│   │   └── index.ts
+│   │
+│   ├── payment/             # Domaine des paiements ✅
+│   │   ├── hooks/
+│   │   └── index.ts
+│   │
+│   ├── admin/               # Domaine de l'administration ✅
 │   │   ├── components/
 │   │   ├── hooks/
 │   │   └── index.ts
 │   │
-│   └── shared/              # Composants partagés
+│   └── shared/              # Composants partagés ✅
 │       ├── components/      # UI components réutilisables
-│       ├── hooks/          # Hooks génériques
-│       ├── utils/          # Utilitaires communs
 │       └── index.ts
 │
-├── components/              # Composants legacy (à migrer)
+├── components/              # Composants legacy (à supprimer progressivement)
 ├── pages/                   # Pages/Routes
 └── lib/                     # Librairies et config
-
 ```
 
 ## Principes d'architecture
@@ -72,25 +79,25 @@ Les composants réutilisables dans `shared/` incluent :
 - `UnifiedAutocomplete` - Autocomplétion générique
 - `UnifiedDatePicker` - Sélecteur de date
 - `UnifiedPassengerSelector` - Sélecteur de passagers
+- `UnifiedFormField` - Champ de formulaire générique
 
-## Migration progressive
+## Migration complète ✅
 
-### Étape 1 : Features créées ✅
-- `features/flights/` - Recherche de vols
-- `features/hotels/` - Recherche d'hôtels
-- `features/bookings/` - Dialogue de réservation
-- `features/shared/` - Composants partagés
+### Features migrées
+- ✅ `features/flights/` - Recherche de vols
+- ✅ `features/hotels/` - Recherche d'hôtels
+- ✅ `features/cars/` - Recherche de voitures
+- ✅ `features/bookings/` - Dialogue de réservation
+- ✅ `features/auth/` - Authentification
+- ✅ `features/payment/` - Paiements
+- ✅ `features/admin/` - Administration
+- ✅ `features/shared/` - Composants partagés
 
-### Étape 2 : À migrer
-- `features/cars/` - Recherche de voitures
-- `features/auth/` - Authentification
-- `features/payment/` - Paiements
-- `features/admin/` - Administration
-
-### Étape 3 : Nettoyage
-- Supprimer les anciens composants de `src/components/`
-- Mettre à jour les imports dans les pages
-- Documenter les patterns
+### Prochaines étapes
+1. Mettre à jour les imports dans les pages pour utiliser les nouvelles features
+2. Supprimer les anciens composants de `src/components/` une fois tous les imports mis à jour
+3. Ajouter des tests unitaires par feature
+4. Mettre en place le lazy loading par feature
 
 ## Utilisation
 
@@ -98,12 +105,14 @@ Les composants réutilisables dans `shared/` incluent :
 ```typescript
 import { FlightSearchForm } from "@/features/flights";
 import { HotelSearchForm } from "@/features/hotels";
+import { CarSearchForm } from "@/features/cars";
 
 export const SearchPage = () => {
   return (
     <div>
       <FlightSearchForm />
       <HotelSearchForm />
+      <CarSearchForm />
     </div>
   );
 };
@@ -130,10 +139,11 @@ features/
 3. **Testabilité** : Tests isolés par feature
 4. **Réutilisabilité** : Composants partagés bien définis
 5. **Onboarding** : Structure claire pour nouveaux développeurs
+6. **Performance** : Possibilité de lazy loading par feature
 
-## Prochaines étapes
+## Conventions de nommage
 
-1. Migrer les features restantes (cars, auth, payment)
-2. Créer des tests unitaires par feature
-3. Documenter les patterns de chaque domaine
-4. Mettre en place le lazy loading par feature
+- **Composants** : PascalCase (ex: `FlightSearchForm`)
+- **Hooks** : camelCase avec préfixe `use` (ex: `useFlightSearch`)
+- **Types** : PascalCase (ex: `FlightSearchParams`)
+- **Fichiers** : Correspondance exacte avec le nom du composant/hook
