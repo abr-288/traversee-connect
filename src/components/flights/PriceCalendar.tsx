@@ -9,9 +9,10 @@ interface PriceCalendarProps {
   prices?: Record<string, number>;
   currency?: string;
   onDateSelect: (date: string) => void;
+  lowestPrice?: number;
 }
 
-export const PriceCalendar = ({ departureDate, prices = {}, currency = "€", onDateSelect }: PriceCalendarProps) => {
+export const PriceCalendar = ({ departureDate, prices = {}, currency = "€", onDateSelect, lowestPrice }: PriceCalendarProps) => {
   const baseDate = parseISO(departureDate);
   const dates = Array.from({ length: 7 }, (_, i) => addDays(baseDate, i - 3));
 
@@ -27,7 +28,7 @@ export const PriceCalendar = ({ departureDate, prices = {}, currency = "€", on
             {dates.map((date) => {
               const dateStr = format(date, "yyyy-MM-dd");
               const isSelected = dateStr === departureDate;
-              const price = prices[dateStr] || 304;
+              const price = prices[dateStr] || lowestPrice || 0;
               
               return (
                 <button

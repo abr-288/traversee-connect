@@ -84,8 +84,8 @@ const Flights = () => {
           const airline = getAirlineName(airlineCode);
 
           const priceTotal =
-            typeof offer.price === "object" && offer.price?.total
-              ? parseFloat(offer.price.total)
+            typeof offer.price === "object" && (offer.price?.grandTotal || offer.price?.total)
+              ? parseFloat(offer.price.grandTotal || offer.price.total)
               : typeof offer.price === "number"
               ? offer.price
               : 0;
@@ -190,11 +190,12 @@ const Flights = () => {
       </div>
 
       {/* Price Calendar */}
-      {hasSearched && departureDate && (
+      {hasSearched && departureDate && flights.length > 0 && (
         <PriceCalendar
           departureDate={departureDate}
           onDateSelect={handleDateSelect}
           currency="XOF"
+          lowestPrice={Math.min(...flights.map(f => f.price))}
         />
       )}
 
