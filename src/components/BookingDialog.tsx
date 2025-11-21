@@ -1,11 +1,9 @@
-import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { supabase } from "@/integrations/supabase/client";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { toast } from "@/hooks/use-toast";
-import { bookingSchema } from "@/lib/validation";
-import { UnifiedForm, UnifiedFormField, UnifiedDatePicker, UnifiedSubmitButton } from "@/components/forms";
+import { Plane, Hotel, Car, MapPin, Calendar, Users } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 interface BookingDialogProps {
   open: boolean;
@@ -16,214 +14,117 @@ interface BookingDialogProps {
     price_per_unit: number;
     currency: string;
     type: string;
+    location?: string;
   };
 }
 
 export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProps) => {
   const { t } = useTranslation();
-  const [loading, setLoading] = useState(false);
-  const [startDate, setStartDate] = useState<Date>();
-  const [endDate, setEndDate] = useState<Date>();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-
-    const formData = new FormData(e.currentTarget);
-    const guests = parseInt(formData.get("guests") as string);
-    const customerName = formData.get("customerName") as string;
-    const customerEmail = formData.get("customerEmail") as string;
-    const customerPhone = formData.get("customerPhone") as string;
-    const notes = formData.get("notes") as string;
-
-    // Validate input
-    try {
-      bookingSchema.parse({
-        customerName,
-        customerEmail,
-        customerPhone,
-        notes: notes || null,
-      });
-    } catch (error: any) {
-      toast({
-        title: t('error.title'),
-        description: error.errors?.[0]?.message || t('booking.validation.checkInfo'),
-        variant: "destructive",
-      });
-      setLoading(false);
-      return;
+  const getServiceIcon = () => {
+    switch (service.type) {
+      case "flight": return <Plane className="w-6 h-6" />;
+      case "hotel": return <Hotel className="w-6 h-6" />;
+      case "car": return <Car className="w-6 h-6" />;
+      default: return <MapPin className="w-6 h-6" />;
     }
+  };
 
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      toast({
-        title: t('error.title'),
-        description: t('booking.validation.mustBeLoggedIn'),
-        variant: "destructive",
-      });
-      setLoading(false);
-      return;
-    }
-
-    // Check if service exists in DB, if not create it
-    let serviceId = service.id;
-    const { data: existingService } = await supabase
-      .from("services")
-      .select("id")
-      .eq("id", service.id)
-      .maybeSingle();
-
-    if (!existingService) {
-      const { data: newService, error: serviceError } = await supabase
-        .from("services")
-        .insert({
-          name: service.name,
-          type: service.type as any,
-          price_per_unit: service.price_per_unit,
-          currency: service.currency,
-          location: "Côte d'Ivoire",
-          available: true,
-        } as any)
-        .select()
-        .single();
-
-      if (serviceError) {
-        toast({
-          title: t('error.title'),
-          description: t('booking.error.createService'),
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-
-      serviceId = newService.id;
-    }
-
-    // Calculate days
-    const start = startDate || new Date();
-    const end = endDate || start;
-    const days = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
-    const totalPrice = service.price_per_unit * guests * days;
-
-    const { data: bookingData, error } = await supabase.from("bookings").insert({
-      user_id: user.id,
-      service_id: serviceId,
-      start_date: start.toISOString().split('T')[0],
-      end_date: end.toISOString().split('T')[0],
-      guests,
-      total_price: totalPrice,
-      customer_name: customerName,
-      customer_email: customerEmail,
-      customer_phone: customerPhone,
-      notes: notes || null,
+  const handleStartBooking = () => {
+    // Construire les paramètres URL
+    const params = new URLSearchParams({
+      type: service.type,
+      name: service.name,
+      price: service.price_per_unit.toString(),
       currency: service.currency,
-      status: "pending",
-      payment_status: "pending",
-    }).select().single();
-
-    if (error) {
-      console.error("Booking error:", error);
-      toast({
-        title: t('error.title'),
-        description: t('booking.error.createBooking') + ": " + error.message,
-        variant: "destructive",
-      });
-      setLoading(false);
-      return;
-    }
-
-    toast({
-      title: t('booking.success.created'),
-      description: t('booking.success.description'),
+      location: service.location || "",
+      serviceId: service.id,
     });
 
+    // Rediriger vers le processus de réservation unifié
+    navigate(`/booking/${service.type}?${params.toString()}`);
     onOpenChange(false);
-    navigate(`/payment?bookingId=${bookingData.id}`);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>{t('booking.dialog.generic.title')} {service.name}</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            {getServiceIcon()}
+            {t('booking.dialog.generic.title')} {service.name}
+          </DialogTitle>
           <DialogDescription>
-            {t('booking.dialog.generic.description')}
+            Préparez-vous à réserver ce service en quelques étapes simples
           </DialogDescription>
         </DialogHeader>
 
-        <UnifiedForm onSubmit={handleSubmit} variant="booking" loading={loading}>
-          <div className="space-y-6">
-            {/* Dates */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <UnifiedDatePicker
-                label={t('booking.dialog.generic.startDate')}
-                value={startDate}
-                onChange={setStartDate}
-                required
-                minDate={new Date()}
-              />
-              <UnifiedDatePicker
-                label={t('booking.dialog.generic.endDate')}
-                value={endDate}
-                onChange={setEndDate}
-                minDate={startDate || new Date()}
-              />
-            </div>
-
-            {/* Guests */}
-            <UnifiedFormField
-              label={t('booking.dialog.generic.guests')}
-              name="guests"
-              type="number"
-              defaultValue="1"
-              min={1}
-              required
-            />
-
-            {/* Customer Info */}
-            <div className="space-y-4 pt-4 border-t">
-              <h3 className="font-semibold text-lg">{t('booking.form.customerInfo')}</h3>
-              
-              <UnifiedFormField
-                label={t('booking.form.customerName')}
-                name="customerName"
-                placeholder="John Doe"
-                required
-              />
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <UnifiedFormField
-                  label={t('booking.form.customerEmail')}
-                  name="customerEmail"
-                  type="email"
-                  placeholder="john@example.com"
-                  required
-                />
-                <UnifiedFormField
-                  label={t('booking.form.customerPhone')}
-                  name="customerPhone"
-                  type="tel"
-                  placeholder="+225 XX XX XX XX XX"
-                  required
-                />
+        <div className="space-y-6 py-4">
+          <Card className="p-4 bg-gradient-to-br from-primary/5 to-transparent">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Service</span>
+                <span className="font-semibold">{service.name}</span>
               </div>
-
-              <UnifiedFormField
-                label={t('booking.form.notes')}
-                name="notes"
-                type="textarea"
-                placeholder={t('booking.form.specialRequests')}
-              />
+              {service.location && (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Lieu</span>
+                  <span className="font-medium flex items-center gap-1">
+                    <MapPin className="w-3 h-3" />
+                    {service.location}
+                  </span>
+                </div>
+              )}
+              <div className="flex items-center justify-between pt-2 border-t">
+                <span className="text-sm text-muted-foreground">Prix de base</span>
+                <span className="text-xl font-bold text-primary">
+                  {service.price_per_unit.toLocaleString()} {service.currency}
+                </span>
+              </div>
             </div>
+          </Card>
 
-            <UnifiedSubmitButton variant="booking" loading={loading} fullWidth>
-              {t('booking.summary.confirm')}
-            </UnifiedSubmitButton>
+          <div className="space-y-3">
+            <h4 className="font-semibold text-sm text-muted-foreground">Le processus de réservation comprend :</h4>
+            <div className="space-y-2">
+              <div className="flex items-center gap-3 text-sm">
+                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">1</div>
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-primary" />
+                  <span>Informations des participants</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 text-sm">
+                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">2</div>
+                <span>Options et services supplémentaires</span>
+              </div>
+              <div className="flex items-center gap-3 text-sm">
+                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">3</div>
+                <span>Préférences et détails</span>
+              </div>
+              <div className="flex items-center gap-3 text-sm">
+                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">4</div>
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-primary" />
+                  <span>Paiement sécurisé</span>
+                </div>
+              </div>
+            </div>
           </div>
-        </UnifiedForm>
+
+          <div className="flex gap-3 pt-4">
+            <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
+              Annuler
+            </Button>
+            <Button 
+              onClick={handleStartBooking}
+              className="flex-1 gradient-primary"
+            >
+              Commencer la réservation
+            </Button>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );

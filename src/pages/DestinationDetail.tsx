@@ -11,7 +11,6 @@ import {
   ThermometerSun
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { BookingDialog } from "@/components/BookingDialog";
 import { useDestinations } from "@/hooks/useDestinations";
 import { useWeather, WeatherData } from "@/hooks/useWeather";
 
@@ -20,11 +19,9 @@ const DestinationDetail = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [selectedImage, setSelectedImage] = useState(0);
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const { data: destinations } = useDestinations();
   const { getWeather } = useWeather();
-  
   const destination = destinations?.find(d => d.id === id);
 
   useEffect(() => {
@@ -97,22 +94,7 @@ const DestinationDetail = () => {
   ];
 
   return (
-    <>
-      {dialogOpen && (
-        <BookingDialog 
-          open={dialogOpen}
-          onOpenChange={setDialogOpen}
-          service={{
-            id: destination.id,
-            name: destination.name,
-            price_per_unit: parseInt(destination.price.replace(/\s/g, '')),
-            currency: "FCFA",
-            type: "stay"
-          } as any}
-        />
-      )}
-
-      <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background">
         {/* Header */}
         <div className="bg-gradient-to-b from-primary/10 to-background border-b">
           <div className="container mx-auto px-4 py-6">
@@ -208,9 +190,18 @@ const DestinationDetail = () => {
                     </div>
                   </div>
                   <Button 
-                    className="w-full gradient-primary shadow-primary"
-                    size="lg"
-                    onClick={() => setDialogOpen(true)}
+                    className="w-full gradient-primary shadow-primary hover:shadow-xl transition-all"
+                    onClick={() => {
+                      const params = new URLSearchParams({
+                        type: 'stay',
+                        name: destination.name,
+                        price: destination.price.replace(/\s/g, ''),
+                        currency: 'FCFA',
+                        location: destination.location,
+                        serviceId: destination.id,
+                      });
+                      navigate(`/booking/stay?${params.toString()}`);
+                    }}
                   >
                     Réserver maintenant
                   </Button>
@@ -485,7 +476,7 @@ const DestinationDetail = () => {
           </Tabs>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
