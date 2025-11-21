@@ -29,7 +29,8 @@ const Payment = lazy(() => import("./pages/Payment"));
 const Confirmation = lazy(() => import("./pages/Confirmation"));
 const FlightComparison = lazy(() => import("./pages/FlightComparison"));
 const FlightBookingProcess = lazy(() => import("./pages/FlightBookingProcess"));
-const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AdminDashboard = lazy(() => import("./pages/admin/AdminOverview"));
+const AdminBookings = lazy(() => import("./pages/admin/AdminBookings"));
 const AdminEmailTemplates = lazy(() => import("./pages/AdminEmailTemplates"));
 const Help = lazy(() => import("./pages/Help"));
 const Support = lazy(() => import("./pages/Support"));
@@ -80,6 +81,7 @@ const App = () => (
               <Route path="/flight-comparison" element={<FlightComparison />} />
               <Route path="/booking-process" element={<FlightBookingProcess />} />
               <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/bookings" element={<AdminBookings />} />
               <Route path="/admin/email-templates" element={<AdminEmailTemplates />} />
               <Route path="/help" element={<Help />} />
               <Route path="/support" element={<Support />} />
