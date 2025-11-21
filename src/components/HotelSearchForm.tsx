@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
+import { AlertCircle } from "lucide-react";
 import { 
   UnifiedForm, 
   UnifiedAutocomplete,
@@ -9,13 +10,18 @@ import {
   UnifiedSubmitButton 
 } from "@/components/forms";
 import { useTranslation } from "react-i18next";
+import { hotelSearchSchema, type HotelSearchInput } from "@/lib/validationSchemas";
+import { safeValidate } from "@/lib/formHelpers";
+import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 /**
- * HotelSearchForm - Recherche d'hôtels avec UnifiedForm
+ * HotelSearchForm - Recherche d'hôtels avec validation Zod
  * Design premium type Booking/Hotels.com avec identité Bossiz
  */
 export const HotelSearchForm = () => {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const navigate = useNavigate();
   const [destination, setDestination] = useState("");
   const [checkIn, setCheckIn] = useState<Date>();
@@ -27,82 +33,211 @@ export const HotelSearchForm = () => {
     infants: 0
   });
 
+  // État des erreurs de validation
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  // Validation en temps réel
+  useEffect(() => {
+    if (Object.keys(touched).length === 0) return;
+
+    const formData: HotelSearchInput = {
+      destination: destination || "",
+      checkIn: checkIn ? format(checkIn, "yyyy-MM-dd") : "",
+      checkOut: checkOut ? format(checkOut, "yyyy-MM-dd") : "",
+      adults: passengers.adults,
+      children: passengers.children,
+      rooms: passengers.rooms,
+    };
+
+    const validation = safeValidate(hotelSearchSchema, formData);
+    
+    if (!validation.success) {
+      const filteredErrors: Record<string, string> = {};
+      Object.keys(validation.errors).forEach(key => {
+        if (touched[key]) {
+          filteredErrors[key] = validation.errors[key];
+        }
+      });
+      setErrors(filteredErrors);
+    } else {
+      const clearedErrors = { ...errors };
+      Object.keys(touched).forEach(key => {
+        delete clearedErrors[key];
+      });
+      setErrors(clearedErrors);
+    }
+  }, [destination, checkIn, checkOut, passengers, touched]);
+
+  const handleBlur = (field: string) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+  };
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!destination || !checkIn || !checkOut) {
+    // Marquer tous les champs comme touchés
+    setTouched({
+      destination: true,
+      checkIn: true,
+      checkOut: true,
+      adults: true,
+      children: true,
+      rooms: true,
+    });
+
+    // Validation complète avant soumission
+    const formData: HotelSearchInput = {
+      destination: destination || "",
+      checkIn: checkIn ? format(checkIn, "yyyy-MM-dd") : "",
+      checkOut: checkOut ? format(checkOut, "yyyy-MM-dd") : "",
+      adults: passengers.adults,
+      children: passengers.children,
+      rooms: passengers.rooms,
+    };
+
+    const validation = safeValidate(hotelSearchSchema, formData);
+
+    if (!validation.success) {
+      setErrors(validation.errors);
+      toast({
+        title: "Erreur de validation",
+        description: "Veuillez corriger les erreurs dans le formulaire",
+        variant: "destructive",
+      });
+      
+      const firstErrorField = Object.keys(validation.errors)[0];
+      document.getElementById(firstErrorField)?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
 
     const params = new URLSearchParams({
-      destination,
-      checkIn: format(checkIn, "yyyy-MM-dd"),
-      checkOut: format(checkOut, "yyyy-MM-dd"),
-      adults: passengers.adults.toString(),
-      children: passengers.children.toString(),
-      rooms: passengers.rooms?.toString() || "1",
+      destination: validation.data.destination,
+      checkIn: validation.data.checkIn,
+      checkOut: validation.data.checkOut,
+      adults: validation.data.adults.toString(),
+      children: validation.data.children.toString(),
+      rooms: validation.data.rooms.toString(),
     });
 
     navigate(`/hotels?${params.toString()}`);
   };
 
+  const hasErrors = Object.keys(errors).length > 0;
+
   return (
     <UnifiedForm onSubmit={handleSearch} variant="search" className="max-w-6xl mx-auto">
+      {/* Alert d'erreur générale */}
+      {hasErrors && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Veuillez corriger les erreurs dans le formulaire
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Destination */}
         <div className="lg:col-span-4">
-          <UnifiedAutocomplete
-            label={t("search.destination")}
-            type="hotel"
-            value={destination}
-            onChange={(value) => setDestination(value)}
-            placeholder={t("search.cityRegionCountry")}
-            required
-          />
+          <div className="space-y-1">
+            <UnifiedAutocomplete
+              label={t("search.destination")}
+              type="hotel"
+              value={destination}
+              onChange={(value) => {
+                setDestination(value);
+                handleBlur("destination");
+              }}
+              placeholder={t("search.cityRegionCountry")}
+              required
+              className={errors.destination && touched.destination ? "border-destructive" : ""}
+            />
+            {errors.destination && touched.destination && (
+              <p className="text-xs text-destructive mt-1 animate-in slide-in-from-top-1">
+                {errors.destination}
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Check-in */}
         <div className="lg:col-span-3">
-          <UnifiedDatePicker
-            label={t("search.checkIn")}
-            value={checkIn}
-            onChange={setCheckIn}
-            minDate={new Date()}
-            required
-          />
+          <div className="space-y-1">
+            <UnifiedDatePicker
+              label={t("search.checkIn")}
+              value={checkIn}
+              onChange={(date) => {
+                setCheckIn(date);
+                handleBlur("checkIn");
+              }}
+              minDate={new Date()}
+              required
+            />
+            {errors.checkIn && touched.checkIn && (
+              <p className="text-xs text-destructive mt-1 animate-in slide-in-from-top-1">
+                {errors.checkIn}
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Check-out */}
         <div className="lg:col-span-3">
-          <UnifiedDatePicker
-            label={t("search.checkOut")}
-            value={checkOut}
-            onChange={setCheckOut}
-            minDate={checkIn || new Date()}
-            required
-          />
+          <div className="space-y-1">
+            <UnifiedDatePicker
+              label={t("search.checkOut")}
+              value={checkOut}
+              onChange={(date) => {
+                setCheckOut(date);
+                handleBlur("checkOut");
+              }}
+              minDate={checkIn || new Date()}
+              required
+            />
+            {errors.checkOut && touched.checkOut && (
+              <p className="text-xs text-destructive mt-1 animate-in slide-in-from-top-1">
+                {errors.checkOut}
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Guests & Rooms */}
         <div className="lg:col-span-2">
-          <UnifiedPassengerSelector
-            label={t("search.guests")}
-            value={passengers}
-            onChange={(value) => setPassengers({ 
-              adults: value.adults,
-              children: value.children,
-              rooms: value.rooms || 1,
-              infants: value.infants || 0
-            })}
-            showRooms
-            required
-          />
+          <div className="space-y-1">
+            <UnifiedPassengerSelector
+              label={t("search.guests")}
+              value={passengers}
+              onChange={(value) => {
+                setPassengers({ 
+                  adults: value.adults,
+                  children: value.children,
+                  rooms: value.rooms || 1,
+                  infants: value.infants || 0
+                });
+                handleBlur("adults");
+                handleBlur("rooms");
+              }}
+              showRooms
+              required
+            />
+            {((errors.adults && touched.adults) || (errors.children && touched.children) || (errors.rooms && touched.rooms)) && (
+              <p className="text-xs text-destructive mt-1 animate-in slide-in-from-top-1">
+                {errors.adults || errors.children || errors.rooms}
+              </p>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Submit Button */}
       <div className="mt-6">
-        <UnifiedSubmitButton variant="search">
+        <UnifiedSubmitButton 
+          variant="search"
+          disabled={hasErrors}
+          className={hasErrors ? "opacity-50 cursor-not-allowed" : ""}
+        >
           {t("search.search")}
         </UnifiedSubmitButton>
       </div>
