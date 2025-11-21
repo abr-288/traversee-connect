@@ -192,103 +192,145 @@ const Navbar = () => {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-primary-light">
-            <div className="flex flex-col gap-4">
-              <Link
-                to="/flights"
-                className="text-white hover:text-secondary transition-smooth text-sm font-medium px-4 py-2 flex items-center gap-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Plane className="w-4 h-4" />
-                {t("nav.flights")}
-              </Link>
-              <Link
-                to="/hotels"
-                className="text-white hover:text-secondary transition-smooth text-sm font-medium px-4 py-2 flex items-center gap-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Hotel className="w-4 h-4" />
-                {t("nav.hotels")}
-              </Link>
-              <Link
-                to="/flight-hotel"
-                className="text-white hover:text-secondary transition-smooth text-sm font-medium px-4 py-2 flex items-center gap-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <PlaneTakeoff className="w-4 h-4" />
-                {t("nav.flightHotel")}
-              </Link>
-              <Link
-                to="/trains"
-                className="text-white hover:text-secondary transition-smooth text-sm font-medium px-4 py-2 flex items-center gap-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Train className="w-4 h-4" />
-                {t("nav.trains")}
-              </Link>
-              <Link
-                to="/events"
-                className="text-white hover:text-secondary transition-smooth text-sm font-medium px-4 py-2 flex items-center gap-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Calendar className="w-4 h-4" />
-                {t("nav.events")}
-              </Link>
-              <Link
-                to="/cars"
-                className="text-white hover:text-secondary transition-smooth text-sm font-medium px-4 py-2 flex items-center gap-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Car className="w-4 h-4" />
-                {t("nav.carRental")}
-              </Link>
-              <Link
-                to="/support"
-                className="text-white hover:text-secondary transition-smooth text-sm font-medium px-4 py-2 flex items-center gap-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <HelpCircle className="w-4 h-4" />
-                {t("nav.support")}
-              </Link>
-              <div className="flex flex-col gap-2 px-4 pt-4 border-t border-primary-light">
-                <div className="w-full mb-2">
-                  <LanguageSwitcher />
-                </div>
-                <div className="w-full mb-2">
-                  <CurrencySelector />
-                </div>
+          <div className="md:hidden py-4 border-t border-primary-light animate-fade-in">
+            <div className="flex flex-col">
+              {/* Section Navigation */}
+              <div className="px-4 pb-2">
+                <p className="text-xs font-semibold text-white/60 uppercase tracking-wider">
+                  Navigation
+                </p>
+              </div>
+              
+              <div className="flex flex-col gap-1 px-2 pb-3">
+                <Link
+                  to="/flights"
+                  className="text-white hover:bg-white/10 rounded-lg transition-all duration-200 text-sm font-medium px-3 py-2.5 flex items-center gap-3 hover:translate-x-1"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <Plane className="w-4 h-4 text-secondary" />
+                  {t("nav.flights")}
+                </Link>
+                <Link
+                  to="/hotels"
+                  className="text-white hover:bg-white/10 rounded-lg transition-all duration-200 text-sm font-medium px-3 py-2.5 flex items-center gap-3 hover:translate-x-1"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <Hotel className="w-4 h-4 text-secondary" />
+                  {t("nav.hotels")}
+                </Link>
+                <Link
+                  to="/flight-hotel"
+                  className="text-white hover:bg-white/10 rounded-lg transition-all duration-200 text-sm font-medium px-3 py-2.5 flex items-center gap-3 hover:translate-x-1"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <PlaneTakeoff className="w-4 h-4 text-secondary" />
+                  {t("nav.flightHotel")}
+                </Link>
+                <Link
+                  to="/trains"
+                  className="text-white hover:bg-white/10 rounded-lg transition-all duration-200 text-sm font-medium px-3 py-2.5 flex items-center gap-3 hover:translate-x-1"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <Train className="w-4 h-4 text-secondary" />
+                  {t("nav.trains")}
+                </Link>
+                <Link
+                  to="/events"
+                  className="text-white hover:bg-white/10 rounded-lg transition-all duration-200 text-sm font-medium px-3 py-2.5 flex items-center gap-3 hover:translate-x-1"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <Calendar className="w-4 h-4 text-secondary" />
+                  {t("nav.events")}
+                </Link>
+                <Link
+                  to="/cars"
+                  className="text-white hover:bg-white/10 rounded-lg transition-all duration-200 text-sm font-medium px-3 py-2.5 flex items-center gap-3 hover:translate-x-1"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <Car className="w-4 h-4 text-secondary" />
+                  {t("nav.carRental")}
+                </Link>
+              </div>
+
+              {/* Séparateur */}
+              <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-2"></div>
+
+              {/* Section Support */}
+              <div className="px-2 py-2">
+                <Link
+                  to="/support"
+                  className="text-white hover:bg-white/10 rounded-lg transition-all duration-200 text-sm font-medium px-3 py-2.5 flex items-center gap-3 hover:translate-x-1"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <HelpCircle className="w-4 h-4 text-secondary" />
+                  {t("nav.support")}
+                </Link>
+              </div>
+
+              {/* Séparateur */}
+              <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-2"></div>
+
+              {/* Section Préférences */}
+              <div className="px-4 pb-2 pt-2">
+                <p className="text-xs font-semibold text-white/60 uppercase tracking-wider">
+                  Préférences
+                </p>
+              </div>
+              
+              <div className="flex flex-col gap-3 px-4 pb-3">
+                <LanguageSwitcher />
+                <CurrencySelector />
+              </div>
+
+              {/* Séparateur */}
+              <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-2"></div>
+
+              {/* Section Compte */}
+              <div className="px-4 pb-2 pt-2">
+                <p className="text-xs font-semibold text-white/60 uppercase tracking-wider">
+                  {isLoggedIn ? "Mon Compte" : "Connexion"}
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-2 px-4 pb-2">
                 {isLoggedIn ? (
                   <>
                     {isAdmin && (
-                      <Link to="/admin" className="w-full">
-                        <Button variant="outline" className="w-full gap-1.5 text-sm text-white border-white/20 hover:bg-white/10">
-                          <LayoutDashboard className="w-3.5 h-3.5" />
+                      <Link to="/admin" className="w-full" onClick={() => setIsMenuOpen(false)}>
+                        <Button variant="outline" className="w-full gap-2 text-sm text-white border-white/20 hover:bg-white/10 justify-start">
+                          <LayoutDashboard className="w-4 h-4" />
                           {t("nav.admin")}
                         </Button>
                       </Link>
                     )}
-                    <Link to="/dashboard" className="w-full">
-                      <Button className="w-full gap-1.5 text-sm bg-secondary hover:bg-secondary/90 text-primary">
-                        <User className="w-3.5 h-3.5" />
+                    <Link to="/dashboard" className="w-full" onClick={() => setIsMenuOpen(false)}>
+                      <Button className="w-full gap-2 text-sm bg-secondary hover:bg-secondary/90 text-primary justify-start">
+                        <User className="w-4 h-4" />
                         {t("nav.myAccount")}
                       </Button>
                     </Link>
-                    <Button className="w-full gap-1.5 text-sm bg-destructive hover:bg-destructive/90 text-destructive-foreground" onClick={handleLogout}>
-                      <LogOut className="w-3.5 h-3.5" />
+                    <Button 
+                      className="w-full gap-2 text-sm bg-destructive hover:bg-destructive/90 text-destructive-foreground justify-start" 
+                      onClick={() => {
+                        handleLogout();
+                        setIsMenuOpen(false);
+                      }}
+                    >
+                      <LogOut className="w-4 h-4" />
                       {t("nav.logout")}
                     </Button>
                   </>
                 ) : (
                   <>
-                    <Link to="/auth" className="w-full">
-                      <Button variant="outline" className="w-full gap-1.5 text-sm text-white border-white/20 hover:bg-white/10">
-                        <User className="w-3.5 h-3.5" />
+                    <Link to="/auth" className="w-full" onClick={() => setIsMenuOpen(false)}>
+                      <Button className="w-full gap-2 text-sm bg-secondary hover:bg-secondary/90 text-primary justify-start">
+                        <User className="w-4 h-4" />
                         {t("nav.login")}
                       </Button>
                     </Link>
-                    <Link to="/auth" className="w-full">
-                      <Button variant="outline" className="w-full gap-1.5 text-sm text-white border-white/20 hover:bg-white/10">
-                        <User className="w-3.5 h-3.5" />
+                    <Link to="/auth" className="w-full" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="outline" className="w-full gap-2 text-sm text-white border-white/20 hover:bg-white/10 justify-start">
+                        <User className="w-4 h-4" />
                         {t("nav.signup")}
                       </Button>
                     </Link>
