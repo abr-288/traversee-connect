@@ -20,6 +20,18 @@
     "subtitle": "Trouvez les meilleures offres pour vos vols, hôtels, trains et bien plus encore",
     "search": "Rechercher"
   },
+  "flights": {
+    "from": "D'où partez-vous ?",
+    "to": "Où allez-vous ?",
+    "departure": "Départ",
+    "arrival": "Arrivée",
+    "departureDate": "Date départ",
+    "returnDate": "Date retour",
+    "passengers": "Passagers",
+    "roundtrip": "Aller-retour",
+    "oneway": "Aller simple",
+    "search": "Rechercher"
+  },
   "search": {
     "from": "De",
     "to": "Vers",
