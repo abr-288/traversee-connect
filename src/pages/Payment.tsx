@@ -7,9 +7,13 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { paymentSchema, type PaymentInput } from "@/lib/validationSchemas";
+import { validateWithSchema, getUserFriendlyErrorMessage } from "@/lib/formHelpers";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import ErrorBoundary, { ErrorFallback } from "@/components/ErrorBoundary";
 
 export default function Payment() {
   const [searchParams] = useSearchParams();
@@ -21,6 +25,8 @@ export default function Payment() {
   const [processing, setProcessing] = useState(false);
   const [booking, setBooking] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState("wave");
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [generalError, setGeneralError] = useState<string | null>(null);
   
   // Customer info
   const [customerName, setCustomerName] = useState("");
@@ -134,48 +140,60 @@ export default function Payment() {
   const handlePayment = async () => {
     if (!booking) return;
 
-    // Validation
-    if (!customerName || !customerEmail || !customerPhone) {
+    // Clear previous errors
+    setValidationErrors({});
+    setGeneralError(null);
+
+    // Validate form data with Zod
+    const formData: PaymentInput = {
+      customerName,
+      customerEmail,
+      customerPhone,
+      customerAddress: customerAddress || undefined,
+      customerCity,
+      paymentMethod: paymentMethod as "wave" | "mobile_money" | "card" | "bank_transfer",
+    };
+
+    const validation = validateWithSchema(paymentSchema, formData);
+
+    if (validation.success === false) {
+      // Accès safe aux erreurs après vérification explicite
+      setValidationErrors(validation.errors);
       toast({
-        title: "Erreur",
-        description: "Veuillez remplir tous les champs obligatoires",
+        title: "Erreur de validation",
+        description: "Veuillez corriger les erreurs dans le formulaire",
         variant: "destructive",
       });
+      
+      // Scroll to first error
+      const firstErrorField = Object.keys(validation.errors)[0];
+      document.getElementById(firstErrorField)?.focus();
       return;
     }
 
-    // Phone validation - more flexible for international formats
-    const phoneRegex = /^[\d\s\-\+\(\)]{8,}$/;
-    if (!phoneRegex.test(customerPhone)) {
-      toast({
-        title: "Erreur",
-        description: "Numéro de téléphone invalide (minimum 8 chiffres)",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(customerEmail)) {
-      toast({
-        title: "Erreur",
-        description: "Adresse email invalide",
-        variant: "destructive",
-      });
-      return;
-    }
+    // Accès safe à data après vérification explicite
+    const validatedData = validation.data;
 
     // Prevent double processing
     if (processing) return;
 
     setProcessing(true);
 
+    // Set timeout for payment process (30 seconds)
+    const timeoutId = setTimeout(() => {
+      setProcessing(false);
+      setGeneralError("Le délai de traitement du paiement a expiré. Veuillez réessayer.");
+      toast({
+        title: "Délai dépassé",
+        description: "Le traitement du paiement a pris trop de temps. Veuillez réessayer.",
+        variant: "destructive",
+      });
+    }, 30000);
+
     try {
       console.log("=== INITIATING PAYMENT ===");
       console.log("Booking ID:", bookingId);
       console.log("Amount:", booking.total_price, booking.currency);
-      console.log("Method:", paymentMethod);
 
       // Double-check booking status before payment
       const { data: currentBooking, error: checkError } = await supabase
@@ -214,18 +232,18 @@ export default function Payment() {
           bookingId: bookingId,
           amount: booking.total_price,
           currency: booking.currency,
-          paymentMethod: paymentMethod,
+          paymentMethod: validatedData.paymentMethod,
           customerInfo: {
-            name: customerName,
-            email: customerEmail,
-            phone: customerPhone,
-            address: customerAddress,
-            city: customerCity,
+            name: validatedData.customerName,
+            email: validatedData.customerEmail,
+            phone: validatedData.customerPhone,
+            address: validatedData.customerAddress,
+            city: validatedData.customerCity,
           },
         },
       });
 
-      console.log("Payment response:", data);
+      clearTimeout(timeoutId);
 
       if (error) {
         console.error("Payment error:", error);
@@ -240,15 +258,20 @@ export default function Payment() {
         throw new Error("URL de paiement non reçue");
       }
 
-      console.log("✅ Redirecting to:", data.payment_url);
+      console.log("✅ Redirecting to payment provider");
 
       // Redirect to payment provider page
       window.location.href = data.payment_url;
     } catch (error: any) {
+      clearTimeout(timeoutId);
       console.error("Payment error:", error);
+      
+      const userMessage = getUserFriendlyErrorMessage(error);
+      setGeneralError(userMessage);
+      
       toast({
         title: "Erreur de paiement",
-        description: error.message || "Une erreur s'est produite lors du traitement du paiement",
+        description: userMessage,
         variant: "destructive",
       });
       setProcessing(false);
@@ -268,14 +291,22 @@ export default function Payment() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto">
-          <h1 className="text-3xl font-bold mb-2">Paiement</h1>
-          <p className="text-muted-foreground mb-8">
-            Complétez votre réservation en effectuant le paiement
-          </p>
+    <ErrorBoundary fallback={<ErrorFallback title="Erreur de paiement" description="Impossible de charger la page de paiement" />}>
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-1 container mx-auto px-4 py-8">
+          <div className="max-w-2xl mx-auto">
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">Paiement</h1>
+            <p className="text-sm md:text-base text-muted-foreground mb-6 md:mb-8">
+              Complétez votre réservation en effectuant le paiement
+            </p>
+
+            {generalError && (
+              <Alert variant="destructive" className="mb-6">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{generalError}</AlertDescription>
+              </Alert>
+            )}
 
           <Card className="p-6 mb-6">
             <h2 className="text-xl font-semibold mb-4">Détails de la réservation</h2>
@@ -333,47 +364,92 @@ export default function Payment() {
               {/* Customer Information */}
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="name">Nom complet *</Label>
+                  <Label htmlFor="customerName">Nom complet *</Label>
                   <Input
-                    id="name"
+                    id="customerName"
                     value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
+                    onChange={(e) => {
+                      setCustomerName(e.target.value);
+                      if (validationErrors.customerName) {
+                        setValidationErrors(prev => {
+                          const { customerName, ...rest } = prev;
+                          return rest;
+                        });
+                      }
+                    }}
                     placeholder="Votre nom complet"
-                    required
+                    className={validationErrors.customerName ? "border-destructive" : ""}
+                    aria-invalid={!!validationErrors.customerName}
+                    aria-describedby={validationErrors.customerName ? "customerName-error" : undefined}
                   />
+                  {validationErrors.customerName && (
+                    <p id="customerName-error" className="text-xs text-destructive mt-1">
+                      {validationErrors.customerName}
+                    </p>
+                  )}
                 </div>
 
                 <div>
-                  <Label htmlFor="email">Email *</Label>
+                  <Label htmlFor="customerEmail">Email *</Label>
                   <Input
-                    id="email"
+                    id="customerEmail"
                     type="email"
                     value={customerEmail}
-                    onChange={(e) => setCustomerEmail(e.target.value)}
+                    onChange={(e) => {
+                      setCustomerEmail(e.target.value);
+                      if (validationErrors.customerEmail) {
+                        setValidationErrors(prev => {
+                          const { customerEmail, ...rest } = prev;
+                          return rest;
+                        });
+                      }
+                    }}
                     placeholder="votre@email.com"
-                    required
+                    className={validationErrors.customerEmail ? "border-destructive" : ""}
+                    aria-invalid={!!validationErrors.customerEmail}
+                    aria-describedby={validationErrors.customerEmail ? "customerEmail-error" : undefined}
                   />
+                  {validationErrors.customerEmail && (
+                    <p id="customerEmail-error" className="text-xs text-destructive mt-1">
+                      {validationErrors.customerEmail}
+                    </p>
+                  )}
                 </div>
 
                 <div>
-                  <Label htmlFor="phone">Téléphone *</Label>
+                  <Label htmlFor="customerPhone">Téléphone *</Label>
                   <Input
-                    id="phone"
+                    id="customerPhone"
                     type="tel"
                     value={customerPhone}
-                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    onChange={(e) => {
+                      setCustomerPhone(e.target.value);
+                      if (validationErrors.customerPhone) {
+                        setValidationErrors(prev => {
+                          const { customerPhone, ...rest } = prev;
+                          return rest;
+                        });
+                      }
+                    }}
                     placeholder="+225 07 XX XX XX XX"
-                    required
+                    className={validationErrors.customerPhone ? "border-destructive" : ""}
+                    aria-invalid={!!validationErrors.customerPhone}
+                    aria-describedby={validationErrors.customerPhone ? "customerPhone-error" : undefined}
                   />
-                  <p className="text-sm text-muted-foreground mt-1">
+                  {validationErrors.customerPhone && (
+                    <p id="customerPhone-error" className="text-xs text-destructive mt-1">
+                      {validationErrors.customerPhone}
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground mt-1">
                     Ce numéro sera utilisé pour le paiement mobile
                   </p>
                 </div>
 
                 <div>
-                  <Label htmlFor="address">Adresse</Label>
+                  <Label htmlFor="customerAddress">Adresse</Label>
                   <Input
-                    id="address"
+                    id="customerAddress"
                     value={customerAddress}
                     onChange={(e) => setCustomerAddress(e.target.value)}
                     placeholder="Votre adresse"
@@ -381,13 +457,29 @@ export default function Payment() {
                 </div>
 
                 <div>
-                  <Label htmlFor="city">Ville</Label>
+                  <Label htmlFor="customerCity">Ville *</Label>
                   <Input
-                    id="city"
+                    id="customerCity"
                     value={customerCity}
-                    onChange={(e) => setCustomerCity(e.target.value)}
+                    onChange={(e) => {
+                      setCustomerCity(e.target.value);
+                      if (validationErrors.customerCity) {
+                        setValidationErrors(prev => {
+                          const { customerCity, ...rest } = prev;
+                          return rest;
+                        });
+                      }
+                    }}
                     placeholder="Abidjan"
+                    className={validationErrors.customerCity ? "border-destructive" : ""}
+                    aria-invalid={!!validationErrors.customerCity}
+                    aria-describedby={validationErrors.customerCity ? "customerCity-error" : undefined}
                   />
+                  {validationErrors.customerCity && (
+                    <p id="customerCity-error" className="text-xs text-destructive mt-1">
+                      {validationErrors.customerCity}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -416,5 +508,6 @@ export default function Payment() {
       </main>
       <Footer />
     </div>
+  </ErrorBoundary>
   );
 }
