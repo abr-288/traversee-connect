@@ -13,13 +13,13 @@ serve(async (req) => {
 
   try {
     const requestData = await req.json();
-    console.log('=== PAYMENT CALLBACK START ===');
-    console.log('Raw callback data:', JSON.stringify(requestData, null, 2));
+    console.log('=== PAYMENT CALLBACK RECEIVED ===');
+    // Security: Do not log full callback data as it contains sensitive information
 
     const { cpm_trans_id, cpm_site_id, signature } = requestData;
 
     if (!cpm_trans_id || !cpm_site_id) {
-      console.error('❌ Missing required parameters');
+      console.error('❌ Missing required callback parameters');
       throw new Error('Missing transaction ID or site ID');
     }
 
@@ -52,7 +52,7 @@ serve(async (req) => {
       .single();
 
     if (existingPayment && existingPayment.status === 'completed') {
-      console.log('⚠️ Payment already processed:', cpm_trans_id);
+      console.log('⚠️ Payment already processed');
       return new Response(
         JSON.stringify({ success: true, message: 'Payment already processed' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -60,7 +60,7 @@ serve(async (req) => {
     }
 
     // Verify payment status with CinetPay
-    console.log('=== VERIFYING WITH CINETPAY ===');
+    console.log('=== VERIFYING PAYMENT STATUS ===');
     const verifyPayload = {
       apikey: cinetpayApiKey,
       site_id: cinetpaySiteId,
@@ -77,10 +77,12 @@ serve(async (req) => {
     });
 
     const verifyData = await verifyResponse.json();
-    console.log('CinetPay verification response:', JSON.stringify(verifyData, null, 2));
+    console.log('Payment verification completed');
+    // Security: Do not log full verification response
 
     if (verifyData.code !== '00') {
-      console.error('❌ Payment verification failed:', verifyData.message);
+      console.error('❌ Payment verification failed with code:', verifyData.code);
+      // Security: Do not log the full error message
       
       // Update payment as failed
       if (existingPayment) {
@@ -94,18 +96,17 @@ serve(async (req) => {
           .eq('transaction_id', cpm_trans_id);
       }
 
-      throw new Error(verifyData.message || 'Payment verification failed');
+      throw new Error('Payment verification failed');
     }
 
     const paymentStatus = verifyData.data?.status;
     const metadata = verifyData.data?.metadata ? JSON.parse(verifyData.data.metadata) : {};
     const bookingId = metadata.booking_id;
 
-    console.log('Payment status:', paymentStatus);
-    console.log('Booking ID:', bookingId);
+    console.log('Payment verification successful');
 
     if (!bookingId) {
-      console.error('❌ No booking ID in metadata');
+      console.error('❌ Booking ID missing in callback metadata');
       throw new Error('No booking ID found');
     }
 
@@ -125,11 +126,12 @@ serve(async (req) => {
       .eq('transaction_id', cpm_trans_id);
 
     if (paymentUpdateError) {
-      console.error('❌ Failed to update payment:', paymentUpdateError);
+      console.error('❌ Failed to update payment record');
+      // Security: Do not log the full error
       throw new Error('Failed to update payment');
     }
 
-    console.log('✅ Payment updated:', cpm_trans_id, paymentUpdateData.status);
+    console.log('✅ Payment record updated');
 
     // If payment successful, update booking
     if (paymentStatus === 'ACCEPTED') {
@@ -143,9 +145,10 @@ serve(async (req) => {
         .eq('id', bookingId);
 
       if (bookingUpdateError) {
-        console.error('❌ Failed to update booking:', bookingUpdateError);
+        console.error('❌ Failed to update booking status');
+        // Security: Do not log the full error
       } else {
-        console.log('✅ Booking confirmed:', bookingId);
+        console.log('✅ Booking confirmed successfully');
       }
 
       // Generate invoice
@@ -157,18 +160,20 @@ serve(async (req) => {
         );
 
         if (invoiceError) {
-          console.error('⚠️ Invoice generation failed:', invoiceError);
+          console.error('⚠️ Invoice generation failed');
+          // Security: Do not log the full error
         } else {
-          console.log('✅ Invoice generated');
+          console.log('✅ Invoice generated successfully');
         }
       } catch (invoiceErr) {
-        console.error('⚠️ Invoice generation error:', invoiceErr);
+        console.error('⚠️ Invoice generation error occurred');
+        // Security: Do not log the full error
       }
     }
     
     // Trigger PNR creation job asynchronously
     if (bookingId && paymentStatus === 'ACCEPTED') {
-      console.log('Triggering PNR creation for booking:', bookingId);
+      console.log('Triggering PNR creation...');
       
       try {
         // Call create-pnr function asynchronously
@@ -180,14 +185,16 @@ serve(async (req) => {
           },
           body: JSON.stringify({ booking_id: bookingId }),
         }).catch(err => {
-          console.error('⚠️ Failed to trigger PNR creation:', err);
+          console.error('⚠️ PNR creation trigger failed');
+          // Security: Do not log the full error
         });
       } catch (pnrErr) {
-        console.error('⚠️ PNR creation trigger error:', pnrErr);
+        console.error('⚠️ PNR creation trigger error occurred');
+        // Security: Do not log the full error
       }
     }
 
-    console.log('=== PAYMENT CALLBACK END ===');
+    console.log('=== PAYMENT CALLBACK COMPLETED ===');
 
     return new Response(
       JSON.stringify({
@@ -201,11 +208,13 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error('❌ ERROR in payment-callback:', error);
+    // Security: Only log error type, not details which may contain sensitive data
+    console.error('❌ Payment callback error:', error instanceof Error ? error.constructor.name : 'Unknown');
+    
     return new Response(
       JSON.stringify({
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : 'Payment callback failed',
       }),
       {
         status: 500,
