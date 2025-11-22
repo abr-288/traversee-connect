@@ -162,7 +162,7 @@ export const FlightSearchForm = () => {
       )}
 
       {/* Trip Type Selector */}
-      <div className="flex gap-3 mb-6">
+      <div className="flex gap-3 mb-4 md:mb-6">
         {[
           { value: "round-trip", label: t("search.roundTrip") },
           { value: "one-way", label: t("search.oneWay") }
@@ -189,7 +189,7 @@ export const FlightSearchForm = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4">
         {/* From */}
         <div className="md:col-span-3">
           <div className="space-y-1">
@@ -297,7 +297,7 @@ export const FlightSearchForm = () => {
       </div>
 
       {/* Passengers & Class */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-4 mt-4 md:mt-6">
         <div className="space-y-2">
           <label className="text-sm font-medium text-foreground">
             {t("search.adults")}
@@ -401,7 +401,7 @@ export const FlightSearchForm = () => {
       </div>
 
       {/* Submit Button */}
-      <div className="mt-6">
+      <div className="mt-4 md:mt-6">
         <UnifiedSubmitButton 
           variant="search"
           disabled={hasErrors}
