@@ -129,7 +129,7 @@ export const HotelSearchForm = () => {
     <UnifiedForm onSubmit={handleSearch} variant="search" className="max-w-6xl mx-auto">
       {/* Alert d'erreur générale */}
       {hasErrors && (
-        <Alert variant="destructive" className="mb-4">
+        <Alert variant="destructive" className="mb-3 md:mb-4">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             Veuillez corriger les erreurs dans le formulaire
@@ -137,7 +137,7 @@ export const HotelSearchForm = () => {
         </Alert>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 md:gap-4">
         {/* Destination */}
         <div className="lg:col-span-4">
           <div className="space-y-1">
@@ -232,7 +232,7 @@ export const HotelSearchForm = () => {
       </div>
 
       {/* Submit Button */}
-      <div className="mt-6">
+      <div className="mt-4 md:mt-6">
         <UnifiedSubmitButton 
           variant="search"
           disabled={hasErrors}

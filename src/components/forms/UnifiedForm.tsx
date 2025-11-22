@@ -34,11 +34,11 @@ export const UnifiedForm = ({
   };
 
   const variantStyles = {
-    search: "bg-white rounded-2xl shadow-lg border border-border/50 p-6",
-    booking: "bg-gradient-to-br from-white to-muted/30 rounded-2xl shadow-xl border border-border p-8",
-    auth: "bg-white rounded-2xl shadow-2xl border border-border p-8 max-w-md mx-auto",
-    payment: "bg-gradient-to-br from-white via-white to-accent/10 rounded-2xl shadow-xl border-2 border-primary/20 p-8",
-    contact: "bg-white rounded-xl shadow-md border border-border/50 p-6"
+    search: "bg-white rounded-2xl shadow-lg border border-border/50 p-4 md:p-6",
+    booking: "bg-gradient-to-br from-white to-muted/30 rounded-2xl shadow-xl border border-border p-6 md:p-8",
+    auth: "bg-white rounded-2xl shadow-2xl border border-border p-6 md:p-8 max-w-md mx-auto",
+    payment: "bg-gradient-to-br from-white via-white to-accent/10 rounded-2xl shadow-xl border-2 border-primary/20 p-6 md:p-8",
+    contact: "bg-white rounded-xl shadow-md border border-border/50 p-4 md:p-6"
   };
 
   return (

@@ -120,10 +120,10 @@ export const CarSearchForm = () => {
   const hasErrors = Object.keys(errors).length > 0;
 
   return (
-    <UnifiedForm onSubmit={handleSearch} variant="search" className="w-full max-w-6xl mx-auto p-4 md:p-6">
+    <UnifiedForm onSubmit={handleSearch} variant="search" className="max-w-6xl mx-auto">
       {/* Alert d'erreur générale */}
       {hasErrors && (
-        <Alert variant="destructive" className="mb-4">
+        <Alert variant="destructive" className="mb-3 md:mb-4">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             Veuillez corriger les erreurs dans le formulaire
@@ -131,9 +131,9 @@ export const CarSearchForm = () => {
         </Alert>
       )}
 
-      <div className="space-y-4">
+      <div className="space-y-3 md:space-y-4">
         {/* Ligne 1: Lieu de prise en charge */}
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-3 md:gap-4">
           <div className="space-y-1">
             <UnifiedAutocomplete
               label={t("search.pickup")}
@@ -156,7 +156,7 @@ export const CarSearchForm = () => {
         </div>
 
         {/* Ligne 2: Dates */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
           <div className="space-y-1">
             <UnifiedDatePicker
               label={t("search.pickup")}
@@ -195,7 +195,7 @@ export const CarSearchForm = () => {
         </div>
 
         {/* Bouton de recherche */}
-        <div className="pt-2">
+        <div className="pt-1 md:pt-2">
           <UnifiedSubmitButton 
             fullWidth
             disabled={hasErrors}
