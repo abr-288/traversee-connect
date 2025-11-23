@@ -137,9 +137,9 @@ export const HotelSearchForm = () => {
         </Alert>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 md:gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4">
         {/* Destination */}
-        <div className="lg:col-span-4">
+        <div className="md:col-span-4">
           <div className="space-y-1">
             <UnifiedAutocomplete
               label={t("search.destination")}
@@ -162,7 +162,7 @@ export const HotelSearchForm = () => {
         </div>
 
         {/* Check-in */}
-        <div className="lg:col-span-3">
+        <div className="md:col-span-3">
           <div className="space-y-1">
             <UnifiedDatePicker
               label={t("search.checkIn")}
@@ -183,7 +183,7 @@ export const HotelSearchForm = () => {
         </div>
 
         {/* Check-out */}
-        <div className="lg:col-span-3">
+        <div className="md:col-span-3">
           <div className="space-y-1">
             <UnifiedDatePicker
               label={t("search.checkOut")}
@@ -204,7 +204,7 @@ export const HotelSearchForm = () => {
         </div>
 
         {/* Guests & Rooms */}
-        <div className="lg:col-span-2">
+        <div className="md:col-span-2">
           <div className="space-y-1">
             <UnifiedPassengerSelector
               label={t("search.guests")}

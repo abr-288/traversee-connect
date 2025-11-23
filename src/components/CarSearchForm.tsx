@@ -195,7 +195,7 @@ export const CarSearchForm = () => {
         </div>
 
         {/* Bouton de recherche */}
-        <div className="pt-1 md:pt-2">
+        <div className="mt-4 md:mt-6">
           <UnifiedSubmitButton 
             fullWidth
             disabled={hasErrors}
