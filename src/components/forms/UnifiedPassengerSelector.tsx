@@ -53,10 +53,10 @@ export const UnifiedPassengerSelector = ({
 
   const getDisplayText = () => {
     const parts: string[] = [];
-    if (value.adults > 0) parts.push(`${value.adults} ad.`);
-    if (value.children > 0) parts.push(`${value.children} enf.`);
+    if (value.adults > 0) parts.push(`${value.adults} ad`);
+    if (value.children > 0) parts.push(`${value.children} enf`);
     if (showInfants && (value.infants || 0) > 0) parts.push(`${value.infants} bb`);
-    if (showRooms && (value.rooms || 0) > 0) parts.push(`${value.rooms} ch.`);
+    if (showRooms && (value.rooms || 0) > 0) parts.push(`${value.rooms} ch`);
     
     return parts.length > 0 ? parts.join(' · ') : 'Sélectionner';
   };
@@ -143,10 +143,10 @@ export const UnifiedPassengerSelector = ({
               "group overflow-hidden"
             )}
           >
-            <Users className="mr-2 h-5 w-5 flex-shrink-0 text-muted-foreground group-hover:text-primary transition-colors" />
-            <span className="flex-1 truncate text-sm md:text-base">{getDisplayText()}</span>
-            <span className="text-xs text-muted-foreground ml-2 flex-shrink-0 hidden sm:inline">
-              {getTotalPassengers()} voyageur{getTotalPassengers() > 1 ? 's' : ''}
+            <Users className="mr-1.5 md:mr-2 h-4 w-4 md:h-5 md:w-5 flex-shrink-0 text-muted-foreground group-hover:text-primary transition-colors" />
+            <span className="flex-1 truncate text-xs sm:text-sm">{getDisplayText()}</span>
+            <span className="text-[10px] sm:text-xs text-muted-foreground ml-1 sm:ml-2 flex-shrink-0 hidden lg:inline">
+              {getTotalPassengers()}p
             </span>
           </Button>
         </PopoverTrigger>
