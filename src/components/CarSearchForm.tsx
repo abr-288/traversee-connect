@@ -133,7 +133,7 @@ export const CarSearchForm = () => {
 
       <div className="space-y-3 md:space-y-4">
         {/* Ligne 1: Lieu de prise en charge */}
-        <div className="grid grid-cols-1 gap-3 md:gap-4">
+        <div className="grid grid-cols-1 gap-3 md:gap-6">
           <div className="space-y-1">
             <UnifiedAutocomplete
               label={t("search.pickup")}
@@ -156,7 +156,7 @@ export const CarSearchForm = () => {
         </div>
 
         {/* Ligne 2: Dates */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-6">
           <div className="space-y-1">
             <UnifiedDatePicker
               label={t("search.pickup")}

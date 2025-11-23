@@ -189,7 +189,7 @@ export const FlightSearchForm = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-6">
         {/* From */}
         <div className="md:col-span-3">
           <div className="space-y-1">
@@ -297,7 +297,7 @@ export const FlightSearchForm = () => {
       </div>
 
       {/* Passengers & Class */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-4 mt-4 md:mt-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-6 mt-4 md:mt-6">
         <div className="space-y-2">
           <label className="text-sm font-medium text-foreground">
             {t("search.adults")}

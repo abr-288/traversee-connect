@@ -137,7 +137,7 @@ export const HotelSearchForm = () => {
         </Alert>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 md:gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 md:gap-6">
         {/* Destination */}
         <div className="lg:col-span-4">
           <div className="space-y-1">
