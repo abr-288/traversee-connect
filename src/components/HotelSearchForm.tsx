@@ -195,6 +195,7 @@ export const HotelSearchForm = () => {
                 handleBlur("checkIn");
               }}
               minDate={new Date()}
+              placeholder="Choisir date"
               required
             />
             {errors.checkIn && touched.checkIn && (
@@ -216,6 +217,7 @@ export const HotelSearchForm = () => {
                 handleBlur("checkOut");
               }}
               minDate={checkIn || new Date()}
+              placeholder="Choisir date"
               required
             />
             {errors.checkOut && touched.checkOut && (
