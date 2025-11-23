@@ -53,12 +53,12 @@ export const UnifiedPassengerSelector = ({
 
   const getDisplayText = () => {
     const parts: string[] = [];
-    if (value.adults > 0) parts.push(`${value.adults} ad`);
-    if (value.children > 0) parts.push(`${value.children} enf`);
-    if (showInfants && (value.infants || 0) > 0) parts.push(`${value.infants} bb`);
-    if (showRooms && (value.rooms || 0) > 0) parts.push(`${value.rooms} ch`);
+    if (value.adults > 0) parts.push(`${value.adults} adulte${value.adults > 1 ? 's' : ''}`);
+    if (value.children > 0) parts.push(`${value.children} enfant${value.children > 1 ? 's' : ''}`);
+    if (showInfants && (value.infants || 0) > 0) parts.push(`${value.infants} bébé${(value.infants || 0) > 1 ? 's' : ''}`);
+    if (showRooms && (value.rooms || 0) > 0) parts.push(`${value.rooms} chambre${(value.rooms || 0) > 1 ? 's' : ''}`);
     
-    return parts.length > 0 ? parts.join(' · ') : 'Sélectionner';
+    return parts.length > 0 ? parts.join(', ') : 'Sélectionner';
   };
 
   const CounterRow = ({ 
@@ -143,10 +143,10 @@ export const UnifiedPassengerSelector = ({
               "group overflow-hidden"
             )}
           >
-            <Users className="mr-1.5 md:mr-2 h-4 w-4 md:h-5 md:w-5 flex-shrink-0 text-muted-foreground group-hover:text-primary transition-colors" />
-            <span className="flex-1 truncate text-xs sm:text-sm">{getDisplayText()}</span>
-            <span className="text-[10px] sm:text-xs text-muted-foreground ml-1 sm:ml-2 flex-shrink-0 hidden lg:inline">
-              {getTotalPassengers()}p
+            <Users className="mr-2 h-5 w-5 flex-shrink-0 text-muted-foreground group-hover:text-primary transition-colors" />
+            <span className="flex-1 truncate text-sm">{getDisplayText()}</span>
+            <span className="text-xs text-muted-foreground ml-2 flex-shrink-0 hidden sm:inline">
+              {getTotalPassengers()} voyageur{getTotalPassengers() > 1 ? 's' : ''}
             </span>
           </Button>
         </PopoverTrigger>
