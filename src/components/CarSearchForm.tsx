@@ -6,7 +6,8 @@ import {
   UnifiedForm, 
   UnifiedAutocomplete,
   UnifiedDatePicker,
-  UnifiedSubmitButton 
+  UnifiedSubmitButton,
+  FormProgressBar
 } from "@/components/forms";
 import { useTranslation } from "react-i18next";
 import { carRentalSchema, type CarRentalInput } from "@/lib/validationSchemas";
@@ -119,8 +120,23 @@ export const CarSearchForm = () => {
 
   const hasErrors = Object.keys(errors).length > 0;
 
+  // Calcul de la progression du formulaire
+  const totalFields = 3;
+  const completedFields = [
+    location,
+    pickupDate,
+    returnDate,
+  ].filter(Boolean).length;
+
   return (
     <UnifiedForm onSubmit={handleSearch} variant="search" className="max-w-6xl mx-auto">
+      {/* Barre de progression */}
+      <FormProgressBar 
+        totalFields={totalFields} 
+        completedFields={completedFields}
+        className="mb-3 md:mb-4"
+      />
+
       {/* Alert d'erreur générale */}
       {hasErrors && (
         <Alert variant="destructive" className="mb-3 md:mb-4">
@@ -146,6 +162,7 @@ export const CarSearchForm = () => {
               placeholder={t("search.cityOrAirport")}
               required
               className={errors.pickupLocation && touched.pickupLocation ? "border-destructive" : ""}
+              helpText="Indiquez le lieu de prise en charge du véhicule"
             />
             {errors.pickupLocation && touched.pickupLocation && (
               <p className="text-xs text-destructive mt-1 animate-in slide-in-from-top-1">

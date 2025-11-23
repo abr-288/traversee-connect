@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { MapPin, Plane, Building2, LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { ContextualHelp } from "@/components/forms/ContextualHelp";
 
 export interface AutocompleteSuggestion {
   id: string;
@@ -25,6 +26,7 @@ interface UnifiedAutocompleteProps {
   error?: string;
   className?: string;
   disabled?: boolean;
+  helpText?: string;
 }
 
 /**
@@ -42,6 +44,7 @@ export const UnifiedAutocomplete = ({
   error,
   className,
   disabled = false,
+  helpText,
 }: UnifiedAutocompleteProps) => {
   const [suggestions, setSuggestions] = useState<AutocompleteSuggestion[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -143,15 +146,18 @@ export const UnifiedAutocomplete = ({
       className={cn("space-y-2 relative", className)}
     >
       {label && (
-        <Label 
-          className={cn(
-            "text-sm font-semibold text-foreground flex items-center gap-2",
-            required && "after:content-['*'] after:text-destructive after:ml-0.5"
-          )}
-        >
-          <Icon className="w-4 h-4 text-primary" />
-          {label}
-        </Label>
+        <div className="flex items-center gap-2">
+          <Label 
+            className={cn(
+              "text-sm font-semibold text-foreground flex items-center gap-2",
+              required && "after:content-['*'] after:text-destructive after:ml-0.5"
+            )}
+          >
+            <Icon className="w-4 h-4 text-primary" />
+            {label}
+          </Label>
+          {helpText && <ContextualHelp content={helpText} />}
+        </div>
       )}
 
       <div className="relative group">

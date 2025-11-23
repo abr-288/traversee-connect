@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Plane, Hotel, ArrowRightLeft } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { UnifiedForm, UnifiedAutocomplete, UnifiedDatePicker, UnifiedFormField, UnifiedSubmitButton } from "@/components/forms";
+import { UnifiedForm, UnifiedAutocomplete, UnifiedDatePicker, UnifiedFormField, UnifiedSubmitButton, FormProgressBar } from "@/components/forms";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useTranslation } from "react-i18next";
 
@@ -57,8 +57,27 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
     });
   };
 
+  // Calcul de la progression du formulaire
+  const totalFields = 7;
+  const completedFields = [
+    origin,
+    destination,
+    departureDate,
+    returnDate,
+    true, // adults (toujours au moins 1)
+    true, // rooms (toujours au moins 1)
+    travelClass,
+  ].filter(Boolean).length;
+
   return (
     <UnifiedForm onSubmit={handleSearch} variant="search" className="max-w-6xl mx-auto">
+      {/* Barre de progression */}
+      <FormProgressBar 
+        totalFields={totalFields} 
+        completedFields={completedFields}
+        className="mb-3 md:mb-4"
+      />
+
       <div className="space-y-3 md:space-y-4">
         {/* Ligne 1: Origine et Destination */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4">
@@ -70,6 +89,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
               placeholder={t("search.cityOrAirport")}
               type="airport"
               required
+              helpText="Point de départ de votre voyage"
             />
           </div>
 
@@ -95,6 +115,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
               placeholder={t("search.cityOrAirport")}
               type="airport"
               required
+              helpText="Votre destination de séjour"
             />
           </div>
         </div>

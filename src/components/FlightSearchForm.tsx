@@ -10,7 +10,8 @@ import {
   UnifiedForm, 
   UnifiedAutocomplete,
   UnifiedDatePicker,
-  UnifiedSubmitButton 
+  UnifiedSubmitButton,
+  FormProgressBar
 } from "@/components/forms";
 import { useTranslation } from "react-i18next";
 import { flightSearchSchema, type FlightSearchInput } from "@/lib/validationSchemas";
@@ -149,8 +150,26 @@ export const FlightSearchForm = () => {
 
   const hasErrors = Object.keys(errors).length > 0;
 
+  // Calcul de la progression du formulaire
+  const totalFields = tripType === "round-trip" ? 7 : 6;
+  const completedFields = [
+    from,
+    to,
+    departureDate,
+    tripType === "round-trip" ? returnDate : true,
+    adults > 0,
+    travelClass,
+  ].filter(Boolean).length;
+
   return (
     <UnifiedForm onSubmit={handleSearch} variant="search" className="max-w-6xl mx-auto">
+      {/* Barre de progression */}
+      <FormProgressBar 
+        totalFields={totalFields} 
+        completedFields={completedFields}
+        className="mb-4 md:mb-6"
+      />
+
       {/* Alert d'erreur générale */}
       {hasErrors && (
         <Alert variant="destructive" className="mb-4">
@@ -204,6 +223,7 @@ export const FlightSearchForm = () => {
               placeholder={t("search.cityOrAirport")}
               required
               className={errors.origin && touched.origin ? "border-destructive" : ""}
+              helpText="Saisissez le nom de la ville ou le code de l'aéroport (ex: Paris ou CDG)"
             />
             {errors.origin && touched.origin && (
               <p className="text-xs text-destructive mt-1 animate-in slide-in-from-top-1">
@@ -240,6 +260,7 @@ export const FlightSearchForm = () => {
               placeholder={t("search.cityOrAirport")}
               required
               className={errors.destination && touched.destination ? "border-destructive" : ""}
+              helpText="Choisissez votre destination finale"
             />
             {errors.destination && touched.destination && (
               <p className="text-xs text-destructive mt-1 animate-in slide-in-from-top-1">
