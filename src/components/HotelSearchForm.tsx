@@ -223,7 +223,7 @@ export const HotelSearchForm = () => {
         </div>
 
         {/* Guests & Rooms */}
-        <div className="md:col-span-2">
+        <div className="md:col-span-2 min-w-0">
           <div className="space-y-1">
             <UnifiedPassengerSelector
               label={t("search.guests")}
