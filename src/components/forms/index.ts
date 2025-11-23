@@ -12,3 +12,10 @@ export { UnifiedPassengerSelector } from "./UnifiedPassengerSelector";
 export { UnifiedAutocomplete } from "./UnifiedAutocomplete";
 export type { AutocompleteSuggestion } from "./UnifiedAutocomplete";
 export { UnifiedSubmitButton } from "./UnifiedSubmitButton";
+
+export { ValidationIndicator } from "./ValidationIndicator";
+export type { ValidationIndicatorProps } from "./ValidationIndicator";
+export { FormProgressBar } from "./FormProgressBar";
+export type { FormProgressBarProps } from "./FormProgressBar";
+export { ContextualHelp } from "./ContextualHelp";
+export type { ContextualHelpProps } from "./ContextualHelp";

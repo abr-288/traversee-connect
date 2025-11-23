@@ -1,10 +1,12 @@
 import { motion } from "framer-motion";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
+import { ValidationIndicator } from "@/components/forms/ValidationIndicator";
+import { ContextualHelp } from "@/components/forms/ContextualHelp";
 
 interface UnifiedFormFieldProps {
   label?: string;
@@ -13,9 +15,12 @@ interface UnifiedFormFieldProps {
   placeholder?: string;
   value?: string | number;
   onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onBlur?: () => void;
   required?: boolean;
   error?: string;
   hint?: string;
+  helpText?: string;
+  validMessage?: string;
   className?: string;
   disabled?: boolean;
   children?: ReactNode;
@@ -39,9 +44,12 @@ export const UnifiedFormField = ({
   placeholder,
   value,
   onChange,
+  onBlur,
   required = false,
   error,
   hint,
+  helpText,
+  validMessage,
   className,
   disabled = false,
   children,
@@ -54,6 +62,19 @@ export const UnifiedFormField = ({
   defaultValue,
 }: UnifiedFormFieldProps) => {
   const fieldId = id || name || `field-${Math.random()}`;
+  const [touched, setTouched] = useState(false);
+
+  const handleBlur = () => {
+    setTouched(true);
+    onBlur?.();
+  };
+
+  const getValidationStatus = () => {
+    if (!touched || !value) return "idle";
+    if (error) return "invalid";
+    if (validMessage) return "valid";
+    return "idle";
+  };
 
   return (
     <motion.div
@@ -63,16 +84,19 @@ export const UnifiedFormField = ({
       className={cn("space-y-2", className)}
     >
       {label && (
-        <Label 
-          htmlFor={fieldId}
-          className={cn(
-            "text-sm font-semibold text-foreground flex items-center gap-2",
-            required && "after:content-['*'] after:text-destructive after:ml-0.5"
-          )}
-        >
-          {Icon && <Icon className="w-4 h-4 text-primary" />}
-          {label}
-        </Label>
+        <div className="flex items-center gap-2">
+          <Label 
+            htmlFor={fieldId}
+            className={cn(
+              "text-sm font-semibold text-foreground flex items-center gap-2",
+              required && "after:content-['*'] after:text-destructive after:ml-0.5"
+            )}
+          >
+            {Icon && <Icon className="w-4 h-4 text-primary" />}
+            {label}
+          </Label>
+          {helpText && <ContextualHelp content={helpText} />}
+        </div>
       )}
 
       <div className="relative group">
@@ -85,6 +109,7 @@ export const UnifiedFormField = ({
             placeholder={placeholder}
             value={value}
             onChange={onChange}
+            onBlur={handleBlur}
             required={required}
             disabled={disabled}
             minLength={minLength}
@@ -94,7 +119,8 @@ export const UnifiedFormField = ({
               "border-2 border-input hover:border-primary/50 focus:border-primary",
               "transition-all duration-200",
               "placeholder:text-muted-foreground/60",
-              error && "border-destructive focus:border-destructive"
+              error && touched && "border-destructive focus:border-destructive",
+              !error && touched && value && "border-green-500 focus:ring-green-500"
             )}
           />
         ) : (
@@ -109,6 +135,7 @@ export const UnifiedFormField = ({
               placeholder={placeholder}
               value={value}
               onChange={onChange}
+              onBlur={handleBlur}
               required={required}
               disabled={disabled}
               min={min}
@@ -122,7 +149,8 @@ export const UnifiedFormField = ({
                 "transition-all duration-200",
                 "placeholder:text-muted-foreground/60",
                 "font-medium",
-                error && "border-destructive focus:border-destructive"
+                error && touched && "border-destructive focus:border-destructive",
+                !error && touched && value && "border-green-500 focus:ring-green-500"
               )}
             />
           </>
@@ -135,15 +163,10 @@ export const UnifiedFormField = ({
         </p>
       )}
 
-      {error && (
-        <motion.p
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="text-xs text-destructive font-medium flex items-center gap-1"
-        >
-          ⚠️ {error}
-        </motion.p>
-      )}
+      <ValidationIndicator
+        status={getValidationStatus()}
+        message={error || (touched && value ? validMessage : undefined)}
+      />
     </motion.div>
   );
 };

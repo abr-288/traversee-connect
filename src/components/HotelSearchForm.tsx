@@ -7,7 +7,8 @@ import {
   UnifiedAutocomplete,
   UnifiedDatePicker,
   UnifiedPassengerSelector,
-  UnifiedSubmitButton 
+  UnifiedSubmitButton,
+  FormProgressBar
 } from "@/components/forms";
 import { useTranslation } from "react-i18next";
 import { hotelSearchSchema, type HotelSearchInput } from "@/lib/validationSchemas";
@@ -125,8 +126,25 @@ export const HotelSearchForm = () => {
 
   const hasErrors = Object.keys(errors).length > 0;
 
+  // Calcul de la progression du formulaire
+  const totalFields = 5;
+  const completedFields = [
+    destination,
+    checkIn,
+    checkOut,
+    passengers.adults > 0,
+    passengers.rooms > 0,
+  ].filter(Boolean).length;
+
   return (
     <UnifiedForm onSubmit={handleSearch} variant="search" className="max-w-6xl mx-auto">
+      {/* Barre de progression */}
+      <FormProgressBar 
+        totalFields={totalFields} 
+        completedFields={completedFields}
+        className="mb-4 md:mb-6"
+      />
+
       {/* Alert d'erreur générale */}
       {hasErrors && (
         <Alert variant="destructive" className="mb-3 md:mb-4">
@@ -152,6 +170,7 @@ export const HotelSearchForm = () => {
               placeholder={t("search.cityRegionCountry")}
               required
               className={errors.destination && touched.destination ? "border-destructive" : ""}
+              helpText="Saisissez la ville, région ou pays de destination"
             />
             {errors.destination && touched.destination && (
               <p className="text-xs text-destructive mt-1 animate-in slide-in-from-top-1">
