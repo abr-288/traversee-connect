@@ -61,8 +61,8 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
     <UnifiedForm onSubmit={handleSearch} variant="search" className="max-w-6xl mx-auto">
       <div className="space-y-3 md:space-y-4">
         {/* Ligne 1: Origine et Destination */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-          <div className="relative">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-3 md:gap-4">
+          <div className="relative md:col-span-2">
             <UnifiedAutocomplete
               label={t("search.departure")}
               value={origin}
@@ -73,7 +73,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
             />
           </div>
 
-          <div className="relative">
+          <div className="relative md:col-span-2">
             <UnifiedAutocomplete
               label={t("search.destination")}
               value={destination}
@@ -93,6 +93,8 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
               <ArrowRightLeft className="h-4 w-4" />
             </Button>
           </div>
+          
+          <div className="hidden md:block md:col-span-1"></div>
         </div>
 
         {/* Ligne 2: Dates */}
