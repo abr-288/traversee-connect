@@ -1,8 +1,11 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useMemo } from "react";
+import { ChevronLeft, ChevronRight, TrendingDown, TrendingUp, Calendar as CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { format, addDays, parseISO } from "date-fns";
+import { format, addDays, parseISO, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, isWeekend, getDay } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Price } from "@/components/ui/price";
+import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface PriceCalendarProps {
   departureDate: string;
@@ -10,54 +13,288 @@ interface PriceCalendarProps {
   currency?: string;
   onDateSelect: (date: string) => void;
   lowestPrice?: number;
+  viewMode?: "week" | "month";
 }
 
-export const PriceCalendar = ({ departureDate, prices = {}, currency = "€", onDateSelect, lowestPrice }: PriceCalendarProps) => {
+/**
+ * Génère un prix simulé basé sur des règles réalistes
+ */
+const generatePrice = (date: Date, basePrice: number): number => {
+  const dayOfWeek = getDay(date);
+  const isWeekendDay = isWeekend(date);
+  
+  // Prix de base
+  let price = basePrice;
+  
+  // Week-end + 20-30%
+  if (isWeekendDay) {
+    price *= 1.2 + Math.random() * 0.1;
+  }
+  
+  // Vendredi + 15%
+  if (dayOfWeek === 5) {
+    price *= 1.15;
+  }
+  
+  // Mardi/Mercredi -10% (jours les moins chers)
+  if (dayOfWeek === 2 || dayOfWeek === 3) {
+    price *= 0.9;
+  }
+  
+  // Variation aléatoire ±10%
+  price *= 0.9 + Math.random() * 0.2;
+  
+  return Math.round(price);
+};
+
+export const PriceCalendar = ({ 
+  departureDate, 
+  prices = {}, 
+  currency = "€", 
+  onDateSelect, 
+  lowestPrice = 250,
+  viewMode: initialViewMode = "week"
+}: PriceCalendarProps) => {
   const baseDate = parseISO(departureDate);
-  const dates = Array.from({ length: 7 }, (_, i) => addDays(baseDate, i - 3));
+  const [currentMonth, setCurrentMonth] = useState(baseDate);
+  const [viewMode, setViewMode] = useState<"week" | "month">(initialViewMode);
+
+  // Génération des prix avec cache
+  const pricesWithDefaults = useMemo(() => {
+    const result: Record<string, number> = { ...prices };
+    
+    if (viewMode === "week") {
+      const weekDates = Array.from({ length: 7 }, (_, i) => addDays(baseDate, i - 3));
+      weekDates.forEach(date => {
+        const dateStr = format(date, "yyyy-MM-dd");
+        if (!result[dateStr]) {
+          result[dateStr] = generatePrice(date, lowestPrice);
+        }
+      });
+    } else {
+      const start = startOfMonth(currentMonth);
+      const end = endOfMonth(currentMonth);
+      const monthDates = eachDayOfInterval({ start, end });
+      
+      monthDates.forEach(date => {
+        const dateStr = format(date, "yyyy-MM-dd");
+        if (!result[dateStr]) {
+          result[dateStr] = generatePrice(date, lowestPrice);
+        }
+      });
+    }
+    
+    return result;
+  }, [viewMode, baseDate, currentMonth, prices, lowestPrice]);
+
+  // Calcul du meilleur prix et prix moyen
+  const priceStats = useMemo(() => {
+    const priceValues = Object.values(pricesWithDefaults);
+    const min = Math.min(...priceValues);
+    const max = Math.max(...priceValues);
+    const avg = priceValues.reduce((a, b) => a + b, 0) / priceValues.length;
+    return { min, max, avg };
+  }, [pricesWithDefaults]);
+
+  // Fonction pour obtenir la couleur selon le prix
+  const getPriceColor = (price: number) => {
+    const { min, max } = priceStats;
+    const range = max - min;
+    const position = (price - min) / range;
+    
+    if (position < 0.33) return "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800";
+    if (position < 0.66) return "text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/30 border-orange-200 dark:border-orange-800";
+    return "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800";
+  };
+
+  const handlePrevMonth = () => setCurrentMonth(prev => subMonths(prev, 1));
+  const handleNextMonth = () => setCurrentMonth(prev => addMonths(prev, 1));
+
+  if (viewMode === "week") {
+    const dates = Array.from({ length: 7 }, (_, i) => addDays(baseDate, i - 3));
+
+    return (
+      <motion.div 
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-gradient-to-br from-background to-muted/20 border-b border-border"
+      >
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <TrendingDown className="h-4 w-4 text-green-600" />
+              <span className="text-sm font-medium">
+                Meilleur prix: <Price amount={priceStats.min} fromCurrency={currency} />
+              </span>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => setViewMode("month")}
+              className="text-xs"
+            >
+              <CalendarIcon className="h-3 w-3 mr-1" />
+              Vue mois
+            </Button>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <div className="flex-1 flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+              {dates.map((date) => {
+                const dateStr = format(date, "yyyy-MM-dd");
+                const isSelected = dateStr === departureDate;
+                const price = pricesWithDefaults[dateStr];
+                const colorClass = getPriceColor(price);
+                
+                return (
+                  <motion.button
+                    key={dateStr}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => onDateSelect(dateStr)}
+                    className={cn(
+                      "flex-shrink-0 flex flex-col items-center px-4 py-2.5 rounded-xl border-2 transition-all min-w-[100px]",
+                      isSelected
+                        ? "border-primary bg-primary/10 shadow-lg ring-2 ring-primary/20"
+                        : colorClass
+                    )}
+                  >
+                    <span className="text-xs font-medium capitalize opacity-80">
+                      {format(date, "EEE", { locale: fr })}
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                      {format(date, "d MMM", { locale: fr })}
+                    </span>
+                    <span className="text-lg font-bold mt-1">
+                      <Price amount={price} fromCurrency={currency} />
+                    </span>
+                    {price === priceStats.min && (
+                      <span className="text-[10px] font-semibold text-green-600 dark:text-green-400 mt-0.5">
+                        Meilleur prix
+                      </span>
+                    )}
+                  </motion.button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  // Vue mois
+  const start = startOfMonth(currentMonth);
+  const end = endOfMonth(currentMonth);
+  const days = eachDayOfInterval({ start, end });
 
   return (
-    <div className="bg-card border-b border-border">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="bg-gradient-to-br from-background to-muted/20 border-b border-border"
+    >
       <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={handlePrevMonth}>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <h3 className="text-lg font-semibold capitalize min-w-[140px] text-center">
+              {format(currentMonth, "MMMM yyyy", { locale: fr })}
+            </h3>
+            <Button variant="ghost" size="icon" onClick={handleNextMonth}>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
           
-          <div className="flex-1 flex gap-2 overflow-x-auto scrollbar-hide">
-            {dates.map((date) => {
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-sm">
+              <TrendingDown className="h-4 w-4 text-green-600" />
+              <span className="font-medium">
+                Min: <Price amount={priceStats.min} fromCurrency={currency} />
+              </span>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => setViewMode("week")}
+              className="text-xs"
+            >
+              Vue semaine
+            </Button>
+          </div>
+        </div>
+
+        {/* Jours de la semaine */}
+        <div className="grid grid-cols-7 gap-2 mb-2">
+          {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map(day => (
+            <div key={day} className="text-center text-xs font-semibold text-muted-foreground py-2">
+              {day}
+            </div>
+          ))}
+        </div>
+
+        {/* Grille des jours */}
+        <div className="grid grid-cols-7 gap-2">
+          <AnimatePresence mode="wait">
+            {days.map((date, idx) => {
               const dateStr = format(date, "yyyy-MM-dd");
-              const isSelected = dateStr === departureDate;
-              const price = prices[dateStr] || lowestPrice || 0;
-              
+              const isSelected = isSameDay(date, baseDate);
+              const price = pricesWithDefaults[dateStr];
+              const colorClass = getPriceColor(price);
+              const isPast = date < new Date();
+
               return (
-                <button
+                <motion.button
                   key={dateStr}
-                  onClick={() => onDateSelect(dateStr)}
-                  className={`flex-shrink-0 flex flex-col items-center px-4 py-2 rounded-lg border transition-all min-w-[100px] ${
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: idx * 0.01 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => !isPast && onDateSelect(dateStr)}
+                  disabled={isPast}
+                  className={cn(
+                    "flex flex-col items-center justify-center p-2 rounded-lg border transition-all min-h-[70px]",
                     isSelected
-                      ? "border-primary bg-primary/5 shadow-sm"
-                      : "border-border hover:border-primary/50 hover:bg-muted/50"
-                  }`}
+                      ? "border-primary bg-primary/10 shadow-md ring-2 ring-primary/20"
+                      : isPast
+                      ? "opacity-40 cursor-not-allowed bg-muted/50"
+                      : colorClass
+                  )}
                 >
-                  <span className="text-xs text-muted-foreground capitalize">
-                    {format(date, "EEE. d MMM", { locale: fr })}
+                  <span className="text-xs font-medium mb-1">
+                    {format(date, "d")}
                   </span>
-                  <span className={`text-lg font-semibold mt-1 ${
-                    isSelected ? "text-primary" : "text-foreground"
-                  }`}>
-                    <Price amount={price} fromCurrency={currency} />
+                  <span className="text-xs font-bold">
+                    <Price amount={price} fromCurrency={currency} className="text-[10px]" />
                   </span>
-                </button>
+                  {price === priceStats.min && !isPast && (
+                    <TrendingDown className="h-3 w-3 text-green-600 mt-0.5" />
+                  )}
+                </motion.button>
               );
             })}
-          </div>
+          </AnimatePresence>
+        </div>
 
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+        {/* Légende */}
+        <div className="flex items-center justify-center gap-6 mt-4 pt-4 border-t border-border">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800" />
+            <span className="text-xs text-muted-foreground">Prix bas</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800" />
+            <span className="text-xs text-muted-foreground">Prix moyen</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800" />
+            <span className="text-xs text-muted-foreground">Prix élevé</span>
+          </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
