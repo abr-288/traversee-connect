@@ -157,7 +157,7 @@ export const HotelSearchForm = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4">
         {/* Destination */}
-        <div className="md:col-span-4">
+        <div className="md:col-span-3">
           <div className="space-y-1">
             <UnifiedAutocomplete
               label={t("search.destination")}
@@ -223,7 +223,7 @@ export const HotelSearchForm = () => {
         </div>
 
         {/* Guests & Rooms */}
-        <div className="md:col-span-2">
+        <div className="md:col-span-3">
           <div className="space-y-1">
             <UnifiedPassengerSelector
               label={t("search.guests")}
