@@ -62,7 +62,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
       <div className="space-y-3 md:space-y-4">
         {/* Ligne 1: Origine et Destination */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4">
-          <div className="md:col-span-3">
+          <div className="md:col-span-5">
             <UnifiedAutocomplete
               label={t("search.departure")}
               value={origin}
@@ -74,7 +74,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
           </div>
 
           {/* Bouton Swap */}
-          <div className="md:col-span-1 flex items-center justify-center pt-6">
+          <div className="md:col-span-2 flex items-center justify-center pt-6">
             <Button
               type="button"
               variant="outline"
@@ -87,7 +87,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
             </Button>
           </div>
 
-          <div className="md:col-span-3">
+          <div className="md:col-span-5">
             <UnifiedAutocomplete
               label={t("search.destination")}
               value={destination}
@@ -119,7 +119,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
         </div>
 
         {/* Ligne 3: Voyageurs et Options */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4 mt-3 md:mt-4">
           <UnifiedFormField
             label={t("search.adults")}
             name="adults"
@@ -163,7 +163,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
         </div>
 
         {/* Bouton de recherche */}
-        <div className="pt-1 md:pt-2">
+        <div className="mt-4 md:mt-6">
           <UnifiedSubmitButton fullWidth>
             {t("search.search")}
           </UnifiedSubmitButton>

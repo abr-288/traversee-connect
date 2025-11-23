@@ -191,7 +191,7 @@ export const FlightSearchForm = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4">
         {/* From */}
-        <div className="md:col-span-3">
+        <div className="md:col-span-5">
           <div className="space-y-1">
             <UnifiedAutocomplete
               label={t("search.departure")}
@@ -214,20 +214,20 @@ export const FlightSearchForm = () => {
         </div>
 
         {/* Swap Button */}
-        <div className="md:col-span-1 flex items-center justify-center pt-6">
+        <div className="md:col-span-2 flex items-center justify-center pt-6">
           <Button
             type="button"
             variant="outline"
             size="icon"
             onClick={handleSwap}
-            className="h-12 w-12 rounded-full border-2 hover:border-primary hover:bg-primary/5 transition-all shadow-md"
+            className="h-12 w-12 rounded-full border-2 hover:border-primary hover:bg-primary/5 transition-all shadow-md hidden md:flex"
           >
             <ArrowRightLeft className="h-5 w-5" />
           </Button>
         </div>
 
         {/* To */}
-        <div className="md:col-span-3">
+        <div className="md:col-span-5">
           <div className="space-y-1">
             <UnifiedAutocomplete
               label={t("search.to")}
@@ -248,9 +248,12 @@ export const FlightSearchForm = () => {
             )}
           </div>
         </div>
+      </div>
 
+      {/* Dates */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 mt-3 md:mt-4">
         {/* Departure Date */}
-        <div className="md:col-span-2">
+        <div>
           <div className="space-y-1">
             <UnifiedDatePicker
               label={t("search.departure")}
@@ -273,7 +276,7 @@ export const FlightSearchForm = () => {
 
         {/* Return Date */}
         {tripType === "round-trip" && (
-          <div className="md:col-span-2">
+          <div>
             <div className="space-y-1">
               <UnifiedDatePicker
                 label={t("search.return")}
@@ -297,7 +300,7 @@ export const FlightSearchForm = () => {
       </div>
 
       {/* Passengers & Class */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-4 mt-4 md:mt-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4 mt-3 md:mt-4">
         <div className="space-y-2">
           <label className="text-sm font-medium text-foreground">
             {t("search.adults")}
