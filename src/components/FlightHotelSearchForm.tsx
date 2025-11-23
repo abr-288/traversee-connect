@@ -61,8 +61,8 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
     <UnifiedForm onSubmit={handleSearch} variant="search" className="max-w-6xl mx-auto">
       <div className="space-y-3 md:space-y-4">
         {/* Ligne 1: Origine et Destination */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-3 md:gap-4">
-          <div className="relative md:col-span-2">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4">
+          <div className="md:col-span-3">
             <UnifiedAutocomplete
               label={t("search.departure")}
               value={origin}
@@ -73,7 +73,21 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
             />
           </div>
 
-          <div className="relative md:col-span-2">
+          {/* Bouton Swap */}
+          <div className="md:col-span-1 flex items-center justify-center pt-6">
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={handleSwap}
+              className="h-12 w-12 rounded-full border-2 hover:border-primary hover:bg-primary/5 transition-all shadow-md hidden md:flex"
+              aria-label={t("search.from")}
+            >
+              <ArrowRightLeft className="h-5 w-5" />
+            </Button>
+          </div>
+
+          <div className="md:col-span-3">
             <UnifiedAutocomplete
               label={t("search.destination")}
               value={destination}
@@ -82,19 +96,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
               type="airport"
               required
             />
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              onClick={handleSwap}
-              className="absolute -left-3 top-1/2 -translate-y-1/2 z-10 hidden md:flex"
-              aria-label={t("search.from")}
-            >
-              <ArrowRightLeft className="h-4 w-4" />
-            </Button>
           </div>
-          
-          <div className="hidden md:block md:col-span-1"></div>
         </div>
 
         {/* Ligne 2: Dates */}
