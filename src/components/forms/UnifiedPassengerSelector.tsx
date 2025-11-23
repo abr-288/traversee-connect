@@ -53,12 +53,12 @@ export const UnifiedPassengerSelector = ({
 
   const getDisplayText = () => {
     const parts: string[] = [];
-    if (value.adults > 0) parts.push(`${value.adults} adulte${value.adults > 1 ? 's' : ''}`);
-    if (value.children > 0) parts.push(`${value.children} enfant${value.children > 1 ? 's' : ''}`);
-    if (showInfants && (value.infants || 0) > 0) parts.push(`${value.infants} bébé${(value.infants || 0) > 1 ? 's' : ''}`);
-    if (showRooms && (value.rooms || 0) > 0) parts.push(`${value.rooms} chambre${(value.rooms || 0) > 1 ? 's' : ''}`);
+    if (value.adults > 0) parts.push(`${value.adults} ad.`);
+    if (value.children > 0) parts.push(`${value.children} enf.`);
+    if (showInfants && (value.infants || 0) > 0) parts.push(`${value.infants} bb`);
+    if (showRooms && (value.rooms || 0) > 0) parts.push(`${value.rooms} ch.`);
     
-    return parts.length > 0 ? parts.join(', ') : 'Sélectionner';
+    return parts.length > 0 ? parts.join(' · ') : 'Sélectionner';
   };
 
   const CounterRow = ({ 
@@ -140,12 +140,12 @@ export const UnifiedPassengerSelector = ({
               "w-full h-12 justify-start text-left font-medium",
               "border-2 border-input hover:border-primary/50",
               "transition-all duration-200",
-              "group"
+              "group overflow-hidden"
             )}
           >
-            <Users className="mr-2 h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-            <span className="flex-1">{getDisplayText()}</span>
-            <span className="text-xs text-muted-foreground">
+            <Users className="mr-2 h-5 w-5 flex-shrink-0 text-muted-foreground group-hover:text-primary transition-colors" />
+            <span className="flex-1 truncate text-sm md:text-base">{getDisplayText()}</span>
+            <span className="text-xs text-muted-foreground ml-2 flex-shrink-0 hidden sm:inline">
               {getTotalPassengers()} voyageur{getTotalPassengers() > 1 ? 's' : ''}
             </span>
           </Button>
