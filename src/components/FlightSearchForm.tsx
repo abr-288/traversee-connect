@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
-import { ArrowRightLeft, AlertCircle } from "lucide-react";
+import { ArrowRightLeft, AlertCircle, TrendingDown } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -18,6 +18,7 @@ import { flightSearchSchema, type FlightSearchInput } from "@/lib/validationSche
 import { safeValidate } from "@/lib/formHelpers";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { PriceCalendar } from "@/components/flights/PriceCalendar";
 
 /**
  * FlightSearchForm - Recherche de vols avec UnifiedForm
@@ -36,6 +37,7 @@ export const FlightSearchForm = () => {
   const [children, setChildren] = useState(0);
   const [infants, setInfants] = useState(0);
   const [travelClass, setTravelClass] = useState<"economy" | "premium_economy" | "business" | "first">("economy");
+  const [showPriceCalendar, setShowPriceCalendar] = useState(false);
   
   // État des erreurs de validation
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -423,6 +425,42 @@ export const FlightSearchForm = () => {
           )}
         </div>
       </div>
+
+      {/* Comparateur de prix - Affichage conditionnel */}
+      {departureDate && (
+        <div className="mt-4">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setShowPriceCalendar(!showPriceCalendar)}
+            className="w-full md:w-auto"
+          >
+            <TrendingDown className="h-4 w-4 mr-2" />
+            {showPriceCalendar ? "Masquer" : "Comparer"} les prix par date
+          </Button>
+        </div>
+      )}
+
+      {/* Calendrier de comparaison des prix */}
+      {showPriceCalendar && departureDate && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          className="mt-4 overflow-hidden"
+        >
+          <PriceCalendar
+            departureDate={format(departureDate, "yyyy-MM-dd")}
+            onDateSelect={(dateStr) => {
+              setDepartureDate(new Date(dateStr));
+              handleBlur("departureDate");
+            }}
+            lowestPrice={250}
+            viewMode="week"
+          />
+        </motion.div>
+      )}
 
       {/* Submit Button */}
       <div className="mt-4 md:mt-6">

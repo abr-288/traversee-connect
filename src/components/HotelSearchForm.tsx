@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, TrendingDown } from "lucide-react";
+import { motion } from "framer-motion";
 import { 
   UnifiedForm, 
   UnifiedAutocomplete,
@@ -15,6 +16,8 @@ import { hotelSearchSchema, type HotelSearchInput } from "@/lib/validationSchema
 import { safeValidate } from "@/lib/formHelpers";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { PriceCalendar } from "@/components/flights/PriceCalendar";
 
 /**
  * HotelSearchForm - Recherche d'hôtels avec validation Zod
@@ -33,6 +36,7 @@ export const HotelSearchForm = () => {
     rooms: 1,
     infants: 0
   });
+  const [showPriceCalendar, setShowPriceCalendar] = useState(false);
 
   // État des erreurs de validation
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -249,6 +253,42 @@ export const HotelSearchForm = () => {
           </div>
         </div>
       </div>
+
+      {/* Comparateur de prix - Affichage conditionnel */}
+      {checkIn && (
+        <div className="mt-4">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setShowPriceCalendar(!showPriceCalendar)}
+            className="w-full md:w-auto"
+          >
+            <TrendingDown className="h-4 w-4 mr-2" />
+            {showPriceCalendar ? "Masquer" : "Comparer"} les prix par date
+          </Button>
+        </div>
+      )}
+
+      {/* Calendrier de comparaison des prix */}
+      {showPriceCalendar && checkIn && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          className="mt-4 overflow-hidden"
+        >
+          <PriceCalendar
+            departureDate={format(checkIn, "yyyy-MM-dd")}
+            onDateSelect={(dateStr) => {
+              setCheckIn(new Date(dateStr));
+              handleBlur("checkIn");
+            }}
+            lowestPrice={120}
+            viewMode="week"
+          />
+        </motion.div>
+      )}
 
       {/* Submit Button */}
       <div className="mt-4 md:mt-6">
