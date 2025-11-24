@@ -9,6 +9,7 @@ import { Boss } from "@/components/Boss";
 import StatsSection from "@/components/StatsSection";
 import FeaturedServices from "@/components/FeaturedServices";
 import SpecialOffers from "@/components/SpecialOffers";
+import { SeasonalSuggestions } from "@/components/SeasonalSuggestions";
 import { useTranslation } from "react-i18next";
 
 const Index = () => {
@@ -24,8 +25,23 @@ const Index = () => {
         <FeaturedServices />
         <SpecialOffers />
         
-        {/* AI Travel Advisor Section */}
+        {/* Seasonal Suggestions Section */}
         <section className="py-12 md:py-16 px-4 bg-muted/30">
+          <div className="container mx-auto max-w-7xl">
+            <div className="text-center mb-6 md:mb-8">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">
+                Suggestions Saisonnières Intelligentes
+              </h2>
+              <p className="text-muted-foreground text-base md:text-lg px-4">
+                Découvrez les meilleures périodes pour voyager selon la météo, les événements et la saisonnalité
+              </p>
+            </div>
+            <SeasonalSuggestions />
+          </div>
+        </section>
+        
+        {/* AI Travel Advisor Section */}
+        <section className="py-12 md:py-16 px-4">
           <div className="container mx-auto max-w-4xl">
             <div className="text-center mb-6 md:mb-8">
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">
