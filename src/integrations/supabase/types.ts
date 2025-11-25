@@ -332,6 +332,66 @@ export type Database = {
           },
         ]
       }
+      price_alerts: {
+        Row: {
+          alert_threshold: number | null
+          created_at: string
+          currency: string
+          current_price: number | null
+          departure_date: string | null
+          destination: string
+          id: string
+          is_active: boolean
+          last_checked_at: string | null
+          origin: string | null
+          passengers: number | null
+          return_date: string | null
+          rooms: number | null
+          service_type: string
+          target_price: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          alert_threshold?: number | null
+          created_at?: string
+          currency?: string
+          current_price?: number | null
+          departure_date?: string | null
+          destination: string
+          id?: string
+          is_active?: boolean
+          last_checked_at?: string | null
+          origin?: string | null
+          passengers?: number | null
+          return_date?: string | null
+          rooms?: number | null
+          service_type: string
+          target_price?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          alert_threshold?: number | null
+          created_at?: string
+          currency?: string
+          current_price?: number | null
+          departure_date?: string | null
+          destination?: string
+          id?: string
+          is_active?: boolean
+          last_checked_at?: string | null
+          origin?: string | null
+          passengers?: number | null
+          return_date?: string | null
+          rooms?: number | null
+          service_type?: string
+          target_price?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -356,6 +416,33 @@ export type Database = {
           id?: string
           phone?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          user_id?: string
         }
         Relationships: []
       }
