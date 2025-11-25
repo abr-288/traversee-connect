@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 type NotificationPermission = 'default' | 'granted' | 'denied';
 
@@ -49,6 +50,14 @@ export const usePushNotifications = () => {
     try {
       const registration = await navigator.serviceWorker.ready;
       
+      // Check for existing subscription
+      const existingSubscription = await registration.pushManager.getSubscription();
+      if (existingSubscription) {
+        setSubscription(existingSubscription);
+        await savePushSubscription(existingSubscription);
+        return existingSubscription;
+      }
+      
       // Create a subscription
       const sub = await registration.pushManager.subscribe({
         userVisibleOnly: true,
@@ -59,10 +68,30 @@ export const usePushNotifications = () => {
       });
       
       setSubscription(sub);
+      await savePushSubscription(sub);
       return sub;
     } catch (error) {
       console.error('Error subscribing to push notifications:', error);
       return null;
+    }
+  };
+
+  const savePushSubscription = async (subscription: PushSubscription) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const subscriptionData = subscription.toJSON();
+      await supabase.from('push_subscriptions').upsert({
+        user_id: user.id,
+        endpoint: subscriptionData.endpoint!,
+        p256dh: subscriptionData.keys!.p256dh,
+        auth: subscriptionData.keys!.auth,
+      }, {
+        onConflict: 'user_id,endpoint'
+      });
+    } catch (error) {
+      console.error('Error saving push subscription:', error);
     }
   };
 
