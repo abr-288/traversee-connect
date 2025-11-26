@@ -57,7 +57,7 @@ serve(async (req) => {
     }
 
     // Format phone number for Côte d'Ivoire (+225) and sanitize
-    let formattedPhone = sanitizeString(requestData.customerInfo.phone || '', 20).replace(/[\s\-\(\)]/g, '');
+    let formattedPhone = sanitizeString((requestData.customerInfo.phone as string | undefined) || '', 20).replace(/[\s\-\(\)]/g, '');
     
     // Normalize to include country code
     if (!formattedPhone.startsWith('+')) {
@@ -89,12 +89,17 @@ serve(async (req) => {
     }
 
     // Split customer name and sanitize
-    const sanitizedName = sanitizeString(requestData.customerInfo.name, 100);
-    const sanitizedEmail = sanitizeString(requestData.customerInfo.email, 255);
+    const sanitizedName = sanitizeString(requestData.customerInfo.name || '', 100);
+    const sanitizedEmail = sanitizeString(requestData.customerInfo.email || '', 255);
     
     const nameParts = sanitizedName.trim().split(' ');
     const firstName = nameParts[0] || sanitizedName;
-    const lastName = nameParts.slice(1).join(' ') || firstName;
+    let lastName = nameParts.slice(1).join(' ') || firstName;
+    
+    // CinetPay requires lastName to be at least 2 characters
+    if (lastName.length < 2) {
+      lastName = firstName.length >= 2 ? firstName : 'Client';
+    }
 
     // Build CinetPay payload
     const cinetpayPayload = {
