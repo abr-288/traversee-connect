@@ -659,6 +659,7 @@ export type Database = {
         | "tour"
         | "event"
         | "flight_hotel"
+        | "stay"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -789,7 +790,15 @@ export const Constants = {
       app_role: ["admin", "user"],
       booking_status: ["pending", "confirmed", "cancelled", "completed"],
       payment_status: ["pending", "paid", "refunded", "failed"],
-      service_type: ["hotel", "flight", "car", "tour", "event", "flight_hotel"],
+      service_type: [
+        "hotel",
+        "flight",
+        "car",
+        "tour",
+        "event",
+        "flight_hotel",
+        "stay",
+      ],
     },
   },
 } as const
