@@ -227,11 +227,14 @@ export default function Payment() {
         return;
       }
 
+      // Convert FCFA to ISO standard XOF for payment processing
+      const isoCurrency = booking.currency === "FCFA" ? "XOF" : booking.currency;
+      
       const { data, error } = await supabase.functions.invoke("process-payment", {
         body: {
           bookingId: bookingId,
           amount: booking.total_price,
-          currency: booking.currency,
+          currency: isoCurrency,
           paymentMethod: validatedData.paymentMethod,
           customerInfo: {
             name: validatedData.customerName,
