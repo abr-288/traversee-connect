@@ -144,9 +144,14 @@ serve(async (req) => {
     console.log('HTTP Status:', cinetpayResponse.status);
     console.log('Response Code:', cinetpayData.code);
     console.log('Payment URL Present:', !!cinetpayData.data?.payment_url);
-    
+
+    // Log non-sensitive error details from CinetPay when payment creation fails
     if (cinetpayData.code !== '201') {
       console.error('❌ Payment creation failed with code:', cinetpayData.code);
+      if (cinetpayData.message || cinetpayData.description) {
+        console.error('CinetPay error message:', cinetpayData.message || 'N/A');
+        console.error('CinetPay error description:', cinetpayData.description || 'N/A');
+      }
       // Do not log the full error message as it may contain sensitive data
       throw new Error('Payment creation failed');
     }
