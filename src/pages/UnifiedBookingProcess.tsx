@@ -304,9 +304,15 @@ const UnifiedBookingProcess = () => {
               />
             )}
 
-            {currentStep === 4 && flightData && (
+            {currentStep === 4 && (
               <SummaryStep
                 flightData={flightData}
+                serviceType={serviceType}
+                serviceName={serviceName}
+                servicePrice={parseFloat(servicePrice)}
+                serviceLocation={serviceLocation}
+                startDate={startDate}
+                endDate={endDate || undefined}
                 passengers={passengers}
                 selectedBaggage={selectedBaggage}
                 selectedSeats={selectedSeats}

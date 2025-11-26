@@ -21,7 +21,26 @@ interface Passenger {
 }
 
 interface SummaryStepProps {
-  flightData: any;
+  flightData?: {
+    origin: string;
+    destination: string;
+    departureDate: string;
+    returnDate: string | null;
+    departureTime: string;
+    arrivalTime: string;
+    duration: string;
+    airline: string;
+    flightNumber: string;
+    price: string;
+    stops: number;
+    fare: string;
+  } | null;
+  serviceType: string;
+  serviceName: string;
+  servicePrice: number;
+  serviceLocation: string;
+  startDate: string;
+  endDate?: string;
   passengers: Passenger[];
   selectedBaggage: Record<string, number>;
   selectedSeats: string[];
@@ -32,6 +51,12 @@ interface SummaryStepProps {
 
 export const SummaryStep = ({
   flightData,
+  serviceType,
+  serviceName,
+  servicePrice,
+  serviceLocation,
+  startDate,
+  endDate,
   passengers,
   selectedBaggage,
   selectedSeats,
@@ -62,7 +87,8 @@ export const SummaryStep = ({
   };
 
   const getBasePrice = () => {
-    return parseFloat(flightData.price || "0") * (adultsCount + childrenCount);
+    const basePrice = flightData ? parseFloat(flightData.price) : servicePrice;
+    return basePrice * (adultsCount + childrenCount);
   };
 
   const getTotalPrice = () => {
@@ -72,12 +98,12 @@ export const SummaryStep = ({
   const handlePayment = async () => {
     try {
       const bookingId = await createBooking({
-        service_type: "flight",
-        service_name: `Vol ${flightData.origin} - ${flightData.destination}`,
-        service_description: `${flightData.airline} - ${flightData.flightNumber}`,
-        location: flightData.origin,
-        start_date: flightData.departureDate,
-        end_date: flightData.returnDate || flightData.departureDate,
+        service_type: serviceType as any,
+        service_name: flightData ? `Vol ${flightData.origin} - ${flightData.destination}` : serviceName,
+        service_description: flightData ? `${flightData.airline} - ${flightData.flightNumber}` : serviceLocation,
+        location: flightData ? flightData.origin : serviceLocation,
+        start_date: startDate,
+        end_date: endDate || startDate,
         guests: adultsCount + childrenCount,
         total_price: getTotalPrice(),
         currency: "FCFA",
@@ -93,7 +119,7 @@ export const SummaryStep = ({
           nationality: p.nationality,
         })),
         booking_details: {
-          flight: flightData,
+          ...(flightData && { flight: flightData }),
           baggage: selectedBaggage,
           seats: selectedSeats,
           paymentMethod,
@@ -124,47 +150,78 @@ export const SummaryStep = ({
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Détails de la réservation */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Vol */}
+          {/* Service Details */}
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <Plane className="h-5 w-5 text-primary" />
-              Détails du vol
+              {flightData ? "Détails du vol" : "Détails du service"}
             </h3>
             <div className="space-y-4">
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <div className="flex items-center gap-4 mb-2">
-                    <div>
-                      <p className="text-2xl font-bold">{flightData.departureTime}</p>
-                      <p className="text-sm text-muted-foreground">{flightData.origin}</p>
-                    </div>
-                    <div className="flex-1 flex items-center gap-2">
-                      <Separator className="flex-1" />
-                      <Badge variant="secondary" className="px-3">
-                        {flightData.duration}
-                      </Badge>
-                      <Separator className="flex-1" />
-                    </div>
-                    <div className="text-right">
-                      <p className="text-2xl font-bold">{flightData.arrivalTime}</p>
-                      <p className="text-sm text-muted-foreground">{flightData.destination}</p>
+              {flightData ? (
+                <>
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-4 mb-2">
+                        <div>
+                          <p className="text-2xl font-bold">{flightData.departureTime}</p>
+                          <p className="text-sm text-muted-foreground">{flightData.origin}</p>
+                        </div>
+                        <div className="flex-1 flex items-center gap-2">
+                          <Separator className="flex-1" />
+                          <Badge variant="secondary" className="px-3">
+                            {flightData.duration}
+                          </Badge>
+                          <Separator className="flex-1" />
+                        </div>
+                        <div className="text-right">
+                          <p className="text-2xl font-bold">{flightData.arrivalTime}</p>
+                          <p className="text-sm text-muted-foreground">{flightData.destination}</p>
+                        </div>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {flightData.airline} • Vol {flightData.flightNumber}
+                      </p>
                     </div>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    {flightData.airline} • Vol {flightData.flightNumber}
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span>{new Date(flightData.departureDate).toLocaleDateString("fr-FR")}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
-                  <span>{flightData.stops === 0 ? "Vol direct" : `${flightData.stops} escale(s)`}</span>
-                </div>
-              </div>
+                  <div className="flex gap-4 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <span>{new Date(flightData.departureDate).toLocaleDateString("fr-FR")}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
+                      <span>{flightData.stops === 0 ? "Vol direct" : `${flightData.stops} escale(s)`}</span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Service:</span>
+                      <span className="font-medium">{serviceName}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Localisation:</span>
+                      <span className="font-medium">{serviceLocation}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Date de début:</span>
+                      <span className="font-medium">
+                        {new Date(startDate).toLocaleDateString("fr-FR")}
+                      </span>
+                    </div>
+                    {endDate && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Date de fin:</span>
+                        <span className="font-medium">
+                          {new Date(endDate).toLocaleDateString("fr-FR")}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           </Card>
 

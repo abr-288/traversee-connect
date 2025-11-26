@@ -249,6 +249,12 @@ const FlightBookingProcess = () => {
             {currentStep === 4 && (
               <SummaryStep
                 flightData={flightData}
+                serviceType="flight"
+                serviceName={`${flightData.airline} ${flightData.flightNumber}`}
+                servicePrice={parseFloat(flightData.price)}
+                serviceLocation={flightData.origin}
+                startDate={flightData.departureDate}
+                endDate={flightData.returnDate || undefined}
                 passengers={passengers}
                 selectedBaggage={selectedBaggage}
                 selectedSeats={selectedSeats}
