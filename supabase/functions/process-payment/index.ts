@@ -58,15 +58,19 @@ serve(async (req) => {
 
     // Format phone number for Côte d'Ivoire (+225) and sanitize
     let formattedPhone = sanitizeString(requestData.customerInfo.phone || '', 20).replace(/[\s\-\(\)]/g, '');
+    
+    // Normalize to include country code
     if (!formattedPhone.startsWith('+')) {
       if (formattedPhone.startsWith('0')) {
-        formattedPhone = '+225' + formattedPhone.substring(1);
+        formattedPhone = '225' + formattedPhone.substring(1);
       } else if (!formattedPhone.startsWith('225')) {
-        formattedPhone = '+225' + formattedPhone;
-      } else {
-        formattedPhone = '+' + formattedPhone;
+        formattedPhone = '225' + formattedPhone;
       }
+    } else {
+      // Remove + sign as CinetPay expects format without +
+      formattedPhone = formattedPhone.substring(1);
     }
+    
     console.log('Customer data formatted');
 
     // Generate unique transaction ID
