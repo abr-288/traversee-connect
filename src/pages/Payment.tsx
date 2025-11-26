@@ -310,16 +310,92 @@ export default function Payment() {
 
           <Card className="p-6 mb-6">
             <h2 className="text-xl font-semibold mb-4">Détails de la réservation</h2>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Référence:</span>
-                <span className="font-medium">{booking.id.substring(0, 8)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Montant:</span>
-                <span className="font-bold text-lg">
-                  {booking.total_price.toLocaleString()} {booking.currency}
+            <div className="space-y-3">
+              {/* Service Information */}
+              {booking.services && (
+                <>
+                  <div className="flex justify-between items-start">
+                    <span className="text-muted-foreground">Service:</span>
+                    <span className="font-medium text-right">{booking.services.name}</span>
+                  </div>
+                  <div className="flex justify-between items-start">
+                    <span className="text-muted-foreground">Type:</span>
+                    <span className="font-medium text-right capitalize">{booking.services.type}</span>
+                  </div>
+                  <div className="flex justify-between items-start">
+                    <span className="text-muted-foreground">Localisation:</span>
+                    <span className="font-medium text-right">{booking.services.location}</span>
+                  </div>
+                </>
+              )}
+              
+              {/* Dates */}
+              <div className="flex justify-between items-start">
+                <span className="text-muted-foreground">Date de début:</span>
+                <span className="font-medium text-right">
+                  {new Date(booking.start_date).toLocaleDateString('fr-FR', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric'
+                  })}
                 </span>
+              </div>
+              
+              {booking.end_date && (
+                <div className="flex justify-between items-start">
+                  <span className="text-muted-foreground">Date de fin:</span>
+                  <span className="font-medium text-right">
+                    {new Date(booking.end_date).toLocaleDateString('fr-FR', {
+                      day: '2-digit',
+                      month: 'long',
+                      year: 'numeric'
+                    })}
+                  </span>
+                </div>
+              )}
+              
+              {/* Guests */}
+              <div className="flex justify-between items-start">
+                <span className="text-muted-foreground">Nombre de personnes:</span>
+                <span className="font-medium text-right">{booking.guests}</span>
+              </div>
+              
+              {/* Customer Info */}
+              <div className="border-t pt-3 mt-3">
+                <div className="flex justify-between items-start mb-2">
+                  <span className="text-muted-foreground">Nom du client:</span>
+                  <span className="font-medium text-right">{booking.customer_name}</span>
+                </div>
+                <div className="flex justify-between items-start mb-2">
+                  <span className="text-muted-foreground">Email:</span>
+                  <span className="font-medium text-right">{booking.customer_email}</span>
+                </div>
+                <div className="flex justify-between items-start">
+                  <span className="text-muted-foreground">Téléphone:</span>
+                  <span className="font-medium text-right">{booking.customer_phone}</span>
+                </div>
+              </div>
+              
+              {/* Notes if available */}
+              {booking.notes && (
+                <div className="border-t pt-3 mt-3">
+                  <span className="text-muted-foreground block mb-1">Notes:</span>
+                  <p className="text-sm">{booking.notes}</p>
+                </div>
+              )}
+              
+              {/* Booking Reference & Total */}
+              <div className="border-t pt-3 mt-3">
+                <div className="flex justify-between mb-2">
+                  <span className="text-muted-foreground">Référence:</span>
+                  <span className="font-mono text-sm">{booking.id.substring(0, 8).toUpperCase()}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground text-lg">Montant total:</span>
+                  <span className="font-bold text-2xl text-primary">
+                    {booking.total_price.toLocaleString()} {booking.currency}
+                  </span>
+                </div>
               </div>
             </div>
           </Card>
