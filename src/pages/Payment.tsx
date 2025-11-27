@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, Smartphone, CheckCircle2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { paymentSchema, type PaymentInput } from "@/lib/validationSchemas";
@@ -14,6 +14,16 @@ import { validateWithSchema, getUserFriendlyErrorMessage } from "@/lib/formHelpe
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import ErrorBoundary, { ErrorFallback } from "@/components/ErrorBoundary";
 import PaymentMethodSelector from "@/components/PaymentMethodSelector";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function Payment() {
   const [searchParams] = useSearchParams();
@@ -27,6 +37,8 @@ export default function Payment() {
   const [paymentMethod, setPaymentMethod] = useState("wave");
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [generalError, setGeneralError] = useState<string | null>(null);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [validatedFormData, setValidatedFormData] = useState<PaymentInput | null>(null);
   
   // Customer info
   const [customerName, setCustomerName] = useState("");
@@ -171,9 +183,18 @@ export default function Payment() {
       return;
     }
 
-    // Accès safe à data après vérification explicite
-    const validatedData = validation.data;
+    // Show confirmation dialog for mobile payment methods
+    if (paymentMethod === 'wave' || paymentMethod === 'mobile_money') {
+      setValidatedFormData(validation.data);
+      setShowConfirmDialog(true);
+      return;
+    }
 
+    // For card and bank transfer, proceed directly
+    await processPayment(validation.data);
+  };
+
+  const processPayment = async (validatedData: PaymentInput) => {
     // Prevent double processing
     if (processing) return;
 
@@ -281,6 +302,23 @@ export default function Payment() {
     }
   };
 
+  const handleConfirmPayment = () => {
+    setShowConfirmDialog(false);
+    if (validatedFormData) {
+      processPayment(validatedFormData);
+    }
+  };
+
+  const getPaymentMethodLabel = () => {
+    switch (paymentMethod) {
+      case 'wave': return 'Wave';
+      case 'mobile_money': return 'Mobile Money';
+      case 'card': return 'Carte bancaire';
+      case 'bank_transfer': return 'Virement bancaire';
+      default: return paymentMethod;
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -308,6 +346,16 @@ export default function Payment() {
               <Alert variant="destructive" className="mb-6">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{generalError}</AlertDescription>
+              </Alert>
+            )}
+
+            {/* Mobile payment confirmation info */}
+            {(paymentMethod === 'wave' || paymentMethod === 'mobile_money') && customerPhone && (
+              <Alert className="mb-6 border-primary/30 bg-primary/5">
+                <Smartphone className="h-4 w-4 text-primary" />
+                <AlertDescription className="text-foreground">
+                  La demande de paiement sera envoyée au numéro: <strong>{customerPhone}</strong>
+                </AlertDescription>
               </Alert>
             )}
 
@@ -561,6 +609,54 @@ export default function Payment() {
         </div>
       </main>
       <Footer />
+
+      {/* Payment Confirmation Dialog */}
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Smartphone className="h-5 w-5 text-primary" />
+              Confirmer le paiement {getPaymentMethodLabel()}
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-4 pt-2">
+                <p>
+                  Une demande de paiement de{" "}
+                  <strong className="text-foreground">
+                    {booking?.total_price?.toLocaleString()} {booking?.currency}
+                  </strong>{" "}
+                  sera envoyée au numéro:
+                </p>
+                <div className="flex items-center justify-center gap-3 p-4 rounded-lg bg-primary/10 border border-primary/20">
+                  <Smartphone className="h-6 w-6 text-primary" />
+                  <span className="text-xl font-bold text-foreground">{customerPhone}</span>
+                </div>
+                <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Vous recevrez une notification sur ce numéro pour confirmer le paiement</span>
+                </div>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2 sm:gap-0">
+            <AlertDialogCancel disabled={processing}>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmPayment}
+              disabled={processing}
+              className="gap-2"
+            >
+              {processing ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Traitement...
+                </>
+              ) : (
+                "Confirmer et payer"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   </ErrorBoundary>
   );
