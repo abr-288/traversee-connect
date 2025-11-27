@@ -4,7 +4,6 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, AlertCircle } from "lucide-react";
@@ -14,6 +13,7 @@ import { paymentSchema, type PaymentInput } from "@/lib/validationSchemas";
 import { validateWithSchema, getUserFriendlyErrorMessage } from "@/lib/formHelpers";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import ErrorBoundary, { ErrorFallback } from "@/components/ErrorBoundary";
+import PaymentMethodSelector from "@/components/PaymentMethodSelector";
 
 export default function Payment() {
   const [searchParams] = useSearchParams();
@@ -412,32 +412,7 @@ export default function Payment() {
                 <Label className="text-base font-medium mb-3 block">
                   Méthode de paiement
                 </Label>
-                <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-accent cursor-pointer">
-                    <RadioGroupItem value="wave" id="wave" />
-                    <Label htmlFor="wave" className="flex-1 cursor-pointer">
-                      Wave (Mobile Money)
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-accent cursor-pointer">
-                    <RadioGroupItem value="mobile_money" id="mobile_money" />
-                    <Label htmlFor="mobile_money" className="flex-1 cursor-pointer">
-                      Mobile Money (Orange, MTN, Moov)
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-accent cursor-pointer">
-                    <RadioGroupItem value="card" id="card" />
-                    <Label htmlFor="card" className="flex-1 cursor-pointer">
-                      Carte bancaire
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-accent cursor-pointer">
-                    <RadioGroupItem value="bank_transfer" id="bank_transfer" />
-                    <Label htmlFor="bank_transfer" className="flex-1 cursor-pointer">
-                      Virement bancaire
-                    </Label>
-                  </div>
-                </RadioGroup>
+                <PaymentMethodSelector value={paymentMethod} onChange={setPaymentMethod} />
               </div>
 
               {/* Customer Information */}
