@@ -77,15 +77,16 @@ serve(async (req) => {
     const transactionId = `TXN-${requestData.bookingId}-${Date.now()}`;
     
     // Determine payment channels based on method
+    // CinetPay valid channels: ALL, MOBILE_MONEY, WALLET, CREDIT_CARD, INTERNATIONAL_CARD
     let channels = 'ALL';
     if (requestData.paymentMethod === 'card') {
       channels = 'CREDIT_CARD';
     } else if (requestData.paymentMethod === 'mobile_money') {
       channels = 'MOBILE_MONEY';
     } else if (requestData.paymentMethod === 'wave') {
-      channels = 'WAVE_CI'; // Specific Wave channel for Côte d'Ivoire
+      channels = 'WALLET'; // Wave uses WALLET channel in CinetPay
     } else if (requestData.paymentMethod === 'bank_transfer') {
-      channels = 'CREDIT_CARD'; // Use CREDIT_CARD for bank transfers
+      channels = 'CREDIT_CARD'; // Bank transfers use CREDIT_CARD channel
     }
 
     // Split customer name and sanitize
