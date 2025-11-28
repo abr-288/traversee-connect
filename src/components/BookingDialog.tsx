@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Plane, Hotel, Car, MapPin, Calendar, Users } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { Price } from "@/components/ui/price";
 
 interface BookingDialogProps {
   open: boolean;
@@ -79,7 +80,7 @@ export const BookingDialog = ({ open, onOpenChange, service }: BookingDialogProp
               <div className="flex items-center justify-between pt-2 border-t">
                 <span className="text-sm text-muted-foreground">Prix de base</span>
                 <span className="text-xl font-bold text-primary">
-                  {service.price_per_unit.toLocaleString()} {service.currency}
+                  <Price amount={service.price_per_unit} fromCurrency={service.currency} showLoader />
                 </span>
               </div>
             </div>

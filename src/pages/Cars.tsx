@@ -16,11 +16,14 @@ import { useCarServices } from "@/hooks/useCarServices";
 import { toast } from "sonner";
 import { LazyImage } from "@/components/ui/lazy-image";
 import bannerCars from "@/assets/banner-cars.jpg";
+import { Price } from "@/components/ui/price";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 const Cars = () => {
   const [searchParams] = useSearchParams();
   const { searchCarRentals, loading } = useCarRental();
   const { cars: dbCars, loading: dbLoading } = useCarServices();
+  const { formatPrice } = useCurrency();
   const [priceRange, setPriceRange] = useState([0, 150000]);
   const [selectedCar, setSelectedCar] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -324,7 +327,7 @@ const Cars = () => {
 
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Prix par jour: {priceRange[0].toLocaleString()} - {priceRange[1].toLocaleString()} FCFA
+                    Prix par jour: {formatPrice(priceRange[0])} - {formatPrice(priceRange[1])}
                   </label>
                   <Slider
                     min={0}
@@ -518,7 +521,7 @@ const Cars = () => {
                       <div>
                         <p className="text-sm text-muted-foreground">À partir de</p>
                         <p className="text-2xl font-bold text-primary">
-                          {car.price.toLocaleString()} <span className="text-sm">FCFA</span>
+                          <Price amount={car.price} fromCurrency="XOF" showLoader />
                         </p>
                         <p className="text-xs text-muted-foreground">par jour</p>
                       </div>

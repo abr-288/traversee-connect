@@ -188,7 +188,7 @@ export const BaggageStep = ({
 
                   <div className="flex items-center justify-between mt-4">
                     <div className="text-2xl font-bold text-primary">
-                      {option.price.toLocaleString()} FCFA
+                      <Price amount={option.price} fromCurrency="XOF" showLoader />
                     </div>
                     <div className="flex items-center gap-2">
                       <Button

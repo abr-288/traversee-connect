@@ -10,6 +10,7 @@ import { useFlightHotelSearch } from "@/hooks/useFlightHotelSearch";
 import { toast } from "sonner";
 import { LazyImage } from "@/components/ui/lazy-image";
 import bannerFlightHotel from "@/assets/banner-flight-hotel.jpg";
+import { Price } from "@/components/ui/price";
 
 const FlightHotel = () => {
   const [selectedFlight, setSelectedFlight] = useState<any>(null);
@@ -152,7 +153,7 @@ const FlightHotel = () => {
                         </div>
                         <div className="pt-3 border-t">
                           <div className="text-2xl font-bold text-primary">
-                            {flight.price.toLocaleString()} FCFA
+                            <Price amount={flight.price} fromCurrency="XOF" showLoader />
                           </div>
                         </div>
                       </CardContent>
@@ -213,7 +214,7 @@ const FlightHotel = () => {
                         </div>
                         <div className="pt-3 border-t">
                           <div className="text-2xl font-bold text-primary">
-                            {hotel.price.toLocaleString()} FCFA
+                            <Price amount={hotel.price} fromCurrency="XOF" showLoader />
                           </div>
                           <p className="text-xs text-muted-foreground">par nuit</p>
                         </div>
@@ -232,7 +233,7 @@ const FlightHotel = () => {
                     <span>Votre sélection</span>
                     {selectedFlight && selectedHotel && (
                       <span className="text-sm font-normal text-green-600">
-                        Économisez {calculateTotal().savings.toLocaleString()} FCFA (30%)
+                        Économisez <Price amount={calculateTotal().savings} fromCurrency="XOF" /> (30%)
                       </span>
                     )}
                   </CardTitle>
@@ -247,7 +248,7 @@ const FlightHotel = () => {
                       {selectedFlight ? (
                         <div className="text-sm">
                           <p className="font-medium">{selectedFlight.airline}</p>
-                          <p className="text-muted-foreground">{selectedFlight.price.toLocaleString()} FCFA</p>
+                          <p className="text-muted-foreground"><Price amount={selectedFlight.price} fromCurrency="XOF" /></p>
                         </div>
                       ) : (
                         <p className="text-sm text-muted-foreground">Aucun vol sélectionné</p>
@@ -262,7 +263,7 @@ const FlightHotel = () => {
                       {selectedHotel ? (
                         <div className="text-sm">
                           <p className="font-medium">{selectedHotel.name}</p>
-                          <p className="text-muted-foreground">{selectedHotel.price.toLocaleString()} FCFA</p>
+                          <p className="text-muted-foreground"><Price amount={selectedHotel.price} fromCurrency="XOF" /></p>
                         </div>
                       ) : (
                         <p className="text-sm text-muted-foreground">Aucun hôtel sélectionné</p>
@@ -274,10 +275,10 @@ const FlightHotel = () => {
                       {selectedFlight && selectedHotel ? (
                         <div>
                           <p className="text-2xl font-bold text-primary">
-                            {calculateTotal().discounted.toLocaleString()} FCFA
+                            <Price amount={calculateTotal().discounted} fromCurrency="XOF" showLoader />
                           </p>
                           <p className="text-sm text-muted-foreground line-through">
-                            {calculateTotal().original.toLocaleString()} FCFA
+                            <Price amount={calculateTotal().original} fromCurrency="XOF" />
                           </p>
                         </div>
                       ) : (

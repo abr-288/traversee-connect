@@ -378,8 +378,9 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
                         <p className="text-sm text-muted-foreground">Par passager</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-3xl font-bold text-primary">{flight.price.toLocaleString()}</p>
-                        <p className="text-sm text-muted-foreground">FCFA</p>
+                        <p className="text-3xl font-bold text-primary">
+                          <Price amount={flight.price} fromCurrency="XOF" showLoader />
+                        </p>
                       </div>
                     </div>
                   </Card>

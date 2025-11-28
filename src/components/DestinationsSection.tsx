@@ -6,6 +6,7 @@ import { MapPin, Star, Loader2, Users, Calendar, Wifi, Coffee, Utensils, Waves, 
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useDestinations } from "@/hooks/useDestinations";
+import { Price } from "@/components/ui/price";
 
 
 const DestinationsSection = () => {
@@ -118,8 +119,10 @@ const DestinationsSection = () => {
                       {destination.name}
                     </h3>
                     <div className="text-right flex-shrink-0">
-                      <p className="text-2xl font-bold text-primary whitespace-nowrap">{destination.price}</p>
-                      <p className="text-xs text-muted-foreground whitespace-nowrap">FCFA / {t('destinations.perNight')}</p>
+                      <p className="text-2xl font-bold text-primary whitespace-nowrap">
+                        <Price amount={parseFloat(destination.price.replace(/\s/g, '')) || 0} fromCurrency="XOF" showLoader />
+                      </p>
+                      <p className="text-xs text-muted-foreground whitespace-nowrap">/ {t('destinations.perNight')}</p>
                     </div>
                   </div>
 

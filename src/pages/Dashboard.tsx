@@ -15,6 +15,7 @@ import { BookingCalendar } from "@/components/dashboard/BookingCalendar";
 import { CurrencyDebugPanel } from "@/components/CurrencyDebugPanel";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { useOfflineBookings } from "@/hooks/useOfflineBookings";
+import { Price } from "@/components/ui/price";
 
 interface Booking {
   id: string;
@@ -411,7 +412,7 @@ const Dashboard = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalSpent.toLocaleString()} FCFA</div>
+              <div className="text-2xl font-bold"><Price amount={stats.totalSpent} fromCurrency="XOF" showLoader /></div>
             </CardContent>
           </Card>
 
