@@ -132,60 +132,7 @@ async function searchBookingDestinations(
   }
 }
 
-// Search using Geoapify Places API
-async function searchGeoapify(
-  query: string,
-  rapidApiKey: string
-): Promise<Destination[]> {
-  try {
-    console.log('Searching Geoapify Places API:', query);
-    
-    const response = await fetch(
-      `https://geoapify-places.p.rapidapi.com/v2/places?categories=tourism&filter=place:${encodeURIComponent(query)}&limit=3`,
-      {
-        headers: {
-          'X-RapidAPI-Key': rapidApiKey,
-          'X-RapidAPI-Host': 'geoapify-places.p.rapidapi.com'
-        }
-      }
-    );
-
-    if (!response.ok) {
-      console.error('Geoapify API error:', response.status);
-      return [];
-    }
-
-    const data = await response.json();
-    const results: Destination[] = [];
-    
-    if (data.features && Array.isArray(data.features)) {
-      for (const feature of data.features.slice(0, 3)) {
-        const props = feature.properties || {};
-        results.push({
-          id: `geo-${props.place_id || results.length}`,
-          name: props.name || props.city || query,
-          location: props.state || props.region || 'Unknown',
-          country: props.country || 'Unknown',
-          image: getDefaultImage(results.length),
-          rating: 4.3,
-          reviews: Math.floor(1000 + Math.random() * 2000),
-          price: getEstimatedPrice(props.name || query),
-          description: `Découvrez ${props.name || query}, une destination à explorer.`,
-          category: getCategoryFromType(props.category || 'tourism'),
-          amenities: ['Attractions', 'Culture', 'Gastronomie'],
-          highlights: ['Sites touristiques', 'Expériences locales'],
-          source: 'geoapify',
-        });
-      }
-    }
-    
-    console.log('Geoapify results:', results.length);
-    return results;
-  } catch (error) {
-    console.error('Geoapify API exception:', error);
-    return [];
-  }
-}
+// Note: Geoapify Places API n'existe pas sur RapidAPI - supprimée
 
 function getCountryFromLocation(locationData: any): string {
   if (locationData.ancestors && locationData.ancestors.length > 0) {
@@ -268,19 +215,18 @@ serve(async (req) => {
       );
     }
 
-    console.log('Fetching popular destinations from multiple APIs...');
+    console.log('Fetching popular destinations from available APIs...');
 
     const popularQueries = ['Paris', 'Dubai', 'Bali', 'Tokyo', 'New York', 'Rome'];
     
-    // Search all APIs in parallel for each destination
+    // Search available APIs in parallel (Travel Advisor + Booking.com)
     const allResults = await Promise.all(
       popularQueries.map(async (query) => {
-        const [travelAdvisor, booking, geoapify] = await Promise.all([
+        const [travelAdvisor, booking] = await Promise.all([
           searchTravelAdvisor(query, rapidApiKey),
           searchBookingDestinations(query, rapidApiKey),
-          searchGeoapify(query, rapidApiKey),
         ]);
-        return [...travelAdvisor, ...booking, ...geoapify];
+        return [...travelAdvisor, ...booking];
       })
     );
 

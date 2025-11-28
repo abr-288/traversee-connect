@@ -21,194 +21,8 @@ interface TrainResult {
   source: string;
 }
 
-// Search trains using Trainline API via RapidAPI
-async function searchTrainline(
-  origin: string,
-  destination: string,
-  departureDate: string,
-  travelClass: string,
-  adults: number,
-  rapidApiKey: string
-): Promise<TrainResult[]> {
-  try {
-    console.log('Searching Trainline API...');
-    
-    const response = await fetch(
-      `https://trainline-eu.p.rapidapi.com/search?` + 
-      new URLSearchParams({
-        from: origin,
-        to: destination,
-        date: departureDate,
-        passengers: adults.toString(),
-      }),
-      {
-        headers: {
-          'X-RapidAPI-Key': rapidApiKey,
-          'X-RapidAPI-Host': 'trainline-eu.p.rapidapi.com',
-        },
-      }
-    );
-
-    if (!response.ok) {
-      console.error('Trainline API error:', response.status);
-      return [];
-    }
-
-    const data = await response.json();
-    console.log('Trainline response:', JSON.stringify(data).substring(0, 300));
-
-    if (data.journeys && Array.isArray(data.journeys)) {
-      return data.journeys.slice(0, 10).map((journey: any, index: number) => ({
-        id: `trainline-${index}`,
-        operator: journey.carrier || journey.operator || 'Trainline',
-        trainNumber: journey.train_number || journey.trainId || `TL${index + 100}`,
-        origin: origin,
-        destination: destination,
-        departureTime: journey.departure_time || journey.departureTime || '09:00',
-        arrivalTime: journey.arrival_time || journey.arrivalTime || '12:00',
-        duration: journey.duration || '3h 00m',
-        price: Math.round((journey.price?.amount || journey.price || 50) * 655.957), // EUR to XOF
-        currency: 'XOF',
-        class: travelClass || 'economy',
-        availableSeats: journey.available_seats || 50,
-        source: 'trainline',
-      }));
-    }
-    
-    return [];
-  } catch (error) {
-    console.error('Trainline API exception:', error);
-    return [];
-  }
-}
-
-// Search trains using Omio API via RapidAPI
-async function searchOmio(
-  origin: string,
-  destination: string,
-  departureDate: string,
-  travelClass: string,
-  adults: number,
-  rapidApiKey: string
-): Promise<TrainResult[]> {
-  try {
-    console.log('Searching Omio/GoEuro API...');
-    
-    const response = await fetch(
-      `https://omio-goeuro.p.rapidapi.com/api/v3/search?` +
-      new URLSearchParams({
-        from: origin,
-        to: destination,
-        departure_date: departureDate,
-        adult: adults.toString(),
-        sort: 'price',
-      }),
-      {
-        headers: {
-          'X-RapidAPI-Key': rapidApiKey,
-          'X-RapidAPI-Host': 'omio-goeuro.p.rapidapi.com',
-        },
-      }
-    );
-
-    if (!response.ok) {
-      console.error('Omio API error:', response.status);
-      return [];
-    }
-
-    const data = await response.json();
-    console.log('Omio response:', JSON.stringify(data).substring(0, 300));
-
-    if (data.trains && Array.isArray(data.trains)) {
-      return data.trains.slice(0, 10).map((train: any, index: number) => ({
-        id: `omio-${index}`,
-        operator: train.operator || train.company || 'Omio',
-        trainNumber: train.train_number || `OM${index + 100}`,
-        origin: origin,
-        destination: destination,
-        departureTime: train.departure || '10:00',
-        arrivalTime: train.arrival || '13:00',
-        duration: train.duration || '3h 00m',
-        price: Math.round((train.price || 45) * 655.957), // EUR to XOF
-        currency: 'XOF',
-        class: travelClass || 'economy',
-        availableSeats: train.seats || 40,
-        source: 'omio',
-      }));
-    }
-    
-    return [];
-  } catch (error) {
-    console.error('Omio API exception:', error);
-    return [];
-  }
-}
-
-// Search trains using Rome2Rio API
-async function searchRome2Rio(
-  origin: string,
-  destination: string,
-  departureDate: string,
-  travelClass: string,
-  rapidApiKey: string
-): Promise<TrainResult[]> {
-  try {
-    console.log('Searching Rome2Rio API for trains...');
-    
-    const response = await fetch(
-      `https://rome2rio12.p.rapidapi.com/Search/Sync?` +
-      new URLSearchParams({
-        key: 'search',
-        oName: origin,
-        dName: destination,
-        departureDate: departureDate,
-      }),
-      {
-        headers: {
-          'X-RapidAPI-Key': rapidApiKey,
-          'X-RapidAPI-Host': 'rome2rio12.p.rapidapi.com',
-        },
-      }
-    );
-
-    if (!response.ok) {
-      console.error('Rome2Rio API error:', response.status);
-      return [];
-    }
-
-    const data = await response.json();
-    console.log('Rome2Rio response:', JSON.stringify(data).substring(0, 300));
-
-    // Filter only train routes
-    const trainRoutes = (data.routes || []).filter((route: any) => 
-      route.name?.toLowerCase().includes('train') || 
-      route.segments?.some((s: any) => s.kind === 'train')
-    );
-
-    return trainRoutes.slice(0, 5).map((route: any, index: number) => {
-      const trainSegment = route.segments?.find((s: any) => s.kind === 'train') || {};
-      return {
-        id: `rome2rio-${index}`,
-        operator: trainSegment.operatingCompany?.name || route.name || 'Train',
-        trainNumber: `R2R${index + 100}`,
-        origin: origin,
-        destination: destination,
-        departureTime: '08:00',
-        arrivalTime: '12:00',
-        duration: route.totalDuration ? `${Math.floor(route.totalDuration / 60)}h ${route.totalDuration % 60}m` : '4h 00m',
-        price: Math.round((route.indicativePrice?.price || 60) * 655.957), // EUR to XOF
-        currency: 'XOF',
-        class: travelClass || 'economy',
-        availableSeats: 35,
-        source: 'rome2rio',
-      };
-    });
-  } catch (error) {
-    console.error('Rome2Rio API exception:', error);
-    return [];
-  }
-}
-
+// Note: Les APIs de trains (Trainline, Omio, Rome2Rio) n'existent pas sur RapidAPI
+// Cette fonction utilise uniquement des données mock réalistes
 function getMockTrains(origin: string, destination: string, departureDate: string, travelClass: string): TrainResult[] {
   const basePrice = 45000;
   const operators = [
@@ -217,23 +31,40 @@ function getMockTrains(origin: string, destination: string, departureDate: strin
     { name: 'Thalys', prefix: 'TH' },
     { name: 'Deutsche Bahn', prefix: 'ICE' },
     { name: 'Trenitalia', prefix: 'FR' },
+    { name: 'ONCF', prefix: 'AL' },
+    { name: 'Renfe', prefix: 'AVE' },
   ];
 
-  return operators.map((op, index) => ({
-    id: `mock-${index}`,
-    operator: op.name,
-    trainNumber: `${op.prefix} ${6600 + index}`,
-    origin: origin,
-    destination: destination,
-    departureTime: `${8 + index * 2}:${index % 2 === 0 ? '00' : '30'}`,
-    arrivalTime: `${11 + index * 2}:${index % 2 === 0 ? '30' : '00'}`,
-    duration: '3h 30m',
-    price: basePrice + (index * 5000),
-    currency: 'XOF',
-    class: travelClass || 'economy',
-    availableSeats: 45 - (index * 5),
-    source: 'mock',
-  }));
+  // Generate realistic train schedules
+  const trains: TrainResult[] = [];
+  const departureTimes = ['06:15', '07:30', '08:45', '10:00', '12:30', '14:15', '16:00', '18:30', '20:00'];
+  
+  for (let i = 0; i < Math.min(operators.length, 7); i++) {
+    const op = operators[i];
+    const departureHour = parseInt(departureTimes[i].split(':')[0]);
+    const durationHours = 2 + Math.floor(Math.random() * 3);
+    const durationMinutes = Math.floor(Math.random() * 60);
+    const arrivalHour = (departureHour + durationHours) % 24;
+    
+    trains.push({
+      id: `train-${i}`,
+      operator: op.name,
+      trainNumber: `${op.prefix} ${6600 + Math.floor(Math.random() * 400)}`,
+      origin: origin,
+      destination: destination,
+      departureTime: departureTimes[i],
+      arrivalTime: `${arrivalHour.toString().padStart(2, '0')}:${durationMinutes.toString().padStart(2, '0')}`,
+      duration: `${durationHours}h ${durationMinutes.toString().padStart(2, '0')}m`,
+      price: basePrice + (i * 5000) + Math.floor(Math.random() * 10000),
+      currency: 'XOF',
+      class: travelClass || 'economy',
+      availableSeats: 45 - (i * 5) + Math.floor(Math.random() * 20),
+      source: 'simulation',
+    });
+  }
+
+  // Sort by price
+  return trains.sort((a, b) => a.price - b.price);
 }
 
 serve(async (req) => {
@@ -246,41 +77,13 @@ serve(async (req) => {
     
     console.log('Train search params:', { origin, destination, departureDate, returnDate, adults, children, travelClass });
 
-    const rapidApiKey = Deno.env.get('RAPIDAPI_KEY');
+    // Note: Aucune API de trains disponible sur RapidAPI, utilisation de données simulées
+    const trains = getMockTrains(origin, destination, departureDate, travelClass);
     
-    if (!rapidApiKey) {
-      console.log('RapidAPI key not configured, returning mock data');
-      return new Response(
-        JSON.stringify({ trains: getMockTrains(origin, destination, departureDate, travelClass) }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Search all train APIs in parallel
-    const [trainlineResults, omioResults, rome2rioResults] = await Promise.all([
-      searchTrainline(origin, destination, departureDate, travelClass, adults, rapidApiKey),
-      searchOmio(origin, destination, departureDate, travelClass, adults, rapidApiKey),
-      searchRome2Rio(origin, destination, departureDate, travelClass, rapidApiKey),
-    ]);
-
-    const allTrains = [...trainlineResults, ...omioResults, ...rome2rioResults];
-    
-    console.log(`Total trains found: ${allTrains.length} (Trainline: ${trainlineResults.length}, Omio: ${omioResults.length}, Rome2Rio: ${rome2rioResults.length})`);
-
-    // If no API results, use mock data
-    if (allTrains.length === 0) {
-      console.log('No train results from APIs, returning mock data');
-      return new Response(
-        JSON.stringify({ trains: getMockTrains(origin, destination, departureDate, travelClass) }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Sort by price
-    allTrains.sort((a, b) => a.price - b.price);
+    console.log(`Generated ${trains.length} train results`);
 
     return new Response(
-      JSON.stringify({ trains: allTrains }),
+      JSON.stringify({ trains }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
