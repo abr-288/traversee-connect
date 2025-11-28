@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Calendar, AlertCircle, Users } from "lucide-react";
+import { Price } from "@/components/ui/price";
 
 interface StatsCardsProps {
   totalRevenue: number;
@@ -17,7 +18,7 @@ export function StatsCards({ totalRevenue, totalBookings, pendingBookings, total
           <TrendingUp className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{totalRevenue.toLocaleString()} FCFA</div>
+          <div className="text-2xl font-bold"><Price amount={totalRevenue} fromCurrency="XOF" showLoader /></div>
           <p className="text-xs text-muted-foreground">Réservations payées</p>
         </CardContent>
       </Card>

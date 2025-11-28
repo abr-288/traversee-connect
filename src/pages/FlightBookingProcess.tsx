@@ -12,6 +12,7 @@ import { PassengerStep } from "@/components/booking-steps/PassengerStep";
 import { OptionsStep } from "@/components/booking-steps/OptionsStep";
 import { PreferencesStep } from "@/components/booking-steps/PreferencesStep";
 import { SummaryStep } from "@/components/booking-steps/SummaryStep";
+import { Price } from "@/components/ui/price";
 
 interface Passenger {
   firstName: string;
@@ -90,7 +91,7 @@ const FlightBookingProcess = () => {
             </div>
             <Badge variant="secondary" className="text-lg px-4 py-2">
               <span className="font-bold text-primary">
-                {parseInt(flightData.price).toLocaleString()} FCFA
+                <Price amount={parseInt(flightData.price)} fromCurrency="XOF" showLoader />
               </span>
             </Badge>
           </div>
@@ -164,7 +165,7 @@ const FlightBookingProcess = () => {
                   <div className="flex justify-between items-center">
                     <span className="font-semibold">Prix du vol</span>
                     <span className="text-xl font-bold text-primary">
-                      {parseInt(flightData.price).toLocaleString()} FCFA
+                      <Price amount={parseInt(flightData.price)} fromCurrency="XOF" showLoader />
                     </span>
                   </div>
                 </div>

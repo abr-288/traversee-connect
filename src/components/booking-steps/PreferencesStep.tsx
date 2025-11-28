@@ -137,7 +137,7 @@ export const PreferencesStep = ({
                 </div>
                 <div>
                   <p className="text-sm font-medium">Standard</p>
-                  <p className="text-xs text-muted-foreground">5 000 FCFA</p>
+                  <p className="text-xs text-muted-foreground"><Price amount={5000} fromCurrency="XOF" /></p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -146,7 +146,7 @@ export const PreferencesStep = ({
                 </div>
                 <div>
                   <p className="text-sm font-medium">Espace extra</p>
-                  <p className="text-xs text-muted-foreground">10 000 FCFA</p>
+                  <p className="text-xs text-muted-foreground"><Price amount={10000} fromCurrency="XOF" /></p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -155,7 +155,7 @@ export const PreferencesStep = ({
                 </div>
                 <div>
                   <p className="text-sm font-medium">Avant de l'avion</p>
-                  <p className="text-xs text-muted-foreground">15 000 FCFA</p>
+                  <p className="text-xs text-muted-foreground"><Price amount={15000} fromCurrency="XOF" /></p>
                 </div>
               </div>
               <div className="flex items-center gap-3">

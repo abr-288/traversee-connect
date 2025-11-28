@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin, ExternalLink } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { Price } from "@/components/ui/price";
 
 interface Event {
   id: string;
@@ -84,7 +85,7 @@ export const EventResults = ({ events }: EventResultsProps) => {
                 <div>
                   <p className="text-sm text-muted-foreground">À partir de</p>
                   <p className="text-xl font-bold">
-                    {event.price} {event.currency || ''}
+                    <Price amount={parseFloat(event.price) || 0} fromCurrency={event.currency || 'XOF'} showLoader />
                   </p>
                 </div>
                 {event.link && (

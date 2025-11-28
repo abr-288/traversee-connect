@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Train, Clock, MapPin } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Price } from "@/components/ui/price";
 
 interface TrainResult {
   id: string;
@@ -86,7 +87,7 @@ export const TrainResults = ({ trains }: TrainResultsProps) => {
               <div className="flex flex-col items-end gap-2">
                 <div className="text-right">
                   <p className="text-3xl font-bold text-primary">
-                    {train.price} {train.currency}
+                    <Price amount={train.price} fromCurrency={train.currency} showLoader />
                   </p>
                 </div>
                 <Button className="w-full md:w-auto">

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Star, MapPin, Globe, X } from "lucide-react";
+import { Price } from "@/components/ui/price";
 
 interface Hotel {
   id: string | number;
@@ -98,9 +99,8 @@ export function HotelComparisonDialog({
                       <span className="text-sm font-medium">Prix/nuit</span>
                       <div className="text-right">
                         <div className="font-bold text-lg text-primary">
-                          {hotel.price.toLocaleString()}
+                          <Price amount={hotel.price} fromCurrency="XOF" showLoader />
                         </div>
-                        <div className="text-xs text-muted-foreground">FCFA</div>
                       </div>
                     </div>
 
