@@ -72,17 +72,12 @@ serve(async (req) => {
       apiPromises.push(searchAmadeus(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, amadeusKey, amadeusSecret));
     }
 
-    // Skyscanner API via RapidAPI (secondary)
-    if (rapidApiKey) {
-      apiPromises.push(searchSkyscanner(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, rapidApiKey));
-    }
-
-    // Kiwi.com API via RapidAPI (tertiary)
+    // Kiwi.com API via RapidAPI (secondary)
     if (rapidApiKey) {
       apiPromises.push(searchKiwi(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, rapidApiKey));
     }
 
-    // Sabre API (quaternary)
+    // Sabre API (tertiary)
     if (sabreUserId && sabrePassword) {
       apiPromises.push(searchSabre(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, sabreUserId, sabrePassword));
     }
@@ -431,99 +426,6 @@ async function searchSabre(
   }
   
   return [];
-}
-
-// Skyscanner API via RapidAPI
-async function searchSkyscanner(
-  origin: string,
-  destination: string,
-  departureDate: string,
-  returnDate: string | undefined,
-  adults: number,
-  children: number,
-  travelClass: string,
-  rapidApiKey: string
-): Promise<any[]> {
-  try {
-    console.log('Searching flights with Skyscanner API via RapidAPI...');
-    
-    // First, search for flights
-    const searchResponse = await fetch(
-      'https://skyscanner80.p.rapidapi.com/api/v1/flights/search-one-way',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-RapidAPI-Key': rapidApiKey,
-          'X-RapidAPI-Host': 'skyscanner80.p.rapidapi.com'
-        },
-        body: JSON.stringify({
-          fromId: `${origin}-sky`,
-          toId: `${destination}-sky`,
-          departDate: departureDate,
-          adults: adults,
-          children: children,
-          cabinClass: travelClass.toLowerCase(),
-          currency: 'EUR'
-        })
-      }
-    );
-
-    if (!searchResponse.ok) {
-      const errorText = await searchResponse.text();
-      console.error('Skyscanner API error:', searchResponse.status, errorText.substring(0, 300));
-      return [];
-    }
-
-    const searchData = await searchResponse.json();
-    console.log('Skyscanner API response received');
-
-    if (searchData.data?.itineraries && Array.isArray(searchData.data.itineraries)) {
-      const flights = searchData.data.itineraries.slice(0, 15).map((itinerary: any, index: number) => {
-        const leg = itinerary.legs?.[0];
-        const price = itinerary.price?.raw || itinerary.price?.formatted?.replace(/[^0-9.]/g, '') || 0;
-        
-        return {
-          id: `SKY-${origin}-${destination}-${index}`,
-          itineraries: [{
-            segments: [{
-              departure: {
-                iataCode: leg?.origin?.id || origin,
-                at: leg?.departure || `${departureDate}T00:00:00`,
-              },
-              arrival: {
-                iataCode: leg?.destination?.id || destination,
-                at: leg?.arrival || `${departureDate}T23:59:00`,
-              },
-              carrierCode: leg?.carriers?.marketing?.[0]?.alternateId || leg?.carriers?.operating?.[0]?.alternateId || 'XX',
-              number: leg?.segments?.[0]?.flightNumber || '0000',
-              duration: leg?.durationInMinutes ? `PT${Math.floor(leg.durationInMinutes / 60)}H${leg.durationInMinutes % 60}M` : 'PT0H',
-            }],
-            duration: leg?.durationInMinutes ? `PT${Math.floor(leg.durationInMinutes / 60)}H${leg.durationInMinutes % 60}M` : 'PT0H',
-          }],
-          price: {
-            grandTotal: (parseFloat(price) * 655).toString(), // Convert EUR to XOF
-            currency: 'XOF',
-          },
-          validatingAirlineCodes: [leg?.carriers?.marketing?.[0]?.alternateId || 'XX'],
-          travelerPricings: [{
-            fareDetailsBySegment: [{
-              cabin: travelClass || 'ECONOMY',
-            }],
-          }],
-          source: 'skyscanner'
-        };
-      });
-      
-      console.log(`Found ${flights.length} flights from Skyscanner`);
-      return flights;
-    }
-    
-    return [];
-  } catch (error) {
-    console.error('Skyscanner API exception:', error instanceof Error ? error.message : String(error));
-    return [];
-  }
 }
 
 // Kiwi.com API via RapidAPI
