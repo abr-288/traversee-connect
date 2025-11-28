@@ -1,0 +1,220 @@
+import { motion } from "framer-motion";
+import { Briefcase, Plus, Minus, Check, Shield, Utensils, Wifi, Car, Bed, Sparkles } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { UnifiedSubmitButton } from "@/components/forms/UnifiedSubmitButton";
+import { Price } from "@/components/ui/price";
+
+interface Option {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  included: boolean;
+  icon: React.ReactNode;
+}
+
+interface OptionsStepProps {
+  serviceType: string;
+  selectedOptions: Record<string, number>;
+  onOptionsChange: (optionId: string, quantity: number) => void;
+  guestsCount: number;
+  onNext: () => void;
+  onBack: () => void;
+}
+
+export const OptionsStep = ({
+  serviceType,
+  selectedOptions,
+  onOptionsChange,
+  guestsCount,
+  onNext,
+  onBack,
+}: OptionsStepProps) => {
+  
+  const getOptionsForService = (): { title: string; subtitle: string; options: Option[] } => {
+    switch (serviceType) {
+      case "flight":
+        return {
+          title: "Sélection des bagages",
+          subtitle: `Ajoutez des bagages pour votre voyage (${guestsCount} passager${guestsCount > 1 ? "s" : ""})`,
+          options: [
+            { id: "cabin-small", name: "Bagage cabine 7kg", description: "40x30x20cm - Inclus", price: 0, included: true, icon: <Briefcase className="h-5 w-5" /> },
+            { id: "cabin-large", name: "Bagage cabine 10kg", description: "55x40x23cm", price: 15000, included: false, icon: <Briefcase className="h-5 w-5" /> },
+            { id: "checked-20", name: "Bagage soute 20kg", description: "55x40x23cm", price: 25000, included: false, icon: <Briefcase className="h-5 w-5" /> },
+            { id: "checked-30", name: "Bagage soute 30kg", description: "75x50x30cm", price: 40000, included: false, icon: <Briefcase className="h-5 w-5" /> },
+          ],
+        };
+      case "hotel":
+      case "stay":
+        return {
+          title: "Options et services",
+          subtitle: "Personnalisez votre séjour avec nos options",
+          options: [
+            { id: "breakfast", name: "Petit-déjeuner inclus", description: "Buffet complet chaque matin", price: 8000, included: false, icon: <Utensils className="h-5 w-5" /> },
+            { id: "wifi-premium", name: "Wi-Fi Premium", description: "Connexion haut débit illimitée", price: 3000, included: false, icon: <Wifi className="h-5 w-5" /> },
+            { id: "late-checkout", name: "Départ tardif", description: "Check-out jusqu'à 16h", price: 15000, included: false, icon: <Bed className="h-5 w-5" /> },
+            { id: "room-upgrade", name: "Surclassement chambre", description: "Vue mer ou suite", price: 25000, included: false, icon: <Sparkles className="h-5 w-5" /> },
+          ],
+        };
+      case "car":
+        return {
+          title: "Assurances et extras",
+          subtitle: "Protégez votre location avec nos options",
+          options: [
+            { id: "basic-insurance", name: "Assurance de base", description: "Couverture collision - Inclus", price: 0, included: true, icon: <Shield className="h-5 w-5" /> },
+            { id: "full-insurance", name: "Assurance tous risques", description: "Couverture complète sans franchise", price: 15000, included: false, icon: <Shield className="h-5 w-5" /> },
+            { id: "gps", name: "GPS Navigation", description: "Système de navigation intégré", price: 5000, included: false, icon: <Car className="h-5 w-5" /> },
+            { id: "child-seat", name: "Siège enfant", description: "Siège auto homologué", price: 8000, included: false, icon: <Car className="h-5 w-5" /> },
+            { id: "extra-driver", name: "Conducteur additionnel", description: "Ajouter un conducteur", price: 10000, included: false, icon: <Car className="h-5 w-5" /> },
+          ],
+        };
+      case "tour":
+      case "event":
+      case "destination":
+        return {
+          title: "Options et extras",
+          subtitle: "Enrichissez votre expérience",
+          options: [
+            { id: "guide-private", name: "Guide privé", description: "Guide francophone dédié", price: 25000, included: false, icon: <Sparkles className="h-5 w-5" /> },
+            { id: "meals", name: "Repas inclus", description: "Déjeuner et dîner locaux", price: 15000, included: false, icon: <Utensils className="h-5 w-5" /> },
+            { id: "photo-pack", name: "Pack photo souvenir", description: "Photos professionnelles", price: 20000, included: false, icon: <Sparkles className="h-5 w-5" /> },
+            { id: "transport-vip", name: "Transport VIP", description: "Véhicule climatisé privé", price: 35000, included: false, icon: <Car className="h-5 w-5" /> },
+          ],
+        };
+      default:
+        return {
+          title: "Options supplémentaires",
+          subtitle: "Personnalisez votre réservation",
+          options: [
+            { id: "premium", name: "Option Premium", description: "Service prioritaire", price: 15000, included: false, icon: <Sparkles className="h-5 w-5" /> },
+            { id: "support", name: "Support dédié", description: "Assistance 24/7", price: 10000, included: false, icon: <Shield className="h-5 w-5" /> },
+          ],
+        };
+    }
+  };
+
+  const { title, subtitle, options } = getOptionsForService();
+
+  const handleQuantityChange = (optionId: string, delta: number) => {
+    const currentQuantity = selectedOptions[optionId] || 0;
+    const maxQuantity = serviceType === "flight" ? guestsCount : 1;
+    const newQuantity = Math.max(0, Math.min(maxQuantity, currentQuantity + delta));
+    onOptionsChange(optionId, newQuantity);
+  };
+
+  const getTotalOptionsPrice = () => {
+    return Object.entries(selectedOptions).reduce((total, [id, quantity]) => {
+      const option = options.find((opt) => opt.id === id);
+      return total + (option?.price || 0) * quantity;
+    }, 0);
+  };
+
+  const getNextButtonText = () => {
+    switch (serviceType) {
+      case "flight": return "Continuer vers les sièges";
+      case "hotel":
+      case "stay": return "Continuer vers les préférences";
+      case "car": return "Continuer vers les détails";
+      default: return "Continuer";
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-6"
+    >
+      <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-6 rounded-lg border border-primary/20">
+        <h2 className="text-2xl font-bold text-primary mb-2">{title}</h2>
+        <p className="text-muted-foreground">{subtitle}</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {options.map((option) => (
+          <Card
+            key={option.id}
+            className={`p-6 transition-all ${
+              option.included
+                ? "border-2 border-primary bg-primary/5"
+                : "border border-border hover:border-primary/50"
+            }`}
+          >
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  {option.icon}
+                </div>
+                <div>
+                  <h4 className="font-semibold text-lg mb-1">{option.name}</h4>
+                  <p className="text-sm text-muted-foreground">{option.description}</p>
+                </div>
+              </div>
+              {option.included && (
+                <Badge className="bg-green-500 shrink-0">
+                  <Check className="h-3 w-3 mr-1" />
+                  Inclus
+                </Badge>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between mt-4">
+              <div className="text-2xl font-bold text-primary">
+                {option.price === 0 ? "Gratuit" : <Price amount={option.price} fromCurrency="XOF" showLoader />}
+              </div>
+              {!option.included && (
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="outline"
+                    onClick={() => handleQuantityChange(option.id, -1)}
+                    disabled={(selectedOptions[option.id] || 0) === 0}
+                  >
+                    <Minus className="h-4 w-4" />
+                  </Button>
+                  <span className="w-8 text-center font-semibold">
+                    {selectedOptions[option.id] || 0}
+                  </span>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="outline"
+                    onClick={() => handleQuantityChange(option.id, 1)}
+                    disabled={(selectedOptions[option.id] || 0) >= (serviceType === "flight" ? guestsCount : 1)}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      {getTotalOptionsPrice() > 0 && (
+        <Card className="p-6 bg-gradient-to-r from-primary/5 to-transparent border-primary/20">
+          <div className="flex justify-between items-center">
+            <span className="text-lg font-semibold">Total options</span>
+            <span className="text-2xl font-bold text-primary">
+              <Price amount={getTotalOptionsPrice()} fromCurrency="XOF" showLoader />
+            </span>
+          </div>
+        </Card>
+      )}
+
+      <div className="flex gap-4">
+        <Button type="button" variant="outline" onClick={onBack} className="flex-1">
+          Retour
+        </Button>
+        <div className="flex-1">
+          <UnifiedSubmitButton variant="booking" fullWidth onClick={onNext}>
+            {getNextButtonText()}
+          </UnifiedSubmitButton>
+        </div>
+      </div>
+    </motion.div>
+  );
+};

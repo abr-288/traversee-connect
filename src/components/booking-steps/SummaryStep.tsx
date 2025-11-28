@@ -42,8 +42,8 @@ interface SummaryStepProps {
   startDate: string;
   endDate?: string;
   passengers: Passenger[];
-  selectedBaggage: Record<string, number>;
-  selectedSeats: string[];
+  selectedOptions: Record<string, number>;
+  selectedPreferences: Record<string, any>;
   adultsCount: number;
   childrenCount: number;
   onBack: () => void;
@@ -58,8 +58,8 @@ export const SummaryStep = ({
   startDate,
   endDate,
   passengers,
-  selectedBaggage,
-  selectedSeats,
+  selectedOptions,
+  selectedPreferences,
   adultsCount,
   childrenCount,
   onBack,
@@ -68,21 +68,34 @@ export const SummaryStep = ({
   const { createBooking, loading } = useCreateBooking();
   const navigate = useNavigate();
 
-  const getBaggagePrice = () => {
-    const baggageOptions = [
-      { id: "cabin-large", price: 15000 },
-      { id: "checked-20", price: 25000 },
-      { id: "checked-30", price: 40000 },
-    ];
+  const getOptionsPrice = () => {
+    const optionPrices: Record<string, number> = {
+      "cabin-large": 15000,
+      "checked-20": 25000,
+      "checked-30": 40000,
+      "breakfast": 8000,
+      "wifi-premium": 3000,
+      "late-checkout": 15000,
+      "room-upgrade": 25000,
+      "full-insurance": 15000,
+      "gps": 5000,
+      "child-seat": 8000,
+      "extra-driver": 10000,
+      "guide-private": 25000,
+      "meals": 15000,
+      "photo-pack": 20000,
+      "transport-vip": 35000,
+      "premium": 15000,
+      "support": 10000,
+    };
     
-    return Object.entries(selectedBaggage).reduce((total, [id, quantity]) => {
-      const option = baggageOptions.find((opt) => opt.id === id);
-      return total + (option?.price || 0) * quantity;
+    return Object.entries(selectedOptions).reduce((total, [id, quantity]) => {
+      return total + (optionPrices[id] || 0) * quantity;
     }, 0);
   };
 
-  const getSeatsPrice = () => {
-    // Simulation - dans une vraie app, vous récupéreriez les prix réels
+  const getPreferencesPrice = () => {
+    const selectedSeats = (selectedPreferences.seats as string[]) || [];
     return selectedSeats.length * 7500;
   };
 
@@ -92,7 +105,7 @@ export const SummaryStep = ({
   };
 
   const getTotalPrice = () => {
-    return getBasePrice() + getBaggagePrice() + getSeatsPrice();
+    return getBasePrice() + getOptionsPrice() + getPreferencesPrice();
   };
 
   const handlePayment = async () => {
@@ -120,8 +133,8 @@ export const SummaryStep = ({
         })),
         booking_details: {
           ...(flightData && { flight: flightData }),
-          baggage: selectedBaggage,
-          seats: selectedSeats,
+          options: selectedOptions,
+          preferences: selectedPreferences,
           paymentMethod,
         },
       });
@@ -250,20 +263,19 @@ export const SummaryStep = ({
             </div>
           </Card>
 
-          {/* Bagages */}
-          {Object.keys(selectedBaggage).length > 0 && (
+          {/* Options */}
+          {Object.keys(selectedOptions).some(key => selectedOptions[key] > 0) && (
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Briefcase className="h-5 w-5 text-primary" />
-                Bagages
+                Options sélectionnées
               </h3>
               <div className="space-y-2">
-                {Object.entries(selectedBaggage).map(([id, quantity]) => {
+                {Object.entries(selectedOptions).map(([id, quantity]) => {
                   if (quantity === 0) return null;
                   return (
                     <div key={id} className="flex justify-between items-center">
                       <span className="text-sm">{id} ({quantity}x)</span>
-                      <span className="font-medium">{(quantity * 15000).toLocaleString()} FCFA</span>
                     </div>
                   );
                 })}
@@ -271,15 +283,15 @@ export const SummaryStep = ({
             </Card>
           )}
 
-          {/* Sièges */}
-          {selectedSeats.length > 0 && (
+          {/* Préférences */}
+          {serviceType === "flight" && (selectedPreferences.seats as string[] || []).length > 0 && (
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Armchair className="h-5 w-5 text-primary" />
                 Sièges sélectionnés
               </h3>
               <div className="flex flex-wrap gap-2">
-                {selectedSeats.map((seat) => (
+                {((selectedPreferences.seats as string[]) || []).map((seat) => (
                   <Badge key={seat} variant="secondary" className="px-3 py-1">
                     {seat}
                   </Badge>
@@ -298,24 +310,24 @@ export const SummaryStep = ({
             </h3>
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
-                <span>Vol ({adultsCount + childrenCount} passagers)</span>
+                <span>Service ({adultsCount + childrenCount} participants)</span>
                 <span className="font-medium">
                   <Price amount={getBasePrice()} fromCurrency="XOF" />
                 </span>
               </div>
-              {getBaggagePrice() > 0 && (
+              {getOptionsPrice() > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span>Bagages</span>
+                  <span>Options</span>
                   <span className="font-medium">
-                    <Price amount={getBaggagePrice()} fromCurrency="XOF" />
+                    <Price amount={getOptionsPrice()} fromCurrency="XOF" />
                   </span>
                 </div>
               )}
-              {getSeatsPrice() > 0 && (
+              {getPreferencesPrice() > 0 && (
                 <div className="flex justify-between text-sm">
                   <span>Sièges</span>
                   <span className="font-medium">
-                    <Price amount={getSeatsPrice()} fromCurrency="XOF" />
+                    <Price amount={getPreferencesPrice()} fromCurrency="XOF" />
                   </span>
                 </div>
               )}
