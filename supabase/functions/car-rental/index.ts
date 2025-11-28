@@ -6,6 +6,270 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+interface CarResult {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  currency: string;
+  rating: number;
+  reviews: number;
+  image: string;
+  seats: number;
+  transmission: string;
+  fuel: string;
+  luggage: number;
+  airConditioning: boolean;
+  provider: string;
+  source: string;
+}
+
+// Search cars using Booking.com Car Rental API
+async function searchBookingCars(
+  pickupLocation: string,
+  pickupDate: string,
+  dropoffDate: string,
+  pickupTime: string,
+  dropoffTime: string,
+  rapidApiKey: string
+): Promise<CarResult[]> {
+  try {
+    console.log('Searching Booking.com Car Rentals...');
+    
+    // First get location coordinates
+    const locationResponse = await fetch(
+      `https://booking-com15.p.rapidapi.com/api/v1/cars/searchDestination?query=${encodeURIComponent(pickupLocation)}`,
+      {
+        headers: {
+          'X-RapidAPI-Key': rapidApiKey,
+          'X-RapidAPI-Host': 'booking-com15.p.rapidapi.com',
+        },
+      }
+    );
+
+    let coordinates = { lat: '0', lng: '0' };
+    if (locationResponse.ok) {
+      const locData = await locationResponse.json();
+      if (locData.data && locData.data[0]) {
+        coordinates.lat = locData.data[0].latitude || '0';
+        coordinates.lng = locData.data[0].longitude || '0';
+        console.log('Found coordinates:', coordinates);
+      }
+    }
+
+    const bookingParams = new URLSearchParams({
+      pick_up_latitude: coordinates.lat,
+      pick_up_longitude: coordinates.lng,
+      drop_off_latitude: coordinates.lat,
+      drop_off_longitude: coordinates.lng,
+      pick_up_date: pickupDate,
+      drop_off_date: dropoffDate,
+      pick_up_time: pickupTime,
+      drop_off_time: dropoffTime,
+      driver_age: '30',
+      currency_code: 'EUR',
+    });
+
+    const response = await fetch(
+      `https://booking-com15.p.rapidapi.com/api/v1/cars/searchCarRentals?${bookingParams}`,
+      {
+        headers: {
+          'X-RapidAPI-Key': rapidApiKey,
+          'X-RapidAPI-Host': 'booking-com15.p.rapidapi.com',
+        },
+      }
+    );
+
+    if (!response.ok) {
+      console.error('Booking.com Cars API error:', response.status);
+      return [];
+    }
+
+    const data = await response.json();
+    console.log('Booking.com Cars response:', JSON.stringify(data).substring(0, 300));
+
+    if (data.data?.vehicles && Array.isArray(data.data.vehicles)) {
+      return data.data.vehicles.slice(0, 10).map((vehicle: any, index: number) => ({
+        id: `booking-${vehicle.id || index}`,
+        name: vehicle.name || vehicle.vehicle_info?.v_name || 'Véhicule',
+        category: vehicle.category || vehicle.vehicle_info?.category || 'Standard',
+        price: Math.round((parseFloat(vehicle.price?.total_price || vehicle.pricing?.total || 50)) * 655.957),
+        currency: 'XOF',
+        rating: vehicle.supplier_info?.rating || 4.5,
+        reviews: vehicle.supplier_info?.reviews_count || 0,
+        image: vehicle.image_url || vehicle.vehicle_info?.image || 'https://images.unsplash.com/photo-1494905998402-395d579af36f',
+        seats: vehicle.passengers || vehicle.vehicle_info?.passengers || 5,
+        transmission: vehicle.transmission?.toLowerCase().includes('auto') ? 'Automatique' : 'Manuelle',
+        fuel: vehicle.fuel_type || 'Essence',
+        luggage: vehicle.bags_fit || vehicle.vehicle_info?.bags || 3,
+        airConditioning: vehicle.has_ac !== false,
+        provider: vehicle.supplier_name || 'Booking.com',
+        source: 'booking',
+      }));
+    }
+
+    return [];
+  } catch (error) {
+    console.error('Booking.com Cars exception:', error);
+    return [];
+  }
+}
+
+// Search cars using Priceline API
+async function searchPricelineCars(
+  pickupLocation: string,
+  pickupDate: string,
+  dropoffDate: string,
+  pickupTime: string,
+  dropoffTime: string,
+  rapidApiKey: string
+): Promise<CarResult[]> {
+  try {
+    console.log('Searching Priceline Car Rentals...');
+    
+    const pricelineParams = new URLSearchParams({
+      location: pickupLocation,
+      pick_up_date: pickupDate,
+      drop_off_date: dropoffDate,
+      pick_up_time: pickupTime,
+      drop_off_time: dropoffTime,
+    });
+
+    const response = await fetch(
+      `https://priceline-com-provider.p.rapidapi.com/v2/cars/search?${pricelineParams}`,
+      {
+        headers: {
+          'X-RapidAPI-Key': rapidApiKey,
+          'X-RapidAPI-Host': 'priceline-com-provider.p.rapidapi.com',
+        },
+      }
+    );
+
+    if (!response.ok) {
+      console.error('Priceline Cars API error:', response.status);
+      return [];
+    }
+
+    const data = await response.json();
+    console.log('Priceline Cars response:', JSON.stringify(data).substring(0, 300));
+
+    if (data.cars && Array.isArray(data.cars)) {
+      return data.cars.slice(0, 10).map((car: any, index: number) => ({
+        id: `priceline-${index}`,
+        name: car.name || car.vehicle_name || 'Véhicule',
+        category: car.category || car.class || 'Standard',
+        price: Math.round((car.price || car.total_price || 45) * 655.957),
+        currency: 'XOF',
+        rating: car.rating || 4.3,
+        reviews: car.reviews_count || 0,
+        image: car.image || 'https://images.unsplash.com/photo-1494905998402-395d579af36f',
+        seats: car.passengers || 5,
+        transmission: car.transmission || 'Automatique',
+        fuel: car.fuel || 'Essence',
+        luggage: car.baggage || 3,
+        airConditioning: true,
+        provider: car.provider || 'Priceline',
+        source: 'priceline',
+      }));
+    }
+
+    return [];
+  } catch (error) {
+    console.error('Priceline Cars exception:', error);
+    return [];
+  }
+}
+
+// Search cars using Kayak API
+async function searchKayakCars(
+  pickupLocation: string,
+  pickupDate: string,
+  dropoffDate: string,
+  rapidApiKey: string
+): Promise<CarResult[]> {
+  try {
+    console.log('Searching Kayak Car Rentals...');
+    
+    const response = await fetch(
+      `https://kayak-car-rental.p.rapidapi.com/search?` +
+      new URLSearchParams({
+        pickup_location: pickupLocation,
+        pickup_date: pickupDate,
+        dropoff_date: dropoffDate,
+        currency: 'EUR',
+      }),
+      {
+        headers: {
+          'X-RapidAPI-Key': rapidApiKey,
+          'X-RapidAPI-Host': 'kayak-car-rental.p.rapidapi.com',
+        },
+      }
+    );
+
+    if (!response.ok) {
+      console.error('Kayak Cars API error:', response.status);
+      return [];
+    }
+
+    const data = await response.json();
+    console.log('Kayak Cars response:', JSON.stringify(data).substring(0, 300));
+
+    if (data.results && Array.isArray(data.results)) {
+      return data.results.slice(0, 10).map((car: any, index: number) => ({
+        id: `kayak-${index}`,
+        name: car.name || car.model || 'Véhicule',
+        category: car.category || car.type || 'Standard',
+        price: Math.round((car.price || car.total || 55) * 655.957),
+        currency: 'XOF',
+        rating: car.rating || 4.4,
+        reviews: car.reviews || 0,
+        image: car.image_url || 'https://images.unsplash.com/photo-1494905998402-395d579af36f',
+        seats: car.seats || 5,
+        transmission: car.transmission || 'Automatique',
+        fuel: car.fuel_type || 'Essence',
+        luggage: car.bags || 3,
+        airConditioning: true,
+        provider: car.provider || 'Kayak',
+        source: 'kayak',
+      }));
+    }
+
+    return [];
+  } catch (error) {
+    console.error('Kayak Cars exception:', error);
+    return [];
+  }
+}
+
+function getMockCarRentals(pickupLocation: string): CarResult[] {
+  const cars = [
+    { name: 'Toyota Corolla', category: 'Économique', price: 25000, seats: 5, transmission: 'Automatique' },
+    { name: 'Renault Clio', category: 'Compacte', price: 22000, seats: 5, transmission: 'Manuelle' },
+    { name: 'Peugeot 308', category: 'Berline', price: 35000, seats: 5, transmission: 'Automatique' },
+    { name: 'Mercedes Classe E', category: 'Luxe', price: 55000, seats: 5, transmission: 'Automatique' },
+    { name: 'Toyota Land Cruiser', category: 'SUV', price: 65000, seats: 7, transmission: 'Automatique' },
+    { name: 'Volkswagen Polo', category: 'Économique', price: 20000, seats: 5, transmission: 'Manuelle' },
+  ];
+
+  return cars.map((car, index) => ({
+    id: `mock-${index}`,
+    name: car.name,
+    category: car.category,
+    price: car.price,
+    currency: 'XOF',
+    rating: 4.5 - (index * 0.1),
+    reviews: 120 - (index * 15),
+    image: 'https://images.unsplash.com/photo-1494905998402-395d579af36f',
+    seats: car.seats,
+    transmission: car.transmission,
+    fuel: 'Essence',
+    luggage: 3,
+    airConditioning: true,
+    provider: 'Location Auto',
+    source: 'mock',
+  }));
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -21,123 +285,44 @@ serve(async (req) => {
       return createValidationErrorResponse(validation.errors!, corsHeaders);
     }
 
-    const { pickupLocation, dropoffLocation, pickupDate, dropoffDate, pickupTime, dropoffTime } = validation.data!;
-    
-    // pickupTime and dropoffTime have defaults from schema, but TypeScript needs explicit values
-    const finalPickupTime = pickupTime || '10:00';
-    const finalDropoffTime = dropoffTime || '10:00';
+    const { pickupLocation, dropoffLocation, pickupDate, dropoffDate, pickupTime = '10:00', dropoffTime = '10:00' } = validation.data!;
     
     console.log('Searching car rentals:', { pickupLocation, dropoffLocation, pickupDate, dropoffDate });
 
     const rapidApiKey = Deno.env.get('RAPIDAPI_KEY');
     if (!rapidApiKey) {
       console.log('RapidAPI key not configured, returning mock data');
-      return getMockCarRentals(pickupLocation, pickupDate, dropoffDate);
-    }
-
-    const results = [];
-
-    // Try Booking.com Car Rental API
-    try {
-      const bookingParams = new URLSearchParams({
-        pick_up_latitude: '0',
-        pick_up_longitude: '0',
-        drop_off_latitude: '0',
-        drop_off_longitude: '0',
-        pick_up_time: finalPickupTime.replace(':', '%3A'),
-        drop_off_time: finalDropoffTime.replace(':', '%3A'),
-        driver_age: '30',
-        currency_code: 'XOF',
-        location: pickupLocation,
-      });
-
-      const bookingResponse = await fetch(
-        `https://booking-com15.p.rapidapi.com/api/v1/cars/searchCarRentals?${bookingParams}`,
-        {
-          headers: {
-            'X-RapidAPI-Key': rapidApiKey,
-            'X-RapidAPI-Host': 'booking-com15.p.rapidapi.com',
-          },
-        }
+      return new Response(
+        JSON.stringify({ success: true, data: getMockCarRentals(pickupLocation) }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
-
-      if (bookingResponse.ok) {
-        const data = await bookingResponse.json();
-        if (data.data?.vehicles && Array.isArray(data.data.vehicles)) {
-          const transformed = data.data.vehicles.slice(0, 10).map((vehicle: any, index: number) => ({
-            id: vehicle.id || `car-${index}`,
-            name: vehicle.name || vehicle.vehicle_info?.v_name || 'Véhicule',
-            category: vehicle.category || vehicle.vehicle_info?.category || 'Standard',
-            price: parseFloat(vehicle.price?.total_price || vehicle.pricing?.total || 25000),
-            currency: 'XOF',
-            rating: vehicle.supplier_info?.rating || 4.5,
-            reviews: vehicle.supplier_info?.reviews_count || 0,
-            image: vehicle.image_url || vehicle.vehicle_info?.image || 'https://images.unsplash.com/photo-1494905998402-395d579af36f',
-            seats: vehicle.passengers || vehicle.vehicle_info?.passengers || 5,
-            transmission: vehicle.transmission?.toLowerCase().includes('auto') ? 'Automatique' : 'Manuelle',
-            fuel: vehicle.fuel_type || 'Essence',
-            luggage: vehicle.bags_fit || vehicle.vehicle_info?.bags || 3,
-            airConditioning: vehicle.has_ac || true,
-            provider: vehicle.supplier_name || 'Location de voiture'
-          }));
-          results.push(...transformed);
-          console.log(`Found ${transformed.length} cars from Booking.com`);
-        }
-      }
-    } catch (error) {
-      console.error('Booking.com car rental API error:', error);
     }
 
-    // Try Car Data API for additional car information
-    try {
-      const carDataResponse = await fetch(
-        'https://car-data.p.rapidapi.com/cars?limit=5&page=0',
-        {
-          headers: {
-            'X-RapidAPI-Key': rapidApiKey,
-            'X-RapidAPI-Host': 'car-data.p.rapidapi.com',
-          },
-        }
-      );
+    // Search all car rental APIs in parallel
+    const [bookingResults, pricelineResults, kayakResults] = await Promise.all([
+      searchBookingCars(pickupLocation, pickupDate, dropoffDate, pickupTime, dropoffTime, rapidApiKey),
+      searchPricelineCars(pickupLocation, pickupDate, dropoffDate, pickupTime, dropoffTime, rapidApiKey),
+      searchKayakCars(pickupLocation, pickupDate, dropoffDate, rapidApiKey),
+    ]);
 
-      if (carDataResponse.ok) {
-        const data = await carDataResponse.json();
-        if (Array.isArray(data)) {
-          const transformed = data.slice(0, 5).map((car: any, index: number) => ({
-            id: `cardata-${index}`,
-            name: `${car.make} ${car.model}` || 'Véhicule',
-            category: car.type || 'Standard',
-            price: Math.floor(Math.random() * 30000) + 15000,
-            currency: 'XOF',
-            rating: 4.5,
-            reviews: Math.floor(Math.random() * 100) + 20,
-            image: 'https://images.unsplash.com/photo-1494905998402-395d579af36f',
-            seats: 5,
-            transmission: car.transmission || 'Automatique',
-            fuel: car.fuel_type || 'Essence',
-            luggage: 3,
-            airConditioning: true,
-            provider: 'Location premium'
-          }));
-          results.push(...transformed);
-          console.log(`Found ${transformed.length} cars from Car Data API`);
-        }
-      }
-    } catch (error) {
-      console.error('Car Data API error:', error);
-    }
+    const allCars = [...bookingResults, ...pricelineResults, ...kayakResults];
+    
+    console.log(`Total cars found: ${allCars.length} (Booking: ${bookingResults.length}, Priceline: ${pricelineResults.length}, Kayak: ${kayakResults.length})`);
 
-    // If no results, return mock data
-    if (results.length === 0) {
+    // If no API results, return mock data
+    if (allCars.length === 0) {
       console.log('No car rental results from APIs, returning mock data');
-      return getMockCarRentals(pickupLocation, pickupDate, dropoffDate);
+      return new Response(
+        JSON.stringify({ success: true, data: getMockCarRentals(pickupLocation) }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
+
+    // Sort by price
+    allCars.sort((a, b) => a.price - b.price);
 
     return new Response(
-      JSON.stringify({
-        success: true,
-        data: results,
-      }),
+      JSON.stringify({ success: true, data: allCars }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
@@ -148,69 +333,7 @@ serve(async (req) => {
         error: error instanceof Error ? error.message : 'Unknown error',
         data: [],
       }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });
-
-function getMockCarRentals(pickupLocation: string, pickupDate: string, dropoffDate: string) {
-  return new Response(
-    JSON.stringify({
-      success: true,
-      data: [
-        {
-          id: '1',
-          name: 'Toyota Corolla',
-          category: 'Économique',
-          price: 25000,
-          currency: 'XOF',
-          rating: 4.5,
-          reviews: 120,
-          image: 'https://images.unsplash.com/photo-1494905998402-395d579af36f',
-          seats: 5,
-          transmission: 'Automatique',
-          fuel: 'Essence',
-          luggage: 3,
-          airConditioning: true,
-          provider: 'Location Auto'
-        },
-        {
-          id: '2',
-          name: 'Renault Clio',
-          category: 'Compacte',
-          price: 22000,
-          currency: 'XOF',
-          rating: 4.3,
-          reviews: 85,
-          image: 'https://images.unsplash.com/photo-1494905998402-395d579af36f',
-          seats: 5,
-          transmission: 'Manuelle',
-          fuel: 'Diesel',
-          luggage: 2,
-          airConditioning: true,
-          provider: 'Location Auto'
-        },
-        {
-          id: '3',
-          name: 'Mercedes Classe E',
-          category: 'Luxe',
-          price: 55000,
-          currency: 'XOF',
-          rating: 4.8,
-          reviews: 95,
-          image: 'https://images.unsplash.com/photo-1494905998402-395d579af36f',
-          seats: 5,
-          transmission: 'Automatique',
-          fuel: 'Essence',
-          luggage: 4,
-          airConditioning: true,
-          provider: 'Location Premium'
-        },
-      ],
-    }),
-    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-  );
-}
