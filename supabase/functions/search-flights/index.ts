@@ -633,12 +633,12 @@ async function searchSkyScrapper(
     
     // Step 1: Search for origin airport to get skyId and entityId
     const originSearchResponse = await fetch(
-      `https://flights-sky.p.rapidapi.com/api/v1/flights/searchAirport?query=${origin}`,
+      `https://sky-scrapper.p.rapidapi.com/api/v1/flights/searchAirport?query=${origin}`,
       {
         method: 'GET',
         headers: {
           'X-RapidAPI-Key': rapidApiKey,
-          'X-RapidAPI-Host': 'flights-sky.p.rapidapi.com'
+          'X-RapidAPI-Host': 'sky-scrapper.p.rapidapi.com'
         }
       }
     );
@@ -662,12 +662,12 @@ async function searchSkyScrapper(
     
     // Step 2: Search for destination airport
     const destSearchResponse = await fetch(
-      `https://flights-sky.p.rapidapi.com/api/v1/flights/searchAirport?query=${destination}`,
+      `https://sky-scrapper.p.rapidapi.com/api/v1/flights/searchAirport?query=${destination}`,
       {
         method: 'GET',
         headers: {
           'X-RapidAPI-Key': rapidApiKey,
-          'X-RapidAPI-Host': 'flights-sky.p.rapidapi.com'
+          'X-RapidAPI-Host': 'sky-scrapper.p.rapidapi.com'
         }
       }
     );
@@ -709,12 +709,12 @@ async function searchSkyScrapper(
     }
     
     const flightResponse = await fetch(
-      `https://flights-sky.p.rapidapi.com/api/v1/flights/searchFlights?${flightParams}`,
+      `https://sky-scrapper.p.rapidapi.com/api/v1/flights/searchFlights?${flightParams}`,
       {
         method: 'GET',
         headers: {
           'X-RapidAPI-Key': rapidApiKey,
-          'X-RapidAPI-Host': 'flights-sky.p.rapidapi.com'
+          'X-RapidAPI-Host': 'sky-scrapper.p.rapidapi.com'
         }
       }
     );
