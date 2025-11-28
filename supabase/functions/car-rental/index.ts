@@ -180,66 +180,7 @@ async function searchPricelineCars(
   }
 }
 
-// Search cars using Kayak API
-async function searchKayakCars(
-  pickupLocation: string,
-  pickupDate: string,
-  dropoffDate: string,
-  rapidApiKey: string
-): Promise<CarResult[]> {
-  try {
-    console.log('Searching Kayak Car Rentals...');
-    
-    const response = await fetch(
-      `https://kayak-car-rental.p.rapidapi.com/search?` +
-      new URLSearchParams({
-        pickup_location: pickupLocation,
-        pickup_date: pickupDate,
-        dropoff_date: dropoffDate,
-        currency: 'EUR',
-      }),
-      {
-        headers: {
-          'X-RapidAPI-Key': rapidApiKey,
-          'X-RapidAPI-Host': 'kayak-car-rental.p.rapidapi.com',
-        },
-      }
-    );
-
-    if (!response.ok) {
-      console.error('Kayak Cars API error:', response.status);
-      return [];
-    }
-
-    const data = await response.json();
-    console.log('Kayak Cars response:', JSON.stringify(data).substring(0, 300));
-
-    if (data.results && Array.isArray(data.results)) {
-      return data.results.slice(0, 10).map((car: any, index: number) => ({
-        id: `kayak-${index}`,
-        name: car.name || car.model || 'Véhicule',
-        category: car.category || car.type || 'Standard',
-        price: Math.round((car.price || car.total || 55) * 655.957),
-        currency: 'XOF',
-        rating: car.rating || 4.4,
-        reviews: car.reviews || 0,
-        image: car.image_url || 'https://images.unsplash.com/photo-1494905998402-395d579af36f',
-        seats: car.seats || 5,
-        transmission: car.transmission || 'Automatique',
-        fuel: car.fuel_type || 'Essence',
-        luggage: car.bags || 3,
-        airConditioning: true,
-        provider: car.provider || 'Kayak',
-        source: 'kayak',
-      }));
-    }
-
-    return [];
-  } catch (error) {
-    console.error('Kayak Cars exception:', error);
-    return [];
-  }
-}
+// Note: Kayak Car Rental API n'existe pas sur RapidAPI - supprimé
 
 function getMockCarRentals(pickupLocation: string): CarResult[] {
   const cars = [
@@ -298,16 +239,15 @@ serve(async (req) => {
       );
     }
 
-    // Search all car rental APIs in parallel
-    const [bookingResults, pricelineResults, kayakResults] = await Promise.all([
+    // Search available car rental APIs in parallel (Booking.com + Priceline)
+    const [bookingResults, pricelineResults] = await Promise.all([
       searchBookingCars(pickupLocation, pickupDate, dropoffDate, pickupTime, dropoffTime, rapidApiKey),
       searchPricelineCars(pickupLocation, pickupDate, dropoffDate, pickupTime, dropoffTime, rapidApiKey),
-      searchKayakCars(pickupLocation, pickupDate, dropoffDate, rapidApiKey),
     ]);
 
-    const allCars = [...bookingResults, ...pricelineResults, ...kayakResults];
+    const allCars = [...bookingResults, ...pricelineResults];
     
-    console.log(`Total cars found: ${allCars.length} (Booking: ${bookingResults.length}, Priceline: ${pricelineResults.length}, Kayak: ${kayakResults.length})`);
+    console.log(`Total cars found: ${allCars.length} (Booking: ${bookingResults.length}, Priceline: ${pricelineResults.length})`);
 
     // If no API results, return mock data
     if (allCars.length === 0) {
