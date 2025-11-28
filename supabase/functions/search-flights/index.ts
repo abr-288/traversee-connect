@@ -74,9 +74,9 @@ serve(async (req) => {
       apiPromises.push(searchKiwi(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, rapidApiKey));
     }
 
-    // Note: Travelpayouts API disabled - endpoint not working on RapidAPI
+    // Note: Flight Fare Search API disabled - endpoints not working on RapidAPI
     // if (rapidApiKey) {
-    //   apiPromises.push(searchTravelpayouts(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, rapidApiKey));
+    //   apiPromises.push(searchFlightFare(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, rapidApiKey));
     // }
 
     if (apiPromises.length === 0) {
@@ -280,8 +280,8 @@ async function searchAmadeus(
   return [];
 }
 
-// Travelpayouts API via RapidAPI search function (replacing Sabre)
-async function searchTravelpayouts(
+// Flight Fare Search API via RapidAPI
+async function searchFlightFare(
   origin: string,
   destination: string,
   departureDate: string,
@@ -292,101 +292,138 @@ async function searchTravelpayouts(
   rapidApiKey: string
 ): Promise<any[]> {
   try {
-    console.log('Searching flights with Travelpayouts API via RapidAPI...');
+    console.log('Searching flights with Flight Fare Search API via RapidAPI...');
     
-    // Format departure date for Travelpayouts (YYYY-MM)
-    const departureMonth = departureDate.substring(0, 7);
+    // Total travellers
+    const totalTravellers = adults + children;
     
-    // Build search parameters
+    // Build search parameters - API uses city names, not IATA codes
+    // But we'll try with IATA codes first as that's what we have
     const searchParams = new URLSearchParams({
-      origin: origin,
-      destination: destination,
-      depart_date: departureMonth,
-      currency: 'EUR',
-      page: '1'
+      departureCity: origin,
+      destinationCity: destination,
+      departureDate: departureDate,
+      travellers: totalTravellers.toString()
     });
     
     if (returnDate) {
-      searchParams.append('return_date', returnDate.substring(0, 7));
+      searchParams.append('returnDate', returnDate);
     }
     
+    // Try with the documented host from publicapi.dev
     const searchResponse = await fetch(
-      `https://travelpayouts-travelpayouts-flight-data-v1.p.rapidapi.com/v1/prices/cheap?${searchParams}`,
+      `https://farish-flight-fare-search.p.rapidapi.com/searchFlights?${searchParams}`,
       {
         method: 'GET',
         headers: {
           'X-RapidAPI-Key': rapidApiKey,
-          'X-RapidAPI-Host': 'travelpayouts-travelpayouts-flight-data-v1.p.rapidapi.com'
+          'X-RapidAPI-Host': 'farish-flight-fare-search.p.rapidapi.com'
         }
       }
     );
 
     if (!searchResponse.ok) {
       const errorText = await searchResponse.text();
-      console.error('Travelpayouts API error:', searchResponse.status, errorText.substring(0, 300));
+      console.error('Flight Fare Search API error:', searchResponse.status, errorText.substring(0, 300));
       return [];
     }
 
     const searchData = await searchResponse.json();
-    console.log('Travelpayouts API response received');
+    console.log('Flight Fare Search API response received, keys:', Object.keys(searchData));
     
-    // Travelpayouts returns data in format: { success: true, data: { "DSS": { "CDG": { "0": {...}, "1": {...} } } } }
-    const destData = searchData.data?.[origin]?.[destination] || {};
-    const flightsArray = Object.values(destData);
+    // Handle response - try different possible structures
+    const flightsArray = searchData.data || searchData.flights || searchData.results || searchData.offers || [];
     
     if (Array.isArray(flightsArray) && flightsArray.length > 0) {
+      console.log('Flight Fare Search first item:', JSON.stringify(flightsArray[0])?.substring(0, 500));
+      
       const flights = flightsArray.slice(0, 15).map((flight: any, index: number) => {
-        const price = flight.price || 0;
-        const airline = flight.airline || 'XX';
-        const flightNumber = flight.flight_number?.toString() || '0000';
-        const departureAt = flight.departure_at || `${departureDate}T00:00:00`;
-        const returnAt = flight.return_at;
-        const expiresAt = flight.expires_at;
+        // Try to extract data from various possible structures
+        const price = flight.price?.amount || flight.fare?.total || flight.totalPrice || flight.price || 0;
+        const currency = flight.price?.currency || flight.fare?.currency || 'EUR';
+        
+        // Get itinerary/segment info
+        const segments = flight.itineraries?.[0]?.segments || 
+                        flight.segments || 
+                        flight.legs || 
+                        [flight];
+        const firstSegment = segments[0] || {};
+        const lastSegment = segments[segments.length - 1] || firstSegment;
+        
+        const departureCode = firstSegment.departure?.iataCode || 
+                             firstSegment.origin?.code || 
+                             firstSegment.from || 
+                             origin;
+        const arrivalCode = lastSegment.arrival?.iataCode || 
+                           lastSegment.destination?.code || 
+                           lastSegment.to || 
+                           destination;
+        
+        const departureTime = firstSegment.departure?.at || 
+                             firstSegment.departureTime || 
+                             `${departureDate}T00:00:00`;
+        const arrivalTime = lastSegment.arrival?.at || 
+                           lastSegment.arrivalTime || 
+                           `${departureDate}T23:59:00`;
+        
+        const carrierCode = firstSegment.carrierCode || 
+                           firstSegment.airline?.code || 
+                           firstSegment.airline || 
+                           flight.validatingAirlineCodes?.[0] ||
+                           'XX';
+        const flightNumber = firstSegment.number || 
+                            firstSegment.flightNumber || 
+                            '0000';
+        
+        // Calculate duration
+        const duration = firstSegment.duration || flight.duration || 'PT0H';
+        
+        // Convert price to XOF if in EUR
+        const priceValue = parseFloat(price.toString()) || 0;
+        const priceXOF = currency === 'EUR' ? Math.round(priceValue * 655) : priceValue;
         
         return {
-          id: `TP-${origin}-${destination}-${index}`,
+          id: `FFS-${origin}-${destination}-${index}`,
           itineraries: [{
             segments: [{
               departure: {
-                iataCode: origin,
-                at: departureAt,
+                iataCode: departureCode,
+                at: departureTime,
               },
               arrival: {
-                iataCode: destination,
-                at: departureAt, // Travelpayouts doesn't provide arrival time
+                iataCode: arrivalCode,
+                at: arrivalTime,
               },
-              carrierCode: airline,
-              number: flightNumber,
-              duration: 'PT0H', // Duration not provided
+              carrierCode: carrierCode,
+              number: flightNumber.toString(),
+              duration: duration,
             }],
-            duration: 'PT0H',
+            duration: duration,
           }],
           price: {
-            grandTotal: Math.round(parseFloat(price.toString()) * 655).toString(), // Convert EUR to XOF
+            grandTotal: priceXOF.toString(),
             currency: 'XOF',
           },
-          validatingAirlineCodes: [airline],
+          validatingAirlineCodes: [carrierCode],
           travelerPricings: [{
             fareDetailsBySegment: [{
               cabin: travelClass || 'ECONOMY',
             }],
           }],
-          source: 'travelpayouts',
-          expiresAt: expiresAt
+          source: 'flightfare'
         };
       });
       
-      console.log(`Found ${flights.length} flights from Travelpayouts`);
+      console.log(`Found ${flights.length} flights from Flight Fare Search`);
       return flights;
     }
     
-    console.log('No flights found in Travelpayouts response');
+    console.log('No flights found in Flight Fare Search response');
     return [];
   } catch (error) {
-    console.error('Travelpayouts API exception:', error instanceof Error ? error.message : String(error));
+    console.error('Flight Fare Search API exception:', error instanceof Error ? error.message : String(error));
+    return [];
   }
-  
-  return [];
 }
 
 // Kiwi.com API via RapidAPI
