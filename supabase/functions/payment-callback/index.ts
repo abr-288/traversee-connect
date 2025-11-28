@@ -169,6 +169,25 @@ serve(async (req) => {
         console.error('⚠️ Invoice generation error occurred');
         // Security: Do not log the full error
       }
+
+      // Send confirmation email
+      try {
+        console.log('Sending confirmation email...');
+        fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-booking-confirmation`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+          },
+          body: JSON.stringify({ bookingId }),
+        }).then(() => {
+          console.log('✅ Confirmation email triggered');
+        }).catch(err => {
+          console.error('⚠️ Confirmation email trigger failed');
+        });
+      } catch (emailErr) {
+        console.error('⚠️ Confirmation email error occurred');
+      }
     }
     
     // Trigger PNR creation job asynchronously
