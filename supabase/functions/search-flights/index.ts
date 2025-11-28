@@ -442,44 +442,50 @@ async function searchKiwi(
   try {
     console.log('Searching flights with Kiwi.com API via RapidAPI...');
     
-    // Format date for Kiwi API (DD/MM/YYYY)
-    const formatDateForKiwi = (dateStr: string) => {
-      const [year, month, day] = dateStr.split('-');
-      return `${day}/${month}/${year}`;
-    };
-    
-    const kiwiDepartureDate = formatDateForKiwi(departureDate);
-    const kiwiReturnDate = returnDate ? formatDateForKiwi(returnDate) : undefined;
-    
     // Map travel class to Kiwi format
     const cabinMap: Record<string, string> = {
-      'ECONOMY': 'M',
-      'PREMIUM_ECONOMY': 'W',
-      'BUSINESS': 'C',
-      'FIRST': 'F'
+      'ECONOMY': 'ECONOMY',
+      'PREMIUM_ECONOMY': 'PREMIUM_ECONOMY',
+      'BUSINESS': 'BUSINESS',
+      'FIRST': 'FIRST'
     };
-    const selectedCabin = cabinMap[travelClass] || 'M';
+    const selectedCabin = cabinMap[travelClass] || 'ECONOMY';
     
+    // Determine if one-way or round-trip
+    const endpoint = returnDate ? 'round-trip' : 'one-way';
+    
+    // Build URL with required parameters
     const params = new URLSearchParams({
-      fly_from: origin,
-      fly_to: destination,
-      date_from: kiwiDepartureDate,
-      date_to: kiwiDepartureDate,
+      source: `Airport:${origin}`,
+      destination: `Airport:${destination}`,
+      currency: 'eur',
+      locale: 'en',
       adults: adults.toString(),
       children: children.toString(),
-      selected_cabins: selectedCabin,
-      curr: 'EUR',
-      limit: '15',
-      sort: 'price'
+      infants: '0',
+      handbags: '1',
+      holdbags: '0',
+      cabinClass: selectedCabin,
+      sortBy: 'PRICE',
+      sortOrder: 'ASCENDING',
+      limit: '15'
     });
     
-    if (kiwiReturnDate) {
-      params.append('return_from', kiwiReturnDate);
-      params.append('return_to', kiwiReturnDate);
+    // Add date parameters based on endpoint type
+    if (returnDate) {
+      // Round trip: outboundDepartureMinDate, outboundDepartureMaxDate, inboundDepartureMinDate, inboundDepartureMaxDate
+      params.append('outboundDepartureMinDate', departureDate);
+      params.append('outboundDepartureMaxDate', departureDate);
+      params.append('inboundDepartureMinDate', returnDate);
+      params.append('inboundDepartureMaxDate', returnDate);
+    } else {
+      // One-way: departureMinDate, departureMaxDate
+      params.append('departureMinDate', departureDate);
+      params.append('departureMaxDate', departureDate);
     }
     
     const searchResponse = await fetch(
-      `https://kiwi-com-cheap-flights.p.rapidapi.com/v2/search?${params}`,
+      `https://kiwi-com-cheap-flights.p.rapidapi.com/${endpoint}?${params}`,
       {
         method: 'GET',
         headers: {
@@ -496,45 +502,99 @@ async function searchKiwi(
     }
 
     const searchData = await searchResponse.json();
-    console.log('Kiwi.com API response received');
-
-    if (searchData.data && Array.isArray(searchData.data)) {
-      const flights = searchData.data.slice(0, 15).map((flight: any, index: number) => {
-        const firstRoute = flight.route?.[0];
-        const lastRoute = flight.route?.[flight.route?.length - 1];
-        const price = flight.price || 0;
-        const durationMinutes = flight.duration?.departure ? Math.floor(flight.duration.departure / 60) : 0;
+    console.log('Kiwi.com API response received, keys:', Object.keys(searchData));
+    
+    // Handle different response structures from Kiwi API
+    const flightsArray = searchData.itineraries || searchData.data || [];
+    
+    if (Array.isArray(flightsArray) && flightsArray.length > 0) {
+      // Log first item structure for debugging
+      const firstItem = flightsArray[0];
+      console.log('Kiwi first item keys:', Object.keys(firstItem));
+      if (firstItem.legs) {
+        console.log('Kiwi first leg:', JSON.stringify(firstItem.legs[0])?.substring(0, 800));
+      }
+      if (firstItem.sector) {
+        console.log('Kiwi sector:', JSON.stringify(firstItem.sector)?.substring(0, 800));
+      }
+      if (firstItem.priceEur) {
+        console.log('Kiwi priceEur:', firstItem.priceEur);
+      }
+      
+      const flights = flightsArray.slice(0, 15).map((flight: any, index: number) => {
+        // Handle Kiwi RapidAPI structure (sector contains segments)
+        const sector = flight.sector || {};
+        const segments = sector.sectorSegments || flight.legs || flight.route || [];
+        const firstSegment = segments[0]?.segment || segments[0] || {};
+        const lastSegment = segments[segments.length - 1]?.segment || segments[segments.length - 1] || {};
+        
+        // Get price - priceEur.amount is the main price in this API
+        const priceEur = flight.priceEur?.amount || flight.price?.amount || flight.price || 0;
+        
+        // Get duration from sector
+        const durationSeconds = sector.duration || flight.duration?.total || 0;
+        const durationMinutes = Math.floor(durationSeconds / 60);
+        
+        // Get departure info from first segment
+        const departureCode = firstSegment.source?.station?.code || 
+          firstSegment.origin?.id || 
+          firstSegment.flyFrom || 
+          origin;
+        const arrivalCode = lastSegment.destination?.station?.code || 
+          lastSegment.destination?.id || 
+          lastSegment.flyTo || 
+          destination;
+        
+        // Get times
+        const departureTime = firstSegment.source?.localTime || 
+          firstSegment.departure || 
+          firstSegment.local_departure || 
+          `${departureDate}T00:00:00`;
+        const arrivalTime = lastSegment.destination?.localTime || 
+          lastSegment.arrival || 
+          lastSegment.local_arrival || 
+          `${departureDate}T23:59:00`;
+        
+        // Get carrier info
+        const carrierCode = firstSegment.carrier?.code || 
+          firstSegment.airline || 
+          flight.carriers?.[0]?.code ||
+          'XX';
+        const carrierName = firstSegment.carrier?.name || flight.carriers?.[0]?.name || '';
+        const flightNumber = firstSegment.flightNumber?.toString() || 
+          firstSegment.flight_no?.toString() || 
+          '0000';
         
         return {
           id: `KIWI-${origin}-${destination}-${index}`,
           itineraries: [{
             segments: [{
               departure: {
-                iataCode: firstRoute?.flyFrom || origin,
-                at: firstRoute?.local_departure || `${departureDate}T00:00:00`,
+                iataCode: departureCode,
+                at: departureTime,
               },
               arrival: {
-                iataCode: lastRoute?.flyTo || destination,
-                at: lastRoute?.local_arrival || `${departureDate}T23:59:00`,
+                iataCode: arrivalCode,
+                at: arrivalTime,
               },
-              carrierCode: firstRoute?.airline || flight.airlines?.[0] || 'XX',
-              number: firstRoute?.flight_no?.toString() || '0000',
+              carrierCode: carrierCode,
+              number: flightNumber,
               duration: `PT${Math.floor(durationMinutes / 60)}H${durationMinutes % 60}M`,
             }],
             duration: `PT${Math.floor(durationMinutes / 60)}H${durationMinutes % 60}M`,
           }],
           price: {
-            grandTotal: (parseFloat(price) * 655).toString(), // Convert EUR to XOF
+            grandTotal: Math.round(parseFloat(priceEur.toString()) * 655).toString(), // Convert EUR to XOF
             currency: 'XOF',
           },
-          validatingAirlineCodes: flight.airlines || [firstRoute?.airline || 'XX'],
+          validatingAirlineCodes: [carrierCode],
           travelerPricings: [{
             fareDetailsBySegment: [{
               cabin: travelClass || 'ECONOMY',
             }],
           }],
           source: 'kiwi',
-          deepLink: flight.deep_link // Include booking link from Kiwi
+          deepLink: flight.deepLink || flight.shareId
         };
       });
       
@@ -542,6 +602,7 @@ async function searchKiwi(
       return flights;
     }
     
+    console.log('No flights found in Kiwi.com response');
     return [];
   } catch (error) {
     console.error('Kiwi.com API exception:', error instanceof Error ? error.message : String(error));
