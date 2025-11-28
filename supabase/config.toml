@@ -1,5 +1,8 @@
 project_id = "jcjfjyvmtfvmrplonxrg"
 
+[functions.send-booking-confirmation]
+verify_jwt = false
+
 [functions.search-flights]
 verify_jwt = false
 
