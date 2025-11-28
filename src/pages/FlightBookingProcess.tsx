@@ -9,8 +9,8 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { PassengerStep } from "@/components/booking-steps/PassengerStep";
-import { BaggageStep } from "@/components/booking-steps/BaggageStep";
-import { SeatsStep } from "@/components/booking-steps/SeatsStep";
+import { OptionsStep } from "@/components/booking-steps/OptionsStep";
+import { PreferencesStep } from "@/components/booking-steps/PreferencesStep";
 import { SummaryStep } from "@/components/booking-steps/SummaryStep";
 
 interface Passenger {
@@ -48,8 +48,8 @@ const FlightBookingProcess = () => {
 
   // États pour le processus de réservation
   const [passengers, setPassengers] = useState<Passenger[]>([]);
-  const [selectedBaggage, setSelectedBaggage] = useState<Record<string, number>>({});
-  const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, number>>({});
+  const [selectedPreferences, setSelectedPreferences] = useState<Record<string, any>>({});
 
   const steps = [
     { number: 1, title: "Passagers", completed: currentStep > 1 },
@@ -223,24 +223,24 @@ const FlightBookingProcess = () => {
             )}
 
             {currentStep === 2 && (
-              <BaggageStep
-                selectedBaggage={selectedBaggage}
-                onBaggageChange={(baggageId, quantity) => {
-                  setSelectedBaggage((prev) => ({ ...prev, [baggageId]: quantity }));
+              <OptionsStep
+                serviceType="flight"
+                selectedOptions={selectedOptions}
+                onOptionsChange={(optionId, quantity) => {
+                  setSelectedOptions((prev) => ({ ...prev, [optionId]: quantity }));
                 }}
-                adultsCount={adultsCount}
-                childrenCount={childrenCount}
+                guestsCount={adultsCount + childrenCount}
                 onNext={() => setCurrentStep(3)}
                 onBack={() => setCurrentStep(1)}
               />
             )}
 
             {currentStep === 3 && (
-              <SeatsStep
-                selectedSeats={selectedSeats}
-                onSeatsChange={setSelectedSeats}
-                adultsCount={adultsCount}
-                childrenCount={childrenCount}
+              <PreferencesStep
+                serviceType="flight"
+                selectedPreferences={selectedPreferences}
+                onPreferencesChange={setSelectedPreferences}
+                guestsCount={adultsCount + childrenCount}
                 onNext={() => setCurrentStep(4)}
                 onBack={() => setCurrentStep(2)}
               />
@@ -256,8 +256,8 @@ const FlightBookingProcess = () => {
                 startDate={flightData.departureDate}
                 endDate={flightData.returnDate || undefined}
                 passengers={passengers}
-                selectedBaggage={selectedBaggage}
-                selectedSeats={selectedSeats}
+                selectedOptions={selectedOptions}
+                selectedPreferences={selectedPreferences}
                 adultsCount={adultsCount}
                 childrenCount={childrenCount}
                 onBack={() => setCurrentStep(3)}

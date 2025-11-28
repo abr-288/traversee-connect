@@ -35,6 +35,7 @@ interface PassengerStepProps {
   adultsCount: number;
   childrenCount: number;
   onNext: () => void;
+  serviceType?: string;
 }
 
 type PassengersFormValues = z.infer<typeof passengersFormSchema>;
@@ -45,6 +46,7 @@ export const PassengerStep = ({
   adultsCount,
   childrenCount,
   onNext,
+  serviceType = "flight",
 }: PassengerStepProps) => {
   const totalPassengers = adultsCount + childrenCount;
 
@@ -79,6 +81,31 @@ export const PassengerStep = ({
     onNext();
   };
 
+  const getParticipantLabel = () => {
+    switch (serviceType) {
+      case "flight": return { title: "Informations des passagers", main: "Passager principal (Adulte)", other: "Passager" };
+      case "hotel":
+      case "stay": return { title: "Informations des voyageurs", main: "Voyageur principal (Adulte)", other: "Voyageur" };
+      case "car": return { title: "Informations du conducteur", main: "Conducteur principal", other: "Conducteur additionnel" };
+      case "tour":
+      case "event":
+      case "destination": return { title: "Informations des participants", main: "Participant principal (Adulte)", other: "Participant" };
+      default: return { title: "Informations des participants", main: "Contact principal", other: "Participant" };
+    }
+  };
+
+  const labels = getParticipantLabel();
+
+  const getNextButtonText = () => {
+    switch (serviceType) {
+      case "flight": return "Continuer vers les bagages";
+      case "hotel":
+      case "stay": return "Continuer vers les options";
+      case "car": return "Continuer vers les assurances";
+      default: return "Continuer vers les extras";
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -86,7 +113,7 @@ export const PassengerStep = ({
       className="space-y-6"
     >
       <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-6 rounded-lg border border-primary/20">
-        <h2 className="text-2xl font-bold text-primary mb-2">Informations des passagers</h2>
+        <h2 className="text-2xl font-bold text-primary mb-2">{labels.title}</h2>
         <p className="text-muted-foreground">
           Veuillez renseigner les informations exactement comme indiqué sur les documents d'identité
         </p>
@@ -94,14 +121,14 @@ export const PassengerStep = ({
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-          {/* Passager principal */}
+          {/* Participant principal */}
           <Card className="p-6 border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
                 <User className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-foreground">Passager principal (Adulte)</h3>
+                <h3 className="text-lg font-semibold text-foreground">{labels.main}</h3>
                 <p className="text-sm text-muted-foreground">Contact de réservation</p>
               </div>
             </div>
@@ -243,7 +270,7 @@ export const PassengerStep = ({
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-foreground">
-                        Passager {index + 1} ({index < adultsCount ? "Adulte" : "Enfant"})
+                        {labels.other} {index + 1} ({index < adultsCount ? "Adulte" : "Enfant"})
                       </h3>
                     </div>
                   </div>
@@ -404,7 +431,7 @@ export const PassengerStep = ({
               className="w-full h-14 text-lg font-semibold bg-primary hover:bg-primary/90"
               disabled={form.formState.isSubmitting}
             >
-              {form.formState.isSubmitting ? "Vérification..." : "Continuer vers les bagages"}
+              {form.formState.isSubmitting ? "Vérification..." : getNextButtonText()}
             </Button>
           </div>
         </form>
