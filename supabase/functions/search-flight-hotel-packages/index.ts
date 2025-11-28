@@ -55,11 +55,11 @@ async function searchKiwiFlights(
     });
 
     const response = await fetch(
-      `https://api.tequila.kiwi.com/v2/search?${params}`,
+      `https://kiwi-com-cheapest-flights.p.rapidapi.com/v2/search?${params}`,
       {
         headers: {
-          'apikey': rapidApiKey,
-          'Content-Type': 'application/json',
+          'X-RapidAPI-Key': rapidApiKey,
+          'X-RapidAPI-Host': 'kiwi-com-cheapest-flights.p.rapidapi.com',
         },
       }
     );
@@ -77,7 +77,7 @@ async function searchKiwiFlights(
         return {
           id: `kiwi-flight-${index}`,
           airline: route.airline || flight.airlines?.[0] || 'Airline',
-          price: Math.round((flight.price || 300) * 655.957), // EUR to XOF
+          price: Math.round((flight.price || 300) * 655.957),
           currency: 'XOF',
           departure: departureDate,
           return: returnDate,
@@ -107,7 +107,6 @@ async function searchSkyScrapperFlights(
   try {
     console.log('Searching Sky-Scrapper for package flights...');
     
-    // Search for origin airport
     const originResp = await fetch(
       `https://sky-scrapper.p.rapidapi.com/api/v1/flights/searchAirport?query=${origin}`,
       {
@@ -123,7 +122,6 @@ async function searchSkyScrapperFlights(
     const originAirport = originData.data?.[0];
     if (!originAirport) return [];
 
-    // Search for destination airport
     const destResp = await fetch(
       `https://sky-scrapper.p.rapidapi.com/api/v1/flights/searchAirport?query=${destination}`,
       {
@@ -139,7 +137,6 @@ async function searchSkyScrapperFlights(
     const destAirport = destData.data?.[0];
     if (!destAirport) return [];
 
-    // Search for flights
     const flightParams = new URLSearchParams({
       originSkyId: originAirport.skyId,
       destinationSkyId: destAirport.skyId,
@@ -171,7 +168,7 @@ async function searchSkyScrapperFlights(
       return {
         id: `sky-flight-${index}`,
         airline: firstLeg.carriers?.marketing?.[0]?.name || 'Airline',
-        price: Math.round(price * 655.957), // EUR to XOF
+        price: Math.round(price * 655.957),
         currency: 'XOF',
         departure: departureDate,
         return: returnDate,
@@ -182,6 +179,74 @@ async function searchSkyScrapperFlights(
     });
   } catch (error) {
     console.error('Sky-Scrapper API exception:', error);
+    return [];
+  }
+}
+
+// Search flights using Amadeus API
+async function searchAmadeusFlights(
+  origin: string,
+  destination: string,
+  departureDate: string,
+  returnDate: string,
+  adults: number
+): Promise<FlightOffer[]> {
+  try {
+    console.log('Searching Amadeus for package flights...');
+    
+    const AMADEUS_API_KEY = Deno.env.get('AMADEUS_API_KEY');
+    const AMADEUS_API_SECRET = Deno.env.get('AMADEUS_API_SECRET');
+    
+    if (!AMADEUS_API_KEY || !AMADEUS_API_SECRET) return [];
+
+    // Get access token
+    const tokenResponse = await fetch('https://api.amadeus.com/v1/security/oauth2/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'client_credentials',
+        client_id: AMADEUS_API_KEY,
+        client_secret: AMADEUS_API_SECRET,
+      }),
+    });
+
+    if (!tokenResponse.ok) return [];
+    const tokenData = await tokenResponse.json();
+    const accessToken = tokenData.access_token;
+
+    const searchParams = new URLSearchParams({
+      originLocationCode: origin,
+      destinationLocationCode: destination,
+      departureDate: departureDate,
+      returnDate: returnDate,
+      adults: adults.toString(),
+      currencyCode: 'EUR',
+      max: '5',
+    });
+
+    const response = await fetch(
+      `https://api.amadeus.com/v2/shopping/flight-offers?${searchParams}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+
+    if (!response.ok) return [];
+    const data = await response.json();
+
+    return (data.data || []).slice(0, 5).map((offer: any, index: number) => ({
+      id: `amadeus-flight-${index}`,
+      airline: offer.validatingAirlineCodes?.[0] || 'Airline',
+      price: Math.round(parseFloat(offer.price?.total || '400') * 655.957),
+      currency: 'XOF',
+      departure: departureDate,
+      return: returnDate,
+      duration: offer.itineraries?.[0]?.duration?.replace('PT', '').toLowerCase() || '3h 00min',
+      stops: (offer.itineraries?.[0]?.segments?.length || 1) - 1,
+      source: 'amadeus',
+    }));
+  } catch (error) {
+    console.error('Amadeus API exception:', error);
     return [];
   }
 }
@@ -198,7 +263,6 @@ async function searchBookingHotels(
   try {
     console.log('Searching Booking.com for package hotels...');
     
-    // First get destination ID
     const destResp = await fetch(
       `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchDestination?query=${encodeURIComponent(destination)}`,
       {
@@ -217,7 +281,6 @@ async function searchBookingHotels(
       }
     }
 
-    // Search hotels
     const hotelParams = new URLSearchParams({
       dest_id: destId,
       search_type: 'CITY',
@@ -239,11 +302,7 @@ async function searchBookingHotels(
       }
     );
 
-    if (!response.ok) {
-      console.error('Booking.com API error:', response.status);
-      return [];
-    }
-
+    if (!response.ok) return [];
     const data = await response.json();
     
     if (data.data?.hotels && Array.isArray(data.data.hotels)) {
@@ -251,7 +310,7 @@ async function searchBookingHotels(
         id: `booking-hotel-${index}`,
         name: hotel.hotel_name || hotel.name || 'Hôtel',
         rating: Math.round((hotel.review_score || 8) / 2),
-        price: Math.round((hotel.min_total_price || 80) * 655.957), // EUR to XOF
+        price: Math.round((hotel.min_total_price || 80) * 655.957),
         currency: 'XOF',
         image: hotel.main_photo_url || 'https://images.unsplash.com/photo-1566073771259-6a8506099945',
         address: hotel.address || hotel.city || destination,
@@ -268,80 +327,128 @@ async function searchBookingHotels(
   }
 }
 
+// Search hotels using Hotels.com Provider API
+async function searchHotelsComProvider(
+  destination: string,
+  checkIn: string,
+  checkOut: string,
+  adults: number,
+  rapidApiKey: string
+): Promise<HotelOffer[]> {
+  try {
+    console.log('Searching Hotels.com Provider for package hotels...');
+    
+    const params = new URLSearchParams({
+      q: destination,
+      locale: 'en_US',
+      checkin: checkIn,
+      checkout: checkOut,
+      adults: adults.toString(),
+      currency: 'EUR',
+    });
+
+    const response = await fetch(
+      `https://hotels-com-provider.p.rapidapi.com/v2/hotels/search?${params}`,
+      {
+        headers: {
+          'X-RapidAPI-Key': rapidApiKey,
+          'X-RapidAPI-Host': 'hotels-com-provider.p.rapidapi.com',
+        },
+      }
+    );
+
+    if (!response.ok) return [];
+    const data = await response.json();
+
+    if (data.hotels && Array.isArray(data.hotels)) {
+      return data.hotels.slice(0, 5).map((hotel: any, index: number) => ({
+        id: `hotelscom-hotel-${index}`,
+        name: hotel.name || hotel.hotel_name || 'Hôtel',
+        rating: hotel.star_rating || 4,
+        price: Math.round((hotel.price || 75) * 655.957),
+        currency: 'XOF',
+        image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945',
+        address: hotel.address || destination,
+        amenities: hotel.amenities?.slice(0, 5) || ['WiFi', 'Piscine', 'Restaurant'],
+        description: hotel.name || 'Hôtel de qualité',
+        source: 'hotels-com',
+      }));
+    }
+
+    return [];
+  } catch (error) {
+    console.error('Hotels.com Provider API exception:', error);
+    return [];
+  }
+}
+
+// Search hotels using Priceline API
+async function searchPricelineHotels(
+  destination: string,
+  checkIn: string,
+  checkOut: string,
+  adults: number,
+  rooms: number,
+  rapidApiKey: string
+): Promise<HotelOffer[]> {
+  try {
+    console.log('Searching Priceline for package hotels...');
+    
+    const params = new URLSearchParams({
+      location: destination,
+      check_in: checkIn,
+      check_out: checkOut,
+      adults: adults.toString(),
+      rooms: rooms.toString(),
+      currency: 'EUR',
+    });
+
+    const response = await fetch(
+      `https://priceline-com-provider.p.rapidapi.com/v2/hotels/search?${params}`,
+      {
+        headers: {
+          'X-RapidAPI-Key': rapidApiKey,
+          'X-RapidAPI-Host': 'priceline-com-provider.p.rapidapi.com',
+        },
+      }
+    );
+
+    if (!response.ok) return [];
+    const data = await response.json();
+
+    if (data.hotels && Array.isArray(data.hotels)) {
+      return data.hotels.slice(0, 5).map((hotel: any, index: number) => ({
+        id: `priceline-hotel-${index}`,
+        name: hotel.name || hotel.hotel_name || 'Hôtel',
+        rating: hotel.star_rating || 4,
+        price: Math.round((hotel.price || 70) * 655.957),
+        currency: 'XOF',
+        image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945',
+        address: hotel.address || destination,
+        amenities: hotel.amenities?.slice(0, 5) || ['WiFi', 'Parking', 'Restaurant'],
+        description: hotel.name || 'Hôtel confortable',
+        source: 'priceline',
+      }));
+    }
+
+    return [];
+  } catch (error) {
+    console.error('Priceline API exception:', error);
+    return [];
+  }
+}
+
 function getMockData(origin: string, destination: string, departureDate: string, returnDate: string) {
   return {
     flights: [
-      {
-        id: 'mock-flight-1',
-        airline: 'Air France',
-        price: 450000,
-        currency: 'XOF',
-        departure: departureDate,
-        return: returnDate,
-        duration: '2h 30min',
-        stops: 0,
-        source: 'mock',
-      },
-      {
-        id: 'mock-flight-2',
-        airline: 'Brussels Airlines',
-        price: 380000,
-        currency: 'XOF',
-        departure: departureDate,
-        return: returnDate,
-        duration: '3h 15min',
-        stops: 1,
-        source: 'mock',
-      },
-      {
-        id: 'mock-flight-3',
-        airline: 'Royal Air Maroc',
-        price: 420000,
-        currency: 'XOF',
-        departure: departureDate,
-        return: returnDate,
-        duration: '4h 45min',
-        stops: 1,
-        source: 'mock',
-      }
+      { id: 'mock-flight-1', airline: 'Air France', price: 450000, currency: 'XOF', departure: departureDate, return: returnDate, duration: '2h 30min', stops: 0, source: 'mock' },
+      { id: 'mock-flight-2', airline: 'Brussels Airlines', price: 380000, currency: 'XOF', departure: departureDate, return: returnDate, duration: '3h 15min', stops: 1, source: 'mock' },
+      { id: 'mock-flight-3', airline: 'Royal Air Maroc', price: 420000, currency: 'XOF', departure: departureDate, return: returnDate, duration: '4h 45min', stops: 1, source: 'mock' }
     ],
     hotels: [
-      {
-        id: 'mock-hotel-1',
-        name: 'Hôtel Sofitel',
-        rating: 5,
-        price: 180000,
-        currency: 'XOF',
-        image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945',
-        address: destination,
-        amenities: ['WiFi', 'Piscine', 'Spa', 'Restaurant', 'Bar'],
-        description: 'Hôtel de luxe avec vue exceptionnelle',
-        source: 'mock',
-      },
-      {
-        id: 'mock-hotel-2',
-        name: 'Hôtel Pullman',
-        rating: 4,
-        price: 120000,
-        currency: 'XOF',
-        image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa',
-        address: destination,
-        amenities: ['WiFi', 'Piscine', 'Climatisation', 'Restaurant'],
-        description: 'Hôtel moderne au cœur de la ville',
-        source: 'mock',
-      },
-      {
-        id: 'mock-hotel-3',
-        name: 'Hôtel Azalaï',
-        rating: 4,
-        price: 95000,
-        currency: 'XOF',
-        image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b',
-        address: destination,
-        amenities: ['WiFi', 'Piscine', 'Climatisation'],
-        description: 'Hôtel avec excellent rapport qualité-prix',
-        source: 'mock',
-      }
+      { id: 'mock-hotel-1', name: 'Hôtel Sofitel', rating: 5, price: 180000, currency: 'XOF', image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945', address: destination, amenities: ['WiFi', 'Piscine', 'Spa', 'Restaurant', 'Bar'], description: 'Hôtel de luxe', source: 'mock' },
+      { id: 'mock-hotel-2', name: 'Hôtel Pullman', rating: 4, price: 120000, currency: 'XOF', image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa', address: destination, amenities: ['WiFi', 'Piscine', 'Climatisation', 'Restaurant'], description: 'Hôtel moderne', source: 'mock' },
+      { id: 'mock-hotel-3', name: 'Hôtel Azalaï', rating: 4, price: 95000, currency: 'XOF', image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b', address: destination, amenities: ['WiFi', 'Piscine', 'Climatisation'], description: 'Excellent rapport qualité-prix', source: 'mock' }
     ]
   };
 }
@@ -366,19 +473,22 @@ serve(async (req) => {
       );
     }
 
-    // Search all APIs in parallel
-    const [kiwiFlights, skyFlights, bookingHotels] = await Promise.all([
+    // Search all APIs in parallel (3 flight APIs + 3 hotel APIs)
+    const [kiwiFlights, skyFlights, amadeusFlights, bookingHotels, hotelsComHotels, pricelineHotels] = await Promise.all([
       searchKiwiFlights(origin, destination, departureDate, returnDate, adults, rapidApiKey),
       searchSkyScrapperFlights(origin, destination, departureDate, returnDate, adults, rapidApiKey),
+      searchAmadeusFlights(origin, destination, departureDate, returnDate, adults),
       searchBookingHotels(destination, departureDate, returnDate, adults, rooms, rapidApiKey),
+      searchHotelsComProvider(destination, departureDate, returnDate, adults, rapidApiKey),
+      searchPricelineHotels(destination, departureDate, returnDate, adults, rooms, rapidApiKey),
     ]);
 
-    const allFlights = [...kiwiFlights, ...skyFlights];
-    const allHotels = [...bookingHotels];
+    const allFlights = [...kiwiFlights, ...skyFlights, ...amadeusFlights];
+    const allHotels = [...bookingHotels, ...hotelsComHotels, ...pricelineHotels];
 
-    console.log(`Package search: ${allFlights.length} flights (Kiwi: ${kiwiFlights.length}, Sky: ${skyFlights.length}), ${allHotels.length} hotels`);
+    console.log(`Package search: ${allFlights.length} flights (Kiwi: ${kiwiFlights.length}, Sky: ${skyFlights.length}, Amadeus: ${amadeusFlights.length}), ${allHotels.length} hotels (Booking: ${bookingHotels.length}, Hotels.com: ${hotelsComHotels.length}, Priceline: ${pricelineHotels.length})`);
 
-    // If no results, return mock data
+    // Use mock data if no results
     if (allFlights.length === 0 && allHotels.length === 0) {
       console.log('No results from APIs, returning mock data');
       return new Response(
@@ -387,11 +497,9 @@ serve(async (req) => {
       );
     }
 
-    // Sort by price
     allFlights.sort((a, b) => a.price - b.price);
     allHotels.sort((a, b) => a.price - b.price);
 
-    // Use mock data for missing results
     const mockData = getMockData(origin, destination, departureDate, returnDate);
 
     return new Response(
