@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { Loader2, TrendingUp } from "lucide-react";
+import { Loader2, TrendingUp, Plane } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { FlightSearchForm } from "@/components/FlightSearchForm";
@@ -12,6 +12,8 @@ import { PriceCalendar } from "@/components/flights/PriceCalendar";
 import { FlightFilters } from "@/components/flights/FlightFilters";
 import { FlightCard } from "@/components/flights/FlightCard";
 import { Button } from "@/components/ui/button";
+import { LazyImage } from "@/components/ui/lazy-image";
+import bannerFlights from "@/assets/banner-flights.jpg";
 
 interface MappedFlight {
   id: string;
@@ -168,24 +170,36 @@ const Flights = () => {
       <Navbar />
 
       {/* Hero Section with Search Form */}
-      <div className="relative bg-primary py-12 md:py-16">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary-dark to-primary opacity-90" />
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-4xl font-bold text-primary-foreground mb-2">Recherche de vols</h1>
-              <p className="text-primary-foreground/80">Trouvez les meilleurs prix pour votre voyage</p>
+      <div className="relative min-h-[50vh] md:min-h-[60vh] flex items-center justify-center overflow-hidden">
+        <LazyImage
+          src={bannerFlights}
+          alt="Recherche de vols"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background"></div>
+        <div className="relative z-10 container mx-auto px-4 py-12">
+          <div className="text-center mb-8 animate-fade-in">
+            <div className="flex justify-center mb-4">
+              <Plane className="w-16 h-16 text-white drop-shadow-lg" />
             </div>
-            {hasSearched && (
+            <h1 className="text-4xl md:text-6xl font-bold mb-4 text-white drop-shadow-lg">Recherche de vols</h1>
+            <p className="text-lg md:text-xl text-white/95 drop-shadow-md max-w-2xl mx-auto">
+              Trouvez les meilleurs prix pour votre voyage
+            </p>
+          </div>
+          {hasSearched && (
+            <div className="flex justify-center mb-6">
               <Link to={`/flight-comparison?${searchParams.toString()}`}>
                 <Button variant="secondary" className="gap-2">
                   <TrendingUp className="h-4 w-4" />
                   Comparer les prix
                 </Button>
               </Link>
-            )}
+            </div>
+          )}
+          <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <FlightSearchForm />
           </div>
-          <FlightSearchForm />
         </div>
       </div>
 

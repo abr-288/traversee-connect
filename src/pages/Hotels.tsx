@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Star, MapPin, Users, Wifi, UtensilsCrossed, Car, Loader2, Globe, GitCompare, SlidersHorizontal } from "lucide-react";
+import { Star, MapPin, Users, Wifi, UtensilsCrossed, Car, Loader2, Globe, GitCompare, SlidersHorizontal, Hotel } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -24,6 +24,8 @@ import { Pagination } from "@/components/Pagination";
 import { useHotelSearch } from "@/hooks/useHotelSearch";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { LazyImage } from "@/components/ui/lazy-image";
+import bannerHotels from "@/assets/banner-hotels.jpg";
 
 const Hotels = () => {
   const { t } = useTranslation();
@@ -408,14 +410,17 @@ const Hotels = () => {
       
       {/* Hero Banner */}
       <div className="relative min-h-[50vh] md:min-h-[60vh] flex items-center justify-center overflow-hidden">
-        <img 
-          src="https://images.unsplash.com/photo-1566073771259-6a8506099945" 
-          alt="Hotels" 
+        <LazyImage 
+          src={bannerHotels}
+          alt="Hôtels & Hébergements" 
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background"></div>
         <div className="relative z-10 container mx-auto px-4 py-12">
           <div className="text-center mb-8 animate-fade-in">
+            <div className="flex justify-center mb-4">
+              <Hotel className="w-16 h-16 text-white drop-shadow-lg" />
+            </div>
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">Hôtels & Hébergements</h1>
             <p className="text-lg md:text-xl text-white/95 drop-shadow-md max-w-2xl mx-auto">Des hébergements de qualité partout dans le monde</p>
           </div>

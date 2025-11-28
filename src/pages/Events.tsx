@@ -4,6 +4,8 @@ import Footer from "@/components/Footer";
 import { EventSearchForm } from "@/components/EventSearchForm";
 import { EventResults } from "@/components/EventResults";
 import { Calendar } from "lucide-react";
+import { LazyImage } from "@/components/ui/lazy-image";
+import bannerEvents from "@/assets/banner-events.jpg";
 
 const Events = () => {
   const [searchResults, setSearchResults] = useState<any>(null);
@@ -16,14 +18,12 @@ const Events = () => {
         {/* Hero Section with Background */}
         <div className="relative min-h-[50vh] md:min-h-[60vh] flex items-center justify-center overflow-hidden">
           {/* Background Image with Overlay */}
-          <div className="absolute inset-0">
-            <img 
-              src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30" 
-              alt="Événements" 
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background"></div>
-          </div>
+          <LazyImage 
+            src={bannerEvents}
+            alt="Événements" 
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background"></div>
 
           {/* Content */}
           <div className="relative z-10 container mx-auto px-4 py-12">

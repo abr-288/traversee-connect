@@ -7,13 +7,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Star, Users, Briefcase, Fuel, Settings, Loader2 } from "lucide-react";
+import { Star, Users, Briefcase, Fuel, Settings, Loader2, Car as CarIcon } from "lucide-react";
 import { CarBookingDialog } from "@/components/CarBookingDialog";
 import { CarSearchForm } from "@/components/CarSearchForm";
 import { Pagination } from "@/components/Pagination";
 import { useCarRental } from "@/hooks/useCarRental";
 import { useCarServices } from "@/hooks/useCarServices";
 import { toast } from "sonner";
+import { LazyImage } from "@/components/ui/lazy-image";
+import bannerCars from "@/assets/banner-cars.jpg";
 
 const Cars = () => {
   const [searchParams] = useSearchParams();
@@ -266,14 +268,17 @@ const Cars = () => {
       
       {/* Hero Banner */}
       <div className="relative min-h-[50vh] md:min-h-[60vh] flex items-center justify-center overflow-hidden">
-        <img 
-          src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d" 
+        <LazyImage 
+          src={bannerCars}
           alt="Location de voitures" 
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background"></div>
         <div className="relative z-10 container mx-auto px-4 py-12">
           <div className="text-center mb-8 animate-fade-in">
+            <div className="flex justify-center mb-4">
+              <CarIcon className="w-16 h-16 text-white drop-shadow-lg" />
+            </div>
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">Location de voitures</h1>
             <p className="text-lg md:text-xl text-white/95 drop-shadow-md max-w-2xl mx-auto">Louez une voiture adaptée à vos besoins</p>
           </div>

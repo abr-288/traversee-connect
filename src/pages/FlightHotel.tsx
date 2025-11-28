@@ -2,12 +2,14 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plane, Hotel, MapPin, Calendar, Users, Check, Loader2, Star } from "lucide-react";
+import { Plane, Hotel, MapPin, Calendar, Users, Check, Loader2, Star, Package } from "lucide-react";
 import { useState } from "react";
 import { BookingDialog } from "@/components/BookingDialog";
 import { FlightHotelSearchForm } from "@/components/FlightHotelSearchForm";
 import { useFlightHotelSearch } from "@/hooks/useFlightHotelSearch";
 import { toast } from "sonner";
+import { LazyImage } from "@/components/ui/lazy-image";
+import bannerFlightHotel from "@/assets/banner-flight-hotel.jpg";
 
 const FlightHotel = () => {
   const [selectedFlight, setSelectedFlight] = useState<any>(null);
@@ -52,30 +54,31 @@ const FlightHotel = () => {
       <Navbar />
       
       <main className="flex-1">
-        <section className="relative bg-gradient-to-br from-primary via-primary-light to-secondary py-16 md:py-20">
+        <section className="relative min-h-[50vh] md:min-h-[60vh] flex items-center justify-center overflow-hidden">
           {/* Background avec overlay */}
-          <div className="absolute inset-0 z-0">
-            <img
-              src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05"
-              alt="Forfaits Vol + Hôtel"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/90 via-primary-light/85 to-secondary/90 z-[1]" />
+          <LazyImage
+            src={bannerFlightHotel}
+            alt="Forfaits Vol + Hôtel"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background"></div>
 
-          <div className="container relative z-10 mx-auto px-4">
+          <div className="relative z-10 container mx-auto px-4 py-12">
             {/* Titre */}
-            <div className="text-center mb-8">
-              <h1 className="text-3xl md:text-5xl font-bold text-white mb-3 animate-fade-in">
+            <div className="text-center mb-8 animate-fade-in">
+              <div className="flex justify-center mb-4">
+                <Package className="w-16 h-16 text-white drop-shadow-lg" />
+              </div>
+              <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">
                 Forfaits Vol + Hôtel
               </h1>
-              <p className="text-lg md:text-xl text-white/95 animate-fade-in">
+              <p className="text-lg md:text-xl text-white/95 drop-shadow-md max-w-2xl mx-auto">
                 Réservez votre vol et votre hébergement en un seul forfait et économisez jusqu'à 30%
               </p>
             </div>
 
             {/* Formulaire de recherche */}
-            <div className="max-w-6xl mx-auto animate-scale-in">
+            <div className="max-w-6xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
               <FlightHotelSearchForm onSearch={handleSearch} />
             </div>
           </div>

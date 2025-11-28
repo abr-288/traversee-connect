@@ -6,10 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Star, MapPin, Clock, Users } from "lucide-react";
+import { Star, MapPin, Clock, Users, Map } from "lucide-react";
 import { BookingDialog } from "@/components/BookingDialog";
 import { TourSearchForm } from "@/components/TourSearchForm";
 import { Pagination } from "@/components/Pagination";
+import { LazyImage } from "@/components/ui/lazy-image";
+import bannerTours from "@/assets/banner-tours.jpg";
 
 const Tours = () => {
   const [priceRange, setPriceRange] = useState([0, 1000000]);
@@ -319,18 +321,24 @@ const Tours = () => {
       <Navbar />
       
       {/* Hero Banner */}
-      <div className="relative py-16 md:py-32 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
-        <img 
-          src="/src/assets/destination-safari.jpg" 
-          alt="Tours" 
-          className="absolute inset-0 w-full h-full object-cover opacity-40"
+      <div className="relative min-h-[50vh] md:min-h-[60vh] flex items-center justify-center overflow-hidden">
+        <LazyImage 
+          src={bannerTours}
+          alt="Circuits & Tours" 
+          className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="relative z-10 container mx-auto px-4">
-          <div className="text-center mb-10">
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">Circuits & Tours</h1>
-            <p className="text-2xl md:text-3xl text-white/95 font-medium">Découvrez des expériences inoubliables</p>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background"></div>
+        <div className="relative z-10 container mx-auto px-4 py-12">
+          <div className="text-center mb-8 animate-fade-in">
+            <div className="flex justify-center mb-4">
+              <Map className="w-16 h-16 text-white drop-shadow-lg" />
+            </div>
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">Circuits & Tours</h1>
+            <p className="text-lg md:text-xl text-white/95 drop-shadow-md max-w-2xl mx-auto">Découvrez des expériences inoubliables</p>
           </div>
-          <TourSearchForm />
+          <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <TourSearchForm />
+          </div>
         </div>
       </div>
       
