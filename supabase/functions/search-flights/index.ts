@@ -74,10 +74,10 @@ serve(async (req) => {
       apiPromises.push(searchKiwi(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, rapidApiKey));
     }
 
-    // Sabre API via RapidAPI (tertiary)
-    if (rapidApiKey) {
-      apiPromises.push(searchSabre(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, rapidApiKey));
-    }
+    // Note: Travelpayouts API disabled - endpoint not working on RapidAPI
+    // if (rapidApiKey) {
+    //   apiPromises.push(searchTravelpayouts(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, rapidApiKey));
+    // }
 
     if (apiPromises.length === 0) {
       console.log('No API credentials configured, returning mock data');
@@ -280,8 +280,8 @@ async function searchAmadeus(
   return [];
 }
 
-// Sabre API via RapidAPI search function
-async function searchSabre(
+// Travelpayouts API via RapidAPI search function (replacing Sabre)
+async function searchTravelpayouts(
   origin: string,
   destination: string,
   departureDate: string,
@@ -292,142 +292,98 @@ async function searchSabre(
   rapidApiKey: string
 ): Promise<any[]> {
   try {
-    console.log('Searching flights with Sabre API via RapidAPI...');
+    console.log('Searching flights with Travelpayouts API via RapidAPI...');
     
-    // Build search parameters for Sabre RapidAPI
+    // Format departure date for Travelpayouts (YYYY-MM)
+    const departureMonth = departureDate.substring(0, 7);
+    
+    // Build search parameters
     const searchParams = new URLSearchParams({
       origin: origin,
       destination: destination,
-      departuredate: departureDate,
-      adults: adults.toString(),
-      children: children.toString(),
-      cabinclass: travelClass.toLowerCase(),
-      currency: 'USD'
+      depart_date: departureMonth,
+      currency: 'EUR',
+      page: '1'
     });
     
     if (returnDate) {
-      searchParams.append('returndate', returnDate);
+      searchParams.append('return_date', returnDate.substring(0, 7));
     }
     
     const searchResponse = await fetch(
-      `https://sabre-software-sabre-travel-software-sabre-travel-booking-system.p.rapidapi.com/search/flights?${searchParams}`,
+      `https://travelpayouts-travelpayouts-flight-data-v1.p.rapidapi.com/v1/prices/cheap?${searchParams}`,
       {
         method: 'GET',
         headers: {
           'X-RapidAPI-Key': rapidApiKey,
-          'X-RapidAPI-Host': 'sabre-software-sabre-travel-software-sabre-travel-booking-system.p.rapidapi.com'
+          'X-RapidAPI-Host': 'travelpayouts-travelpayouts-flight-data-v1.p.rapidapi.com'
         }
       }
     );
 
     if (!searchResponse.ok) {
       const errorText = await searchResponse.text();
-      console.error('Sabre RapidAPI error:', searchResponse.status, errorText.substring(0, 300));
+      console.error('Travelpayouts API error:', searchResponse.status, errorText.substring(0, 300));
       return [];
     }
 
     const searchData = await searchResponse.json();
-    console.log('Sabre RapidAPI response received, keys:', Object.keys(searchData));
+    console.log('Travelpayouts API response received');
     
-    // Handle different possible response structures
-    const flightsArray = searchData.data || searchData.flights || searchData.itineraries || 
-      searchData.PricedItineraries || searchData.results || [];
+    // Travelpayouts returns data in format: { success: true, data: { "DSS": { "CDG": { "0": {...}, "1": {...} } } } }
+    const destData = searchData.data?.[origin]?.[destination] || {};
+    const flightsArray = Object.values(destData);
     
     if (Array.isArray(flightsArray) && flightsArray.length > 0) {
       const flights = flightsArray.slice(0, 15).map((flight: any, index: number) => {
-        // Try multiple response structure patterns
-        const firstSegment = flight.segments?.[0] || 
-          flight.legs?.[0] || 
-          flight.AirItinerary?.OriginDestinationOptions?.[0]?.FlightSegment?.[0] ||
-          flight.outbound?.[0] ||
-          flight;
-          
-        const lastSegment = flight.segments?.[flight.segments?.length - 1] || 
-          flight.legs?.[flight.legs?.length - 1] ||
-          flight.AirItinerary?.OriginDestinationOptions?.[0]?.FlightSegment?.slice(-1)[0] ||
-          flight.outbound?.[flight.outbound?.length - 1] ||
-          flight;
-        
-        // Get price
-        const price = flight.price?.amount || flight.price?.total || flight.price || 
-          flight.AirItineraryPricingInfo?.ItinTotalFare?.TotalFare?.Amount || 
-          flight.totalPrice || 0;
-        
-        // Get departure info
-        const departureCode = firstSegment.departure?.airport || 
-          firstSegment.DepartureAirport?.LocationCode ||
-          firstSegment.origin || origin;
-        const arrivalCode = lastSegment.arrival?.airport || 
-          lastSegment.ArrivalAirport?.LocationCode ||
-          lastSegment.destination || destination;
-        
-        // Get times
-        const departureTime = firstSegment.departure?.time || 
-          firstSegment.DepartureDateTime ||
-          firstSegment.departureTime || 
-          `${departureDate}T00:00:00`;
-        const arrivalTime = lastSegment.arrival?.time || 
-          lastSegment.ArrivalDateTime ||
-          lastSegment.arrivalTime || 
-          `${departureDate}T23:59:00`;
-        
-        // Get carrier
-        const carrierCode = firstSegment.carrier || 
-          firstSegment.MarketingAirline?.Code ||
-          firstSegment.airline || 
-          flight.airlines?.[0] || 'XX';
-        const flightNumber = firstSegment.flightNumber?.toString() || 
-          firstSegment.FlightNumber?.toString() || '0000';
-        
-        // Get duration
-        const durationMinutes = flight.duration || 
-          firstSegment.duration || 
-          flight.totalDuration || 0;
+        const price = flight.price || 0;
+        const airline = flight.airline || 'XX';
+        const flightNumber = flight.flight_number?.toString() || '0000';
+        const departureAt = flight.departure_at || `${departureDate}T00:00:00`;
+        const returnAt = flight.return_at;
+        const expiresAt = flight.expires_at;
         
         return {
-          id: `SABRE-${origin}-${destination}-${index}`,
+          id: `TP-${origin}-${destination}-${index}`,
           itineraries: [{
             segments: [{
               departure: {
-                iataCode: departureCode,
-                at: departureTime,
+                iataCode: origin,
+                at: departureAt,
               },
               arrival: {
-                iataCode: arrivalCode,
-                at: arrivalTime,
+                iataCode: destination,
+                at: departureAt, // Travelpayouts doesn't provide arrival time
               },
-              carrierCode: carrierCode,
+              carrierCode: airline,
               number: flightNumber,
-              duration: typeof durationMinutes === 'number' ? 
-                `PT${Math.floor(durationMinutes / 60)}H${durationMinutes % 60}M` : 
-                durationMinutes || 'PT0H',
+              duration: 'PT0H', // Duration not provided
             }],
-            duration: typeof durationMinutes === 'number' ? 
-              `PT${Math.floor(durationMinutes / 60)}H${durationMinutes % 60}M` : 
-              durationMinutes || 'PT0H',
+            duration: 'PT0H',
           }],
           price: {
-            grandTotal: Math.round(parseFloat(price.toString()) * 655).toString(), // Convert USD to XOF
+            grandTotal: Math.round(parseFloat(price.toString()) * 655).toString(), // Convert EUR to XOF
             currency: 'XOF',
           },
-          validatingAirlineCodes: [carrierCode],
+          validatingAirlineCodes: [airline],
           travelerPricings: [{
             fareDetailsBySegment: [{
               cabin: travelClass || 'ECONOMY',
             }],
           }],
-          source: 'sabre'
+          source: 'travelpayouts',
+          expiresAt: expiresAt
         };
       });
       
-      console.log(`Found ${flights.length} flights from Sabre RapidAPI`);
+      console.log(`Found ${flights.length} flights from Travelpayouts`);
       return flights;
     }
     
-    console.log('No flights found in Sabre response');
+    console.log('No flights found in Travelpayouts response');
     return [];
   } catch (error) {
-    console.error('Sabre RapidAPI exception:', error instanceof Error ? error.message : String(error));
+    console.error('Travelpayouts API exception:', error instanceof Error ? error.message : String(error));
   }
   
   return [];
