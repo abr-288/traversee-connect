@@ -74,10 +74,10 @@ serve(async (req) => {
       apiPromises.push(searchKiwi(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, rapidApiKey));
     }
 
-    // Note: Flight Fare Search API disabled - endpoints not working on RapidAPI
-    // if (rapidApiKey) {
-    //   apiPromises.push(searchFlightFare(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, rapidApiKey));
-    // }
+    // Sky-Scrapper API via RapidAPI (Google Flights data)
+    if (rapidApiKey) {
+      apiPromises.push(searchSkyScrapper(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, rapidApiKey));
+    }
 
     if (apiPromises.length === 0) {
       console.log('No API credentials configured, returning mock data');
@@ -604,6 +604,205 @@ async function searchKiwi(
     return [];
   } catch (error) {
     console.error('Kiwi.com API exception:', error instanceof Error ? error.message : String(error));
+    return [];
+  }
+}
+
+// Sky-Scrapper API via RapidAPI (Google Flights data)
+async function searchSkyScrapper(
+  origin: string,
+  destination: string,
+  departureDate: string,
+  returnDate: string | undefined,
+  adults: number,
+  children: number,
+  travelClass: string,
+  rapidApiKey: string
+): Promise<any[]> {
+  try {
+    console.log('Searching flights with Sky-Scrapper API via RapidAPI...');
+    
+    // Map travel class to Sky-Scrapper format
+    const cabinMap: Record<string, string> = {
+      'ECONOMY': 'economy',
+      'PREMIUM_ECONOMY': 'premium_economy',
+      'BUSINESS': 'business',
+      'FIRST': 'first'
+    };
+    const selectedCabin = cabinMap[travelClass] || 'economy';
+    
+    // Step 1: Search for origin airport to get skyId and entityId
+    const originSearchResponse = await fetch(
+      `https://sky-scrapper.p.rapidapi.com/api/v1/flights/searchAirport?query=${origin}`,
+      {
+        method: 'GET',
+        headers: {
+          'X-RapidAPI-Key': rapidApiKey,
+          'X-RapidAPI-Host': 'sky-scrapper.p.rapidapi.com'
+        }
+      }
+    );
+    
+    if (!originSearchResponse.ok) {
+      console.error('Sky-Scrapper origin airport search failed:', originSearchResponse.status);
+      return [];
+    }
+    
+    const originData = await originSearchResponse.json();
+    const originAirport = originData.data?.[0];
+    
+    if (!originAirport) {
+      console.error('Sky-Scrapper: Origin airport not found for', origin);
+      return [];
+    }
+    
+    const originSkyId = originAirport.skyId;
+    const originEntityId = originAirport.entityId;
+    console.log('Sky-Scrapper origin found:', originSkyId, originEntityId);
+    
+    // Step 2: Search for destination airport
+    const destSearchResponse = await fetch(
+      `https://sky-scrapper.p.rapidapi.com/api/v1/flights/searchAirport?query=${destination}`,
+      {
+        method: 'GET',
+        headers: {
+          'X-RapidAPI-Key': rapidApiKey,
+          'X-RapidAPI-Host': 'sky-scrapper.p.rapidapi.com'
+        }
+      }
+    );
+    
+    if (!destSearchResponse.ok) {
+      console.error('Sky-Scrapper destination airport search failed:', destSearchResponse.status);
+      return [];
+    }
+    
+    const destData = await destSearchResponse.json();
+    const destAirport = destData.data?.[0];
+    
+    if (!destAirport) {
+      console.error('Sky-Scrapper: Destination airport not found for', destination);
+      return [];
+    }
+    
+    const destSkyId = destAirport.skyId;
+    const destEntityId = destAirport.entityId;
+    console.log('Sky-Scrapper destination found:', destSkyId, destEntityId);
+    
+    // Step 3: Search for flights
+    const flightParams = new URLSearchParams({
+      originSkyId: originSkyId,
+      destinationSkyId: destSkyId,
+      originEntityId: originEntityId,
+      destinationEntityId: destEntityId,
+      date: departureDate,
+      adults: adults.toString(),
+      cabinClass: selectedCabin,
+      currency: 'EUR'
+    });
+    
+    if (returnDate) {
+      flightParams.append('returnDate', returnDate);
+    }
+    if (children > 0) {
+      flightParams.append('childrens', children.toString());
+    }
+    
+    const flightResponse = await fetch(
+      `https://sky-scrapper.p.rapidapi.com/api/v1/flights/searchFlights?${flightParams}`,
+      {
+        method: 'GET',
+        headers: {
+          'X-RapidAPI-Key': rapidApiKey,
+          'X-RapidAPI-Host': 'sky-scrapper.p.rapidapi.com'
+        }
+      }
+    );
+    
+    if (!flightResponse.ok) {
+      const errorText = await flightResponse.text();
+      console.error('Sky-Scrapper flight search failed:', flightResponse.status, errorText.substring(0, 300));
+      return [];
+    }
+    
+    const flightData = await flightResponse.json();
+    console.log('Sky-Scrapper flight search response received');
+    
+    // Parse itineraries from response
+    const itineraries = flightData.data?.itineraries || [];
+    
+    if (Array.isArray(itineraries) && itineraries.length > 0) {
+      console.log('Sky-Scrapper found', itineraries.length, 'itineraries');
+      
+      const flights = itineraries.slice(0, 15).map((itinerary: any, index: number) => {
+        // Get price
+        const price = itinerary.price?.raw || itinerary.price?.formatted?.replace(/[^0-9.]/g, '') || 0;
+        
+        // Get legs/segments
+        const legs = itinerary.legs || [];
+        const firstLeg = legs[0] || {};
+        const segments = firstLeg.segments || [];
+        const firstSegment = segments[0] || {};
+        
+        // Get departure/arrival info
+        const departureCode = firstLeg.origin?.id || firstSegment.origin?.flightPlaceId || origin;
+        const arrivalCode = firstLeg.destination?.id || firstSegment.destination?.flightPlaceId || destination;
+        const departureTime = firstLeg.departure || firstSegment.departure || `${departureDate}T00:00:00`;
+        const arrivalTime = firstLeg.arrival || firstSegment.arrival || `${departureDate}T23:59:00`;
+        
+        // Get carrier info
+        const carriers = firstLeg.carriers?.marketing || [];
+        const carrierCode = carriers[0]?.alternateId || firstSegment.marketingCarrier?.alternateId || 'XX';
+        const flightNumber = firstSegment.flightNumber || '0000';
+        
+        // Duration in minutes
+        const durationMinutes = firstLeg.durationInMinutes || 0;
+        
+        // Convert price to XOF
+        const priceValue = parseFloat(price.toString()) || 0;
+        const priceXOF = Math.round(priceValue * 655);
+        
+        return {
+          id: `SKY-${origin}-${destination}-${index}`,
+          itineraries: [{
+            segments: [{
+              departure: {
+                iataCode: departureCode,
+                at: departureTime,
+              },
+              arrival: {
+                iataCode: arrivalCode,
+                at: arrivalTime,
+              },
+              carrierCode: carrierCode,
+              number: flightNumber.toString(),
+              duration: `PT${Math.floor(durationMinutes / 60)}H${durationMinutes % 60}M`,
+            }],
+            duration: `PT${Math.floor(durationMinutes / 60)}H${durationMinutes % 60}M`,
+          }],
+          price: {
+            grandTotal: priceXOF.toString(),
+            currency: 'XOF',
+          },
+          validatingAirlineCodes: [carrierCode],
+          travelerPricings: [{
+            fareDetailsBySegment: [{
+              cabin: travelClass || 'ECONOMY',
+            }],
+          }],
+          source: 'skyscrapper',
+          deepLink: itinerary.deepLink
+        };
+      });
+      
+      console.log(`Found ${flights.length} flights from Sky-Scrapper`);
+      return flights;
+    }
+    
+    console.log('No flights found in Sky-Scrapper response');
+    return [];
+  } catch (error) {
+    console.error('Sky-Scrapper API exception:', error instanceof Error ? error.message : String(error));
     return [];
   }
 }
