@@ -9,12 +9,12 @@ const Events = () => {
   const [searchResults, setSearchResults] = useState<any>(null);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col pt-16">
       <Navbar />
       
       <main className="flex-1">
         {/* Hero Section with Background */}
-        <div className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
+        <div className="relative min-h-[50vh] md:min-h-[60vh] flex items-center justify-center overflow-hidden">
           {/* Background Image with Overlay */}
           <div className="absolute inset-0">
             <img 

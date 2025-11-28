@@ -403,11 +403,11 @@ const Hotels = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col pt-16">
       <Navbar />
       
       {/* Hero Banner */}
-      <div className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
+      <div className="relative min-h-[50vh] md:min-h-[60vh] flex items-center justify-center overflow-hidden">
         <img 
           src="https://images.unsplash.com/photo-1566073771259-6a8506099945" 
           alt="Hotels" 

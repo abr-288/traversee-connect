@@ -145,11 +145,11 @@ const Destinations = () => {
     : popularDestinations;
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col pt-16">
       <Navbar />
 
       {/* Hero Section */}
-      <div className="relative h-[400px] bg-gradient-to-br from-primary via-primary-dark to-primary-darker overflow-hidden">
+      <div className="relative h-[350px] md:h-[400px] bg-gradient-to-br from-primary via-primary-dark to-primary-darker overflow-hidden">
         <div className="absolute inset-0 bg-black/30"></div>
         <div className="relative container mx-auto px-4 h-full flex flex-col justify-center items-center text-center">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">

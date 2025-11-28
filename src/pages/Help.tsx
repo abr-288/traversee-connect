@@ -153,11 +153,11 @@ const Help = () => {
     : faqs;
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col pt-16">
       <Navbar />
 
       {/* Hero Section */}
-      <div className="bg-gradient-to-br from-primary via-primary-dark to-primary-darker py-20">
+      <div className="bg-gradient-to-br from-primary via-primary-dark to-primary-darker py-12 md:py-20">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
             Comment pouvons-nous vous aider ?

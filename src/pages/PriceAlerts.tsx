@@ -7,10 +7,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const PriceAlerts = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-muted/20">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-muted/20 pt-16">
       <Navbar />
       
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-4 py-6 md:py-8">
         <div className="max-w-5xl mx-auto space-y-6">
           <div className="space-y-2">
             <h1 className="text-3xl md:text-4xl font-bold">Alertes de Prix</h1>

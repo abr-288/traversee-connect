@@ -48,10 +48,10 @@ const FlightHotel = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col pt-16">
       <Navbar />
       
-      <main className="flex-1 mt-20">
+      <main className="flex-1">
         <section className="relative bg-gradient-to-br from-primary via-primary-light to-secondary py-16 md:py-20">
           {/* Background avec overlay */}
           <div className="absolute inset-0 z-0">

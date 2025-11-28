@@ -333,9 +333,9 @@ export default function Payment() {
 
   return (
     <ErrorBoundary fallback={<ErrorFallback title="Erreur de paiement" description="Impossible de charger la page de paiement" />}>
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col pt-16">
         <Navbar />
-        <main className="flex-1 container mx-auto px-4 py-8">
+        <main className="flex-1 container mx-auto px-4 py-6 md:py-8">
           <div className="max-w-2xl mx-auto">
             <h1 className="text-2xl md:text-3xl font-bold mb-2">Paiement</h1>
             <p className="text-sm md:text-base text-muted-foreground mb-6 md:mb-8">

@@ -200,12 +200,12 @@ const Trains = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col pt-16">
       <Navbar />
 
       {/* Hero Section */}
       <div
-        className="relative min-h-[60vh] flex items-center justify-center overflow-hidden"
+        className="relative min-h-[50vh] md:min-h-[60vh] flex items-center justify-center overflow-hidden"
         style={{
           backgroundImage: "url('https://images.unsplash.com/photo-1474487548417-781cb71495f3')",
           backgroundSize: "cover",

@@ -164,11 +164,11 @@ const Flights = () => {
     });
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col pt-16">
       <Navbar />
 
       {/* Hero Section with Search Form */}
-      <div className="relative bg-primary py-16">
+      <div className="relative bg-primary py-12 md:py-16">
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary-dark to-primary opacity-90" />
         <div className="container mx-auto px-4 relative z-10">
           <div className="flex items-center justify-between mb-6">

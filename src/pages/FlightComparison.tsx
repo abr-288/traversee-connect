@@ -220,11 +220,11 @@ const FlightComparison = () => {
   }, [flights]);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col pt-16">
       <Navbar />
       
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/20 py-16">
+      <div className="relative bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/20 py-10 md:py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
