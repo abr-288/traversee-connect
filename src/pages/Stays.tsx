@@ -2,7 +2,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MapPin, Calendar, Star, Sparkles, Loader2 } from "lucide-react";
+import { MapPin, Calendar, Star, Sparkles, Loader2, Palmtree } from "lucide-react";
 import { WeatherWidget } from "@/components/WeatherWidget";
 import { CurrencyConverter } from "@/components/CurrencyConverter";
 import { StaySearchForm } from "@/components/StaySearchForm";
@@ -11,6 +11,7 @@ import { useState, useEffect } from "react";
 import { Price } from "@/components/ui/price";
 import { useStaySearch } from "@/hooks/useStaySearch";
 import { LazyImage } from "@/components/ui/lazy-image";
+import bannerStays from "@/assets/banner-stays.jpg";
 
 const Stays = () => {
   const [selectedStay, setSelectedStay] = useState<any>(null);
@@ -26,18 +27,24 @@ const Stays = () => {
       <Navbar />
       
       {/* Hero Banner */}
-      <div className="relative py-16 md:py-32 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
-        <img 
-          src="/src/assets/hero-beach.jpg" 
-          alt="Stays" 
-          className="absolute inset-0 w-full h-full object-cover opacity-40"
+      <div className="relative min-h-[50vh] md:min-h-[60vh] flex items-center justify-center overflow-hidden">
+        <LazyImage 
+          src={bannerStays}
+          alt="Séjours et Escapades" 
+          className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="relative z-10 container mx-auto px-4">
-          <div className="text-center mb-10">
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">Séjours et Escapades</h1>
-            <p className="text-2xl md:text-3xl text-white/95 font-medium">Découvrez nos forfaits séjours tout compris</p>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background"></div>
+        <div className="relative z-10 container mx-auto px-4 py-12">
+          <div className="text-center mb-8 animate-fade-in">
+            <div className="flex justify-center mb-4">
+              <Palmtree className="w-16 h-16 text-white drop-shadow-lg" />
+            </div>
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">Séjours et Escapades</h1>
+            <p className="text-lg md:text-xl text-white/95 drop-shadow-md max-w-2xl mx-auto">Découvrez nos forfaits séjours tout compris</p>
           </div>
-          <StaySearchForm />
+          <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <StaySearchForm />
+          </div>
         </div>
       </div>
       

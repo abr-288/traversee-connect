@@ -15,6 +15,8 @@ import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { BookingDialog } from "@/components/BookingDialog";
 import { toast } from "sonner";
+import { LazyImage } from "@/components/ui/lazy-image";
+import bannerTrains from "@/assets/banner-trains.jpg";
 
 interface MappedTrain {
   id: string;
@@ -204,18 +206,16 @@ const Trains = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <div
-        className="relative min-h-[50vh] md:min-h-[60vh] flex items-center justify-center overflow-hidden"
-        style={{
-          backgroundImage: "url('https://images.unsplash.com/photo-1474487548417-781cb71495f3')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
+      <div className="relative min-h-[50vh] md:min-h-[60vh] flex items-center justify-center overflow-hidden">
+        <LazyImage
+          src={bannerTrains}
+          alt="Voyagez en Train"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background"></div>
 
         <div className="relative z-10 container mx-auto px-4 py-12">
-          <div className="text-center mb-8">
+          <div className="text-center mb-8 animate-fade-in">
             <div className="flex justify-center mb-4">
               <Train className="w-16 h-16 text-white drop-shadow-lg" />
             </div>
@@ -227,7 +227,9 @@ const Trains = () => {
             </p>
           </div>
 
-          <TrainSearchForm />
+          <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <TrainSearchForm />
+          </div>
         </div>
       </div>
 
