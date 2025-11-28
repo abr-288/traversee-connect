@@ -94,7 +94,7 @@ const DestinationDetail = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pt-16">
       {/* Header */}
       <div className="bg-gradient-to-b from-primary/10 to-background border-b">
         <div className="container mx-auto px-4 py-6">

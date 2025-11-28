@@ -261,11 +261,11 @@ const Cars = () => {
   }, [filteredAndSortedCars, currentPage, itemsPerPage]);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col pt-16">
       <Navbar />
       
       {/* Hero Banner */}
-      <div className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
+      <div className="relative min-h-[50vh] md:min-h-[60vh] flex items-center justify-center overflow-hidden">
         <img 
           src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d" 
           alt="Location de voitures" 

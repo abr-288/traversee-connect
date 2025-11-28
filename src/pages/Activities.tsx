@@ -20,11 +20,11 @@ const Activities = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col pt-16">
       <Navbar />
       
       {/* Hero Banner */}
-      <div className="relative py-32 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
+      <div className="relative py-16 md:py-32 bg-gradient-to-r from-primary/90 to-secondary/90 overflow-hidden">
         <img 
           src="/src/assets/destination-city.jpg" 
           alt="Activities" 

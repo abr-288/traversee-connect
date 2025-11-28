@@ -104,7 +104,7 @@ const Confirmation = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col pt-16">
         <Navbar />
         <main className="flex-1 flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin" />
@@ -116,7 +116,7 @@ const Confirmation = () => {
 
   if (error || !booking) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col pt-16">
         <Navbar />
         <main className="flex-1 container mx-auto px-4 py-12">
           <Card className="max-w-2xl mx-auto">
@@ -143,9 +143,9 @@ const Confirmation = () => {
   const statusInfo = getStatusText();
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col pt-16">
       <Navbar />
-      <main className="flex-1 container mx-auto px-4 py-12">
+      <main className="flex-1 container mx-auto px-4 py-6 md:py-12">
         <Card className="max-w-3xl mx-auto">
           <CardHeader>
             <div className="text-center space-y-4">

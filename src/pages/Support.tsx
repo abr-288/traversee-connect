@@ -86,10 +86,10 @@ const Support = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col pt-16">
       <Navbar />
       
-      <main className="flex-1 container mx-auto px-4 py-8 mt-20">
+      <main className="flex-1 container mx-auto px-4 py-6 md:py-8">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-4">{t("pages.support.title")}</h1>
           <p className="text-muted-foreground text-lg">

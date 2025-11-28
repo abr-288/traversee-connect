@@ -29,9 +29,9 @@ const Install = () => {
   };
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col pt-16">
       <Navbar />
-      <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-20">
+      <div className="flex-1 bg-gradient-to-b from-background to-muted/20 py-10 md:py-20">
         <div className="container max-w-4xl px-4">
           <div className="text-center mb-12">
             <Smartphone className="w-20 h-20 mx-auto mb-6 text-primary" />
@@ -178,7 +178,7 @@ const Install = () => {
         </div>
       </div>
       <Footer />
-    </>
+    </div>
   );
 };
 
