@@ -77,7 +77,12 @@ serve(async (req) => {
       apiPromises.push(searchSkyscanner(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, rapidApiKey));
     }
 
-    // Sabre API (tertiary)
+    // Kiwi.com API via RapidAPI (tertiary)
+    if (rapidApiKey) {
+      apiPromises.push(searchKiwi(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, rapidApiKey));
+    }
+
+    // Sabre API (quaternary)
     if (sabreUserId && sabrePassword) {
       apiPromises.push(searchSabre(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, sabreUserId, sabrePassword));
     }
@@ -517,6 +522,127 @@ async function searchSkyscanner(
     return [];
   } catch (error) {
     console.error('Skyscanner API exception:', error instanceof Error ? error.message : String(error));
+    return [];
+  }
+}
+
+// Kiwi.com API via RapidAPI
+async function searchKiwi(
+  origin: string,
+  destination: string,
+  departureDate: string,
+  returnDate: string | undefined,
+  adults: number,
+  children: number,
+  travelClass: string,
+  rapidApiKey: string
+): Promise<any[]> {
+  try {
+    console.log('Searching flights with Kiwi.com API via RapidAPI...');
+    
+    // Format date for Kiwi API (DD/MM/YYYY)
+    const formatDateForKiwi = (dateStr: string) => {
+      const [year, month, day] = dateStr.split('-');
+      return `${day}/${month}/${year}`;
+    };
+    
+    const kiwiDepartureDate = formatDateForKiwi(departureDate);
+    const kiwiReturnDate = returnDate ? formatDateForKiwi(returnDate) : undefined;
+    
+    // Map travel class to Kiwi format
+    const cabinMap: Record<string, string> = {
+      'ECONOMY': 'M',
+      'PREMIUM_ECONOMY': 'W',
+      'BUSINESS': 'C',
+      'FIRST': 'F'
+    };
+    const selectedCabin = cabinMap[travelClass] || 'M';
+    
+    const params = new URLSearchParams({
+      fly_from: origin,
+      fly_to: destination,
+      date_from: kiwiDepartureDate,
+      date_to: kiwiDepartureDate,
+      adults: adults.toString(),
+      children: children.toString(),
+      selected_cabins: selectedCabin,
+      curr: 'EUR',
+      limit: '15',
+      sort: 'price'
+    });
+    
+    if (kiwiReturnDate) {
+      params.append('return_from', kiwiReturnDate);
+      params.append('return_to', kiwiReturnDate);
+    }
+    
+    const searchResponse = await fetch(
+      `https://kiwi-com-cheap-flights.p.rapidapi.com/v2/search?${params}`,
+      {
+        method: 'GET',
+        headers: {
+          'X-RapidAPI-Key': rapidApiKey,
+          'X-RapidAPI-Host': 'kiwi-com-cheap-flights.p.rapidapi.com'
+        }
+      }
+    );
+
+    if (!searchResponse.ok) {
+      const errorText = await searchResponse.text();
+      console.error('Kiwi.com API error:', searchResponse.status, errorText.substring(0, 300));
+      return [];
+    }
+
+    const searchData = await searchResponse.json();
+    console.log('Kiwi.com API response received');
+
+    if (searchData.data && Array.isArray(searchData.data)) {
+      const flights = searchData.data.slice(0, 15).map((flight: any, index: number) => {
+        const firstRoute = flight.route?.[0];
+        const lastRoute = flight.route?.[flight.route?.length - 1];
+        const price = flight.price || 0;
+        const durationMinutes = flight.duration?.departure ? Math.floor(flight.duration.departure / 60) : 0;
+        
+        return {
+          id: `KIWI-${origin}-${destination}-${index}`,
+          itineraries: [{
+            segments: [{
+              departure: {
+                iataCode: firstRoute?.flyFrom || origin,
+                at: firstRoute?.local_departure || `${departureDate}T00:00:00`,
+              },
+              arrival: {
+                iataCode: lastRoute?.flyTo || destination,
+                at: lastRoute?.local_arrival || `${departureDate}T23:59:00`,
+              },
+              carrierCode: firstRoute?.airline || flight.airlines?.[0] || 'XX',
+              number: firstRoute?.flight_no?.toString() || '0000',
+              duration: `PT${Math.floor(durationMinutes / 60)}H${durationMinutes % 60}M`,
+            }],
+            duration: `PT${Math.floor(durationMinutes / 60)}H${durationMinutes % 60}M`,
+          }],
+          price: {
+            grandTotal: (parseFloat(price) * 655).toString(), // Convert EUR to XOF
+            currency: 'XOF',
+          },
+          validatingAirlineCodes: flight.airlines || [firstRoute?.airline || 'XX'],
+          travelerPricings: [{
+            fareDetailsBySegment: [{
+              cabin: travelClass || 'ECONOMY',
+            }],
+          }],
+          source: 'kiwi',
+          deepLink: flight.deep_link // Include booking link from Kiwi
+        };
+      });
+      
+      console.log(`Found ${flights.length} flights from Kiwi.com`);
+      return flights;
+    }
+    
+    return [];
+  } catch (error) {
+    console.error('Kiwi.com API exception:', error instanceof Error ? error.message : String(error));
     return [];
   }
 }
