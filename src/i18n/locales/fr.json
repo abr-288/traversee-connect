@@ -713,7 +713,41 @@
     "actions": "Actions",
     "print": "Imprimer",
     "share": "Partager",
-    "contactSupport": "Contacter le support"
+    "contactSupport": "Contacter le support",
+    "confirmed": "Réservation confirmée !",
+    "confirmedDesc": "Votre réservation a été confirmée avec succès. Un email de confirmation vous a été envoyé.",
+    "failed": "Réservation échouée",
+    "failedDesc": "La confirmation de votre réservation a échoué. Veuillez contacter le support.",
+    "paymentPending": "Paiement en cours",
+    "paymentPendingDesc": "Votre paiement est en cours de traitement. Veuillez patienter...",
+    "pending": "En attente",
+    "pendingDesc": "Votre réservation est en attente de confirmation.",
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "participants": "Participants",
+    "person": "personne(s)",
+    "contact": "Contact",
+    "amountPaid": "Montant payé",
+    "paid": "Payé",
+    "viewBookings": "Voir mes réservations",
+    "important": "Informations importantes",
+    "keepRef": "Conservez votre numéro de réservation",
+    "emailSent": "Un email de confirmation a été envoyé à",
+    "presentRef": "Présentez ce numéro lors de votre arrivée",
+    "questions": "Pour toute question, contactez notre support 24/7",
+    "serviceTypes": {
+      "flight": "Vol",
+      "hotel": "Hôtel",
+      "car": "Location de voiture",
+      "tour": "Circuit",
+      "stay": "Séjour",
+      "default": "Service"
+    },
+    "passenger": {
+      "main": "Principal",
+      "other": "Passager"
+    },
+    "bornOn": "Né(e) le"
   },
   "auth": {
     "or": "ou",
@@ -723,9 +757,99 @@
     "and": "et notre",
     "privacyPolicy": "politique de confidentialité",
     "passwordStrength": {
+      "veryWeak": "Très faible",
       "weak": "Faible",
       "medium": "Moyen",
-      "strong": "Fort"
+      "strong": "Fort",
+      "veryStrong": "Très fort"
+    },
+    "yourAgency": "Votre agence de voyage de confiance",
+    "secureConnection": "Connexion sécurisée SSL",
+    "validation": {
+      "emailRequired": "L'email est requis",
+      "emailInvalid": "Format d'email invalide",
+      "emailTooLong": "L'email ne peut pas dépasser 255 caractères",
+      "passwordMin": "Le mot de passe doit contenir au moins 8 caractères",
+      "passwordMax": "Le mot de passe ne peut pas dépasser 128 caractères",
+      "passwordUppercase": "Le mot de passe doit contenir au moins une majuscule",
+      "passwordLowercase": "Le mot de passe doit contenir au moins une minuscule",
+      "passwordNumber": "Le mot de passe doit contenir au moins un chiffre",
+      "nameMin": "Le nom doit contenir au moins 2 caractères",
+      "nameMax": "Le nom ne peut pas dépasser 100 caractères",
+      "nameInvalid": "Le nom contient des caractères invalides",
+      "passwordRequired": "Le mot de passe est requis",
+      "passwordMismatch": "Les mots de passe ne correspondent pas"
+    },
+    "errors": {
+      "existingAccount": "Compte existant",
+      "existingAccountDesc": "Un compte existe déjà avec cet email. Connectez-vous ou réinitialisez votre mot de passe.",
+      "signupError": "Erreur d'inscription",
+      "invalidCredentials": "Identifiants incorrects",
+      "invalidCredentialsDesc": "Email ou mot de passe invalide. Vérifiez vos informations.",
+      "loginError": "Erreur de connexion",
+      "googleError": "Erreur Google"
+    },
+    "success": {
+      "signup": "Inscription réussie",
+      "signupDesc": "Vérifiez votre email pour confirmer votre compte",
+      "login": "Connexion réussie",
+      "loginDesc": "Bienvenue sur B-Reserve!",
+      "resetSent": "Email envoyé",
+      "resetSentDesc": "Vérifiez votre boîte mail pour réinitialiser votre mot de passe",
+      "passwordUpdated": "Mot de passe mis à jour",
+      "passwordUpdatedDesc": "Votre mot de passe a été modifié avec succès"
+    },
+    "updatePassword": "Nouveau mot de passe",
+    "updatePasswordDesc": "Entrez votre nouveau mot de passe ci-dessous",
+    "confirmNewPassword": "Confirmer le nouveau mot de passe",
+    "updateBtn": "Mettre à jour"
+  },
+  "dashboardPage": {
+    "title": "Mon Tableau de Bord",
+    "welcome": "Bienvenue",
+    "subtitle": "Gérez vos réservations et suivez vos voyages",
+    "totalBookings": "Total Réservations",
+    "pending": "En Attente",
+    "confirmed": "Confirmées",
+    "completed": "Terminées",
+    "totalSpent": "Total Dépensé",
+    "tabs": {
+      "all": "Toutes",
+      "pending": "En attente",
+      "confirmed": "Confirmées",
+      "completed": "Terminées",
+      "calendar": "Calendrier"
+    },
+    "noBookings": "Aucune réservation",
+    "startPlanning": "Commencez à planifier votre prochain voyage",
+    "explore": "Explorer les destinations",
+    "notifications": {
+      "departingTomorrow": "Départ demain !",
+      "startsTomorrow": "commence demain",
+      "confirmSuccess": "Confirmation réussie",
+      "redirectPayment": "Redirection vers le paiement...",
+      "emailSent": "Réservation confirmée et email envoyé",
+      "emailNotSent": "Email non envoyé. Vous pouvez le télécharger manuellement.",
+      "confirmed": "Réservation confirmée",
+      "cancelSuccess": "Annulation réussie",
+      "cancelledRefund": "Réservation annulée. Remboursement en cours.",
+      "cancelled": "Réservation annulée avec succès",
+      "cancelledNotif": "Réservation annulée",
+      "refundNotif": "Remboursement sous 5-7 jours ouvrés",
+      "comingSoon": "Fonctionnalité à venir",
+      "editSoon": "Modification bientôt disponible",
+      "cannotDelete": "Suppression impossible",
+      "cannotDeleteDesc": "Impossible de supprimer une réservation payée. Veuillez l'annuler d'abord.",
+      "deleteSuccess": "Suppression réussie",
+      "deleted": "Réservation supprimée définitivement",
+      "deletedNotif": "Réservation supprimée",
+      "deletedFromHistory": "La réservation a été supprimée de votre historique"
+    },
+    "errors": {
+      "notFound": "Réservation introuvable",
+      "confirmError": "Impossible de confirmer la réservation",
+      "cancelError": "Impossible d'annuler la réservation",
+      "deleteError": "Impossible de supprimer la réservation"
     }
   }
 }
