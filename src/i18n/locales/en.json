@@ -13,7 +13,8 @@
     "admin": "Admin",
     "logout": "Logout",
     "logoutSuccess": "Logout successful",
-    "dashboard": "Dashboard"
+    "dashboard": "Dashboard",
+    "profile": "My Profile"
   },
   "hero": {
     "title": "Travel anywhere, book in one click",
