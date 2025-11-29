@@ -63,9 +63,9 @@ const Navbar = () => {
             <span className="text-xl font-bold text-white">Bossiz</span>
           </Link>
 
-          <div className="hidden lg:flex items-center flex-1 justify-between pl-4 xl:pl-8">
+          <div className="hidden lg:flex items-center flex-1 justify-end gap-2 xl:gap-4">
             {/* Navigation Principale */}
-            <div className="flex items-center gap-1 lg:gap-2 xl:gap-4">
+            <div className="flex items-center gap-1 lg:gap-2 xl:gap-3">
               <Link to="/flights" className="text-white hover:text-secondary transition-smooth text-[10px] lg:text-xs xl:text-sm font-medium flex items-center gap-1 whitespace-nowrap px-1 lg:px-1.5">
                 <Plane className="w-3 h-3 lg:w-3.5 lg:h-3.5 hidden xl:block" />
                 {t("nav.flights")}
