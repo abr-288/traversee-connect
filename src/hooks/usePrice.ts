@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useCurrency } from '@/contexts/CurrencyContext';
 
-export const usePrice = (amount: number, fromCurrency: string = 'XOF') => {
+export const usePrice = (amount: number, fromCurrency: string = 'EUR') => {
   const { selectedCurrency, convertPrice, formatPrice } = useCurrency();
   const [convertedAmount, setConvertedAmount] = useState<number>(amount);
   const [isConverting, setIsConverting] = useState(false);

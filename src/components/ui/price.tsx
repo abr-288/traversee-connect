@@ -12,7 +12,7 @@ interface PriceProps {
 
 export const Price = memo(({ 
   amount, 
-  fromCurrency = 'XOF', 
+  fromCurrency = 'EUR',
   className = '', 
   showCurrency = true,
   showLoader = false 
