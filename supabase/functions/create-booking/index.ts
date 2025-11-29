@@ -60,9 +60,10 @@ serve(async (req) => {
     }
 
     const requestData: BookingRequest = await req.json();
-    console.log('User ID:', user.id);
-    console.log('Service:', requestData.service_type, requestData.service_name);
-    console.log('Passengers:', requestData.passengers.length);
+    
+    // Security: Only log non-sensitive metadata
+    console.log('Processing booking - Service type:', requestData.service_type);
+    console.log('Passenger count:', requestData.passengers.length);
 
     // Validate input
     if (!requestData.service_type || !requestData.service_name || 
@@ -96,12 +97,13 @@ serve(async (req) => {
         .single();
 
       if (serviceError) {
-        console.error('Service creation error:', serviceError);
+        // Security: Don't log full error details
+        console.error('Service creation failed - Code:', serviceError.code);
         throw new Error('Failed to create service');
       }
 
       serviceId = service.id;
-      console.log('Service created:', serviceId);
+      console.log('Service created successfully');
     }
 
     // Create booking
@@ -128,11 +130,12 @@ serve(async (req) => {
       .single();
 
     if (bookingError) {
-      console.error('Booking creation error:', bookingError);
+      // Security: Don't log full error details
+      console.error('Booking creation failed - Code:', bookingError.code);
       throw new Error('Failed to create booking');
     }
 
-    console.log('Booking created:', booking.id);
+    console.log('Booking created successfully');
 
     // Create passengers
     console.log('Creating passengers...');
@@ -152,7 +155,8 @@ serve(async (req) => {
       .select();
 
     if (passengersError) {
-      console.error('Passengers creation error:', passengersError);
+      // Security: Don't log full error details
+      console.error('Passengers creation failed - Code:', passengersError.code);
       // Don't fail the whole booking if passengers fail
       console.warn('Continuing without passengers...');
     } else {
@@ -174,7 +178,8 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error('❌ ERROR in create-booking:', error);
+    // Security: Only log error type, not full error details
+    console.error('❌ ERROR in create-booking:', error instanceof Error ? error.constructor.name : 'Unknown');
     return new Response(
       JSON.stringify({
         success: false,

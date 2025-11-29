@@ -169,7 +169,8 @@ const handler = async (req: Request): Promise<Response> => {
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   } catch (error: any) {
-    console.error("Error in send-support-email function:", error);
+    // Security: Only log error type, not full error details
+    console.error("Error in send-support-email function:", error instanceof Error ? error.constructor.name : "Unknown");
     return new Response(
       JSON.stringify({ error: error.message }),
       {
