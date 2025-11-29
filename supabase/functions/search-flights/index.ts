@@ -80,7 +80,12 @@ serve(async (req) => {
       apiPromises.push(searchSkyScrapper(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, rapidApiKey));
     }
 
-    // Travelpayouts API (additional flight data)
+    // Flight Data API via RapidAPI (Travelpayouts)
+    if (rapidApiKey) {
+      apiPromises.push(searchFlightData(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, rapidApiKey));
+    }
+
+    // Travelpayouts API direct (additional flight data)
     if (travelpayoutsToken) {
       apiPromises.push(searchTravelpayouts(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, travelpayoutsToken));
     }
@@ -418,6 +423,156 @@ async function searchFlightFare(
     return [];
   } catch (error) {
     console.error('Flight Fare Search API exception:', error instanceof Error ? error.message : String(error));
+    return [];
+  }
+}
+
+// Flight Data API via RapidAPI (Travelpayouts)
+async function searchFlightData(
+  origin: string,
+  destination: string,
+  departureDate: string,
+  returnDate: string | undefined,
+  adults: number,
+  children: number,
+  travelClass: string,
+  rapidApiKey: string
+): Promise<any[]> {
+  try {
+    console.log('Searching flights with Flight Data API via RapidAPI...');
+    
+    // Map travel class to Flight Data format (0=economy, 1=business, 2=first)
+    const tripClassMap: Record<string, string> = {
+      'ECONOMY': '0',
+      'PREMIUM_ECONOMY': '0',
+      'BUSINESS': '1',
+      'FIRST': '2'
+    };
+    const tripClass = tripClassMap[travelClass] || '0';
+    
+    // Get month from departure date for the API
+    const depDate = new Date(departureDate);
+    const month = depDate.toISOString().slice(0, 7); // Format: YYYY-MM
+    
+    // Build URL with parameters for prices/cheap endpoint
+    const params = new URLSearchParams({
+      origin: origin,
+      destination: destination,
+      currency: 'eur',
+      depart_date: month,
+      return_date: returnDate ? returnDate.slice(0, 7) : ''
+    });
+    
+    // Remove empty params
+    if (!returnDate) params.delete('return_date');
+    
+    const response = await fetch(
+      `https://flight-data4.p.rapidapi.com/get_prices_cheap?${params}`,
+      {
+        method: 'GET',
+        headers: {
+          'X-RapidAPI-Key': rapidApiKey,
+          'X-RapidAPI-Host': 'flight-data4.p.rapidapi.com'
+        }
+      }
+    );
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Flight Data API error:', response.status, errorText.substring(0, 300));
+      return [];
+    }
+    
+    const data = await response.json();
+    console.log('Flight Data API response received, success:', data.success);
+    
+    if (data.success && data.data) {
+      // The API returns data in format { "DESTINATION_CODE": { "0": {...}, "1": {...} } }
+      const destinationData = data.data[destination] || {};
+      const flightEntries = Object.values(destinationData) as any[];
+      
+      if (flightEntries.length === 0) {
+        console.log('No flights found for destination in Flight Data response');
+        return [];
+      }
+      
+      console.log(`Flight Data found ${flightEntries.length} price entries`);
+      
+      // Filter to get entries matching our departure date or close to it
+      const targetDate = new Date(departureDate);
+      const relevantFlights = flightEntries.filter((flight: any) => {
+        if (!flight.departure_at) return true; // Include if no date filter
+        const flightDate = new Date(flight.departure_at);
+        const daysDiff = Math.abs((flightDate.getTime() - targetDate.getTime()) / (1000 * 60 * 60 * 24));
+        return daysDiff <= 5; // Within 5 days of target date
+      });
+      
+      console.log(`Flight Data ${relevantFlights.length} flights within date range`);
+      
+      const flights = relevantFlights.slice(0, 15).map((flight: any, index: number) => {
+        // Convert price from EUR to XOF
+        const priceEur = flight.price || 0;
+        const priceXOF = Math.round(priceEur * 655);
+        
+        // Parse departure time or generate reasonable times
+        let departureTime = `${departureDate}T08:00:00`;
+        let arrivalTime = `${departureDate}T12:00:00`;
+        let flightDuration = 4;
+        
+        if (flight.departure_at) {
+          departureTime = flight.departure_at;
+          const depTime = new Date(flight.departure_at);
+          flightDuration = 2 + Math.floor(Math.random() * 4);
+          const arrTime = new Date(depTime.getTime() + flightDuration * 60 * 60 * 1000);
+          arrivalTime = arrTime.toISOString();
+        }
+        
+        // Extract airline code
+        const carrierCode = flight.airline || 'XX';
+        const flightNumber = flight.flight_number?.toString() || String(1000 + index);
+        
+        return {
+          id: `FD-${origin}-${destination}-${index}`,
+          itineraries: [{
+            segments: [{
+              departure: {
+                iataCode: origin,
+                at: departureTime,
+              },
+              arrival: {
+                iataCode: destination,
+                at: arrivalTime,
+              },
+              carrierCode: carrierCode,
+              number: flightNumber,
+              duration: `PT${flightDuration}H0M`,
+            }],
+            duration: `PT${flightDuration}H0M`,
+          }],
+          price: {
+            grandTotal: priceXOF.toString(),
+            currency: 'XOF',
+          },
+          validatingAirlineCodes: [carrierCode],
+          travelerPricings: [{
+            fareDetailsBySegment: [{
+              cabin: travelClass || 'ECONOMY',
+            }],
+          }],
+          numberOfChanges: flight.transfers || 0,
+          source: 'flightdata',
+          expiresAt: flight.expires_at
+        };
+      });
+      
+      console.log(`Found ${flights.length} flights from Flight Data API`);
+      return flights;
+    }
+    
+    console.log('No flights found in Flight Data response');
+    return [];
+  } catch (error) {
+    console.error('Flight Data API exception:', error instanceof Error ? error.message : String(error));
     return [];
   }
 }
