@@ -212,9 +212,7 @@ export default function Payment() {
     }, 30000);
 
     try {
-      console.log("=== INITIATING PAYMENT ===");
-      console.log("Booking ID:", bookingId);
-      console.log("Amount:", booking.total_price, booking.currency);
+      // Security: Don't log sensitive payment information
 
       // Double-check booking status before payment
       const { data: currentBooking, error: checkError } = await supabase
@@ -270,7 +268,6 @@ export default function Payment() {
       clearTimeout(timeoutId);
 
       if (error) {
-        console.error("Payment error:", error);
         throw error;
       }
 
@@ -282,13 +279,12 @@ export default function Payment() {
         throw new Error("URL de paiement non reçue");
       }
 
-      console.log("✅ Redirecting to payment provider");
+      // Redirect to payment provider
 
       // Redirect to payment provider page
       window.location.href = data.payment_url;
     } catch (error: any) {
       clearTimeout(timeoutId);
-      console.error("Payment error:", error);
       
       const userMessage = getUserFriendlyErrorMessage(error);
       setGeneralError(userMessage);
