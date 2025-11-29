@@ -55,7 +55,7 @@ const Navbar = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-primary border-b border-primary-light w-full">
-      <div className="site-container">
+      <div className="w-full px-4 xl:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
@@ -176,11 +176,6 @@ const Navbar = () => {
                   </Button>
                 </Link>
               )}
-
-              <Link to="/dashboard" className="text-white hover:text-secondary transition-smooth text-xs font-medium whitespace-nowrap px-2 py-1 flex items-center gap-1.5">
-                <LayoutDashboard className="w-4 h-4" />
-                {t("nav.dashboard")}
-              </Link>
 
               <Link to="/support" className="text-white hover:text-secondary transition-smooth text-xs font-medium whitespace-nowrap px-2 py-1 flex items-center gap-1.5">
                 <HelpCircle className="w-4 h-4" />
