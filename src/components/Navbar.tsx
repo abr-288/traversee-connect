@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -27,7 +27,17 @@ const Navbar = () => {
   const { isAdmin, loading: roleLoading } = useUserRole();
   const { isInstallable, isInstalled, install } = usePWA();
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
+
+  const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/');
+  
+  const navLinkClass = (path: string) => 
+    `relative transition-smooth text-xs xl:text-sm font-medium whitespace-nowrap px-2 py-1 ${
+      isActive(path) 
+        ? 'text-secondary after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-4/5 after:h-0.5 after:bg-secondary after:rounded-full' 
+        : 'text-white hover:text-secondary'
+    }`;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -75,48 +85,52 @@ const Navbar = () => {
           <div className="hidden lg:flex items-center flex-1 justify-between ml-6">
             {/* Navigation Principale - Gauche */}
             <div className="flex items-center gap-1 xl:gap-2">
-              <Link to="/flights" className="text-white hover:text-secondary transition-smooth text-xs xl:text-sm font-medium whitespace-nowrap px-2 py-1">
+              <Link to="/flights" className={navLinkClass('/flights')}>
                 {t("nav.flights")}
               </Link>
-              <Link to="/hotels" className="text-white hover:text-secondary transition-smooth text-xs xl:text-sm font-medium whitespace-nowrap px-2 py-1">
+              <Link to="/hotels" className={navLinkClass('/hotels')}>
                 {t("nav.hotels")}
               </Link>
-              <Link to="/flight-hotel" className="text-white hover:text-secondary transition-smooth text-xs xl:text-sm font-medium whitespace-nowrap px-2 py-1">
+              <Link to="/flight-hotel" className={navLinkClass('/flight-hotel')}>
                 {t("nav.flightHotel")}
               </Link>
-              <Link to="/cars" className="text-white hover:text-secondary transition-smooth text-xs xl:text-sm font-medium whitespace-nowrap px-2 py-1">
+              <Link to="/cars" className={navLinkClass('/cars')}>
                 {t("nav.carRental")}
               </Link>
               
               {/* Dropdown Autres */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="text-white hover:text-secondary transition-smooth text-xs xl:text-sm font-medium whitespace-nowrap px-2 py-1 flex items-center gap-1">
+                  <button className={`relative transition-smooth text-xs xl:text-sm font-medium whitespace-nowrap px-2 py-1 flex items-center gap-1 ${
+                    isActive('/trains') || isActive('/events') || isActive('/destinations') || isActive('/stays')
+                      ? 'text-secondary after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-4/5 after:h-0.5 after:bg-secondary after:rounded-full'
+                      : 'text-white hover:text-secondary'
+                  }`}>
                     {t("nav.others")}
                     <ChevronDown className="w-3 h-3" />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-48 bg-background border-border z-50">
                   <DropdownMenuItem asChild>
-                    <Link to="/trains" className="flex items-center gap-2 cursor-pointer">
+                    <Link to="/trains" className={`flex items-center gap-2 cursor-pointer ${isActive('/trains') ? 'text-secondary' : ''}`}>
                       <Train className="w-4 h-4" />
                       {t("nav.trains")}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/events" className="flex items-center gap-2 cursor-pointer">
+                    <Link to="/events" className={`flex items-center gap-2 cursor-pointer ${isActive('/events') ? 'text-secondary' : ''}`}>
                       <Calendar className="w-4 h-4" />
                       {t("nav.events")}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/destinations" className="flex items-center gap-2 cursor-pointer">
+                    <Link to="/destinations" className={`flex items-center gap-2 cursor-pointer ${isActive('/destinations') ? 'text-secondary' : ''}`}>
                       <MapPin className="w-4 h-4" />
                       {t("nav.destinations")}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/stays" className="flex items-center gap-2 cursor-pointer">
+                    <Link to="/stays" className={`flex items-center gap-2 cursor-pointer ${isActive('/stays') ? 'text-secondary' : ''}`}>
                       <Compass className="w-4 h-4" />
                       {t("nav.stays")}
                     </Link>
@@ -186,7 +200,7 @@ const Navbar = () => {
                 </Link>
               )}
 
-              <Link to="/support" className="text-white hover:text-secondary transition-smooth text-xs font-medium whitespace-nowrap px-2 py-1 flex items-center gap-1.5">
+              <Link to="/support" className={`${navLinkClass('/support')} flex items-center gap-1.5`}>
                 <HelpCircle className="w-4 h-4" />
                 {t("nav.support")}
               </Link>
