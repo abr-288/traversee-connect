@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,10 +20,12 @@ const profileSchema = z.object({
   full_name: z.string()
     .min(2, "Le nom doit contenir au moins 2 caractères")
     .max(100, "Le nom ne peut pas dépasser 100 caractères")
-    .regex(/^[a-zA-ZÀ-ÿ\s'-]+$/, "Le nom ne peut contenir que des lettres"),
-  phone: z.string()
-    .regex(/^(\+\d{1,3}\s?)?\d{8,15}$/, "Numéro de téléphone invalide")
+    .regex(/^[a-zA-ZÀ-ÿ\s'-]*$/, "Le nom ne peut contenir que des lettres")
     .or(z.literal("")),
+  phone: z.string()
+    .refine((val) => val === "" || /^(\+?\d{1,3}[\s-]?)?\d{8,15}$/.test(val.replace(/\s/g, "")), {
+      message: "Numéro de téléphone invalide"
+    }),
 });
 
 const passwordSchema = z.object({
@@ -300,12 +302,11 @@ const Account = () => {
                   ))}
                 </TabsList>
 
-                <AnimatePresence mode="wait">
-                  <TabsContent value="profile" key="profile">
+                <TabsContent value="profile">
                     <motion.div
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 20 }}
+                      transition={{ duration: 0.3 }}
                     >
                       <Card className="backdrop-blur-sm bg-card/80 border-primary/10 shadow-xl">
                         <CardHeader>
@@ -420,11 +421,11 @@ const Account = () => {
                     </motion.div>
                   </TabsContent>
 
-                  <TabsContent value="security" key="security">
+                <TabsContent value="security">
                     <motion.div
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 20 }}
+                      transition={{ duration: 0.3 }}
                     >
                       <Card className="backdrop-blur-sm bg-card/80 border-primary/10 shadow-xl">
                         <CardHeader>
@@ -603,11 +604,11 @@ const Account = () => {
                     </motion.div>
                   </TabsContent>
 
-                  <TabsContent value="preferences" key="preferences">
+                <TabsContent value="preferences">
                     <motion.div
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 20 }}
+                      transition={{ duration: 0.3 }}
                     >
                       <Card className="backdrop-blur-sm bg-card/80 border-primary/10 shadow-xl">
                         <CardHeader>
@@ -679,11 +680,11 @@ const Account = () => {
                     </motion.div>
                   </TabsContent>
 
-                  <TabsContent value="payment" key="payment">
+                <TabsContent value="payment">
                     <motion.div
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 20 }}
+                      transition={{ duration: 0.3 }}
                     >
                       <Card className="backdrop-blur-sm bg-card/80 border-primary/10 shadow-xl">
                         <CardHeader>
@@ -723,7 +724,6 @@ const Account = () => {
                       </Card>
                     </motion.div>
                   </TabsContent>
-                </AnimatePresence>
               </Tabs>
             </motion.div>
 
