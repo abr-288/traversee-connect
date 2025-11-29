@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Hotel, Car, Plane } from "lucide-react";
@@ -16,12 +16,29 @@ const HERO_SLIDES = [heroSlide1, heroSlide2, heroSlide3, heroSlide4, heroSlide5]
 
 /**
  * HeroSection - Section héro premium avec recherche unifiée
- * Design Opodo/Booking avec système UnifiedForm
+ * Design Opodo/Booking avec système UnifiedForm et effet parallax
  */
 const HeroSection = () => {
   const { t } = useTranslation();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [activeTab, setActiveTab] = useState("flight");
+  const [scrollY, setScrollY] = useState(0);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // Parallax scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      if (sectionRef.current) {
+        const rect = sectionRef.current.getBoundingClientRect();
+        if (rect.bottom > 0) {
+          setScrollY(window.scrollY * 0.4);
+        }
+      }
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -31,15 +48,19 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <section className="relative min-h-[500px] md:min-h-[700px] flex items-center pt-16 md:pt-20 overflow-hidden w-full">
-      {/* Background Image Carousel with Overlay */}
-      <div className="absolute inset-0 z-0">
+    <section ref={sectionRef} className="relative min-h-[500px] md:min-h-[700px] flex items-center pt-16 md:pt-20 overflow-hidden w-full">
+      {/* Background Image Carousel with Parallax Effect */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
         {HERO_SLIDES.map((slide, index) => (
           <div
             key={index}
             className={`absolute inset-0 transition-all duration-1000 ${
               index === currentSlide ? "opacity-100 scale-100" : "opacity-0 scale-105"
             }`}
+            style={{
+              transform: `translateY(${scrollY}px) scale(1.1)`,
+              willChange: 'transform'
+            }}
           >
             <img
               src={slide}
