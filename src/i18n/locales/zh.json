@@ -700,7 +700,41 @@
     "actions": "操作",
     "print": "打印",
     "share": "分享",
-    "contactSupport": "联系客服"
+    "contactSupport": "联系客服",
+    "confirmed": "预订已确认！",
+    "confirmedDesc": "您的预订已成功确认。确认邮件已发送。",
+    "failed": "预订失败",
+    "failedDesc": "您的预订确认失败。请联系客服。",
+    "paymentPending": "付款处理中",
+    "paymentPendingDesc": "您的付款正在处理中，请稍候...",
+    "pending": "待处理",
+    "pendingDesc": "您的预订正在等待确认。",
+    "startDate": "开始日期",
+    "endDate": "结束日期",
+    "participants": "参与人数",
+    "person": "人",
+    "contact": "联系方式",
+    "amountPaid": "已付金额",
+    "paid": "已支付",
+    "viewBookings": "查看我的预订",
+    "important": "重要信息",
+    "keepRef": "请保存您的预订编号",
+    "emailSent": "确认邮件已发送至",
+    "presentRef": "到达时请出示此编号",
+    "questions": "如有疑问，请联系我们的24/7客服",
+    "serviceTypes": {
+      "flight": "航班",
+      "hotel": "酒店",
+      "car": "租车",
+      "tour": "旅游",
+      "stay": "住宿",
+      "default": "服务"
+    },
+    "passenger": {
+      "main": "主要",
+      "other": "乘客"
+    },
+    "bornOn": "出生日期"
   },
   "auth": {
     "or": "或",
@@ -710,9 +744,99 @@
     "and": "和",
     "privacyPolicy": "隐私政策",
     "passwordStrength": {
+      "veryWeak": "非常弱",
       "weak": "弱",
       "medium": "中",
-      "strong": "强"
+      "strong": "强",
+      "veryStrong": "非常强"
+    },
+    "yourAgency": "您信赖的旅行社",
+    "secureConnection": "SSL安全连接",
+    "validation": {
+      "emailRequired": "邮箱为必填项",
+      "emailInvalid": "邮箱格式无效",
+      "emailTooLong": "邮箱不能超过255个字符",
+      "passwordMin": "密码至少需要8个字符",
+      "passwordMax": "密码不能超过128个字符",
+      "passwordUppercase": "密码必须包含至少一个大写字母",
+      "passwordLowercase": "密码必须包含至少一个小写字母",
+      "passwordNumber": "密码必须包含至少一个数字",
+      "nameMin": "名称至少需要2个字符",
+      "nameMax": "名称不能超过100个字符",
+      "nameInvalid": "名称包含无效字符",
+      "passwordRequired": "密码为必填项",
+      "passwordMismatch": "密码不匹配"
+    },
+    "errors": {
+      "existingAccount": "账户已存在",
+      "existingAccountDesc": "此邮箱已注册账户。请登录或重置密码。",
+      "signupError": "注册错误",
+      "invalidCredentials": "凭据无效",
+      "invalidCredentialsDesc": "邮箱或密码无效。请检查您的信息。",
+      "loginError": "登录错误",
+      "googleError": "Google错误"
+    },
+    "success": {
+      "signup": "注册成功",
+      "signupDesc": "请检查邮箱以确认账户",
+      "login": "登录成功",
+      "loginDesc": "欢迎来到B-Reserve！",
+      "resetSent": "邮件已发送",
+      "resetSentDesc": "请检查邮箱以重置密码",
+      "passwordUpdated": "密码已更新",
+      "passwordUpdatedDesc": "您的密码已成功更改"
+    },
+    "updatePassword": "新密码",
+    "updatePasswordDesc": "请在下方输入新密码",
+    "confirmNewPassword": "确认新密码",
+    "updateBtn": "更新"
+  },
+  "dashboardPage": {
+    "title": "我的控制面板",
+    "welcome": "欢迎",
+    "subtitle": "管理您的预订并跟踪您的旅行",
+    "totalBookings": "总预订",
+    "pending": "待处理",
+    "confirmed": "已确认",
+    "completed": "已完成",
+    "totalSpent": "总花费",
+    "tabs": {
+      "all": "全部",
+      "pending": "待处理",
+      "confirmed": "已确认",
+      "completed": "已完成",
+      "calendar": "日历"
+    },
+    "noBookings": "暂无预订",
+    "startPlanning": "开始规划您的下一次旅行",
+    "explore": "探索目的地",
+    "notifications": {
+      "departingTomorrow": "明天出发！",
+      "startsTomorrow": "明天开始",
+      "confirmSuccess": "确认成功",
+      "redirectPayment": "正在跳转到付款...",
+      "emailSent": "预订已确认，邮件已发送",
+      "emailNotSent": "邮件未发送。您可以手动下载。",
+      "confirmed": "预订已确认",
+      "cancelSuccess": "取消成功",
+      "cancelledRefund": "预订已取消。退款处理中。",
+      "cancelled": "预订取消成功",
+      "cancelledNotif": "预订已取消",
+      "refundNotif": "5-7个工作日内退款",
+      "comingSoon": "即将推出",
+      "editSoon": "编辑功能即将推出",
+      "cannotDelete": "无法删除",
+      "cannotDeleteDesc": "无法删除已付款的预订。请先取消。",
+      "deleteSuccess": "删除成功",
+      "deleted": "预订已永久删除",
+      "deletedNotif": "预订已删除",
+      "deletedFromHistory": "预订已从您的历史记录中删除"
+    },
+    "errors": {
+      "notFound": "未找到预订",
+      "confirmError": "无法确认预订",
+      "cancelError": "无法取消预订",
+      "deleteError": "无法删除预订"
     }
   },
   "nav": {

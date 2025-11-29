@@ -16,6 +16,7 @@ import { CurrencyDebugPanel } from "@/components/CurrencyDebugPanel";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { useOfflineBookings } from "@/hooks/useOfflineBookings";
 import { Price } from "@/components/ui/price";
+import { useTranslation } from "react-i18next";
 
 interface Booking {
   id: string;
@@ -40,6 +41,7 @@ interface Booking {
 }
 
 const Dashboard = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
@@ -80,7 +82,7 @@ const Dashboard = () => {
       
       setUserProfile({
         id: user.id,
-        full_name: profileData?.full_name || "Utilisateur",
+        full_name: profileData?.full_name || t('dashboardPage.welcome'),
         email: user.email || "",
       });
       
@@ -117,8 +119,8 @@ const Dashboard = () => {
         if (!existingNotif && booking.services) {
           addNotification({
             type: "warning",
-            title: "Départ demain !",
-            message: `Votre ${booking.services.name} commence demain`,
+            title: t('dashboardPage.notifications.departingTomorrow'),
+            message: `${booking.services.name} ${t('dashboardPage.notifications.startsTomorrow')}`,
           });
         }
       }
@@ -164,7 +166,7 @@ const Dashboard = () => {
     try {
       const booking = bookings.find((b) => b.id === id);
       if (!booking) {
-        throw new Error("Réservation introuvable");
+        throw new Error(t('dashboardPage.errors.notFound'));
       }
 
       const { error } = await supabase
@@ -179,8 +181,8 @@ const Dashboard = () => {
 
       if (booking.payment_status === "pending") {
         toast({
-          title: "Confirmation réussie",
-          description: "Redirection vers le paiement...",
+          title: t('dashboardPage.notifications.confirmSuccess'),
+          description: t('dashboardPage.notifications.redirectPayment'),
         });
         
         setTimeout(() => {
@@ -195,29 +197,29 @@ const Dashboard = () => {
         });
         
         toast({
-          title: "Succès",
-          description: "Réservation confirmée et email envoyé",
+          title: t('common.success'),
+          description: t('dashboardPage.notifications.emailSent'),
         });
       } catch (emailError) {
         console.error("Error sending confirmation email:", emailError);
         toast({
-          title: "Réservation confirmée",
-          description: "Email non envoyé. Vous pouvez le télécharger manuellement.",
+          title: t('dashboardPage.notifications.confirmed'),
+          description: t('dashboardPage.notifications.emailNotSent'),
         });
       }
 
       addNotification({
         type: "success",
-        title: "Réservation confirmée",
+        title: t('dashboardPage.notifications.confirmed'),
         message: booking.payment_status === "paid" 
-          ? "Votre réservation a été confirmée et un email de confirmation a été envoyé"
-          : "Votre réservation a été confirmée. Veuillez procéder au paiement.",
+          ? t('dashboardPage.notifications.emailSent')
+          : t('dashboardPage.notifications.redirectPayment'),
       });
     } catch (error: any) {
       console.error("Error confirming booking:", error);
       toast({
-        title: "Erreur",
-        description: error.message || "Impossible de confirmer la réservation",
+        title: t('common.error'),
+        description: error.message || t('dashboardPage.errors.confirmError'),
         variant: "destructive",
       });
     }
@@ -227,7 +229,7 @@ const Dashboard = () => {
     try {
       const booking = bookings.find((b) => b.id === id);
       if (!booking) {
-        throw new Error("Réservation introuvable");
+        throw new Error(t('dashboardPage.errors.notFound'));
       }
 
       const updateData: any = { 
@@ -247,24 +249,24 @@ const Dashboard = () => {
       if (error) throw error;
 
       toast({
-        title: "Annulation réussie",
+        title: t('dashboardPage.notifications.cancelSuccess'),
         description: booking.payment_status === "paid" 
-          ? "Réservation annulée. Remboursement en cours."
-          : "Réservation annulée avec succès",
+          ? t('dashboardPage.notifications.cancelledRefund')
+          : t('dashboardPage.notifications.cancelled'),
       });
 
       addNotification({
         type: "info",
-        title: "Réservation annulée",
+        title: t('dashboardPage.notifications.cancelledNotif'),
         message: booking.payment_status === "paid" 
-          ? "Remboursement sous 5-7 jours ouvrés"
-          : "Votre réservation a été annulée",
+          ? t('dashboardPage.notifications.refundNotif')
+          : t('dashboardPage.notifications.cancelled'),
       });
     } catch (error: any) {
       console.error("Error cancelling booking:", error);
       toast({
-        title: "Erreur",
-        description: error.message || "Impossible d'annuler la réservation",
+        title: t('common.error'),
+        description: error.message || t('dashboardPage.errors.cancelError'),
         variant: "destructive",
       });
     }
@@ -272,8 +274,8 @@ const Dashboard = () => {
 
   const handleEditBooking = (booking: Booking) => {
     toast({
-      title: "Fonctionnalité à venir",
-      description: "Modification bientôt disponible",
+      title: t('dashboardPage.notifications.comingSoon'),
+      description: t('dashboardPage.notifications.editSoon'),
     });
   };
 
@@ -281,13 +283,13 @@ const Dashboard = () => {
     try {
       const booking = bookings.find((b) => b.id === id);
       if (!booking) {
-        throw new Error("Réservation introuvable");
+        throw new Error(t('dashboardPage.errors.notFound'));
       }
 
       if ((booking.status === "confirmed" || booking.status === "completed") && booking.payment_status === "paid") {
         toast({
-          title: "Suppression impossible",
-          description: "Impossible de supprimer une réservation payée. Veuillez l'annuler d'abord.",
+          title: t('dashboardPage.notifications.cannotDelete'),
+          description: t('dashboardPage.notifications.cannotDeleteDesc'),
           variant: "destructive",
         });
         return;
@@ -298,20 +300,20 @@ const Dashboard = () => {
       if (error) throw error;
 
       toast({
-        title: "Suppression réussie",
-        description: "Réservation supprimée définitivement",
+        title: t('dashboardPage.notifications.deleteSuccess'),
+        description: t('dashboardPage.notifications.deleted'),
       });
 
       addNotification({
         type: "info",
-        title: "Réservation supprimée",
-        message: "La réservation a été supprimée de votre historique",
+        title: t('dashboardPage.notifications.deletedNotif'),
+        message: t('dashboardPage.notifications.deletedFromHistory'),
       });
     } catch (error: any) {
       console.error("Error deleting booking:", error);
       toast({
-        title: "Erreur",
-        description: error.message || "Impossible de supprimer la réservation",
+        title: t('common.error'),
+        description: error.message || t('dashboardPage.errors.deleteError'),
         variant: "destructive",
       });
     }
@@ -342,15 +344,15 @@ const Dashboard = () => {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-4xl font-bold">Mon Tableau de Bord</h1>
+              <h1 className="text-4xl font-bold">{t('dashboardPage.title')}</h1>
             </div>
             {userProfile && (
               <p className="text-lg font-semibold text-primary mb-1">
-                Bienvenue, {userProfile.full_name} 👋
+                {t('dashboardPage.welcome')}, {userProfile.full_name} 👋
               </p>
             )}
             <p className="text-muted-foreground">
-              Gérez vos réservations et suivez vos voyages
+              {t('dashboardPage.subtitle')}
             </p>
           </div>
           <NotificationCenter
@@ -372,7 +374,7 @@ const Dashboard = () => {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <Package className="w-4 h-4" />
-                Total Réservations
+                {t('dashboardPage.totalBookings')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -384,7 +386,7 @@ const Dashboard = () => {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
-                En Attente
+                {t('dashboardPage.pending')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -396,7 +398,7 @@ const Dashboard = () => {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
-                Confirmées
+                {t('dashboardPage.confirmed')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -408,7 +410,7 @@ const Dashboard = () => {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <CreditCard className="w-4 h-4" />
-                Total Dépensé
+                {t('dashboardPage.totalSpent')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -428,11 +430,11 @@ const Dashboard = () => {
 
         <Tabs defaultValue="all" className="w-full">
           <TabsList className="mb-6">
-            <TabsTrigger value="all">Toutes ({stats.total})</TabsTrigger>
-            <TabsTrigger value="pending">En attente ({stats.pending})</TabsTrigger>
-            <TabsTrigger value="confirmed">Confirmées ({stats.confirmed})</TabsTrigger>
-            <TabsTrigger value="completed">Terminées ({stats.completed})</TabsTrigger>
-            <TabsTrigger value="calendar">📅 Calendrier</TabsTrigger>
+            <TabsTrigger value="all">{t('dashboardPage.tabs.all')} ({stats.total})</TabsTrigger>
+            <TabsTrigger value="pending">{t('dashboardPage.tabs.pending')} ({stats.pending})</TabsTrigger>
+            <TabsTrigger value="confirmed">{t('dashboardPage.tabs.confirmed')} ({stats.confirmed})</TabsTrigger>
+            <TabsTrigger value="completed">{t('dashboardPage.tabs.completed')} ({stats.completed})</TabsTrigger>
+            <TabsTrigger value="calendar">📅 {t('dashboardPage.tabs.calendar')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="all" className="space-y-4">
@@ -440,11 +442,11 @@ const Dashboard = () => {
               <Card>
                 <CardContent className="py-12 text-center">
                   <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Aucune réservation</h3>
+                  <h3 className="text-lg font-semibold mb-2">{t('dashboardPage.noBookings')}</h3>
                   <p className="text-muted-foreground mb-6">
-                    Commencez à planifier votre prochain voyage
+                    {t('dashboardPage.startPlanning')}
                   </p>
-                  <Button onClick={() => navigate("/")}>Explorer les destinations</Button>
+                  <Button onClick={() => navigate("/")}>{t('dashboardPage.explore')}</Button>
                 </CardContent>
               </Card>
             ) : (

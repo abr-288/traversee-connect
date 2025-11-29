@@ -713,7 +713,41 @@
     "actions": "Actions",
     "print": "Print",
     "share": "Share",
-    "contactSupport": "Contact support"
+    "contactSupport": "Contact support",
+    "confirmed": "Booking confirmed!",
+    "confirmedDesc": "Your booking has been successfully confirmed. A confirmation email has been sent.",
+    "failed": "Booking failed",
+    "failedDesc": "Your booking confirmation failed. Please contact support.",
+    "paymentPending": "Payment in progress",
+    "paymentPendingDesc": "Your payment is being processed. Please wait...",
+    "pending": "Pending",
+    "pendingDesc": "Your booking is awaiting confirmation.",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "participants": "Participants",
+    "person": "person(s)",
+    "contact": "Contact",
+    "amountPaid": "Amount paid",
+    "paid": "Paid",
+    "viewBookings": "View my bookings",
+    "important": "Important information",
+    "keepRef": "Keep your booking number",
+    "emailSent": "A confirmation email has been sent to",
+    "presentRef": "Present this number upon arrival",
+    "questions": "For any questions, contact our 24/7 support",
+    "serviceTypes": {
+      "flight": "Flight",
+      "hotel": "Hotel",
+      "car": "Car rental",
+      "tour": "Tour",
+      "stay": "Stay",
+      "default": "Service"
+    },
+    "passenger": {
+      "main": "Main",
+      "other": "Passenger"
+    },
+    "bornOn": "Born on"
   },
   "auth": {
     "or": "or",
@@ -723,9 +757,99 @@
     "and": "and our",
     "privacyPolicy": "privacy policy",
     "passwordStrength": {
+      "veryWeak": "Very weak",
       "weak": "Weak",
       "medium": "Medium",
-      "strong": "Strong"
+      "strong": "Strong",
+      "veryStrong": "Very strong"
+    },
+    "yourAgency": "Your trusted travel agency",
+    "secureConnection": "Secure SSL connection",
+    "validation": {
+      "emailRequired": "Email is required",
+      "emailInvalid": "Invalid email format",
+      "emailTooLong": "Email cannot exceed 255 characters",
+      "passwordMin": "Password must be at least 8 characters",
+      "passwordMax": "Password cannot exceed 128 characters",
+      "passwordUppercase": "Password must contain at least one uppercase letter",
+      "passwordLowercase": "Password must contain at least one lowercase letter",
+      "passwordNumber": "Password must contain at least one number",
+      "nameMin": "Name must be at least 2 characters",
+      "nameMax": "Name cannot exceed 100 characters",
+      "nameInvalid": "Name contains invalid characters",
+      "passwordRequired": "Password is required",
+      "passwordMismatch": "Passwords do not match"
+    },
+    "errors": {
+      "existingAccount": "Existing account",
+      "existingAccountDesc": "An account already exists with this email. Log in or reset your password.",
+      "signupError": "Signup error",
+      "invalidCredentials": "Invalid credentials",
+      "invalidCredentialsDesc": "Invalid email or password. Please check your information.",
+      "loginError": "Login error",
+      "googleError": "Google error"
+    },
+    "success": {
+      "signup": "Signup successful",
+      "signupDesc": "Check your email to confirm your account",
+      "login": "Login successful",
+      "loginDesc": "Welcome to B-Reserve!",
+      "resetSent": "Email sent",
+      "resetSentDesc": "Check your inbox to reset your password",
+      "passwordUpdated": "Password updated",
+      "passwordUpdatedDesc": "Your password has been changed successfully"
+    },
+    "updatePassword": "New password",
+    "updatePasswordDesc": "Enter your new password below",
+    "confirmNewPassword": "Confirm new password",
+    "updateBtn": "Update"
+  },
+  "dashboardPage": {
+    "title": "My Dashboard",
+    "welcome": "Welcome",
+    "subtitle": "Manage your bookings and track your travels",
+    "totalBookings": "Total Bookings",
+    "pending": "Pending",
+    "confirmed": "Confirmed",
+    "completed": "Completed",
+    "totalSpent": "Total Spent",
+    "tabs": {
+      "all": "All",
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "calendar": "Calendar"
+    },
+    "noBookings": "No bookings",
+    "startPlanning": "Start planning your next trip",
+    "explore": "Explore destinations",
+    "notifications": {
+      "departingTomorrow": "Departing tomorrow!",
+      "startsTomorrow": "starts tomorrow",
+      "confirmSuccess": "Confirmation successful",
+      "redirectPayment": "Redirecting to payment...",
+      "emailSent": "Booking confirmed and email sent",
+      "emailNotSent": "Email not sent. You can download it manually.",
+      "confirmed": "Booking confirmed",
+      "cancelSuccess": "Cancellation successful",
+      "cancelledRefund": "Booking cancelled. Refund in progress.",
+      "cancelled": "Booking cancelled successfully",
+      "cancelledNotif": "Booking cancelled",
+      "refundNotif": "Refund within 5-7 business days",
+      "comingSoon": "Coming soon",
+      "editSoon": "Edit feature coming soon",
+      "cannotDelete": "Cannot delete",
+      "cannotDeleteDesc": "Cannot delete a paid booking. Please cancel it first.",
+      "deleteSuccess": "Deletion successful",
+      "deleted": "Booking permanently deleted",
+      "deletedNotif": "Booking deleted",
+      "deletedFromHistory": "Booking has been removed from your history"
+    },
+    "errors": {
+      "notFound": "Booking not found",
+      "confirmError": "Unable to confirm booking",
+      "cancelError": "Unable to cancel booking",
+      "deleteError": "Unable to delete booking"
     }
   }
 }

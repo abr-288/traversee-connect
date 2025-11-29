@@ -11,6 +11,7 @@ import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import logoLight from "@/assets/logo-light.png";
+import { useTranslation } from "react-i18next";
 
 // Schémas de validation Zod sécurisés
 const emailSchema = z
@@ -181,6 +182,7 @@ const AnimatedFormField = ({
 };
 
 const Auth = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
@@ -404,7 +406,13 @@ const Auth = () => {
 
   const passwordStrength = getPasswordStrength(signUpForm.password);
   const strengthColors = ["bg-destructive", "bg-orange-500", "bg-yellow-500", "bg-lime-500", "bg-green-500"];
-  const strengthLabels = ["Très faible", "Faible", "Moyen", "Fort", "Très fort"];
+  const strengthLabels = [
+    t('auth.passwordStrength.veryWeak'),
+    t('auth.passwordStrength.weak'),
+    t('auth.passwordStrength.medium'),
+    t('auth.passwordStrength.strong'),
+    t('auth.passwordStrength.veryStrong')
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary via-primary/80 to-secondary relative overflow-hidden flex items-center justify-center p-4">
@@ -480,7 +488,7 @@ const Auth = () => {
             </motion.div>
             <motion.div variants={itemVariants}>
               <CardDescription className="text-base">
-                Votre agence de voyage de confiance
+                {t('auth.yourAgency')}
               </CardDescription>
             </motion.div>
             
@@ -490,7 +498,7 @@ const Auth = () => {
               className="flex items-center justify-center gap-2 mt-3 text-xs text-muted-foreground"
             >
               <Shield className="h-3 w-3 text-green-500" />
-              <span>Connexion sécurisée SSL</span>
+              <span>{t('auth.secureConnection')}</span>
               <Lock className="h-3 w-3 text-green-500" />
             </motion.div>
           </CardHeader>
@@ -615,13 +623,13 @@ const Auth = () => {
                           value="signin"
                           className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-300"
                         >
-                          Connexion
+                          {t('auth.login')}
                         </TabsTrigger>
                         <TabsTrigger 
                           value="signup"
                           className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-300"
                         >
-                          Inscription
+                          {t('auth.signup')}
                         </TabsTrigger>
                       </TabsList>
                     </motion.div>
