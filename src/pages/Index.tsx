@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 import { AITravelAdvisor } from "@/components/AITravelAdvisor";
 import { Boss } from "@/components/Boss";
 import StatsSection from "@/components/StatsSection";
-import FeaturedServices from "@/components/FeaturedServices";
+import FeaturedSubscriptions from "@/components/FeaturedSubscriptions";
 import SpecialOffers from "@/components/SpecialOffers";
 import { SeasonalSuggestions } from "@/components/SeasonalSuggestions";
 import { useTranslation } from "react-i18next";
@@ -22,7 +22,7 @@ const Index = () => {
         <HeroSection />
         <StatsSection />
         <DestinationsSection />
-        <FeaturedServices />
+        <FeaturedSubscriptions />
         <SpecialOffers />
         
         {/* Seasonal Suggestions Section */}
@@ -30,10 +30,10 @@ const Index = () => {
           <div className="container mx-auto max-w-7xl">
             <div className="text-center mb-6 md:mb-8">
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">
-                Suggestions Saisonnières Intelligentes
+                {t("pages.index.seasonalTitle", "Suggestions Saisonnières Intelligentes")}
               </h2>
               <p className="text-muted-foreground text-base md:text-lg px-4">
-                Découvrez les meilleures périodes pour voyager selon la météo, les événements et la saisonnalité
+                {t("pages.index.seasonalSubtitle", "Découvrez les meilleures périodes pour voyager selon la météo, les événements et la saisonnalité")}
               </p>
             </div>
             <SeasonalSuggestions />
