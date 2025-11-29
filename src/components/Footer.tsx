@@ -33,8 +33,8 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-primary border-t border-primary-light">
-      <div className="container mx-auto px-4 py-8 md:py-12">
+    <footer className="bg-primary border-t border-primary-light w-full">
+      <div className="site-container py-8 md:py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 mb-6 md:mb-8">
           {/* Brand Section */}
           <div className="space-y-3 md:space-y-4 text-center sm:text-left">

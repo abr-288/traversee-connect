@@ -38,13 +38,13 @@ const SpecialOffers = () => {
           service={selectedService}
         />
       )}
-      <section className="py-20 md:py-24 lg:py-28 bg-gradient-to-br from-primary/5 via-secondary/5 to-background relative overflow-hidden">
+      <section className="py-20 md:py-24 lg:py-28 bg-gradient-to-br from-primary/5 via-secondary/5 to-background relative overflow-hidden w-full">
         {/* Animated background elements */}
         <div className="absolute inset-0 gradient-mesh opacity-40" />
         <div className="absolute top-10 left-10 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-float" />
         <div className="absolute bottom-10 right-10 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '1.5s' }} />
         
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="site-container relative z-10">
           <div className="text-center mb-14 md:mb-16 animate-slide-up-fade">
             <Badge className="mb-6 gap-2 text-base px-6 py-3 bg-gradient-primary text-white border-0 shadow-primary animate-pulse-glow">
               <Percent className="w-5 h-5" />

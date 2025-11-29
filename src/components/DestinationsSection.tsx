@@ -31,13 +31,13 @@ const DestinationsSection = () => {
   };
 
   return (
-    <section className="py-16 md:py-20 lg:py-24 bg-gradient-to-b from-muted/20 via-background to-muted/30 relative overflow-hidden">
+    <section className="py-16 md:py-20 lg:py-24 bg-gradient-to-b from-muted/20 via-background to-muted/30 relative overflow-hidden w-full">
       {/* Decorative background */}
       <div className="absolute inset-0 gradient-mesh opacity-30" />
       <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
       <div className="absolute bottom-20 left-10 w-80 h-80 bg-secondary/5 rounded-full blur-3xl" />
       
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="site-container relative z-10">
         <div className="text-center mb-12 md:mb-16 animate-slide-up-fade">
           <div className="inline-block mb-4">
             <span className="px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-semibold">

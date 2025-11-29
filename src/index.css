@@ -118,6 +118,45 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
+  /* Layout System - Opodo Style */
+  .site-container {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    box-sizing: border-box;
+    width: 100%;
+  }
+  
+  @media (min-width: 768px) {
+    .site-container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .site-container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+  
+  .full-bleed {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+  }
+  
+  /* Prevent horizontal scroll from full-bleed */
+  .full-bleed-wrapper {
+    overflow-x: hidden;
+  }
+  
   .gradient-primary {
     background: var(--gradient-primary);
   }
