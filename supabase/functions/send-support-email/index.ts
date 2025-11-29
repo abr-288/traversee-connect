@@ -68,7 +68,7 @@ const handler = async (req: Request): Promise<Response> => {
       message: sanitizeString(message, 2000),
     };
 
-    console.log("Support message received from:", sanitizedData.name, sanitizedData.email);
+    console.log("Support message received");
 
     // Send email to support team
     const emailHtml = `
