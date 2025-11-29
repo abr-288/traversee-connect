@@ -10,6 +10,7 @@ import { motion, AnimatePresence, type Transition } from "framer-motion";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import logoLight from "@/assets/logo-light.png";
 
 // Schémas de validation Zod sécurisés
 const emailSchema = z
@@ -461,16 +462,16 @@ const Auth = () => {
           <CardHeader className="text-center pb-2">
             <motion.div 
               className="flex justify-center mb-4"
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
+              animate={{ scale: [1, 1.02, 1] }}
+              transition={{ duration: 3, repeat: Infinity }}
             >
-              <motion.div 
-                className="bg-gradient-to-br from-primary to-secondary p-4 rounded-2xl shadow-lg"
-                whileHover={{ scale: 1.1, rotate: 5 }}
+              <motion.img 
+                src={logoLight}
+                alt="B-Reserve Logo"
+                className="h-16 w-auto"
+                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-              >
-                <Plane className="h-10 w-10 text-primary-foreground" />
-              </motion.div>
+              />
             </motion.div>
             <motion.div variants={itemVariants}>
               <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
