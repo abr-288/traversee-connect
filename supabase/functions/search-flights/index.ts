@@ -865,12 +865,16 @@ async function searchTravelpayouts(
     };
     const tripClass = tripClassMap[travelClass] || '0';
     
+    // beginning_of_period must be the first day of the month
+    const depDate = new Date(departureDate);
+    const firstDayOfMonth = `${depDate.getFullYear()}-${String(depDate.getMonth() + 1).padStart(2, '0')}-01`;
+    
     // Build URL with parameters
     const params = new URLSearchParams({
       currency: 'eur',
       origin: origin,
       destination: destination,
-      beginning_of_period: departureDate,
+      beginning_of_period: firstDayOfMonth,
       period_type: 'month',
       one_way: returnDate ? 'false' : 'true',
       page: '1',
