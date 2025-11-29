@@ -10,8 +10,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   Building2, 
   Crown, 
@@ -171,29 +171,51 @@ export default function Subscriptions() {
     message: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [openDialog, setOpenDialog] = useState<string | null>(null);
 
-  const handleContactSubmit = async (e: React.FormEvent) => {
+  const handleContactSubmit = async (e: React.FormEvent, plan: SubscriptionPlan) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      const { error } = await supabase
+        .from("subscription_requests")
+        .insert({
+          plan_id: plan.id,
+          plan_name: plan.name,
+          name: contactForm.name.trim(),
+          email: contactForm.email.trim(),
+          phone: contactForm.phone.trim(),
+          company: contactForm.company.trim() || null,
+          message: contactForm.message.trim() || null,
+        });
+
+      if (error) throw error;
     
-    toast({
-      title: "Demande envoyée !",
-      description: "Notre équipe vous contactera dans les plus brefs délais.",
-    });
+      toast({
+        title: "Demande envoyée !",
+        description: "Notre équipe vous contactera dans les plus brefs délais.",
+      });
     
-    setContactForm({
-      name: "",
-      email: "",
-      phone: "",
-      company: "",
-      plan: "",
-      message: ""
-    });
-    setIsSubmitting(false);
-    setSelectedPlan(null);
+      setContactForm({
+        name: "",
+        email: "",
+        phone: "",
+        company: "",
+        plan: "",
+        message: ""
+      });
+      setOpenDialog(null);
+    } catch (error: any) {
+      console.error("Error submitting subscription request:", error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue. Veuillez réessayer.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const openWhatsApp = (planName: string) => {
@@ -328,7 +350,7 @@ export default function Subscriptions() {
                               Remplissez ce formulaire et notre équipe vous contactera rapidement.
                             </DialogDescription>
                           </DialogHeader>
-                          <form onSubmit={handleContactSubmit} className="space-y-4 mt-4">
+                          <form onSubmit={(e) => handleContactSubmit(e, plan)} className="space-y-4 mt-4">
                             <div className="grid grid-cols-2 gap-4">
                               <div className="space-y-2">
                                 <Label htmlFor="name">Nom complet *</Label>

@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, Activity, Home, Calendar, Users, Settings } from "lucide-react";
+import { LayoutDashboard, Package, Activity, Home, Calendar, Users, Settings, Crown } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
 import {
   Sidebar,
@@ -18,6 +18,7 @@ const menuItems = [
   { title: "Services", url: "/admin/services", icon: Package },
   { title: "Activités", url: "/admin/activities", icon: Activity },
   { title: "Séjours", url: "/admin/stays", icon: Home },
+  { title: "Abonnements", url: "/admin/subscriptions", icon: Crown },
   { title: "Utilisateurs", url: "/admin/users", icon: Users },
   { title: "Configuration", url: "/admin/email-templates", icon: Settings },
 ];
