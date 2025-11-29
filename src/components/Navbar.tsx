@@ -23,10 +23,19 @@ import CurrencySelector from "./CurrencySelector";
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const { isAdmin, loading: roleLoading } = useUserRole();
   const { isInstallable, isInstalled, install } = usePWA();
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -54,13 +63,13 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-primary border-b border-primary-light w-full">
+    <nav className={`fixed top-0 left-0 right-0 z-50 bg-primary border-b border-primary-light w-full transition-all duration-300 ${isScrolled ? 'shadow-lg' : ''}`}>
       <div className="w-full px-4 xl:px-6">
-        <div className="flex items-center justify-between h-16">
+        <div className={`flex items-center justify-between transition-all duration-300 ${isScrolled ? 'h-12' : 'h-16'}`}>
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
-            <img src={logoLight} alt="Bossiz Logo" className="h-16 w-auto transition-smooth" />
-            <span className="text-xl font-bold text-white">Bossiz</span>
+            <img src={logoLight} alt="Bossiz Logo" className={`transition-all duration-300 ${isScrolled ? 'h-10' : 'h-16'} w-auto`} />
+            <span className={`font-bold text-white transition-all duration-300 ${isScrolled ? 'text-lg' : 'text-xl'}`}>Bossiz</span>
           </Link>
 
           <div className="hidden lg:flex items-center flex-1 justify-between ml-6">
