@@ -53,12 +53,12 @@ const DestinationDetail = () => {
 
   // Generate activities based on destination category
   const activities = [
-    { icon: Camera, name: "Visite guidée de la ville", duration: "3-4h", price: "25 000 FCFA", description: "Explorez les sites emblématiques avec un guide local expérimenté" },
-    { icon: Utensils, name: "Découverte gastronomique", duration: "2-3h", price: "35 000 FCFA", description: "Dégustez les spécialités culinaires locales authentiques" },
-    { icon: Mountain, name: "Randonnée & Nature", duration: "5-6h", price: "40 000 FCFA", description: "Parcourez les paysages naturels spectaculaires de la région" },
-    { icon: Building2, name: "Patrimoine culturel", duration: "4-5h", price: "30 000 FCFA", description: "Visitez les monuments historiques et musées incontournables" },
-    { icon: Waves, name: "Activités nautiques", duration: "2-3h", price: "45 000 FCFA", description: "Sports et loisirs aquatiques pour tous les niveaux" },
-    { icon: ThermometerSun, name: "Expérience locale", duration: "Full day", price: "50 000 FCFA", description: "Immersion complète dans la culture et les traditions locales" },
+    { icon: Camera, name: "Visite guidée de la ville", duration: "3-4h", price: "38€", description: "Explorez les sites emblématiques avec un guide local expérimenté" },
+    { icon: Utensils, name: "Découverte gastronomique", duration: "2-3h", price: "53€", description: "Dégustez les spécialités culinaires locales authentiques" },
+    { icon: Mountain, name: "Randonnée & Nature", duration: "5-6h", price: "61€", description: "Parcourez les paysages naturels spectaculaires de la région" },
+    { icon: Building2, name: "Patrimoine culturel", duration: "4-5h", price: "46€", description: "Visitez les monuments historiques et musées incontournables" },
+    { icon: Waves, name: "Activités nautiques", duration: "2-3h", price: "69€", description: "Sports et loisirs aquatiques pour tous les niveaux" },
+    { icon: ThermometerSun, name: "Expérience locale", duration: "Full day", price: "76€", description: "Immersion complète dans la culture et les traditions locales" },
   ];
 
   const availabilities = [
@@ -186,7 +186,7 @@ const DestinationDetail = () => {
                   <div className="flex items-baseline justify-between mb-4">
                     <div>
                       <span className="text-3xl font-bold text-primary">{destination.price}</span>
-                      <span className="text-muted-foreground ml-2">FCFA / nuit</span>
+                      <span className="text-muted-foreground ml-2">EUR / nuit</span>
                     </div>
                   </div>
                   <Button 
@@ -196,7 +196,7 @@ const DestinationDetail = () => {
                         type: 'stay',
                         name: destination.name,
                         price: destination.price.replace(/\s/g, ''),
-                        currency: 'FCFA',
+                        currency: 'EUR',
                         location: destination.location,
                         serviceId: destination.id,
                       });

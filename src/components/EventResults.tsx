@@ -85,7 +85,7 @@ export const EventResults = ({ events }: EventResultsProps) => {
                 <div>
                   <p className="text-sm text-muted-foreground">À partir de</p>
                   <p className="text-xl font-bold">
-                    <Price amount={parseFloat(event.price) || 0} fromCurrency={event.currency || 'XOF'} showLoader />
+                    <Price amount={parseFloat(event.price) || 0} fromCurrency={event.currency || 'EUR'} showLoader />
                   </p>
                 </div>
                 {event.link && (

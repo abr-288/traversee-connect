@@ -523,7 +523,7 @@ const Cars = () => {
                       <div>
                         <p className="text-sm text-muted-foreground">{t('activities.startingFrom')}</p>
                         <p className="text-2xl font-bold text-primary">
-                          <Price amount={car.price} fromCurrency="XOF" showLoader />
+                          <Price amount={car.price} fromCurrency="EUR" showLoader />
                         </p>
                         <p className="text-xs text-muted-foreground">{t('cars.perDay')}</p>
                       </div>

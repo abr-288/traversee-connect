@@ -120,7 +120,7 @@ const DestinationsSection = () => {
                     </h3>
                     <div className="text-right flex-shrink-0">
                       <p className="text-2xl font-bold text-primary whitespace-nowrap">
-                        <Price amount={parseFloat(destination.price.replace(/\s/g, '')) || 0} fromCurrency="XOF" showLoader />
+                        <Price amount={parseFloat(destination.price.replace(/\s/g, '')) || 0} fromCurrency="EUR" showLoader />
                       </p>
                       <p className="text-xs text-muted-foreground whitespace-nowrap">/ {t('destinations.perNight')}</p>
                     </div>
@@ -203,7 +203,7 @@ const DestinationsSection = () => {
                           type: 'stay',
                           name: destination.name,
                           price: destination.price.replace(/\s/g, ''),
-                          currency: 'FCFA',
+                          currency: 'EUR',
                           location: destination.location,
                           serviceId: destination.id,
                         });

@@ -91,7 +91,7 @@ const FlightBookingProcess = () => {
             </div>
             <Badge variant="secondary" className="text-lg px-4 py-2">
               <span className="font-bold text-primary">
-                <Price amount={parseInt(flightData.price)} fromCurrency="XOF" showLoader />
+                <Price amount={parseInt(flightData.price)} fromCurrency="EUR" showLoader />
               </span>
             </Badge>
           </div>
@@ -165,7 +165,7 @@ const FlightBookingProcess = () => {
                   <div className="flex justify-between items-center">
                     <span className="font-semibold">Prix du vol</span>
                     <span className="text-xl font-bold text-primary">
-                      <Price amount={parseInt(flightData.price)} fromCurrency="XOF" showLoader />
+                      <Price amount={parseInt(flightData.price)} fromCurrency="EUR" showLoader />
                     </span>
                   </div>
                 </div>

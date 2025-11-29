@@ -250,7 +250,7 @@ const handler = async (req: Request): Promise<Response> => {
 
             <div class="total-price">
               <p style="margin: 0; font-size: 16px;">Montant total</p>
-              <div class="amount">${totalPrice.toLocaleString()} FCFA</div>
+              <div class="amount">${totalPrice.toLocaleString()} EUR</div>
               <p style="margin: 10px 0 0 0; font-size: 14px;">pour ${passengers} passager${passengers > 1 ? 's' : ''}</p>
             </div>
 

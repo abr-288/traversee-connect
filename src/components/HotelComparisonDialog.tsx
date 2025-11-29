@@ -99,7 +99,7 @@ export function HotelComparisonDialog({
                       <span className="text-sm font-medium">Prix/nuit</span>
                       <div className="text-right">
                         <div className="font-bold text-lg text-primary">
-                          <Price amount={hotel.price} fromCurrency="XOF" showLoader />
+                          <Price amount={hotel.price} fromCurrency="EUR" showLoader />
                         </div>
                       </div>
                     </div>

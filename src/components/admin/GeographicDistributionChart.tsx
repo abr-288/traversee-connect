@@ -27,7 +27,7 @@ export function GeographicDistributionChart({ data }: GeographicDistributionChar
         <div className="bg-background border border-border rounded-lg shadow-lg p-3">
           <p className="font-medium">{payload[0].payload.location}</p>
           <p className="text-sm text-primary">
-            Revenus: {payload[0].value.toLocaleString()} XOF
+            Revenus: {payload[0].value.toLocaleString()} EUR
           </p>
           <p className="text-sm text-muted-foreground">
             {payload[0].payload.bookings} réservations
@@ -59,7 +59,7 @@ export function GeographicDistributionChart({ data }: GeographicDistributionChar
             <Bar 
               dataKey="revenue" 
               fill="hsl(var(--primary))" 
-              name="Revenus (XOF)"
+              name="Revenus (EUR)"
               radius={[0, 4, 4, 0]}
             />
           </BarChart>

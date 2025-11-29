@@ -39,7 +39,7 @@ export default function AdminServices() {
     destination: "",
     description: "",
     price_per_unit: 0,
-    currency: "XOF",
+    currency: "EUR",
     available: true,
     featured: false,
   });
@@ -143,7 +143,7 @@ export default function AdminServices() {
       destination: "",
       description: "",
       price_per_unit: 0,
-      currency: "XOF",
+      currency: "EUR",
       available: true,
       featured: false,
     });
@@ -239,7 +239,7 @@ export default function AdminServices() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="XOF">XOF</SelectItem>
+                        <SelectItem value="EUR">EUR</SelectItem>
                         <SelectItem value="EUR">EUR</SelectItem>
                         <SelectItem value="USD">USD</SelectItem>
                       </SelectContent>

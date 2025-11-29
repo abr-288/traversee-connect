@@ -598,7 +598,7 @@ serve(async (req) => {
                       id: hotel.hotelId,
                       name: hotel.name || 'Hotel',
                       location: `${hotel.address?.cityName || location}, ${hotel.address?.countryCode || ''}`,
-                      price: { grandTotal: Math.round(parseFloat(price) * 655) }, // Convert USD to FCFA
+                      price: { grandTotal: Math.round(parseFloat(price)) }, // Keep USD price (convert to EUR later if needed)
                       rating: hotel.rating ? parseFloat(hotel.rating) : 4.0,
                       reviews: Math.floor(Math.random() * 500) + 50,
                       image: `https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&sig=${hotel.hotelId}`,

@@ -331,8 +331,8 @@ const Trains = () => {
                         onValueChange={(value) => setPriceRange(value as [number, number])}
                       />
                       <div className="flex justify-between text-sm">
-                        <span>{priceRange[0].toLocaleString()} XOF</span>
-                        <span>{priceRange[1].toLocaleString()} XOF</span>
+                        <span>{priceRange[0].toLocaleString()} EUR</span>
+                        <span>{priceRange[1].toLocaleString()} EUR</span>
                       </div>
                     </CardContent>
                   </Card>
@@ -468,7 +468,7 @@ const Trains = () => {
 
                           <div className="md:col-span-4 text-right">
                             <p className="text-3xl font-bold text-primary mb-1">
-                              {train.price.toLocaleString()} XOF
+                              {train.price.toLocaleString()} EUR
                             </p>
                             <p className="text-sm text-muted-foreground mb-4">par personne</p>
                             <Button onClick={() => handleBook(train)} className="w-full">
@@ -508,7 +508,7 @@ const Trains = () => {
             id: selectedTrain.id,
             name: `${selectedTrain.operator} - ${selectedTrain.trainType} • ${selectedTrain.from} → ${selectedTrain.to}`,
             price_per_unit: selectedTrain.price,
-            currency: "XOF",
+            currency: "EUR",
             type: "train",
           }}
         />

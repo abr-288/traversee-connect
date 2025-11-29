@@ -162,7 +162,7 @@ export const OptionsStep = ({
 
             <div className="flex items-center justify-between mt-4">
               <div className="text-2xl font-bold text-primary">
-                {option.price === 0 ? "Gratuit" : <Price amount={option.price} fromCurrency="XOF" showLoader />}
+                {option.price === 0 ? "Gratuit" : <Price amount={option.price} fromCurrency="EUR" showLoader />}
               </div>
               {!option.included && (
                 <div className="flex items-center gap-2">
@@ -199,7 +199,7 @@ export const OptionsStep = ({
           <div className="flex justify-between items-center">
             <span className="text-lg font-semibold">Total options</span>
             <span className="text-2xl font-bold text-primary">
-              <Price amount={getTotalOptionsPrice()} fromCurrency="XOF" showLoader />
+              <Price amount={getTotalOptionsPrice()} fromCurrency="EUR" showLoader />
             </span>
           </div>
         </Card>

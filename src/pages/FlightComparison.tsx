@@ -342,7 +342,7 @@ const FlightComparison = () => {
                     <Plane className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{avgMarketPrice.toLocaleString()} XOF</div>
+                    <div className="text-2xl font-bold">{avgMarketPrice.toLocaleString()} EUR</div>
                     <p className="text-xs text-muted-foreground mt-1">
                       Sur {flights.length} vols analysés
                     </p>
@@ -357,7 +357,7 @@ const FlightComparison = () => {
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold text-green-600">
-                        {cheapestAirline.minPrice.toLocaleString()} XOF
+                        {cheapestAirline.minPrice.toLocaleString()} EUR
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">{cheapestAirline.airline}</p>
                     </CardContent>
@@ -372,7 +372,7 @@ const FlightComparison = () => {
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold text-red-600">
-                        {mostExpensiveAirline.maxPrice.toLocaleString()} XOF
+                        {mostExpensiveAirline.maxPrice.toLocaleString()} EUR
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">{mostExpensiveAirline.airline}</p>
                     </CardContent>
@@ -413,7 +413,7 @@ const FlightComparison = () => {
                               border: "1px solid hsl(var(--border))",
                               borderRadius: "8px"
                             }}
-                            formatter={(value: any) => `${value.toLocaleString()} XOF`}
+                            formatter={(value: any) => `${value.toLocaleString()} EUR`}
                           />
                           <Legend />
                           <Bar dataKey="avgPrice" name="Prix Moyen" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} />
@@ -449,7 +449,7 @@ const FlightComparison = () => {
                                 border: "1px solid hsl(var(--border))",
                                 borderRadius: "8px"
                               }}
-                              formatter={(value: any) => `${value.toLocaleString()} XOF`}
+                              formatter={(value: any) => `${value.toLocaleString()} EUR`}
                             />
                             <Legend />
                             {topAirlines.map((airline, index) => (
@@ -504,7 +504,7 @@ const FlightComparison = () => {
                               border: "1px solid hsl(var(--border))",
                               borderRadius: "8px"
                             }}
-                            formatter={(value: any) => `${value.toLocaleString()} XOF`}
+                            formatter={(value: any) => `${value.toLocaleString()} EUR`}
                           />
                           <Legend />
                           <Line 
@@ -589,13 +589,13 @@ const FlightComparison = () => {
                           <tr key={index} className="border-b border-border hover:bg-muted/50">
                             <td className="py-3 px-4 font-medium">{stat.airline}</td>
                             <td className="text-right py-3 px-4 text-green-600 font-semibold">
-                              {stat.minPrice.toLocaleString()} XOF
+                              {stat.minPrice.toLocaleString()} EUR
                             </td>
                             <td className="text-right py-3 px-4">
-                              {stat.avgPrice.toLocaleString()} XOF
+                              {stat.avgPrice.toLocaleString()} EUR
                             </td>
                             <td className="text-right py-3 px-4 text-red-600">
-                              {stat.maxPrice.toLocaleString()} XOF
+                              {stat.maxPrice.toLocaleString()} EUR
                             </td>
                             <td className="text-right py-3 px-4">{stat.count}</td>
                             <td className="text-right py-3 px-4">
