@@ -130,73 +130,62 @@ serve(async (req) => {
 });
 
 function getMockFlights(origin: string, destination: string, departureDate: string, returnDate: string | undefined, adults: number, travelClass: string) {
-  const mockFlights = {
-    data: [
-      {
-        id: `${origin}-${destination}-1`,
-        itineraries: [{
-          segments: [{
-            departure: {
-              iataCode: origin,
-              at: `${departureDate}T08:00:00`,
-            },
-            arrival: {
-              iataCode: destination,
-              at: `${departureDate}T12:30:00`,
-            },
-            carrierCode: 'AF',
-            number: '1234',
-            duration: 'PT4H30M',
-          }],
-          duration: 'PT4H30M',
+  // Multiple airlines for variety
+  const airlines = [
+    { code: 'AF', name: 'Air France', basePrice: 185000 },
+    { code: 'ET', name: 'Ethiopian Airlines', basePrice: 165000 },
+    { code: 'TK', name: 'Turkish Airlines', basePrice: 175000 },
+    { code: 'EK', name: 'Emirates', basePrice: 245000 },
+    { code: 'KQ', name: 'Kenya Airways', basePrice: 155000 },
+    { code: 'AT', name: 'Royal Air Maroc', basePrice: 145000 },
+    { code: 'SN', name: 'Brussels Airlines', basePrice: 195000 },
+    { code: 'MS', name: 'EgyptAir', basePrice: 160000 },
+  ];
+  
+  const mockFlights = airlines.map((airline, index) => {
+    const departureHour = 6 + (index * 2); // Stagger departures
+    const flightDuration = 4 + Math.floor(Math.random() * 3); // 4-6 hours
+    const arrivalHour = departureHour + flightDuration;
+    const priceVariation = Math.floor(Math.random() * 20000) - 10000; // +/- 10000
+    
+    return {
+      id: `MOCK-${origin}-${destination}-${index}`,
+      itineraries: [{
+        segments: [{
+          departure: {
+            iataCode: origin,
+            at: `${departureDate}T${String(departureHour).padStart(2, '0')}:${index % 2 === 0 ? '00' : '30'}:00`,
+          },
+          arrival: {
+            iataCode: destination,
+            at: `${departureDate}T${String(arrivalHour % 24).padStart(2, '0')}:${index % 2 === 0 ? '30' : '00'}:00`,
+          },
+          carrierCode: airline.code,
+          carrierName: airline.name,
+          number: String(1000 + index * 111),
+          duration: `PT${flightDuration}H${index % 2 === 0 ? '30' : '00'}M`,
         }],
-        price: {
-          grandTotal: '185000',
-          currency: 'XOF',
-        },
-        validatingAirlineCodes: ['AF'],
-        travelerPricings: [{
-          fareDetailsBySegment: [{
-            cabin: travelClass || 'ECONOMY',
-          }],
-        }],
+        duration: `PT${flightDuration}H${index % 2 === 0 ? '30' : '00'}M`,
+      }],
+      price: {
+        grandTotal: String(airline.basePrice + priceVariation),
+        currency: 'XOF',
       },
-      {
-        id: `${origin}-${destination}-2`,
-        itineraries: [{
-          segments: [{
-            departure: {
-              iataCode: origin,
-              at: `${departureDate}T14:00:00`,
-            },
-            arrival: {
-              iataCode: destination,
-              at: `${departureDate}T18:30:00`,
-            },
-            carrierCode: 'ET',
-            number: '5678',
-            duration: 'PT4H30M',
-          }],
-          duration: 'PT4H30M',
+      validatingAirlineCodes: [airline.code],
+      carrierName: airline.name,
+      travelerPricings: [{
+        fareDetailsBySegment: [{
+          cabin: travelClass || 'ECONOMY',
         }],
-        price: {
-          grandTotal: '165000',
-          currency: 'XOF',
-        },
-        validatingAirlineCodes: ['ET'],
-        travelerPricings: [{
-          fareDetailsBySegment: [{
-            cabin: travelClass || 'ECONOMY',
-          }],
-        }],
-      },
-    ],
-  };
+      }],
+      source: 'mock'
+    };
+  });
 
   return new Response(
     JSON.stringify({
       success: true,
-      data: mockFlights.data,
+      data: mockFlights,
     }),
     {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -646,8 +635,21 @@ async function searchSkyScrapper(
     };
     const selectedCabin = cabinMap[travelClass] || 'economy';
     
+    // Helper function to fetch with retry
+    const fetchWithRetry = async (url: string, options: RequestInit, maxRetries = 2): Promise<Response> => {
+      for (let i = 0; i <= maxRetries; i++) {
+        const response = await fetch(url, options);
+        if (response.status !== 429) return response;
+        if (i < maxRetries) {
+          console.log(`Rate limited, waiting ${(i + 1) * 500}ms before retry...`);
+          await new Promise(resolve => setTimeout(resolve, (i + 1) * 500));
+        }
+      }
+      throw new Error('Rate limit exceeded after retries');
+    };
+    
     // Step 1: Search for origin airport to get skyId and entityId
-    const originSearchResponse = await fetch(
+    const originSearchResponse = await fetchWithRetry(
       `https://sky-scrapper.p.rapidapi.com/api/v1/flights/searchAirport?query=${origin}`,
       {
         method: 'GET',
@@ -676,7 +678,7 @@ async function searchSkyScrapper(
     console.log('Sky-Scrapper origin found:', originSkyId, originEntityId);
     
     // Step 2: Search for destination airport
-    const destSearchResponse = await fetch(
+    const destSearchResponse = await fetchWithRetry(
       `https://sky-scrapper.p.rapidapi.com/api/v1/flights/searchAirport?query=${destination}`,
       {
         method: 'GET',
@@ -723,7 +725,7 @@ async function searchSkyScrapper(
       flightParams.append('childrens', children.toString());
     }
     
-    const flightResponse = await fetch(
+    const flightResponse = await fetchWithRetry(
       `https://sky-scrapper.p.rapidapi.com/api/v1/flights/searchFlights?${flightParams}`,
       {
         method: 'GET',
