@@ -39,6 +39,7 @@ const Flights = () => {
   const [hasSearched, setHasSearched] = useState(false);
   const [selectedFlight, setSelectedFlight] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [isDefaultResults, setIsDefaultResults] = useState(false);
 
   // Filters state
   const [baggageHandCount, setBaggageHandCount] = useState(0);
@@ -47,6 +48,83 @@ const Flights = () => {
   const [sortBy, setSortBy] = useState<string>("best");
 
   const departureDate = searchParams.get("date") || "";
+
+  // Default popular routes for suggestions
+  const defaultRoutes = [
+    { from: "ABJ", to: "CDG", fromCity: "Abidjan", toCity: "Paris" },
+    { from: "ABJ", to: "DXB", fromCity: "Abidjan", toCity: "Dubai" },
+    { from: "ABJ", to: "ACC", fromCity: "Abidjan", toCity: "Accra" },
+    { from: "ABJ", to: "DKR", fromCity: "Abidjan", toCity: "Dakar" },
+  ];
+
+  const mapFlightData = (data: any[], from: string, to: string, date: string, returnDate?: string, travelClass: string = "ECONOMY"): MappedFlight[] => {
+    return data.map((offer: any) => {
+      const firstItinerary = offer.itineraries?.[0];
+      const segments = firstItinerary?.segments || [];
+      const firstSegment = segments[0];
+      const lastSegment = segments[segments.length - 1] || firstSegment;
+
+      const airlineCode = offer.validatingAirlineCodes?.[0] || "XX";
+      const airline = getAirlineName(airlineCode);
+
+      const priceTotal =
+        typeof offer.price === "object" && (offer.price?.grandTotal || offer.price?.total)
+          ? parseFloat(offer.price.grandTotal || offer.price.total)
+          : typeof offer.price === "number"
+          ? offer.price
+          : 0;
+
+      const cabin =
+        offer.travelerPricings?.[0]?.fareDetailsBySegment?.[0]?.cabin ||
+        travelClass ||
+        "ECONOMY";
+
+      return {
+        id: offer.id || Math.random().toString(),
+        airline,
+        airlineCode,
+        from,
+        to,
+        departureTime: firstSegment?.departure?.at || "",
+        arrivalTime: lastSegment?.arrival?.at || "",
+        duration: firstItinerary?.duration || "N/A",
+        stops: segments.length - 1,
+        price: priceTotal,
+        travelClass: cabin,
+        departureDate: date,
+        returnDate,
+        raw: offer,
+      };
+    });
+  };
+
+  // Load default results on mount
+  useEffect(() => {
+    const hasSearchParams = searchParams.get("from") && searchParams.get("to") && searchParams.get("date");
+    
+    if (!hasSearchParams && flights.length === 0 && !loading) {
+      const loadDefaultFlights = async () => {
+        setIsDefaultResults(true);
+        const futureDate = new Date();
+        futureDate.setDate(futureDate.getDate() + 14);
+        const dateStr = futureDate.toISOString().split('T')[0];
+
+        const result = await searchFlights({
+          origin: "ABJ",
+          destination: "CDG",
+          departureDate: dateStr,
+          adults: 1,
+          travelClass: "ECONOMY",
+        });
+
+        if (result?.success && Array.isArray(result.data)) {
+          setFlights(mapFlightData(result.data, "ABJ", "CDG", dateStr, undefined, "ECONOMY"));
+        }
+      };
+
+      loadDefaultFlights();
+    }
+  }, []);
 
   useEffect(() => {
     const from = searchParams.get("from");
@@ -57,14 +135,13 @@ const Flights = () => {
     const children = parseInt(searchParams.get("children") || "0", 10);
     const travelClass = searchParams.get("class") || "ECONOMY";
 
-    // Validation stricte incluant les chaînes vides
     if (!from || from.trim() === '' || !to || to.trim() === '' || !date || Number.isNaN(adults)) {
-      console.error('Paramètres de recherche invalides:', { from, to, date, adults });
       return;
     }
 
     const runSearch = async () => {
       setHasSearched(true);
+      setIsDefaultResults(false);
       const result = await searchFlights({
         origin: from,
         destination: to,
@@ -76,46 +153,7 @@ const Flights = () => {
       });
 
       if (result?.success && Array.isArray(result.data)) {
-        const mapped: MappedFlight[] = result.data.map((offer: any) => {
-          const firstItinerary = offer.itineraries?.[0];
-          const segments = firstItinerary?.segments || [];
-          const firstSegment = segments[0];
-          const lastSegment = segments[segments.length - 1] || firstSegment;
-
-          const airlineCode = offer.validatingAirlineCodes?.[0] || "XX";
-          const airline = getAirlineName(airlineCode);
-
-          const priceTotal =
-            typeof offer.price === "object" && (offer.price?.grandTotal || offer.price?.total)
-              ? parseFloat(offer.price.grandTotal || offer.price.total)
-              : typeof offer.price === "number"
-              ? offer.price
-              : 0;
-
-          const cabin =
-            offer.travelerPricings?.[0]?.fareDetailsBySegment?.[0]?.cabin ||
-            travelClass ||
-            "ECONOMY";
-
-          return {
-            id: offer.id || Math.random().toString(),
-            airline,
-            airlineCode,
-            from,
-            to,
-            departureTime: firstSegment?.departure?.at || "",
-            arrivalTime: lastSegment?.arrival?.at || "",
-            duration: firstItinerary?.duration || "N/A",
-            stops: segments.length - 1,
-            price: priceTotal,
-            travelClass: cabin,
-            departureDate: date,
-            returnDate,
-            raw: offer,
-          };
-        });
-
-        setFlights(mapped);
+        setFlights(mapFlightData(result.data, from, to, date, returnDate, travelClass));
       }
     };
 
@@ -228,21 +266,35 @@ const Flights = () => {
             </div>
           )}
 
-          {!hasSearched && !loading && (
+          {!hasSearched && !loading && !isDefaultResults && flights.length === 0 && (
             <div className="text-center py-20">
+              <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
               <p className="text-muted-foreground">
-                Utilisez le formulaire ci-dessus pour rechercher des vols
+                Chargement des vols populaires...
               </p>
             </div>
           )}
 
-          {hasSearched && !loading && filteredAndSortedFlights.length === 0 && (
+          {(hasSearched || isDefaultResults) && !loading && filteredAndSortedFlights.length === 0 && (
             <div className="text-center py-20">
               <p className="text-muted-foreground">Aucun vol trouvé pour cette recherche</p>
             </div>
           )}
 
-          {hasSearched && !loading && filteredAndSortedFlights.length > 0 && (
+          {/* Default results header */}
+          {isDefaultResults && !loading && filteredAndSortedFlights.length > 0 && (
+            <div className="mb-6 p-4 bg-secondary/10 rounded-lg border border-secondary/20">
+              <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                <Plane className="w-5 h-5 text-secondary" />
+                Vols populaires : Abidjan → Paris
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                Voici les vols disponibles pour dans 2 semaines. Utilisez le formulaire ci-dessus pour personnaliser votre recherche.
+              </p>
+            </div>
+          )}
+
+          {(hasSearched || isDefaultResults) && !loading && filteredAndSortedFlights.length > 0 && (
             <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] xl:grid-cols-[300px_1fr_300px] gap-6">
               {/* Left Sidebar - Filters */}
               <aside className="hidden lg:block">
