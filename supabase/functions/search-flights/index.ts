@@ -81,9 +81,11 @@ serve(async (req) => {
     }
 
     // Travelpayouts API direct (flight data)
-    if (travelpayoutsToken) {
-      apiPromises.push(searchTravelpayouts(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, travelpayoutsToken));
-    }
+    // NOTE: Disabled because the "latest prices" endpoint doesn't provide airline codes
+    // which makes the results less useful for users. Consider using a different endpoint
+    // if (travelpayoutsToken) {
+    //   apiPromises.push(searchTravelpayouts(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, travelpayoutsToken));
+    // }
 
     if (apiPromises.length === 0) {
       console.log('No API credentials configured, returning mock data');
@@ -918,18 +920,50 @@ async function searchTravelpayouts(
       
       console.log(`Travelpayouts ${relevantFlights.length} flights within date range`);
       
+      // Log first flight to understand structure
+      if (relevantFlights.length > 0) {
+        console.log('Travelpayouts flight sample:', JSON.stringify(relevantFlights[0]).substring(0, 500));
+      }
+      
       const flights = relevantFlights.slice(0, 15).map((flight: any, index: number) => {
-        // Convert price from RUB to XOF (approximate: 1 RUB ≈ 7 XOF)
-        const priceRub = flight.value || 0;
-        const priceXOF = Math.round(priceRub * 7);
+        // Price is in EUR (we requested currency=eur), convert to XOF (1 EUR ≈ 655 XOF)
+        const priceEur = flight.value || 0;
+        const priceXOF = Math.round(priceEur * 655);
         
         // Generate reasonable flight times based on index
         const departureHour = 6 + (index * 2) % 18;
-        const flightDuration = 2 + Math.floor(Math.random() * 4);
+        const flightDuration = flight.duration ? Math.round(flight.duration / 60) : (2 + Math.floor(Math.random() * 4));
         const arrivalHour = (departureHour + flightDuration) % 24;
         
-        // Extract airline code if available from gate info
-        const carrierCode = flight.gate || 'XX';
+        // Use airline code from API - flight.airline contains IATA code
+        const carrierCode = flight.airline || 'XX';
+        
+        // Get airline name from carrier code
+        const airlineNames: Record<string, string> = {
+          'AF': 'Air France',
+          'AT': 'Royal Air Maroc',
+          'ET': 'Ethiopian Airlines',
+          'TK': 'Turkish Airlines',
+          'EK': 'Emirates',
+          'KQ': 'Kenya Airways',
+          'SN': 'Brussels Airlines',
+          'MS': 'EgyptAir',
+          'QR': 'Qatar Airways',
+          'LH': 'Lufthansa',
+          'BA': 'British Airways',
+          'IB': 'Iberia',
+          'KL': 'KLM',
+          'TP': 'TAP Portugal',
+          'AZ': 'ITA Airways',
+          'U2': 'easyJet',
+          'FR': 'Ryanair',
+          'W6': 'Wizz Air',
+          'PC': 'Pegasus Airlines',
+          'HV': 'Transavia',
+          'L6': 'Mauritania Airlines',
+          'A3': 'Aegean Airlines'
+        };
+        const carrierName = airlineNames[carrierCode] || carrierCode;
         
         return {
           id: `TP-${origin}-${destination}-${index}`,
@@ -943,8 +977,9 @@ async function searchTravelpayouts(
                 iataCode: flight.destination || destination,
                 at: `${flight.depart_date}T${String(arrivalHour).padStart(2, '0')}:00:00`,
               },
-              carrierCode: carrierCode.substring(0, 2).toUpperCase(),
-              number: String(1000 + index),
+              carrierCode: carrierCode,
+              carrierName: carrierName,
+              number: flight.flight_number?.toString() || String(1000 + index),
               duration: `PT${flightDuration}H0M`,
             }],
             duration: `PT${flightDuration}H0M`,
@@ -953,7 +988,8 @@ async function searchTravelpayouts(
             grandTotal: priceXOF.toString(),
             currency: 'XOF',
           },
-          validatingAirlineCodes: [carrierCode.substring(0, 2).toUpperCase()],
+          validatingAirlineCodes: [carrierCode],
+          carrierName: carrierName,
           travelerPricings: [{
             fareDetailsBySegment: [{
               cabin: travelClass || 'ECONOMY',
