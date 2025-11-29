@@ -614,6 +614,51 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_requests: {
+        Row: {
+          company: string | null
+          created_at: string
+          email: string
+          id: string
+          message: string | null
+          name: string
+          notes: string | null
+          phone: string
+          plan_id: string
+          plan_name: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          message?: string | null
+          name: string
+          notes?: string | null
+          phone: string
+          plan_id: string
+          plan_name: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string | null
+          name?: string
+          notes?: string | null
+          phone?: string
+          plan_id?: string
+          plan_name?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

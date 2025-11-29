@@ -37,6 +37,7 @@ const AdminServices = lazy(() => import("./pages/admin/AdminServices"));
 const AdminActivities = lazy(() => import("./pages/admin/AdminActivities"));
 const AdminStays = lazy(() => import("./pages/admin/AdminStays"));
 const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
+const AdminSubscriptions = lazy(() => import("./pages/admin/AdminSubscriptions"));
 const AdminEmailTemplates = lazy(() => import("./pages/AdminEmailTemplates"));
 const Help = lazy(() => import("./pages/Help"));
 const Support = lazy(() => import("./pages/Support"));
@@ -96,6 +97,7 @@ const App = () => (
               <Route path="/admin/activities" element={<AdminActivities />} />
               <Route path="/admin/stays" element={<AdminStays />} />
               <Route path="/admin/users" element={<AdminUsers />} />
+              <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
               <Route path="/admin/email-templates" element={<AdminEmailTemplates />} />
               <Route path="/help" element={<Help />} />
               <Route path="/support" element={<Support />} />
