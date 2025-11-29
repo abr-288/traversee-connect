@@ -577,7 +577,146 @@
       "createService": "无法创建服务",
       "createBooking": "无法创建预订",
       "sendEmail": "发送确认邮件时出错",
-      "generateTicket": "生成票据时出错"
+      "generateTicket": "生成票据时出错",
+      "downloadTicket": "下载票据时出错"
+    },
+    "loading": {
+      "generatingTicket": "正在生成票据..."
     }
+  },
+  "notFound": {
+    "title": "404",
+    "subtitle": "页面未找到",
+    "description": "您查找的页面不存在或已被移动。",
+    "backHome": "返回首页"
+  },
+  "priceAlerts": {
+    "title": "价格提醒",
+    "subtitle": "监控价格并在价格下降时收到通知",
+    "myAlerts": "我的提醒",
+    "createAlert": "创建提醒"
+  },
+  "activities": {
+    "title": "活动与体验",
+    "subtitle": "通过我们精选的活动体验独特时刻",
+    "noActivities": "暂无活动",
+    "startingFrom": "起价",
+    "book": "预订"
+  },
+  "cars": {
+    "title": "租车服务",
+    "subtitle": "租用适合您需求的汽车",
+    "filters": "筛选",
+    "pickupLocation": "取车地点",
+    "cityOrAirport": "城市或机场...",
+    "category": "类别",
+    "all": "全部",
+    "economy": "经济型",
+    "sedan": "轿车",
+    "suv": "SUV",
+    "luxury": "豪华型",
+    "pricePerDay": "每日价格",
+    "transmission": "变速器",
+    "automatic": "自动",
+    "manual": "手动",
+    "fuel": "燃料",
+    "petrol": "汽油",
+    "diesel": "柴油",
+    "resetFilters": "重置筛选",
+    "loading": "加载中...",
+    "vehiclesAvailable": "辆车可用",
+    "noVehicles": "没有符合条件的车辆",
+    "perDay": "每天",
+    "sortBy": {
+      "popular": "最受欢迎",
+      "priceAsc": "价格升序",
+      "priceDesc": "价格降序",
+      "rating": "评分最高"
+    },
+    "carsFound": "辆车找到",
+    "displayLocal": "显示本地可用车辆"
+  },
+  "bookingHistory": {
+    "title": "我的预订",
+    "subtitle": "查看和管理您的所有预订",
+    "tabs": {
+      "all": "全部",
+      "flights": "航班",
+      "hotels": "酒店",
+      "cars": "汽车",
+      "tours": "行程"
+    },
+    "noBookings": "未找到预订",
+    "discoverOffers": "发现我们的优惠",
+    "startDate": "开始日期",
+    "endDate": "结束日期",
+    "travelers": "旅客",
+    "person": "人",
+    "totalAmount": "总金额",
+    "notes": "备注",
+    "downloadTicket": "下载票据",
+    "modifyBooking": "修改预订",
+    "finalizePayment": "完成支付",
+    "bookingMadeOn": "预订时间",
+    "loadingError": "加载预订时出错",
+    "ticketGenerating": "正在生成票据...",
+    "ticketSuccess": "票据已发送到邮箱！使用Ctrl+P保存为PDF",
+    "ticketError": "下载票据时出错"
+  },
+  "subscriptions": {
+    "title": "订阅计划",
+    "subtitle": "选择适合您需求的计划",
+    "popular": "热门",
+    "selectPlan": "选择此计划",
+    "contactUs": "联系我们",
+    "contactCta": {
+      "title": "需要帮助选择？",
+      "subtitle": "我们的团队随时为您提供帮助，选择适合您需求的计划。",
+      "button": "联系我们"
+    },
+    "dialog": {
+      "title": "申请报价",
+      "description": "填写此表格，我们的团队将尽快与您联系。",
+      "name": "全名",
+      "email": "邮箱",
+      "phone": "电话",
+      "company": "公司（可选）",
+      "message": "留言（可选）",
+      "submit": "发送请求",
+      "submitting": "发送中...",
+      "success": "请求发送成功！",
+      "successDesc": "我们的团队将在24小时内与您联系。",
+      "error": "发送错误",
+      "errorDesc": "请稍后重试。"
+    }
+  },
+  "confirmation": {
+    "loading": "正在加载您的预订...",
+    "error": "错误",
+    "notFound": "未找到预订",
+    "notFoundDesc": "无法找到此预订的详细信息。",
+    "backToHome": "返回首页",
+    "bookingNumber": "预订编号",
+    "actions": "操作",
+    "print": "打印",
+    "share": "分享",
+    "contactSupport": "联系客服"
+  },
+  "auth": {
+    "or": "或",
+    "continueWithGoogle": "使用Google继续",
+    "termsAgreement": "注册即表示您同意我们的",
+    "termsOfUse": "使用条款",
+    "and": "和",
+    "privacyPolicy": "隐私政策",
+    "passwordStrength": {
+      "weak": "弱",
+      "medium": "中",
+      "strong": "强"
+    }
+  },
+  "nav": {
+    "subscriptions": "订阅",
+    "profile": "我的资料"
   }
 }

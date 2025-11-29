@@ -10,8 +10,10 @@ import { Price } from "@/components/ui/price";
 import { useActivitySearch } from "@/hooks/useActivitySearch";
 import { LazyImage } from "@/components/ui/lazy-image";
 import bannerActivities from "@/assets/banner-activities.jpg";
+import { useTranslation } from "react-i18next";
 
 const Activities = () => {
+  const { t } = useTranslation();
   const [selectedActivity, setSelectedActivity] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const { activities, loading, searchActivities } = useActivitySearch();
@@ -28,7 +30,7 @@ const Activities = () => {
       <div className="relative min-h-[50vh] md:min-h-[60vh] flex items-center justify-center overflow-hidden">
         <LazyImage 
           src={bannerActivities}
-          alt="Activités & Expériences" 
+          alt={t('activities.title')} 
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background"></div>
@@ -37,8 +39,8 @@ const Activities = () => {
             <div className="flex justify-center mb-4">
               <Activity className="w-16 h-16 text-white drop-shadow-lg" />
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">Activités & Expériences</h1>
-            <p className="text-lg md:text-xl text-white/95 drop-shadow-md max-w-2xl mx-auto">Vivez des moments uniques avec nos activités sélectionnées</p>
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">{t('activities.title')}</h1>
+            <p className="text-lg md:text-xl text-white/95 drop-shadow-md max-w-2xl mx-auto">{t('activities.subtitle')}</p>
           </div>
           <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <ActivitySearchForm />
@@ -53,7 +55,7 @@ const Activities = () => {
           </div>
         ) : activities.length === 0 ? (
           <div className="text-center py-20">
-            <p className="text-xl text-muted-foreground">Aucune activité disponible</p>
+            <p className="text-xl text-muted-foreground">{t('activities.noActivities')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -97,7 +99,7 @@ const Activities = () => {
 
                 <div className="flex items-center justify-between pt-4 border-t border-border">
                   <div>
-                    <p className="text-xs text-muted-foreground">À partir de</p>
+                    <p className="text-xs text-muted-foreground">{t('activities.startingFrom')}</p>
                     <Price 
                       amount={activity.price_per_unit} 
                       fromCurrency={activity.currency}
@@ -119,7 +121,7 @@ const Activities = () => {
                       setDialogOpen(true);
                     }}
                   >
-                    Réserver
+                    {t('activities.book')}
                   </Button>
                 </div>
               </CardContent>
