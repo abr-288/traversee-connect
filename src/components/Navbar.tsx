@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, X, User, LogOut, LayoutDashboard, Plane, Hotel, PlaneTakeoff, Train, Calendar, Car, HelpCircle, UserCircle2, Crown } from "lucide-react";
+import { Menu, X, User, LogOut, LayoutDashboard, Plane, Hotel, PlaneTakeoff, Train, Calendar, Car, HelpCircle, UserCircle2, Crown, ChevronDown, MapPin, Compass } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
 import { usePWA } from "@/hooks/usePWA";
@@ -78,12 +78,42 @@ const Navbar = () => {
               <Link to="/cars" className="text-white hover:text-secondary transition-smooth text-xs xl:text-sm font-medium whitespace-nowrap px-2 py-1">
                 {t("nav.carRental")}
               </Link>
-              <Link to="/trains" className="text-white hover:text-secondary transition-smooth text-xs xl:text-sm font-medium whitespace-nowrap px-2 py-1">
-                {t("nav.trains")}
-              </Link>
-              <Link to="/events" className="text-white hover:text-secondary transition-smooth text-xs xl:text-sm font-medium whitespace-nowrap px-2 py-1">
-                {t("nav.events")}
-              </Link>
+              
+              {/* Dropdown Autres */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="text-white hover:text-secondary transition-smooth text-xs xl:text-sm font-medium whitespace-nowrap px-2 py-1 flex items-center gap-1">
+                    {t("nav.others")}
+                    <ChevronDown className="w-3 h-3" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-48 bg-background border-border z-50">
+                  <DropdownMenuItem asChild>
+                    <Link to="/trains" className="flex items-center gap-2 cursor-pointer">
+                      <Train className="w-4 h-4" />
+                      {t("nav.trains")}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/events" className="flex items-center gap-2 cursor-pointer">
+                      <Calendar className="w-4 h-4" />
+                      {t("nav.events")}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/destinations" className="flex items-center gap-2 cursor-pointer">
+                      <MapPin className="w-4 h-4" />
+                      {t("nav.destinations")}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/stays" className="flex items-center gap-2 cursor-pointer">
+                      <Compass className="w-4 h-4" />
+                      {t("nav.stays")}
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
 
             {/* Section Droite */}

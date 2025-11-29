@@ -6,6 +6,7 @@
     "trains": "火车",
     "events": "活动",
     "carRental": "租车",
+    "subscriptions": "订阅",
     "support": "客服",
     "login": "登录",
     "signup": "注册",
@@ -13,7 +14,11 @@
     "admin": "管理",
     "logout": "登出",
     "logoutSuccess": "登出成功",
-    "dashboard": "控制面板"
+    "dashboard": "控制面板",
+    "profile": "个人资料",
+    "others": "其他",
+    "destinations": "目的地",
+    "stays": "住宿"
   },
   "hero": {
     "title": "随时随地旅行，一键预订",
