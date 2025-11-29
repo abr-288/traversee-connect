@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, X, User, LogOut, LayoutDashboard, Plane, Hotel, PlaneTakeoff, Train, Calendar, Car, HelpCircle, Download, UserCircle2, Crown } from "lucide-react";
+import { Menu, X, User, LogOut, LayoutDashboard, Plane, Hotel, PlaneTakeoff, Train, Calendar, Car, HelpCircle, UserCircle2, Crown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
 import { usePWA } from "@/hooks/usePWA";
@@ -63,131 +63,101 @@ const Navbar = () => {
             <span className="text-xl font-bold text-white">Bossiz</span>
           </Link>
 
-          <div className="hidden lg:flex items-center flex-1 justify-end gap-2 xl:gap-4">
-            {/* Navigation Principale */}
-            <div className="flex items-center gap-1 lg:gap-2 xl:gap-3">
-              <Link to="/flights" className="text-white hover:text-secondary transition-smooth text-[10px] lg:text-xs xl:text-sm font-medium flex items-center gap-1 whitespace-nowrap px-1 lg:px-1.5">
-                <Plane className="w-3 h-3 lg:w-3.5 lg:h-3.5 hidden xl:block" />
+          <div className="hidden lg:flex items-center flex-1 justify-between ml-6">
+            {/* Navigation Principale - Gauche */}
+            <div className="flex items-center gap-1 xl:gap-2">
+              <Link to="/flights" className="text-white hover:text-secondary transition-smooth text-xs xl:text-sm font-medium whitespace-nowrap px-2 py-1">
                 {t("nav.flights")}
               </Link>
-              <Link to="/hotels" className="text-white hover:text-secondary transition-smooth text-[10px] lg:text-xs xl:text-sm font-medium flex items-center gap-1 whitespace-nowrap px-1 lg:px-1.5">
-                <Hotel className="w-3 h-3 lg:w-3.5 lg:h-3.5 hidden xl:block" />
+              <Link to="/hotels" className="text-white hover:text-secondary transition-smooth text-xs xl:text-sm font-medium whitespace-nowrap px-2 py-1">
                 {t("nav.hotels")}
               </Link>
-              <Link to="/flight-hotel" className="text-white hover:text-secondary transition-smooth text-[10px] lg:text-xs xl:text-sm font-medium flex items-center gap-1 whitespace-nowrap px-1 lg:px-1.5">
-                <PlaneTakeoff className="w-3 h-3 lg:w-3.5 lg:h-3.5 hidden xl:block" />
+              <Link to="/flight-hotel" className="text-white hover:text-secondary transition-smooth text-xs xl:text-sm font-medium whitespace-nowrap px-2 py-1">
                 {t("nav.flightHotel")}
               </Link>
-              <Link to="/trains" className="text-white hover:text-secondary transition-smooth text-[10px] lg:text-xs xl:text-sm font-medium flex items-center gap-1 whitespace-nowrap px-1 lg:px-1.5">
-                <Train className="w-3 h-3 lg:w-3.5 lg:h-3.5 hidden xl:block" />
-                {t("nav.trains")}
-              </Link>
-              <Link to="/events" className="text-white hover:text-secondary transition-smooth text-[10px] lg:text-xs xl:text-sm font-medium flex items-center gap-1 whitespace-nowrap px-1 lg:px-1.5">
-                <Calendar className="w-3 h-3 lg:w-3.5 lg:h-3.5 hidden xl:block" />
-                {t("nav.events")}
-              </Link>
-              <Link to="/cars" className="text-white hover:text-secondary transition-smooth text-[10px] lg:text-xs xl:text-sm font-medium flex items-center gap-1 whitespace-nowrap px-1 lg:px-1.5">
-                <Car className="w-3 h-3 lg:w-3.5 lg:h-3.5 hidden xl:block" />
+              <Link to="/cars" className="text-white hover:text-secondary transition-smooth text-xs xl:text-sm font-medium whitespace-nowrap px-2 py-1">
                 {t("nav.carRental")}
               </Link>
-              <Link to="/subscriptions" className="text-secondary hover:text-secondary/80 transition-smooth text-[10px] lg:text-xs xl:text-sm font-medium flex items-center gap-1 whitespace-nowrap px-1 lg:px-1.5">
-                <Crown className="w-3 h-3 lg:w-3.5 lg:h-3.5 hidden xl:block" />
-                {t("nav.subscriptions")}
+              <Link to="/trains" className="text-white hover:text-secondary transition-smooth text-xs xl:text-sm font-medium whitespace-nowrap px-2 py-1">
+                {t("nav.trains")}
+              </Link>
+              <Link to="/events" className="text-white hover:text-secondary transition-smooth text-xs xl:text-sm font-medium whitespace-nowrap px-2 py-1">
+                {t("nav.events")}
               </Link>
             </div>
 
-            {/* Section Droite - Toujours visible */}
-            <div className="flex items-center gap-1 lg:gap-2 flex-shrink-0">
-              <Link to="/support" className="text-white hover:text-secondary transition-smooth text-[9px] lg:text-[10px] xl:text-[11px] font-medium flex items-center gap-0.5 whitespace-nowrap">
-                <HelpCircle className="w-2.5 h-2.5 hidden xl:block" />
+            {/* Section Droite */}
+            <div className="flex items-center gap-2 xl:gap-3">
+              <Link to="/subscriptions">
+                <Button variant="outline" size="sm" className="text-xs border-secondary text-secondary hover:bg-secondary hover:text-primary whitespace-nowrap px-3">
+                  <Crown className="w-3 h-3 mr-1" />
+                  {t("nav.subscriptions")}
+                </Button>
+              </Link>
+              
+              {isLoggedIn ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-white hover:bg-white/10 whitespace-nowrap px-2">
+                      <UserCircle2 className="w-4 h-4" />
+                      {t("nav.myAccount")}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48 bg-background border-border z-50">
+                    <DropdownMenuLabel className="text-foreground">
+                      {t("nav.myAccount")}
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {isAdmin && (
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin" className="flex items-center gap-2 cursor-pointer">
+                          <LayoutDashboard className="w-4 h-4" />
+                          {t("nav.admin")}
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem asChild>
+                      <Link to="/account" className="flex items-center gap-2 cursor-pointer">
+                        <UserCircle2 className="w-4 h-4" />
+                        {t("nav.profile")}
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/dashboard" className="flex items-center gap-2 cursor-pointer">
+                        <LayoutDashboard className="w-4 h-4" />
+                        {t("nav.dashboard")}
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={handleLogout}
+                      className="flex items-center gap-2 cursor-pointer text-destructive focus:text-destructive"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      {t("nav.logout")}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link to="/auth">
+                  <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-white hover:bg-white/10 whitespace-nowrap px-2">
+                    <User className="w-4 h-4" />
+                    {t("nav.login")}
+                  </Button>
+                </Link>
+              )}
+
+              <Link to="/dashboard" className="text-white hover:text-secondary transition-smooth text-xs font-medium whitespace-nowrap px-2 py-1 flex items-center gap-1.5">
+                <LayoutDashboard className="w-4 h-4" />
+                {t("nav.dashboard")}
+              </Link>
+
+              <Link to="/support" className="text-white hover:text-secondary transition-smooth text-xs font-medium whitespace-nowrap px-2 py-1 flex items-center gap-1.5">
+                <HelpCircle className="w-4 h-4" />
                 {t("nav.support")}
               </Link>
               
-              <div className="h-4 w-px bg-white/20"></div>
-              
               <LanguageSwitcher />
-              
-              <div className="h-4 w-px bg-white/20"></div>
-              
-              <CurrencySelector />
-              
-              {isInstallable && !isInstalled && (
-                <>
-                  <div className="h-4 w-px bg-white/20"></div>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={handleInstall}
-                    className="gap-1 text-[9px] lg:text-[10px] xl:text-[11px] text-secondary hover:bg-white/10 font-semibold whitespace-nowrap px-1 lg:px-2"
-                  >
-                    <Download className="w-3 h-3" />
-                    <span className="hidden xl:inline">Installer</span>
-                  </Button>
-                </>
-              )}
-              
-              {isLoggedIn ? (
-                <>
-                  <div className="h-4 w-px bg-white/20"></div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="gap-1 text-[9px] lg:text-[10px] xl:text-[11px] text-white hover:bg-white/10 whitespace-nowrap px-1 lg:px-2">
-                        <UserCircle2 className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
-                        <span className="hidden xl:inline">{t("nav.myAccount")}</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48 bg-background border-border z-50">
-                      <DropdownMenuLabel className="text-foreground">
-                        {t("nav.myAccount")}
-                      </DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      {isAdmin && (
-                        <DropdownMenuItem asChild>
-                          <Link to="/admin" className="flex items-center gap-2 cursor-pointer">
-                            <LayoutDashboard className="w-4 h-4" />
-                            {t("nav.admin")}
-                          </Link>
-                        </DropdownMenuItem>
-                      )}
-                      <DropdownMenuItem asChild>
-                        <Link to="/account" className="flex items-center gap-2 cursor-pointer">
-                          <UserCircle2 className="w-4 h-4" />
-                          {t("nav.profile")}
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to="/dashboard" className="flex items-center gap-2 cursor-pointer">
-                          <LayoutDashboard className="w-4 h-4" />
-                          {t("nav.dashboard")}
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem 
-                        onClick={handleLogout}
-                        className="flex items-center gap-2 cursor-pointer text-destructive focus:text-destructive"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        {t("nav.logout")}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </>
-              ) : (
-                <>
-                  <div className="h-4 w-px bg-white/20"></div>
-                  <Link to="/auth">
-                    <Button variant="ghost" size="sm" className="gap-0.5 text-[9px] lg:text-[10px] xl:text-[11px] text-white hover:bg-white/10 whitespace-nowrap px-1 lg:px-2">
-                      <User className="w-3 h-3" />
-                      <span className="hidden xl:inline">{t("nav.login")}</span>
-                    </Button>
-                  </Link>
-                  <Link to="/auth">
-                    <Button size="sm" className="text-[9px] lg:text-[10px] xl:text-[11px] bg-secondary hover:bg-secondary/90 text-primary px-1.5 lg:px-2 whitespace-nowrap">
-                      {t("nav.signup")}
-                    </Button>
-                  </Link>
-                </>
-              )}
             </div>
           </div>
 
