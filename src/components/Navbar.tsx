@@ -146,9 +146,15 @@ const Navbar = () => {
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuItem asChild>
+                        <Link to="/account" className="flex items-center gap-2 cursor-pointer">
+                          <UserCircle2 className="w-4 h-4" />
+                          {t("nav.profile")}
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
                         <Link to="/dashboard" className="flex items-center gap-2 cursor-pointer">
-                          <User className="w-4 h-4" />
-                          {t("nav.myAccount")}
+                          <LayoutDashboard className="w-4 h-4" />
+                          {t("nav.dashboard")}
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
@@ -303,10 +309,16 @@ const Navbar = () => {
                         </Button>
                       </Link>
                     )}
-                    <Link to="/dashboard" className="w-full" onClick={() => setIsMenuOpen(false)}>
+                    <Link to="/account" className="w-full" onClick={() => setIsMenuOpen(false)}>
                       <Button className="w-full gap-2 text-sm bg-secondary hover:bg-secondary/90 text-primary justify-start">
-                        <User className="w-4 h-4" />
-                        {t("nav.myAccount")}
+                        <UserCircle2 className="w-4 h-4" />
+                        {t("nav.profile")}
+                      </Button>
+                    </Link>
+                    <Link to="/dashboard" className="w-full" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="outline" className="w-full gap-2 text-sm text-white border-white/20 hover:bg-white/10 justify-start">
+                        <LayoutDashboard className="w-4 h-4" />
+                        {t("nav.dashboard")}
                       </Button>
                     </Link>
                     <Button 

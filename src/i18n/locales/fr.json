@@ -13,7 +13,8 @@
     "admin": "Admin",
     "logout": "Déconnexion",
     "logoutSuccess": "Déconnexion réussie",
-    "dashboard": "Tableau de bord"
+    "dashboard": "Tableau de bord",
+    "profile": "Mon Profil"
   },
   "hero": {
     "title": "Voyagez partout, réservez en un clic",
