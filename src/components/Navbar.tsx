@@ -63,43 +63,43 @@ const Navbar = () => {
             <span className="text-xl font-bold text-white">Bossiz</span>
           </Link>
 
-          <div className="hidden md:flex items-center flex-1 justify-between pl-8">
+          <div className="hidden lg:flex items-center flex-1 justify-between pl-4 xl:pl-8">
             {/* Navigation Principale */}
-            <div className="flex items-center gap-4 lg:gap-6">
-              <Link to="/flights" className="text-white hover:text-secondary transition-smooth text-sm font-medium flex items-center gap-1.5 whitespace-nowrap">
-                <Plane className="w-3.5 h-3.5" />
+            <div className="flex items-center gap-1 lg:gap-2 xl:gap-4">
+              <Link to="/flights" className="text-white hover:text-secondary transition-smooth text-[10px] lg:text-xs xl:text-sm font-medium flex items-center gap-1 whitespace-nowrap px-1 lg:px-1.5">
+                <Plane className="w-3 h-3 lg:w-3.5 lg:h-3.5 hidden xl:block" />
                 {t("nav.flights")}
               </Link>
-              <Link to="/hotels" className="text-white hover:text-secondary transition-smooth text-sm font-medium flex items-center gap-1.5 whitespace-nowrap">
-                <Hotel className="w-3.5 h-3.5" />
+              <Link to="/hotels" className="text-white hover:text-secondary transition-smooth text-[10px] lg:text-xs xl:text-sm font-medium flex items-center gap-1 whitespace-nowrap px-1 lg:px-1.5">
+                <Hotel className="w-3 h-3 lg:w-3.5 lg:h-3.5 hidden xl:block" />
                 {t("nav.hotels")}
               </Link>
-              <Link to="/flight-hotel" className="text-white hover:text-secondary transition-smooth text-sm font-medium flex items-center gap-1.5 whitespace-nowrap">
-                <PlaneTakeoff className="w-3.5 h-3.5" />
+              <Link to="/flight-hotel" className="text-white hover:text-secondary transition-smooth text-[10px] lg:text-xs xl:text-sm font-medium flex items-center gap-1 whitespace-nowrap px-1 lg:px-1.5">
+                <PlaneTakeoff className="w-3 h-3 lg:w-3.5 lg:h-3.5 hidden xl:block" />
                 {t("nav.flightHotel")}
               </Link>
-              <Link to="/trains" className="text-white hover:text-secondary transition-smooth text-sm font-medium flex items-center gap-1.5 whitespace-nowrap">
-                <Train className="w-3.5 h-3.5" />
+              <Link to="/trains" className="text-white hover:text-secondary transition-smooth text-[10px] lg:text-xs xl:text-sm font-medium flex items-center gap-1 whitespace-nowrap px-1 lg:px-1.5">
+                <Train className="w-3 h-3 lg:w-3.5 lg:h-3.5 hidden xl:block" />
                 {t("nav.trains")}
               </Link>
-              <Link to="/events" className="text-white hover:text-secondary transition-smooth text-sm font-medium flex items-center gap-1.5 whitespace-nowrap">
-                <Calendar className="w-3.5 h-3.5" />
+              <Link to="/events" className="text-white hover:text-secondary transition-smooth text-[10px] lg:text-xs xl:text-sm font-medium flex items-center gap-1 whitespace-nowrap px-1 lg:px-1.5">
+                <Calendar className="w-3 h-3 lg:w-3.5 lg:h-3.5 hidden xl:block" />
                 {t("nav.events")}
               </Link>
-              <Link to="/cars" className="text-white hover:text-secondary transition-smooth text-sm font-medium flex items-center gap-1.5 whitespace-nowrap">
-                <Car className="w-3.5 h-3.5" />
+              <Link to="/cars" className="text-white hover:text-secondary transition-smooth text-[10px] lg:text-xs xl:text-sm font-medium flex items-center gap-1 whitespace-nowrap px-1 lg:px-1.5">
+                <Car className="w-3 h-3 lg:w-3.5 lg:h-3.5 hidden xl:block" />
                 {t("nav.carRental")}
               </Link>
-              <Link to="/subscriptions" className="text-secondary hover:text-secondary/80 transition-smooth text-sm font-medium flex items-center gap-1.5 whitespace-nowrap">
-                <Crown className="w-3.5 h-3.5" />
+              <Link to="/subscriptions" className="text-secondary hover:text-secondary/80 transition-smooth text-[10px] lg:text-xs xl:text-sm font-medium flex items-center gap-1 whitespace-nowrap px-1 lg:px-1.5">
+                <Crown className="w-3 h-3 lg:w-3.5 lg:h-3.5 hidden xl:block" />
                 {t("nav.subscriptions")}
               </Link>
             </div>
 
             {/* Section Droite - Toujours visible */}
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <Link to="/support" className="text-white hover:text-secondary transition-smooth text-[11px] font-medium flex items-center gap-0.5 whitespace-nowrap">
-                <HelpCircle className="w-2.5 h-2.5" />
+            <div className="flex items-center gap-1 lg:gap-2 flex-shrink-0">
+              <Link to="/support" className="text-white hover:text-secondary transition-smooth text-[9px] lg:text-[10px] xl:text-[11px] font-medium flex items-center gap-0.5 whitespace-nowrap">
+                <HelpCircle className="w-2.5 h-2.5 hidden xl:block" />
                 {t("nav.support")}
               </Link>
               
@@ -118,10 +118,10 @@ const Navbar = () => {
                     variant="ghost" 
                     size="sm" 
                     onClick={handleInstall}
-                    className="gap-1 text-[11px] text-secondary hover:bg-white/10 font-semibold whitespace-nowrap"
+                    className="gap-1 text-[9px] lg:text-[10px] xl:text-[11px] text-secondary hover:bg-white/10 font-semibold whitespace-nowrap px-1 lg:px-2"
                   >
                     <Download className="w-3 h-3" />
-                    Installer
+                    <span className="hidden xl:inline">Installer</span>
                   </Button>
                 </>
               )}
@@ -131,9 +131,9 @@ const Navbar = () => {
                   <div className="h-4 w-px bg-white/20"></div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="gap-1 text-[11px] text-white hover:bg-white/10 whitespace-nowrap">
-                        <UserCircle2 className="w-4 h-4" />
-                        <span className="hidden lg:inline">{t("nav.myAccount")}</span>
+                      <Button variant="ghost" size="sm" className="gap-1 text-[9px] lg:text-[10px] xl:text-[11px] text-white hover:bg-white/10 whitespace-nowrap px-1 lg:px-2">
+                        <UserCircle2 className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
+                        <span className="hidden xl:inline">{t("nav.myAccount")}</span>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48 bg-background border-border z-50">
@@ -176,13 +176,13 @@ const Navbar = () => {
                 <>
                   <div className="h-4 w-px bg-white/20"></div>
                   <Link to="/auth">
-                    <Button variant="ghost" size="sm" className="gap-0.5 text-[11px] text-white hover:bg-white/10 whitespace-nowrap">
+                    <Button variant="ghost" size="sm" className="gap-0.5 text-[9px] lg:text-[10px] xl:text-[11px] text-white hover:bg-white/10 whitespace-nowrap px-1 lg:px-2">
                       <User className="w-3 h-3" />
-                      {t("nav.login")}
+                      <span className="hidden xl:inline">{t("nav.login")}</span>
                     </Button>
                   </Link>
                   <Link to="/auth">
-                    <Button size="sm" className="text-[11px] bg-secondary hover:bg-secondary/90 text-primary px-2 whitespace-nowrap">
+                    <Button size="sm" className="text-[9px] lg:text-[10px] xl:text-[11px] bg-secondary hover:bg-secondary/90 text-primary px-1.5 lg:px-2 whitespace-nowrap">
                       {t("nav.signup")}
                     </Button>
                   </Link>
@@ -194,7 +194,7 @@ const Navbar = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 text-white hover:text-secondary transition-smooth"
+            className="lg:hidden p-2 text-white hover:text-secondary transition-smooth"
           >
             {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -202,7 +202,7 @@ const Navbar = () => {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-primary-light animate-fade-in">
+          <div className="lg:hidden py-4 border-t border-primary-light animate-fade-in">
             <div className="flex flex-col">
               {/* Section Navigation */}
               <div className="px-4 pb-2">
