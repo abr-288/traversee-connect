@@ -96,13 +96,26 @@ export const FlightCard = ({
     }
   };
 
+  // Airline logo URL - using pics.avs.io service
+  const airlineLogoUrl = `https://pics.avs.io/80/80/${airlineCode}.png`;
+  
   return (
     <Card className="p-4 hover:shadow-md transition-shadow">
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
         {/* Airline Info */}
-        <div className="flex items-center gap-3 min-w-[140px]">
-          <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center text-lg font-bold text-primary">
-            {airlineCode.substring(0, 2)}
+        <div className="flex items-center gap-3 min-w-[160px]">
+          <div className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden bg-white border border-border">
+            <img 
+              src={airlineLogoUrl} 
+              alt={`${airline} logo`}
+              className="w-10 h-10 object-contain"
+              onError={(e) => {
+                // Fallback to text if image fails to load
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                target.parentElement!.innerHTML = `<span class="text-lg font-bold text-primary">${airlineCode.substring(0, 2)}</span>`;
+              }}
+            />
           </div>
           <div className="flex flex-col">
             <span className="font-semibold text-sm">{airline}</span>
