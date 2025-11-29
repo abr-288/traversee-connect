@@ -31,7 +31,7 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <section className="relative min-h-[600px] md:min-h-[850px] flex items-center pt-16 md:pt-20 overflow-hidden">
+    <section className="relative min-h-[500px] md:min-h-[700px] flex items-center pt-16 md:pt-20 overflow-hidden">
       {/* Background Image Carousel with Overlay */}
       <div className="absolute inset-0 z-0">
         {HERO_SLIDES.map((slide, index) => (
