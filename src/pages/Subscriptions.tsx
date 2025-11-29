@@ -26,7 +26,10 @@ import {
   Shield,
   Clock,
   Users,
-  Sparkles
+  Sparkles,
+  Briefcase,
+  GraduationCap,
+  CalendarDays
 } from "lucide-react";
 
 const containerVariants = {
@@ -155,6 +158,98 @@ const subscriptionPlans: SubscriptionPlan[] = [
       "Accès à tous les vols"
     ],
     color: "from-blue-500 to-blue-600"
+  },
+  {
+    id: "family",
+    name: "Pack Famille",
+    subtitle: "Voyages en famille",
+    icon: <Users className="h-8 w-8" />,
+    price: "45 000 FCFA",
+    priceNote: "par mois",
+    features: [
+      "Réservations groupées simplifiées",
+      "Tarifs enfants réduits (-50%)",
+      "Assurance voyage famille complète",
+      "Activités enfants incluses",
+      "Sièges côte à côte garantis",
+      "Bagages supplémentaires enfants"
+    ],
+    advantages: [
+      "Voyages en famille sans stress",
+      "Économies sur chaque voyage",
+      "Tout inclus pour les petits",
+      "Organisation simplifiée"
+    ],
+    color: "from-pink-500 to-pink-600"
+  },
+  {
+    id: "business",
+    name: "Business Traveler",
+    subtitle: "Voyageurs fréquents",
+    icon: <Briefcase className="h-8 w-8" />,
+    price: "75 000 FCFA",
+    priceNote: "par mois",
+    features: [
+      "Check-in prioritaire tous aéroports",
+      "Accès lounge aéroport inclus",
+      "Modifications illimitées gratuites",
+      "Conciergerie voyage dédiée",
+      "Fast-track sécurité",
+      "Chauffeur aéroport inclus"
+    ],
+    advantages: [
+      "Gain de temps considérable",
+      "Confort premium garanti",
+      "Flexibilité totale",
+      "Image professionnelle"
+    ],
+    color: "from-slate-600 to-slate-700"
+  },
+  {
+    id: "student",
+    name: "Évasion Jeunes",
+    subtitle: "Étudiants & -26 ans",
+    icon: <GraduationCap className="h-8 w-8" />,
+    price: "12 000 FCFA",
+    priceNote: "par mois",
+    features: [
+      "Tarifs étudiants exclusifs (-25%)",
+      "Bagages supplémentaires gratuits",
+      "Annulation flexible 48h",
+      "Bons plans destinations",
+      "Assurance études à l'étranger",
+      "Réseau d'entraide voyageurs"
+    ],
+    advantages: [
+      "Budget maîtrisé garanti",
+      "Flexibilité étudiante",
+      "Communauté de voyageurs",
+      "Expériences uniques"
+    ],
+    color: "from-violet-500 to-violet-600"
+  },
+  {
+    id: "events",
+    name: "Events & MICE",
+    subtitle: "Séminaires & Incentives",
+    icon: <CalendarDays className="h-8 w-8" />,
+    price: "Sur devis",
+    priceNote: "selon le groupe",
+    features: [
+      "Organisation événementielle complète",
+      "Logistique transport groupe",
+      "Hébergement groupe négocié",
+      "Team building sur mesure",
+      "Gestion badges et accréditations",
+      "Coordination sur place"
+    ],
+    advantages: [
+      "Événement clé en main",
+      "Économies d'échelle",
+      "Un seul interlocuteur",
+      "Succès garanti"
+    ],
+    color: "from-orange-500 to-orange-600"
   }
 ];
 

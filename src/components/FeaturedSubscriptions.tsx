@@ -20,7 +20,11 @@ import {
   MessageCircle,
   ArrowRight,
   Star,
-  Sparkles
+  Sparkles,
+  Users,
+  Briefcase,
+  GraduationCap,
+  CalendarDays
 } from "lucide-react";
 
 interface SubscriptionPlan {
@@ -96,6 +100,66 @@ const subscriptionPlans: SubscriptionPlan[] = [
       "Tous les vols"
     ],
     color: "from-blue-500 to-blue-600"
+  },
+  {
+    id: "family",
+    name: "Pack Famille",
+    subtitle: "Voyages en famille",
+    icon: <Users className="h-6 w-6" />,
+    price: "45 000 FCFA",
+    priceNote: "par mois",
+    features: [
+      "Réservations groupées",
+      "Tarifs enfants réduits",
+      "Assurance voyage famille",
+      "Activités enfants incluses"
+    ],
+    color: "from-pink-500 to-pink-600"
+  },
+  {
+    id: "business",
+    name: "Business Traveler",
+    subtitle: "Voyageurs fréquents",
+    icon: <Briefcase className="h-6 w-6" />,
+    price: "75 000 FCFA",
+    priceNote: "par mois",
+    features: [
+      "Check-in prioritaire",
+      "Lounge aéroport inclus",
+      "Modifications illimitées",
+      "Conciergerie voyage"
+    ],
+    color: "from-slate-600 to-slate-700"
+  },
+  {
+    id: "student",
+    name: "Évasion Jeunes",
+    subtitle: "Étudiants & -26 ans",
+    icon: <GraduationCap className="h-6 w-6" />,
+    price: "12 000 FCFA",
+    priceNote: "par mois",
+    features: [
+      "Tarifs étudiants exclusifs",
+      "Bagages supplémentaires",
+      "Annulation flexible",
+      "Bons plans destinations"
+    ],
+    color: "from-violet-500 to-violet-600"
+  },
+  {
+    id: "events",
+    name: "Events & MICE",
+    subtitle: "Séminaires & Incentives",
+    icon: <CalendarDays className="h-6 w-6" />,
+    price: "Sur devis",
+    priceNote: "selon groupe",
+    features: [
+      "Organisation complète",
+      "Logistique événementielle",
+      "Hébergement groupe",
+      "Team building inclus"
+    ],
+    color: "from-orange-500 to-orange-600"
   }
 ];
 
