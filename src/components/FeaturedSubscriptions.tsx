@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,9 @@ import {
   Users,
   Briefcase,
   GraduationCap,
-  CalendarDays
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 
 interface SubscriptionPlan {
@@ -163,10 +165,13 @@ const subscriptionPlans: SubscriptionPlan[] = [
   }
 ];
 
+const ITEMS_PER_PAGE = 4;
+
 const FeaturedSubscriptions = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(0);
   const [contactForm, setContactForm] = useState({
     name: "",
     email: "",
@@ -175,6 +180,20 @@ const FeaturedSubscriptions = () => {
     message: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const totalPages = Math.ceil(subscriptionPlans.length / ITEMS_PER_PAGE);
+  const currentPlans = subscriptionPlans.slice(
+    currentPage * ITEMS_PER_PAGE,
+    (currentPage + 1) * ITEMS_PER_PAGE
+  );
+
+  const nextPage = () => {
+    setCurrentPage((prev) => (prev + 1) % totalPages);
+  };
+
+  const prevPage = () => {
+    setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
+  };
 
   const handleContactSubmit = async (e: React.FormEvent, plan: SubscriptionPlan) => {
     e.preventDefault();
@@ -256,142 +275,186 @@ const FeaturedSubscriptions = () => {
           </div>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-          {subscriptionPlans.map((plan, index) => (
-            <motion.div
-              key={plan.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card className={`group h-full overflow-hidden border-2 border-border/50 hover:border-secondary/50 shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer hover-lift rounded-2xl bg-gradient-card relative ${plan.popular ? 'ring-2 ring-primary' : ''}`}>
-                {/* Shine effect overlay */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-10">
-                  <div className="absolute inset-0 animate-shimmer" />
-                </div>
-                
-                {plan.popular && (
-                  <div className="absolute top-3 right-3 z-20">
-                    <Badge className="bg-primary text-primary-foreground">
-                      <Star className="w-3 h-3 mr-1" />
-                      {t("subscriptions.popular", "Populaire")}
-                    </Badge>
-                  </div>
-                )}
+        {/* Carousel Navigation */}
+        <div className="relative">
+          {/* Navigation Arrows */}
+          <button
+            onClick={prevPage}
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 md:-translate-x-6 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-background/90 border border-border shadow-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+            aria-label="Previous"
+          >
+            <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+          </button>
+          
+          <button
+            onClick={nextPage}
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 md:translate-x-6 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-background/90 border border-border shadow-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+            aria-label="Next"
+          >
+            <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+          </button>
 
-                <CardHeader className="pb-2">
-                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${plan.color} flex items-center justify-center text-white mb-3`}>
-                    {plan.icon}
-                  </div>
-                  <CardTitle className="text-lg">{plan.name}</CardTitle>
-                  <CardDescription className="text-sm">{plan.subtitle}</CardDescription>
-                  <div className="mt-2">
-                    <span className="text-xl font-bold text-foreground">{plan.price}</span>
-                    {plan.priceNote && (
-                      <span className="text-xs text-muted-foreground ml-1">{plan.priceNote}</span>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentPage}
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -50 }}
+              transition={{ duration: 0.3 }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 px-4 md:px-8"
+            >
+              {currentPlans.map((plan, index) => (
+                <motion.div
+                  key={plan.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className={`group h-full overflow-hidden border-2 border-border/50 hover:border-secondary/50 shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer hover-lift rounded-2xl bg-gradient-card relative ${plan.popular ? 'ring-2 ring-primary' : ''}`}>
+                    {/* Shine effect overlay */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-10">
+                      <div className="absolute inset-0 animate-shimmer" />
+                    </div>
+                    
+                    {plan.popular && (
+                      <div className="absolute top-3 right-3 z-20">
+                        <Badge className="bg-primary text-primary-foreground">
+                          <Star className="w-3 h-3 mr-1" />
+                          {t("subscriptions.popular", "Populaire")}
+                        </Badge>
+                      </div>
                     )}
-                  </div>
-                </CardHeader>
-                
-                <CardContent className="pt-0 pb-4">
-                  <ul className="space-y-2">
-                    {plan.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-xs text-muted-foreground">
-                        <Check className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-                
-                <CardFooter className="flex flex-col gap-2 pt-0">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button className="w-full" size="sm">
-                        {t("subscriptions.subscribe", "Souscrire")}
-                        <ArrowRight className="w-3 h-3 ml-1" />
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
-                      <DialogHeader>
-                        <DialogTitle>{t("subscriptions.subscribeTo", "Souscrire à")} {plan.name}</DialogTitle>
-                        <DialogDescription>
-                          {t("subscriptions.fillForm", "Remplissez ce formulaire et notre équipe vous contactera rapidement.")}
-                        </DialogDescription>
-                      </DialogHeader>
-                      <form onSubmit={(e) => handleContactSubmit(e, plan)} className="space-y-4 mt-4">
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label htmlFor={`name-${plan.id}`}>{t("subscriptions.fullName", "Nom complet")} *</Label>
-                            <Input
-                              id={`name-${plan.id}`}
-                              value={contactForm.name}
-                              onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
-                              required
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor={`phone-${plan.id}`}>{t("subscriptions.phone", "Téléphone")} *</Label>
-                            <Input
-                              id={`phone-${plan.id}`}
-                              type="tel"
-                              value={contactForm.phone}
-                              onChange={(e) => setContactForm({...contactForm, phone: e.target.value})}
-                              required
-                            />
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor={`email-${plan.id}`}>{t("subscriptions.email", "Email")} *</Label>
-                          <Input
-                            id={`email-${plan.id}`}
-                            type="email"
-                            value={contactForm.email}
-                            onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
-                            required
-                          />
-                        </div>
-                        {plan.id === "corporate" && (
-                          <div className="space-y-2">
-                            <Label htmlFor={`company-${plan.id}`}>{t("subscriptions.company", "Entreprise")}</Label>
-                            <Input
-                              id={`company-${plan.id}`}
-                              value={contactForm.company}
-                              onChange={(e) => setContactForm({...contactForm, company: e.target.value})}
-                            />
-                          </div>
+
+                    <CardHeader className="pb-2">
+                      <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${plan.color} flex items-center justify-center text-white mb-3`}>
+                        {plan.icon}
+                      </div>
+                      <CardTitle className="text-lg">{plan.name}</CardTitle>
+                      <CardDescription className="text-sm">{plan.subtitle}</CardDescription>
+                      <div className="mt-2">
+                        <span className="text-xl font-bold text-foreground">{plan.price}</span>
+                        {plan.priceNote && (
+                          <span className="text-xs text-muted-foreground ml-1">{plan.priceNote}</span>
                         )}
-                        <div className="space-y-2">
-                          <Label htmlFor={`message-${plan.id}`}>{t("subscriptions.messageOptional", "Message (optionnel)")}</Label>
-                          <Textarea
-                            id={`message-${plan.id}`}
-                            value={contactForm.message}
-                            onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
-                            placeholder={t("subscriptions.specifyNeeds", "Précisez vos besoins...")}
-                            rows={3}
-                          />
-                        </div>
-                        <Button type="submit" className="w-full" disabled={isSubmitting}>
-                          {isSubmitting ? t("subscriptions.sending", "Envoi en cours...") : t("subscriptions.sendRequest", "Envoyer ma demande")}
-                        </Button>
-                      </form>
-                    </DialogContent>
-                  </Dialog>
-                  
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="w-full"
-                    onClick={() => openWhatsApp(plan.name)}
-                  >
-                    <MessageCircle className="w-3 h-3 mr-1" />
-                    WhatsApp
-                  </Button>
-                </CardFooter>
-              </Card>
+                      </div>
+                    </CardHeader>
+                    
+                    <CardContent className="pt-0 pb-4">
+                      <ul className="space-y-2">
+                        {plan.features.map((feature, idx) => (
+                          <li key={idx} className="flex items-start gap-2 text-xs text-muted-foreground">
+                            <Check className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                    
+                    <CardFooter className="flex flex-col gap-2 pt-0">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button className="w-full" size="sm">
+                            {t("subscriptions.subscribe", "Souscrire")}
+                            <ArrowRight className="w-3 h-3 ml-1" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-md">
+                          <DialogHeader>
+                            <DialogTitle>{t("subscriptions.subscribeTo", "Souscrire à")} {plan.name}</DialogTitle>
+                            <DialogDescription>
+                              {t("subscriptions.fillForm", "Remplissez ce formulaire et notre équipe vous contactera rapidement.")}
+                            </DialogDescription>
+                          </DialogHeader>
+                          <form onSubmit={(e) => handleContactSubmit(e, plan)} className="space-y-4 mt-4">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                <Label htmlFor={`name-${plan.id}`}>{t("subscriptions.fullName", "Nom complet")} *</Label>
+                                <Input
+                                  id={`name-${plan.id}`}
+                                  value={contactForm.name}
+                                  onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
+                                  required
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <Label htmlFor={`phone-${plan.id}`}>{t("subscriptions.phone", "Téléphone")} *</Label>
+                                <Input
+                                  id={`phone-${plan.id}`}
+                                  type="tel"
+                                  value={contactForm.phone}
+                                  onChange={(e) => setContactForm({...contactForm, phone: e.target.value})}
+                                  required
+                                />
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor={`email-${plan.id}`}>{t("subscriptions.email", "Email")} *</Label>
+                              <Input
+                                id={`email-${plan.id}`}
+                                type="email"
+                                value={contactForm.email}
+                                onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
+                                required
+                              />
+                            </div>
+                            {(plan.id === "corporate" || plan.id === "events") && (
+                              <div className="space-y-2">
+                                <Label htmlFor={`company-${plan.id}`}>{t("subscriptions.company", "Entreprise")}</Label>
+                                <Input
+                                  id={`company-${plan.id}`}
+                                  value={contactForm.company}
+                                  onChange={(e) => setContactForm({...contactForm, company: e.target.value})}
+                                />
+                              </div>
+                            )}
+                            <div className="space-y-2">
+                              <Label htmlFor={`message-${plan.id}`}>{t("subscriptions.messageOptional", "Message (optionnel)")}</Label>
+                              <Textarea
+                                id={`message-${plan.id}`}
+                                value={contactForm.message}
+                                onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
+                                placeholder={t("subscriptions.specifyNeeds", "Précisez vos besoins...")}
+                                rows={3}
+                              />
+                            </div>
+                            <Button type="submit" className="w-full" disabled={isSubmitting}>
+                              {isSubmitting ? t("subscriptions.sending", "Envoi en cours...") : t("subscriptions.sendRequest", "Envoyer ma demande")}
+                            </Button>
+                          </form>
+                        </DialogContent>
+                      </Dialog>
+                      
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="w-full"
+                        onClick={() => openWhatsApp(plan.name)}
+                      >
+                        <MessageCircle className="w-3 h-3 mr-1" />
+                        WhatsApp
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </motion.div>
+              ))}
             </motion.div>
-          ))}
+          </AnimatePresence>
+
+          {/* Pagination Dots */}
+          <div className="flex justify-center gap-2 mt-8">
+            {Array.from({ length: totalPages }).map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentPage(index)}
+                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                  currentPage === index 
+                    ? 'bg-primary w-8' 
+                    : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
+                }`}
+                aria-label={`Page ${index + 1}`}
+              />
+            ))}
+          </div>
         </div>
 
         <div className="text-center mt-12">
