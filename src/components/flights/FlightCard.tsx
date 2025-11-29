@@ -1,4 +1,4 @@
-import { Plane } from "lucide-react";
+import { Plane, Clock, CircleCheck, Circle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Price } from "@/components/ui/price";
@@ -133,19 +133,47 @@ export const FlightCard = ({
           </div>
 
           {/* Duration & Stops */}
-          <div className="flex-1 flex flex-col items-center min-w-[100px]">
-            <span className="text-xs text-muted-foreground mb-1">{formatDuration(duration)}</span>
-            <div className="w-full flex items-center gap-2">
+          <div className="flex-1 flex flex-col items-center min-w-[120px] gap-1">
+            {/* Duration Badge */}
+            <div className="flex items-center gap-1.5 bg-primary/10 text-primary px-3 py-1 rounded-full">
+              <Clock className="h-3.5 w-3.5" />
+              <span className="text-sm font-semibold">{formatDuration(duration)}</span>
+            </div>
+            
+            {/* Flight Path Line */}
+            <div className="w-full flex items-center gap-2 my-1">
               <div className="flex-1 h-[2px] bg-border relative">
-                {stops > 0 && (
-                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-secondary" />
-                )}
+                {stops > 0 && Array.from({ length: stops }).map((_, i) => (
+                  <div 
+                    key={i}
+                    className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-secondary border-2 border-background"
+                    style={{ left: `${((i + 1) / (stops + 1)) * 100}%`, transform: 'translate(-50%, -50%)' }}
+                  />
+                ))}
               </div>
               <Plane className="h-4 w-4 text-secondary" />
             </div>
-            <span className={`text-xs mt-1 ${stops === 0 ? 'text-green-600 font-medium' : 'text-muted-foreground'}`}>
-              {stops === 0 ? "Vol direct" : `${stops} escale${stops > 1 ? "s" : ""}`}
-            </span>
+            
+            {/* Stops Badge */}
+            <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium animate-fade-in ${
+              stops === 0 
+                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
+                : stops === 1 
+                  ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
+                  : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+            }`}>
+              {stops === 0 ? (
+                <>
+                  <CircleCheck className="h-3.5 w-3.5" />
+                  <span>Vol direct</span>
+                </>
+              ) : (
+                <>
+                  <Circle className="h-3.5 w-3.5" />
+                  <span>{stops} escale{stops > 1 ? "s" : ""}</span>
+                </>
+              )}
+            </div>
           </div>
 
           {/* Arrival */}
