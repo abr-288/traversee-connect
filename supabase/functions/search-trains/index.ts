@@ -58,11 +58,11 @@ async function searchIRCTC(
         const hours = Math.floor(durationMinutes / 60);
         const minutes = durationMinutes % 60;
         
-        // Estimate price based on class (INR to XOF: ~8)
+        // Estimate price based on class (INR to EUR: ~0.011)
         const basePriceINR = train.train_type?.includes('Rajdhani') ? 2500 : 
                             train.train_type?.includes('Shatabdi') ? 1500 : 800;
         const classMultiplier = travelClass === 'first' ? 3 : travelClass === 'business' ? 2 : 1;
-        const priceXOF = Math.round(basePriceINR * classMultiplier * 8);
+        const priceEur = Math.round(basePriceINR * classMultiplier * 0.011);
 
         return {
           id: `irctc-${train.train_number || index}`,
@@ -73,8 +73,8 @@ async function searchIRCTC(
           departureTime: train.from_std || '08:00',
           arrivalTime: train.to_std || '14:00',
           duration: `${hours}h ${minutes.toString().padStart(2, '0')}m`,
-          price: priceXOF,
-          currency: 'XOF',
+          price: priceEur,
+          currency: 'EUR',
           class: travelClass || 'economy',
           availableSeats: train.available_seats || 50,
           source: 'irctc',
@@ -138,10 +138,10 @@ async function searchSNCF(
         const hours = Math.floor(durationMinutes / 60);
         const minutes = durationMinutes % 60;
 
-        // Price estimation (EUR to XOF: ~655)
+        // Price estimation (keep in EUR)
         const basePriceEUR = train.od_happy_card === 'OUI' ? 39 : 79;
         const classMultiplier = travelClass === 'first' ? 1.8 : travelClass === 'business' ? 1.4 : 1;
-        const priceXOF = Math.round(basePriceEUR * classMultiplier * 655);
+        const priceEur = Math.round(basePriceEUR * classMultiplier);
 
         return {
           id: `sncf-${index}`,
@@ -152,8 +152,8 @@ async function searchSNCF(
           departureTime: departureTime,
           arrivalTime: arrivalTime,
           duration: `${hours}h ${minutes.toString().padStart(2, '0')}m`,
-          price: priceXOF,
-          currency: 'XOF',
+          price: priceEur,
+          currency: 'EUR',
           class: travelClass || 'economy',
           availableSeats: 45 - (index * 3),
           source: 'sncf',
@@ -239,7 +239,7 @@ function generateSNCFMockTrains(
       const arrivalHour = (depHour + durationHours) % 24;
       
       const classMultiplier = travelClass === 'first' ? 1.8 : travelClass === 'business' ? 1.4 : 1;
-      const priceXOF = Math.round(trainType.basePrice * classMultiplier * 655);
+      const priceEur = Math.round(trainType.basePrice * classMultiplier);
 
       return {
         id: `sncf-${trainType.prefix}-${typeIndex}-${scheduleIndex}`,
@@ -250,8 +250,8 @@ function generateSNCFMockTrains(
         departureTime: departureTime,
         arrivalTime: `${arrivalHour.toString().padStart(2, '0')}:${durationMinutes.toString().padStart(2, '0')}`,
         duration: `${durationHours}h ${durationMinutes.toString().padStart(2, '0')}m`,
-        price: priceXOF,
-        currency: 'XOF',
+        price: priceEur,
+        currency: 'EUR',
         class: travelClass || 'economy',
         availableSeats: 35 + Math.floor(Math.random() * 30),
         source: 'sncf',
@@ -280,7 +280,7 @@ function getMockTrains(origin: string, destination: string, departureDate: strin
     const arrivalHour = (depHour + durationHours) % 24;
     
     const classMultiplier = travelClass === 'first' ? 2 : travelClass === 'business' ? 1.5 : 1;
-    const priceXOF = Math.round(op.basePrice * classMultiplier * 655);
+    const priceEur = Math.round(op.basePrice * classMultiplier);
 
     return {
       id: `euro-${index}`,
@@ -291,8 +291,8 @@ function getMockTrains(origin: string, destination: string, departureDate: strin
       departureTime: departureTime,
       arrivalTime: `${arrivalHour.toString().padStart(2, '0')}:${durationMinutes.toString().padStart(2, '0')}`,
       duration: `${durationHours}h ${durationMinutes.toString().padStart(2, '0')}m`,
-      price: priceXOF,
-      currency: 'XOF',
+      price: priceEur,
+      currency: 'EUR',
       class: travelClass || 'economy',
       availableSeats: 40 - (index * 5) + Math.floor(Math.random() * 20),
       source: 'simulation',

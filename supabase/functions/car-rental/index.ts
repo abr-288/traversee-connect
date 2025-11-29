@@ -93,8 +93,8 @@ async function searchBookingCars(
         id: `booking-${vehicle.id || index}`,
         name: vehicle.name || vehicle.vehicle_info?.v_name || 'Véhicule',
         category: vehicle.category || vehicle.vehicle_info?.category || 'Standard',
-        price: Math.round((parseFloat(vehicle.price?.total_price || vehicle.pricing?.total || 50)) * 655.957),
-        currency: 'XOF',
+        price: parseFloat(vehicle.price?.total_price || vehicle.pricing?.total || 50),
+        currency: 'EUR',
         rating: vehicle.supplier_info?.rating || 4.5,
         reviews: vehicle.supplier_info?.reviews_count || 0,
         image: vehicle.image_url || vehicle.vehicle_info?.image || 'https://images.unsplash.com/photo-1494905998402-395d579af36f',
@@ -158,8 +158,8 @@ async function searchPricelineCars(
         id: `priceline-${index}`,
         name: car.name || car.vehicle_name || 'Véhicule',
         category: car.category || car.class || 'Standard',
-        price: Math.round((car.price || car.total_price || 45) * 655.957),
-        currency: 'XOF',
+        price: car.price || car.total_price || 45,
+        currency: 'EUR',
         rating: car.rating || 4.3,
         reviews: car.reviews_count || 0,
         image: car.image || 'https://images.unsplash.com/photo-1494905998402-395d579af36f',
@@ -184,12 +184,12 @@ async function searchPricelineCars(
 
 function getMockCarRentals(pickupLocation: string): CarResult[] {
   const cars = [
-    { name: 'Toyota Corolla', category: 'Économique', price: 25000, seats: 5, transmission: 'Automatique' },
-    { name: 'Renault Clio', category: 'Compacte', price: 22000, seats: 5, transmission: 'Manuelle' },
-    { name: 'Peugeot 308', category: 'Berline', price: 35000, seats: 5, transmission: 'Automatique' },
-    { name: 'Mercedes Classe E', category: 'Luxe', price: 55000, seats: 5, transmission: 'Automatique' },
-    { name: 'Toyota Land Cruiser', category: 'SUV', price: 65000, seats: 7, transmission: 'Automatique' },
-    { name: 'Volkswagen Polo', category: 'Économique', price: 20000, seats: 5, transmission: 'Manuelle' },
+    { name: 'Toyota Corolla', category: 'Économique', price: 38, seats: 5, transmission: 'Automatique' },
+    { name: 'Renault Clio', category: 'Compacte', price: 33, seats: 5, transmission: 'Manuelle' },
+    { name: 'Peugeot 308', category: 'Berline', price: 53, seats: 5, transmission: 'Automatique' },
+    { name: 'Mercedes Classe E', category: 'Luxe', price: 84, seats: 5, transmission: 'Automatique' },
+    { name: 'Toyota Land Cruiser', category: 'SUV', price: 99, seats: 7, transmission: 'Automatique' },
+    { name: 'Volkswagen Polo', category: 'Économique', price: 30, seats: 5, transmission: 'Manuelle' },
   ];
 
   return cars.map((car, index) => ({
@@ -197,7 +197,7 @@ function getMockCarRentals(pickupLocation: string): CarResult[] {
     name: car.name,
     category: car.category,
     price: car.price,
-    currency: 'XOF',
+    currency: 'EUR',
     rating: 4.5 - (index * 0.1),
     reviews: 120 - (index * 15),
     image: 'https://images.unsplash.com/photo-1494905998402-395d579af36f',

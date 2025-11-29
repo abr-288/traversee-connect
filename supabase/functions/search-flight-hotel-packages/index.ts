@@ -77,8 +77,8 @@ async function searchKiwiFlights(
         return {
           id: `kiwi-flight-${index}`,
           airline: route.airline || flight.airlines?.[0] || 'Airline',
-          price: Math.round((flight.price || 300) * 655.957),
-          currency: 'XOF',
+          price: flight.price || 300,
+          currency: 'EUR',
           departure: departureDate,
           return: returnDate,
           duration: `${Math.floor((flight.fly_duration || 7200) / 3600)}h ${Math.floor(((flight.fly_duration || 7200) % 3600) / 60)}min`,
@@ -168,8 +168,8 @@ async function searchSkyScrapperFlights(
       return {
         id: `sky-flight-${index}`,
         airline: firstLeg.carriers?.marketing?.[0]?.name || 'Airline',
-        price: Math.round(price * 655.957),
-        currency: 'XOF',
+        price: price,
+        currency: 'EUR',
         departure: departureDate,
         return: returnDate,
         duration: `${Math.floor((firstLeg.durationInMinutes || 180) / 60)}h ${(firstLeg.durationInMinutes || 180) % 60}min`,
@@ -237,8 +237,8 @@ async function searchAmadeusFlights(
     return (data.data || []).slice(0, 5).map((offer: any, index: number) => ({
       id: `amadeus-flight-${index}`,
       airline: offer.validatingAirlineCodes?.[0] || 'Airline',
-      price: Math.round(parseFloat(offer.price?.total || '400') * 655.957),
-      currency: 'XOF',
+      price: parseFloat(offer.price?.total || '400'),
+      currency: 'EUR',
       departure: departureDate,
       return: returnDate,
       duration: offer.itineraries?.[0]?.duration?.replace('PT', '').toLowerCase() || '3h 00min',
@@ -441,14 +441,14 @@ async function searchPricelineHotels(
 function getMockData(origin: string, destination: string, departureDate: string, returnDate: string) {
   return {
     flights: [
-      { id: 'mock-flight-1', airline: 'Air France', price: 450000, currency: 'XOF', departure: departureDate, return: returnDate, duration: '2h 30min', stops: 0, source: 'mock' },
-      { id: 'mock-flight-2', airline: 'Brussels Airlines', price: 380000, currency: 'XOF', departure: departureDate, return: returnDate, duration: '3h 15min', stops: 1, source: 'mock' },
-      { id: 'mock-flight-3', airline: 'Royal Air Maroc', price: 420000, currency: 'XOF', departure: departureDate, return: returnDate, duration: '4h 45min', stops: 1, source: 'mock' }
+      { id: 'mock-flight-1', airline: 'Air France', price: 685, currency: 'EUR', departure: departureDate, return: returnDate, duration: '2h 30min', stops: 0, source: 'mock' },
+      { id: 'mock-flight-2', airline: 'Brussels Airlines', price: 580, currency: 'EUR', departure: departureDate, return: returnDate, duration: '3h 15min', stops: 1, source: 'mock' },
+      { id: 'mock-flight-3', airline: 'Royal Air Maroc', price: 640, currency: 'EUR', departure: departureDate, return: returnDate, duration: '4h 45min', stops: 1, source: 'mock' }
     ],
     hotels: [
-      { id: 'mock-hotel-1', name: 'Hôtel Sofitel', rating: 5, price: 180000, currency: 'XOF', image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945', address: destination, amenities: ['WiFi', 'Piscine', 'Spa', 'Restaurant', 'Bar'], description: 'Hôtel de luxe', source: 'mock' },
-      { id: 'mock-hotel-2', name: 'Hôtel Pullman', rating: 4, price: 120000, currency: 'XOF', image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa', address: destination, amenities: ['WiFi', 'Piscine', 'Climatisation', 'Restaurant'], description: 'Hôtel moderne', source: 'mock' },
-      { id: 'mock-hotel-3', name: 'Hôtel Azalaï', rating: 4, price: 95000, currency: 'XOF', image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b', address: destination, amenities: ['WiFi', 'Piscine', 'Climatisation'], description: 'Excellent rapport qualité-prix', source: 'mock' }
+      { id: 'mock-hotel-1', name: 'Hôtel Sofitel', rating: 5, price: 275, currency: 'EUR', image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945', address: destination, amenities: ['WiFi', 'Piscine', 'Spa', 'Restaurant', 'Bar'], description: 'Hôtel de luxe', source: 'mock' },
+      { id: 'mock-hotel-2', name: 'Hôtel Pullman', rating: 4, price: 183, currency: 'EUR', image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa', address: destination, amenities: ['WiFi', 'Piscine', 'Climatisation', 'Restaurant'], description: 'Hôtel moderne', source: 'mock' },
+      { id: 'mock-hotel-3', name: 'Hôtel Azalaï', rating: 4, price: 145, currency: 'EUR', image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b', address: destination, amenities: ['WiFi', 'Piscine', 'Climatisation'], description: 'Excellent rapport qualité-prix', source: 'mock' }
     ]
   };
 }

@@ -80,12 +80,10 @@ serve(async (req) => {
       apiPromises.push(searchSkyScrapper(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, rapidApiKey));
     }
 
-    // Travelpayouts API direct (flight data)
-    // NOTE: Disabled because the "latest prices" endpoint doesn't provide airline codes
-    // which makes the results less useful for users. Consider using a different endpoint
-    // if (travelpayoutsToken) {
-    //   apiPromises.push(searchTravelpayouts(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, travelpayoutsToken));
-    // }
+    // Travelpayouts API v3 (prices_for_dates - includes airline codes)
+    if (travelpayoutsToken) {
+      apiPromises.push(searchTravelpayouts(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, travelpayoutsToken));
+    }
 
     if (apiPromises.length === 0) {
       console.log('No API credentials configured, returning mock data');
@@ -138,23 +136,23 @@ serve(async (req) => {
 });
 
 function getMockFlights(origin: string, destination: string, departureDate: string, returnDate: string | undefined, adults: number, travelClass: string) {
-  // Multiple airlines for variety
+  // Multiple airlines for variety - prices in EUR
   const airlines = [
-    { code: 'AF', name: 'Air France', basePrice: 185000 },
-    { code: 'ET', name: 'Ethiopian Airlines', basePrice: 165000 },
-    { code: 'TK', name: 'Turkish Airlines', basePrice: 175000 },
-    { code: 'EK', name: 'Emirates', basePrice: 245000 },
-    { code: 'KQ', name: 'Kenya Airways', basePrice: 155000 },
-    { code: 'AT', name: 'Royal Air Maroc', basePrice: 145000 },
-    { code: 'SN', name: 'Brussels Airlines', basePrice: 195000 },
-    { code: 'MS', name: 'EgyptAir', basePrice: 160000 },
+    { code: 'AF', name: 'Air France', basePrice: 280 },
+    { code: 'ET', name: 'Ethiopian Airlines', basePrice: 250 },
+    { code: 'TK', name: 'Turkish Airlines', basePrice: 265 },
+    { code: 'EK', name: 'Emirates', basePrice: 375 },
+    { code: 'KQ', name: 'Kenya Airways', basePrice: 235 },
+    { code: 'AT', name: 'Royal Air Maroc', basePrice: 220 },
+    { code: 'SN', name: 'Brussels Airlines', basePrice: 295 },
+    { code: 'MS', name: 'EgyptAir', basePrice: 245 },
   ];
   
   const mockFlights = airlines.map((airline, index) => {
     const departureHour = 6 + (index * 2); // Stagger departures
     const flightDuration = 4 + Math.floor(Math.random() * 3); // 4-6 hours
     const arrivalHour = departureHour + flightDuration;
-    const priceVariation = Math.floor(Math.random() * 20000) - 10000; // +/- 10000
+    const priceVariation = Math.floor(Math.random() * 30) - 15; // +/- 15 EUR
     
     return {
       id: `MOCK-${origin}-${destination}-${index}`,
@@ -177,7 +175,7 @@ function getMockFlights(origin: string, destination: string, departureDate: stri
       }],
       price: {
         grandTotal: String(airline.basePrice + priceVariation),
-        currency: 'XOF',
+        currency: 'EUR',
       },
       validatingAirlineCodes: [airline.code],
       carrierName: airline.name,
@@ -241,7 +239,7 @@ async function searchAmadeus(
       adults: adults.toString(),
       children: children.toString(),
       travelClass: travelClass,
-      currencyCode: 'XOF',
+      currencyCode: 'EUR',
       max: '20',
     });
 
@@ -376,9 +374,9 @@ async function searchFlightFare(
         // Calculate duration
         const duration = firstSegment.duration || flight.duration || 'PT0H';
         
-        // Convert price to XOF if in EUR
+        // Keep price in EUR (or original currency)
         const priceValue = parseFloat(price.toString()) || 0;
-        const priceXOF = currency === 'EUR' ? Math.round(priceValue * 655) : priceValue;
+        const priceEur = currency === 'EUR' ? priceValue : Math.round(priceValue / 655);
         
         return {
           id: `FFS-${origin}-${destination}-${index}`,
@@ -399,8 +397,8 @@ async function searchFlightFare(
             duration: duration,
           }],
           price: {
-            grandTotal: priceXOF.toString(),
-            currency: 'XOF',
+            grandTotal: priceEur.toString(),
+            currency: 'EUR',
           },
           validatingAirlineCodes: [carrierCode],
           travelerPricings: [{
@@ -593,8 +591,8 @@ async function searchKiwi(
             duration: `PT${Math.floor(durationMinutes / 60)}H${durationMinutes % 60}M`,
           }],
           price: {
-            grandTotal: Math.round(parseFloat(priceEur.toString()) * 655).toString(), // Convert EUR to XOF
-            currency: 'XOF',
+            grandTotal: priceEur.toString(),
+            currency: 'EUR',
           },
           validatingAirlineCodes: [carrierCode],
           carrierName: carrierName,
@@ -793,9 +791,9 @@ async function searchSkyScrapper(
         // Duration in minutes
         const durationMinutes = firstLeg.durationInMinutes || 0;
         
-        // Convert price to XOF
+        // Keep price in EUR
         const priceValue = parseFloat(price.toString()) || 0;
-        const priceXOF = Math.round(priceValue * 655);
+        const priceEur = priceValue;
         
         return {
           id: `SKY-${origin}-${destination}-${index}`,
@@ -817,8 +815,8 @@ async function searchSkyScrapper(
             duration: `PT${Math.floor(durationMinutes / 60)}H${durationMinutes % 60}M`,
           }],
           price: {
-            grandTotal: priceXOF.toString(),
-            currency: 'XOF',
+            grandTotal: priceEur.toString(),
+            currency: 'EUR',
           },
           validatingAirlineCodes: [carrierCode],
           carrierName: carrierName,
@@ -844,7 +842,7 @@ async function searchSkyScrapper(
   }
 }
 
-// Travelpayouts API (Aviasales data)
+// Travelpayouts API v3 (prices_for_dates - includes airline codes)
 async function searchTravelpayouts(
   origin: string,
   destination: string,
@@ -856,39 +854,28 @@ async function searchTravelpayouts(
   token: string
 ): Promise<any[]> {
   try {
-    console.log('Searching flights with Travelpayouts API...');
+    console.log('Searching flights with Travelpayouts API v3...');
     
-    // Map travel class to Travelpayouts format (0=economy, 1=business, 2=first)
-    const tripClassMap: Record<string, string> = {
-      'ECONOMY': '0',
-      'PREMIUM_ECONOMY': '0',
-      'BUSINESS': '1',
-      'FIRST': '2'
-    };
-    const tripClass = tripClassMap[travelClass] || '0';
-    
-    // beginning_of_period must be the first day of the month
-    const depDate = new Date(departureDate);
-    const firstDayOfMonth = `${depDate.getFullYear()}-${String(depDate.getMonth() + 1).padStart(2, '0')}-01`;
-    
-    // Build URL with parameters
+    // Build URL with parameters for v3/prices_for_dates endpoint
     const params = new URLSearchParams({
-      currency: 'eur',
       origin: origin,
       destination: destination,
-      beginning_of_period: firstDayOfMonth,
-      period_type: 'month',
+      departure_at: departureDate,
       one_way: returnDate ? 'false' : 'true',
-      page: '1',
-      limit: '20',
-      show_to_affiliates: 'false',
+      direct: 'false',
+      currency: 'eur',
       sorting: 'price',
-      trip_class: tripClass,
+      limit: '30',
       token: token
     });
     
+    // Add return date if provided
+    if (returnDate) {
+      params.append('return_at', returnDate);
+    }
+    
     const response = await fetch(
-      `https://api.travelpayouts.com/v2/prices/latest?${params}`,
+      `https://api.travelpayouts.com/aviasales/v3/prices_for_dates?${params}`,
       {
         method: 'GET',
         headers: {
@@ -905,88 +892,87 @@ async function searchTravelpayouts(
     }
     
     const data = await response.json();
-    console.log('Travelpayouts API response:', data.success ? 'success' : 'failed');
+    console.log('Travelpayouts API v3 response:', data.success ? 'success' : 'failed');
     
     if (data.success && data.data && Array.isArray(data.data)) {
-      console.log(`Travelpayouts found ${data.data.length} price entries`);
+      console.log(`Travelpayouts v3 found ${data.data.length} flights`);
       
-      // Filter to get entries matching our departure date or close to it
-      const targetDate = new Date(departureDate);
-      const relevantFlights = data.data.filter((flight: any) => {
-        const flightDate = new Date(flight.depart_date);
-        const daysDiff = Math.abs((flightDate.getTime() - targetDate.getTime()) / (1000 * 60 * 60 * 24));
-        return daysDiff <= 3; // Within 3 days of target date
-      });
-      
-      console.log(`Travelpayouts ${relevantFlights.length} flights within date range`);
-      
-      // Log first flight to understand structure
-      if (relevantFlights.length > 0) {
-        console.log('Travelpayouts flight sample:', JSON.stringify(relevantFlights[0]).substring(0, 500));
+      // Log first flight to see structure
+      if (data.data.length > 0) {
+        console.log('Travelpayouts v3 sample:', JSON.stringify(data.data[0]).substring(0, 500));
       }
       
-      const flights = relevantFlights.slice(0, 15).map((flight: any, index: number) => {
-        // Price is in EUR (we requested currency=eur), convert to XOF (1 EUR ≈ 655 XOF)
-        const priceEur = flight.value || 0;
-        const priceXOF = Math.round(priceEur * 655);
+      // Get airline name from carrier code
+      const airlineNames: Record<string, string> = {
+        'AF': 'Air France',
+        'AT': 'Royal Air Maroc',
+        'ET': 'Ethiopian Airlines',
+        'TK': 'Turkish Airlines',
+        'EK': 'Emirates',
+        'KQ': 'Kenya Airways',
+        'SN': 'Brussels Airlines',
+        'MS': 'EgyptAir',
+        'QR': 'Qatar Airways',
+        'LH': 'Lufthansa',
+        'BA': 'British Airways',
+        'IB': 'Iberia',
+        'KL': 'KLM',
+        'TP': 'TAP Portugal',
+        'AZ': 'ITA Airways',
+        'U2': 'easyJet',
+        'FR': 'Ryanair',
+        'W6': 'Wizz Air',
+        'PC': 'Pegasus Airlines',
+        'HV': 'Transavia',
+        'L6': 'Mauritania Airlines',
+        'A3': 'Aegean Airlines',
+        'VY': 'Vueling',
+        'DL': 'Delta Air Lines',
+        'AA': 'American Airlines',
+        'UA': 'United Airlines'
+      };
+      
+      const flights = data.data.slice(0, 15).map((flight: any, index: number) => {
+        // Price is in EUR
+        const priceEur = flight.price || 0;
         
-        // Generate reasonable flight times based on index
-        const departureHour = 6 + (index * 2) % 18;
-        const flightDuration = flight.duration ? Math.round(flight.duration / 60) : (2 + Math.floor(Math.random() * 4));
-        const arrivalHour = (departureHour + flightDuration) % 24;
-        
-        // Use airline code from API - flight.airline contains IATA code
+        // Use airline code from API
         const carrierCode = flight.airline || 'XX';
-        
-        // Get airline name from carrier code
-        const airlineNames: Record<string, string> = {
-          'AF': 'Air France',
-          'AT': 'Royal Air Maroc',
-          'ET': 'Ethiopian Airlines',
-          'TK': 'Turkish Airlines',
-          'EK': 'Emirates',
-          'KQ': 'Kenya Airways',
-          'SN': 'Brussels Airlines',
-          'MS': 'EgyptAir',
-          'QR': 'Qatar Airways',
-          'LH': 'Lufthansa',
-          'BA': 'British Airways',
-          'IB': 'Iberia',
-          'KL': 'KLM',
-          'TP': 'TAP Portugal',
-          'AZ': 'ITA Airways',
-          'U2': 'easyJet',
-          'FR': 'Ryanair',
-          'W6': 'Wizz Air',
-          'PC': 'Pegasus Airlines',
-          'HV': 'Transavia',
-          'L6': 'Mauritania Airlines',
-          'A3': 'Aegean Airlines'
-        };
         const carrierName = airlineNames[carrierCode] || carrierCode;
+        
+        // Parse departure time
+        const departureTime = flight.departure_at || `${departureDate}T08:00:00`;
+        
+        // Calculate arrival time from duration
+        const durationMinutes = flight.duration_to || flight.duration || 120;
+        const depDate = new Date(departureTime);
+        const arrDate = new Date(depDate.getTime() + durationMinutes * 60 * 1000);
+        
+        const hours = Math.floor(durationMinutes / 60);
+        const minutes = durationMinutes % 60;
         
         return {
           id: `TP-${origin}-${destination}-${index}`,
           itineraries: [{
             segments: [{
               departure: {
-                iataCode: flight.origin || origin,
-                at: `${flight.depart_date}T${String(departureHour).padStart(2, '0')}:00:00`,
+                iataCode: flight.origin_airport || flight.origin || origin,
+                at: departureTime,
               },
               arrival: {
-                iataCode: flight.destination || destination,
-                at: `${flight.depart_date}T${String(arrivalHour).padStart(2, '0')}:00:00`,
+                iataCode: flight.destination_airport || flight.destination || destination,
+                at: arrDate.toISOString(),
               },
               carrierCode: carrierCode,
               carrierName: carrierName,
-              number: flight.flight_number?.toString() || String(1000 + index),
-              duration: `PT${flightDuration}H0M`,
+              number: flight.flight_number || String(1000 + index),
+              duration: `PT${hours}H${minutes}M`,
             }],
-            duration: `PT${flightDuration}H0M`,
+            duration: `PT${hours}H${minutes}M`,
           }],
           price: {
-            grandTotal: priceXOF.toString(),
-            currency: 'XOF',
+            grandTotal: priceEur.toString(),
+            currency: 'EUR',
           },
           validatingAirlineCodes: [carrierCode],
           carrierName: carrierName,
@@ -995,17 +981,17 @@ async function searchTravelpayouts(
               cabin: travelClass || 'ECONOMY',
             }],
           }],
-          numberOfChanges: flight.number_of_changes || 0,
+          numberOfChanges: flight.transfers || 0,
           source: 'travelpayouts',
-          foundAt: flight.found_at
+          link: flight.link
         };
       });
       
-      console.log(`Found ${flights.length} flights from Travelpayouts`);
+      console.log(`Found ${flights.length} flights from Travelpayouts v3`);
       return flights;
     }
     
-    console.log('No flights found in Travelpayouts response');
+    console.log('No flights found in Travelpayouts v3 response');
     return [];
   } catch (error) {
     console.error('Travelpayouts API exception:', error instanceof Error ? error.message : String(error));
