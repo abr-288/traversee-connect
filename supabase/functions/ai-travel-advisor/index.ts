@@ -19,7 +19,8 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    console.log('Generating AI travel recommendations for:', { destination, interests, budget, duration });
+    // Security: Only log non-sensitive request metadata
+    console.log('Generating AI travel recommendations for destination:', destination);
 
     const prompt = `En tant qu'expert en voyage, fournissez des recommandations détaillées pour un voyage à ${destination}.
     
@@ -61,8 +62,8 @@ Soyez spécifique et pratique dans vos recommandations.`;
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Lovable AI API error:', response.status, errorText);
+      // Security: Don't log full API error response which may contain sensitive data
+      console.error('Lovable AI API error - Status:', response.status);
       
       if (response.status === 429) {
         throw new Error('Limite de requêtes atteinte. Veuillez réessayer plus tard.');
@@ -88,7 +89,8 @@ Soyez spécifique et pratique dans vos recommandations.`;
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
-    console.error('Error in ai-travel-advisor function:', error);
+    // Security: Only log error type, not full error details
+    console.error('Error in ai-travel-advisor function:', error instanceof Error ? error.constructor.name : 'Unknown');
     return new Response(
       JSON.stringify({ 
         success: false, 

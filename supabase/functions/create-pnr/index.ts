@@ -41,7 +41,8 @@ async function getAmadeusToken(): Promise<string> {
 
 // Create PNR via Amadeus API
 async function createAmadeusPNR(booking: any, token: string): Promise<string> {
-  console.log('Creating Amadeus PNR for booking:', booking.id);
+  // Security: Only log booking ID (truncated for privacy)
+  console.log('Creating PNR for booking');
   
   // Build traveler information from passengers
   const travelers = booking.passengers?.map((passenger: any, index: number) => ({
@@ -75,12 +76,12 @@ async function createAmadeusPNR(booking: any, token: string): Promise<string> {
     // This would be a real Amadeus Flight Create Orders API call
     // For now, we generate a valid PNR format
     const pnr = `BR${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-    console.log('Generated flight PNR:', pnr);
+    console.log('Flight PNR generated');
     return pnr;
   } else {
     // For non-flight services (hotels, tours, etc.), generate a booking reference
     const pnr = `${booking.services.type.substring(0, 2).toUpperCase()}${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-    console.log('Generated service PNR:', pnr);
+    console.log('Service PNR generated');
     return pnr;
   }
 }
@@ -99,7 +100,9 @@ serve(async (req) => {
     );
 
     const requestData: PNRRequest = await req.json();
-    console.log('Booking ID:', requestData.booking_id);
+    
+    // Security: Don't log full booking ID
+    console.log('Processing PNR request');
 
     if (!requestData.booking_id) {
       throw new Error('Missing booking_id');
@@ -117,7 +120,8 @@ serve(async (req) => {
       .single();
 
     if (bookingError || !booking) {
-      console.error('Booking not found:', bookingError);
+      // Security: Don't log full error details
+      console.error('Booking lookup failed');
       throw new Error('Booking not found');
     }
 
@@ -141,7 +145,7 @@ serve(async (req) => {
 
     // Check if PNR already exists
     if (booking.external_ref) {
-      console.log('PNR already exists:', booking.external_ref);
+      console.log('PNR already exists');
       return new Response(
         JSON.stringify({
           success: true,
@@ -164,7 +168,7 @@ serve(async (req) => {
 
       // Create PNR via Amadeus
       const pnr = await createAmadeusPNR(booking, token);
-      console.log('✓ PNR created:', pnr);
+      console.log('✓ PNR created successfully');
 
       // Update booking with PNR and confirmed status
       const { error: updateError } = await supabase
@@ -177,7 +181,8 @@ serve(async (req) => {
         .eq('id', booking.id);
 
       if (updateError) {
-        console.error('Failed to update booking:', updateError);
+        // Security: Don't log full error details
+        console.error('Failed to update booking with PNR');
         throw new Error('Failed to update booking with PNR');
       }
 
@@ -193,7 +198,8 @@ serve(async (req) => {
         });
         console.log('✓ Confirmation email sent');
       } catch (emailError) {
-        console.error('Failed to send confirmation email:', emailError);
+        // Security: Don't log full error details
+        console.error('Failed to send confirmation email');
         // Don't fail the PNR creation if email fails
       }
 
@@ -213,7 +219,8 @@ serve(async (req) => {
       );
 
     } catch (apiError: any) {
-      console.error('❌ PNR creation failed:', apiError);
+      // Security: Only log error type, not full error details
+      console.error('❌ PNR creation failed:', apiError instanceof Error ? apiError.constructor.name : 'Unknown');
       
       // Update booking status to failed
       await supabase
@@ -221,8 +228,8 @@ serve(async (req) => {
         .update({
           status: 'failed',
           notes: booking.notes 
-            ? `${booking.notes}\n\nPNR creation failed: ${apiError.message}`
-            : `PNR creation failed: ${apiError.message}`,
+            ? `${booking.notes}\n\nPNR creation failed`
+            : `PNR creation failed`,
           updated_at: new Date().toISOString(),
         })
         .eq('id', booking.id);
@@ -230,7 +237,7 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: `PNR creation failed: ${apiError.message}`,
+          error: 'PNR creation failed',
           booking_id: booking.id,
           status: 'failed',
         }),
@@ -241,7 +248,8 @@ serve(async (req) => {
       );
     }
   } catch (error) {
-    console.error('❌ ERROR in create-pnr:', error);
+    // Security: Only log error type, not full error details
+    console.error('❌ ERROR in create-pnr:', error instanceof Error ? error.constructor.name : 'Unknown');
     return new Response(
       JSON.stringify({
         success: false,
