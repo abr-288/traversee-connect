@@ -42,6 +42,7 @@ const Help = lazy(() => import("./pages/Help"));
 const Support = lazy(() => import("./pages/Support"));
 const Install = lazy(() => import("./pages/Install"));
 const PriceAlerts = lazy(() => import("./pages/PriceAlerts"));
+const Subscriptions = lazy(() => import("./pages/Subscriptions"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -100,6 +101,7 @@ const App = () => (
               <Route path="/support" element={<Support />} />
               <Route path="/install" element={<Install />} />
               <Route path="/price-alerts" element={<PriceAlerts />} />
+              <Route path="/subscriptions" element={<Subscriptions />} />
               <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

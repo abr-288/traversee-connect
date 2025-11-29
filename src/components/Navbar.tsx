@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, X, User, LogOut, LayoutDashboard, Plane, Hotel, PlaneTakeoff, Train, Calendar, Car, HelpCircle, Download, UserCircle2 } from "lucide-react";
+import { Menu, X, User, LogOut, LayoutDashboard, Plane, Hotel, PlaneTakeoff, Train, Calendar, Car, HelpCircle, Download, UserCircle2, Crown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
 import { usePWA } from "@/hooks/usePWA";
@@ -89,6 +89,10 @@ const Navbar = () => {
               <Link to="/cars" className="text-white hover:text-secondary transition-smooth text-sm font-medium flex items-center gap-1.5 whitespace-nowrap">
                 <Car className="w-3.5 h-3.5" />
                 {t("nav.carRental")}
+              </Link>
+              <Link to="/subscriptions" className="text-secondary hover:text-secondary/80 transition-smooth text-sm font-medium flex items-center gap-1.5 whitespace-nowrap">
+                <Crown className="w-3.5 h-3.5" />
+                {t("nav.subscriptions")}
               </Link>
             </div>
 
@@ -255,6 +259,14 @@ const Navbar = () => {
                 >
                   <Car className="w-4 h-4 text-secondary" />
                   {t("nav.carRental")}
+                </Link>
+                <Link
+                  to="/subscriptions"
+                  className="text-secondary hover:bg-white/10 rounded-lg transition-all duration-200 text-sm font-medium px-3 py-2.5 flex items-center gap-3 hover:translate-x-1"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <Crown className="w-4 h-4 text-secondary" />
+                  {t("nav.subscriptions")}
                 </Link>
               </div>
 
