@@ -23,8 +23,8 @@ const FeaturesSection = () => {
   ];
 
   return (
-    <section className="py-12 md:py-16 bg-background">
-      <div className="container mx-auto px-4">
+    <section className="py-12 md:py-16 bg-background w-full">
+      <div className="site-container">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 max-w-5xl mx-auto">
           {features.map((feature, index) => (
             <div

@@ -244,11 +244,11 @@ const FeaturedSubscriptions = () => {
   };
 
   return (
-    <section className="py-16 md:py-20 lg:py-24 bg-gradient-to-b from-background via-muted/20 to-background relative overflow-hidden">
+    <section className="py-16 md:py-20 lg:py-24 bg-gradient-to-b from-background via-muted/20 to-background relative overflow-hidden w-full">
       {/* Background mesh gradient */}
       <div className="absolute inset-0 gradient-mesh opacity-40" />
       
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="site-container relative z-10">
         <motion.div 
           className="text-center mb-10 md:mb-16"
           initial={{ opacity: 0, y: 20 }}

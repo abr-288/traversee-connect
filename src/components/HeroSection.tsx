@@ -31,7 +31,7 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <section className="relative min-h-[500px] md:min-h-[700px] flex items-center pt-16 md:pt-20 overflow-hidden">
+    <section className="relative min-h-[500px] md:min-h-[700px] flex items-center pt-16 md:pt-20 overflow-hidden w-full">
       {/* Background Image Carousel with Overlay */}
       <div className="absolute inset-0 z-0">
         {HERO_SLIDES.map((slide, index) => (
@@ -57,7 +57,7 @@ const HeroSection = () => {
       </div>
 
       {/* Content */}
-      <div className="container relative z-10 mx-auto px-4 py-8 md:py-16">
+      <div className="site-container relative z-10 py-8 md:py-16">
         <div className="max-w-4xl mx-auto text-center mb-8 md:mb-14">
           <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold text-white mb-3 md:mb-6 animate-slide-up-fade drop-shadow-2xl" style={{ animationDelay: '0.1s' }}>
             {t('hero.title')}

@@ -80,13 +80,13 @@ const TestimonialsSection = () => {
   }, [emblaApi, onSelect]);
 
   return (
-    <section className="py-20 md:py-24 lg:py-28 bg-gradient-to-b from-muted/30 via-accent/10 to-background relative overflow-hidden">
+    <section className="py-20 md:py-24 lg:py-28 bg-gradient-to-b from-muted/30 via-accent/10 to-background relative overflow-hidden w-full">
       {/* Background decoration */}
       <div className="absolute inset-0 gradient-mesh opacity-40" />
       <div className="absolute top-20 left-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl animate-float" />
       <div className="absolute bottom-20 right-20 w-72 h-72 bg-secondary/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
       
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="site-container relative z-10">
         <div className="text-center mb-14 md:mb-16 animate-slide-up-fade">
           <div className="inline-block mb-4">
             <span className="px-4 py-2 rounded-full bg-secondary/10 text-secondary text-sm font-semibold">

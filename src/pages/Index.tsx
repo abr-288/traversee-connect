@@ -15,22 +15,23 @@ const Index = () => {
   const { t } = useTranslation();
   
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       <Navbar />
       <main>
+        {/* Hero - Full Bleed */}
         <HeroSection />
         
-        {/* Subscriptions Section */}
+        {/* Subscriptions Section - Full Bleed */}
         <FeaturedSubscriptions />
         
-        {/* Seasonal Suggestions Section */}
-        <section className="py-12 md:py-16 px-4 bg-muted/30">
-          <div className="container mx-auto max-w-7xl">
+        {/* Seasonal Suggestions Section - Full Bleed with Container */}
+        <section className="py-12 md:py-16 bg-muted/30 w-full">
+          <div className="site-container">
             <div className="text-center mb-6 md:mb-8">
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">
                 {t("pages.index.seasonalTitle", "Suggestions Saisonnières Intelligentes")}
               </h2>
-              <p className="text-muted-foreground text-base md:text-lg px-4">
+              <p className="text-muted-foreground text-base md:text-lg">
                 {t("pages.index.seasonalSubtitle", "Découvrez les meilleures périodes pour voyager selon la météo, les événements et la saisonnalité")}
               </p>
             </div>
@@ -38,20 +39,20 @@ const Index = () => {
           </div>
         </section>
         
-        {/* Popular Destinations */}
+        {/* Popular Destinations - Full Bleed */}
         <DestinationsSection />
         
-        {/* Special Offers */}
+        {/* Special Offers - Full Bleed */}
         <SpecialOffers />
         
-        {/* AI Travel Advisor Section */}
-        <section className="py-12 md:py-16 px-4 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5">
-          <div className="container mx-auto max-w-4xl">
+        {/* AI Travel Advisor Section - Full Bleed with Container */}
+        <section className="py-12 md:py-16 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 w-full">
+          <div className="site-container max-w-4xl">
             <div className="text-center mb-6 md:mb-8">
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">
                 {t("pages.index.aiTitle")}
               </h2>
-              <p className="text-muted-foreground text-base md:text-lg px-4">
+              <p className="text-muted-foreground text-base md:text-lg">
                 {t("pages.index.aiSubtitle")}
               </p>
             </div>
@@ -59,7 +60,10 @@ const Index = () => {
           </div>
         </section>
         
+        {/* Features - Boxed */}
         <FeaturesSection />
+        
+        {/* Testimonials - Full Bleed */}
         <TestimonialsSection />
       </main>
       <Footer />
