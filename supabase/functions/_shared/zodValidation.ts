@@ -30,7 +30,9 @@ export const flightSearchSchema = z.object({
     .max(9, "Maximum 9 children allowed")
     .optional()
     .default(0),
-  travelClass: z.enum(["ECONOMY", "PREMIUM_ECONOMY", "BUSINESS", "FIRST"])
+  travelClass: z.string()
+    .transform(val => val.toUpperCase())
+    .pipe(z.enum(["ECONOMY", "PREMIUM_ECONOMY", "BUSINESS", "FIRST"]))
     .optional()
     .default("ECONOMY")
 }).refine(
