@@ -270,7 +270,7 @@ export default function Subscriptions() {
         </section>
 
         {/* Plans Section */}
-        <section className="py-12 md:py-20">
+        <section className="py-12 md:py-16">
           <div className="container mx-auto px-4">
             <motion.div 
               className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8"
@@ -426,7 +426,7 @@ export default function Subscriptions() {
         </section>
 
         {/* Contact CTA Section */}
-        <section className="py-16 bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+        <section className="py-12 md:py-16 mt-8 md:mt-12 border-t border-border/50 bg-gradient-to-br from-primary/5 via-background to-secondary/5">
           <div className="container mx-auto px-4">
             <motion.div 
               className="max-w-2xl mx-auto text-center"
