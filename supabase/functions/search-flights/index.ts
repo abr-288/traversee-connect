@@ -523,9 +523,11 @@ async function searchKiwi(
       const flights = flightsArray.slice(0, 15).map((flight: any, index: number) => {
         // Handle Kiwi RapidAPI structure (sector contains segments)
         const sector = flight.sector || {};
-        const segments = sector.sectorSegments || flight.legs || flight.route || [];
-        const firstSegment = segments[0]?.segment || segments[0] || {};
-        const lastSegment = segments[segments.length - 1]?.segment || segments[segments.length - 1] || {};
+        const sectorSegments = sector.sectorSegments || flight.legs || flight.route || [];
+        const firstSectorSegment = sectorSegments[0] || {};
+        const firstSegment = firstSectorSegment.segment || firstSectorSegment || {};
+        const lastSectorSegment = sectorSegments[sectorSegments.length - 1] || {};
+        const lastSegment = lastSectorSegment.segment || lastSectorSegment || {};
         
         // Get price - priceEur.amount is the main price in this API
         const priceEur = flight.priceEur?.amount || flight.price?.amount || flight.price || 0;
@@ -554,15 +556,25 @@ async function searchKiwi(
           lastSegment.local_arrival || 
           `${departureDate}T23:59:00`;
         
-        // Get carrier info
+        // Get carrier info - try multiple paths for carrier code
         const carrierCode = firstSegment.carrier?.code || 
+          firstSegment.marketingCarrier?.code ||
+          firstSegment.operatingCarrier?.code ||
           firstSegment.airline || 
           flight.carriers?.[0]?.code ||
+          flight.airlines?.[0]?.code ||
           'XX';
-        const carrierName = firstSegment.carrier?.name || flight.carriers?.[0]?.name || '';
+        const carrierName = firstSegment.carrier?.name || 
+          firstSegment.marketingCarrier?.name ||
+          flight.carriers?.[0]?.name || 
+          flight.airlines?.[0]?.name || '';
         const flightNumber = firstSegment.flightNumber?.toString() || 
           firstSegment.flight_no?.toString() || 
+          firstSegment.number?.toString() ||
           '0000';
+        
+        // Log carrier extraction for debugging
+        console.log(`Kiwi flight ${index}: carrier=${carrierCode}, segment keys:`, Object.keys(firstSegment));
         
         return {
           id: `KIWI-${origin}-${destination}-${index}`,
@@ -577,6 +589,7 @@ async function searchKiwi(
                 at: arrivalTime,
               },
               carrierCode: carrierCode,
+              carrierName: carrierName,
               number: flightNumber,
               duration: `PT${Math.floor(durationMinutes / 60)}H${durationMinutes % 60}M`,
             }],
@@ -587,6 +600,7 @@ async function searchKiwi(
             currency: 'XOF',
           },
           validatingAirlineCodes: [carrierCode],
+          carrierName: carrierName,
           travelerPricings: [{
             fareDetailsBySegment: [{
               cabin: travelClass || 'ECONOMY',
@@ -751,10 +765,20 @@ async function searchSkyScrapper(
         const departureTime = firstLeg.departure || firstSegment.departure || `${departureDate}T00:00:00`;
         const arrivalTime = firstLeg.arrival || firstSegment.arrival || `${departureDate}T23:59:00`;
         
-        // Get carrier info
-        const carriers = firstLeg.carriers?.marketing || [];
-        const carrierCode = carriers[0]?.alternateId || firstSegment.marketingCarrier?.alternateId || 'XX';
-        const flightNumber = firstSegment.flightNumber || '0000';
+        // Get carrier info - try multiple paths
+        const carriers = firstLeg.carriers?.marketing || firstLeg.carriers || [];
+        const carrierCode = carriers[0]?.alternateId || 
+          carriers[0]?.id ||
+          carriers[0]?.code ||
+          firstSegment.marketingCarrier?.alternateId || 
+          firstSegment.marketingCarrier?.code ||
+          firstSegment.operatingCarrier?.alternateId ||
+          'XX';
+        const carrierName = carriers[0]?.name || firstSegment.marketingCarrier?.name || '';
+        const flightNumber = firstSegment.flightNumber || firstSegment.number || '0000';
+        
+        // Log carrier extraction for debugging
+        console.log(`SkyScrapper flight ${index}: carrier=${carrierCode}, name=${carrierName}`);
         
         // Duration in minutes
         const durationMinutes = firstLeg.durationInMinutes || 0;
@@ -776,6 +800,7 @@ async function searchSkyScrapper(
                 at: arrivalTime,
               },
               carrierCode: carrierCode,
+              carrierName: carrierName,
               number: flightNumber.toString(),
               duration: `PT${Math.floor(durationMinutes / 60)}H${durationMinutes % 60}M`,
             }],
@@ -786,6 +811,7 @@ async function searchSkyScrapper(
             currency: 'XOF',
           },
           validatingAirlineCodes: [carrierCode],
+          carrierName: carrierName,
           travelerPricings: [{
             fareDetailsBySegment: [{
               cabin: travelClass || 'ECONOMY',
