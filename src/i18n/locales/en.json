@@ -596,5 +596,136 @@
     "loading": {
       "generatingTicket": "Generating ticket..."
     }
+  },
+  "notFound": {
+    "title": "404",
+    "subtitle": "Page not found",
+    "description": "The page you are looking for does not exist or has been moved.",
+    "backHome": "Back to home"
+  },
+  "priceAlerts": {
+    "title": "Price Alerts",
+    "subtitle": "Monitor prices and get notified when they drop",
+    "myAlerts": "My Alerts",
+    "createAlert": "Create Alert"
+  },
+  "activities": {
+    "title": "Activities & Experiences",
+    "subtitle": "Live unique moments with our selected activities",
+    "noActivities": "No activities available",
+    "startingFrom": "Starting from",
+    "book": "Book"
+  },
+  "cars": {
+    "title": "Car Rental",
+    "subtitle": "Rent a car suited to your needs",
+    "filters": "Filters",
+    "pickupLocation": "Pickup location",
+    "cityOrAirport": "City or airport...",
+    "category": "Category",
+    "all": "All",
+    "economy": "Economy",
+    "sedan": "Sedan",
+    "suv": "SUV",
+    "luxury": "Luxury",
+    "pricePerDay": "Price per day",
+    "transmission": "Transmission",
+    "automatic": "Automatic",
+    "manual": "Manual",
+    "fuel": "Fuel",
+    "petrol": "Petrol",
+    "diesel": "Diesel",
+    "resetFilters": "Reset filters",
+    "loading": "Loading...",
+    "vehiclesAvailable": "vehicle(s) available",
+    "noVehicles": "No vehicles match your criteria",
+    "perDay": "per day",
+    "sortBy": {
+      "popular": "Most popular",
+      "priceAsc": "Price ascending",
+      "priceDesc": "Price descending",
+      "rating": "Best rated"
+    },
+    "carsFound": "cars found",
+    "displayLocal": "Displaying locally available cars"
+  },
+  "bookingHistory": {
+    "title": "My Bookings",
+    "subtitle": "View and manage all your bookings",
+    "tabs": {
+      "all": "All",
+      "flights": "Flights",
+      "hotels": "Hotels",
+      "cars": "Cars",
+      "tours": "Tours"
+    },
+    "noBookings": "No bookings found",
+    "discoverOffers": "Discover our offers",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "travelers": "Travelers",
+    "person": "person(s)",
+    "totalAmount": "Total amount",
+    "notes": "Notes",
+    "downloadTicket": "Download ticket",
+    "modifyBooking": "Modify booking",
+    "finalizePayment": "Finalize payment",
+    "bookingMadeOn": "Booking made on",
+    "loadingError": "Error loading your bookings",
+    "ticketGenerating": "Generating ticket...",
+    "ticketSuccess": "Ticket sent by email! Use Ctrl+P to save as PDF",
+    "ticketError": "Error downloading ticket"
+  },
+  "subscriptions": {
+    "title": "Our Subscription Plans",
+    "subtitle": "Choose the plan that suits your needs",
+    "popular": "Popular",
+    "selectPlan": "Select this plan",
+    "contactUs": "Contact us",
+    "contactCta": {
+      "title": "Need help choosing?",
+      "subtitle": "Our team is here to help you choose the right plan for your needs.",
+      "button": "Contact us"
+    },
+    "dialog": {
+      "title": "Request a quote for",
+      "description": "Fill out this form and our team will contact you as soon as possible.",
+      "name": "Full name",
+      "email": "Email",
+      "phone": "Phone",
+      "company": "Company (optional)",
+      "message": "Message (optional)",
+      "submit": "Send request",
+      "submitting": "Sending...",
+      "success": "Request sent successfully!",
+      "successDesc": "Our team will contact you within 24h.",
+      "error": "Error sending",
+      "errorDesc": "Please try again later."
+    }
+  },
+  "confirmation": {
+    "loading": "Loading your booking...",
+    "error": "Error",
+    "notFound": "Booking not found",
+    "notFoundDesc": "Unable to find details for this booking.",
+    "backToHome": "Back to home",
+    "bookingNumber": "Booking number",
+    "actions": "Actions",
+    "print": "Print",
+    "share": "Share",
+    "contactSupport": "Contact support"
+  },
+  "auth": {
+    "or": "or",
+    "continueWithGoogle": "Continue with Google",
+    "termsAgreement": "By signing up, you agree to our",
+    "termsOfUse": "terms of use",
+    "and": "and our",
+    "privacyPolicy": "privacy policy",
+    "passwordStrength": {
+      "weak": "Weak",
+      "medium": "Medium",
+      "strong": "Strong"
+    }
   }
 }

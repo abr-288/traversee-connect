@@ -596,5 +596,136 @@
     "loading": {
       "generatingTicket": "Génération du billet..."
     }
+  },
+  "notFound": {
+    "title": "404",
+    "subtitle": "Page non trouvée",
+    "description": "La page que vous recherchez n'existe pas ou a été déplacée.",
+    "backHome": "Retour à l'accueil"
+  },
+  "priceAlerts": {
+    "title": "Alertes de Prix",
+    "subtitle": "Surveillez les prix et recevez des notifications lorsqu'ils baissent",
+    "myAlerts": "Mes Alertes",
+    "createAlert": "Créer une Alerte"
+  },
+  "activities": {
+    "title": "Activités & Expériences",
+    "subtitle": "Vivez des moments uniques avec nos activités sélectionnées",
+    "noActivities": "Aucune activité disponible",
+    "startingFrom": "À partir de",
+    "book": "Réserver"
+  },
+  "cars": {
+    "title": "Location de voitures",
+    "subtitle": "Louez une voiture adaptée à vos besoins",
+    "filters": "Filtres",
+    "pickupLocation": "Lieu de prise en charge",
+    "cityOrAirport": "Ville ou aéroport...",
+    "category": "Catégorie",
+    "all": "Toutes",
+    "economy": "Économique",
+    "sedan": "Berline",
+    "suv": "SUV",
+    "luxury": "Luxe",
+    "pricePerDay": "Prix par jour",
+    "transmission": "Transmission",
+    "automatic": "Automatique",
+    "manual": "Manuelle",
+    "fuel": "Carburant",
+    "petrol": "Essence",
+    "diesel": "Diesel",
+    "resetFilters": "Réinitialiser les filtres",
+    "loading": "Chargement...",
+    "vehiclesAvailable": "véhicule(s) disponible(s)",
+    "noVehicles": "Aucun véhicule ne correspond à vos critères",
+    "perDay": "par jour",
+    "sortBy": {
+      "popular": "Plus populaires",
+      "priceAsc": "Prix croissant",
+      "priceDesc": "Prix décroissant",
+      "rating": "Mieux notés"
+    },
+    "carsFound": "voitures trouvées",
+    "displayLocal": "Affichage des voitures disponibles localement"
+  },
+  "bookingHistory": {
+    "title": "Mes Réservations",
+    "subtitle": "Consultez et gérez toutes vos réservations",
+    "tabs": {
+      "all": "Toutes",
+      "flights": "Vols",
+      "hotels": "Hôtels",
+      "cars": "Voitures",
+      "tours": "Circuits"
+    },
+    "noBookings": "Aucune réservation trouvée",
+    "discoverOffers": "Découvrir nos offres",
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "travelers": "Voyageurs",
+    "person": "personne(s)",
+    "totalAmount": "Montant total",
+    "notes": "Notes",
+    "downloadTicket": "Télécharger le billet",
+    "modifyBooking": "Modifier la réservation",
+    "finalizePayment": "Finaliser le paiement",
+    "bookingMadeOn": "Réservation effectuée le",
+    "loadingError": "Erreur lors du chargement de vos réservations",
+    "ticketGenerating": "Génération du billet en cours...",
+    "ticketSuccess": "Billet envoyé par email! Utilisez Ctrl+P pour sauvegarder en PDF",
+    "ticketError": "Erreur lors du téléchargement du billet"
+  },
+  "subscriptions": {
+    "title": "Nos Offres d'Abonnement",
+    "subtitle": "Choisissez le forfait qui correspond à vos besoins",
+    "popular": "Populaire",
+    "selectPlan": "Choisir ce forfait",
+    "contactUs": "Contactez-nous",
+    "contactCta": {
+      "title": "Besoin d'aide pour choisir ?",
+      "subtitle": "Notre équipe est là pour vous accompagner dans le choix de la formule adaptée à vos besoins.",
+      "button": "Nous contacter"
+    },
+    "dialog": {
+      "title": "Demander un devis pour",
+      "description": "Remplissez ce formulaire et notre équipe vous contactera dans les plus brefs délais.",
+      "name": "Nom complet",
+      "email": "Email",
+      "phone": "Téléphone",
+      "company": "Entreprise (optionnel)",
+      "message": "Message (optionnel)",
+      "submit": "Envoyer la demande",
+      "submitting": "Envoi en cours...",
+      "success": "Demande envoyée avec succès !",
+      "successDesc": "Notre équipe vous contactera dans les 24h.",
+      "error": "Erreur lors de l'envoi",
+      "errorDesc": "Veuillez réessayer plus tard."
+    }
+  },
+  "confirmation": {
+    "loading": "Chargement de votre réservation...",
+    "error": "Erreur",
+    "notFound": "Réservation non trouvée",
+    "notFoundDesc": "Impossible de trouver les détails de cette réservation.",
+    "backToHome": "Retour à l'accueil",
+    "bookingNumber": "Numéro de réservation",
+    "actions": "Actions",
+    "print": "Imprimer",
+    "share": "Partager",
+    "contactSupport": "Contacter le support"
+  },
+  "auth": {
+    "or": "ou",
+    "continueWithGoogle": "Continuer avec Google",
+    "termsAgreement": "En vous inscrivant, vous acceptez nos",
+    "termsOfUse": "conditions d'utilisation",
+    "and": "et notre",
+    "privacyPolicy": "politique de confidentialité",
+    "passwordStrength": {
+      "weak": "Faible",
+      "medium": "Moyen",
+      "strong": "Fort"
+    }
   }
 }

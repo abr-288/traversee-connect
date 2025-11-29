@@ -18,8 +18,10 @@ import { LazyImage } from "@/components/ui/lazy-image";
 import bannerCars from "@/assets/banner-cars.jpg";
 import { Price } from "@/components/ui/price";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { useTranslation } from "react-i18next";
 
 const Cars = () => {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const { searchCarRentals, loading } = useCarRental();
   const { cars: dbCars, loading: dbLoading } = useCarServices();
@@ -282,8 +284,8 @@ const Cars = () => {
             <div className="flex justify-center mb-4">
               <CarIcon className="w-16 h-16 text-white drop-shadow-lg" />
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">Location de voitures</h1>
-            <p className="text-lg md:text-xl text-white/95 drop-shadow-md max-w-2xl mx-auto">Louez une voiture adaptée à vos besoins</p>
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">{t('cars.title')}</h1>
+            <p className="text-lg md:text-xl text-white/95 drop-shadow-md max-w-2xl mx-auto">{t('cars.subtitle')}</p>
           </div>
           <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <CarSearchForm />
@@ -297,37 +299,37 @@ const Cars = () => {
           {/* Filtres */}
           <aside className="lg:col-span-1 space-y-6">
             <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Filtres</h2>
+              <h2 className="text-xl font-semibold mb-4">{t('cars.filters')}</h2>
               
               <div className="space-y-6">
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Lieu de prise en charge</label>
+                  <label className="text-sm font-medium mb-2 block">{t('cars.pickupLocation')}</label>
                   <Input 
-                    placeholder="Ville ou aéroport..." 
+                    placeholder={t('cars.cityOrAirport')} 
                     value={filterLocation}
                     onChange={(e) => setFilterLocation(e.target.value)}
                   />
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Catégorie</label>
+                  <label className="text-sm font-medium mb-2 block">{t('cars.category')}</label>
                   <Select value={filterCategory} onValueChange={setFilterCategory}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Toutes" />
+                      <SelectValue placeholder={t('cars.all')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Toutes</SelectItem>
-                      <SelectItem value="economy">Économique</SelectItem>
-                      <SelectItem value="sedan">Berline</SelectItem>
-                      <SelectItem value="suv">SUV</SelectItem>
-                      <SelectItem value="luxury">Luxe</SelectItem>
+                      <SelectItem value="all">{t('cars.all')}</SelectItem>
+                      <SelectItem value="economy">{t('cars.economy')}</SelectItem>
+                      <SelectItem value="sedan">{t('cars.sedan')}</SelectItem>
+                      <SelectItem value="suv">{t('cars.suv')}</SelectItem>
+                      <SelectItem value="luxury">{t('cars.luxury')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Prix par jour: {formatPrice(priceRange[0])} - {formatPrice(priceRange[1])}
+                    {t('cars.pricePerDay')}: {formatPrice(priceRange[0])} - {formatPrice(priceRange[1])}
                   </label>
                   <Slider
                     min={0}
@@ -341,7 +343,7 @@ const Cars = () => {
 
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Transmission ({selectedTransmissions.length > 0 ? selectedTransmissions.length : 'Toutes'})
+                    {t('cars.transmission')} ({selectedTransmissions.length > 0 ? selectedTransmissions.length : t('cars.all')})
                   </label>
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 cursor-pointer">
@@ -357,7 +359,7 @@ const Cars = () => {
                           }
                         }}
                       />
-                      <span className="text-sm">Automatique</span>
+                      <span className="text-sm">{t('cars.automatic')}</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input 
@@ -372,14 +374,14 @@ const Cars = () => {
                           }
                         }}
                       />
-                      <span className="text-sm">Manuelle</span>
+                      <span className="text-sm">{t('cars.manual')}</span>
                     </label>
                   </div>
                 </div>
 
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Carburant ({selectedFuelTypes.length > 0 ? selectedFuelTypes.length : 'Tous'})
+                    {t('cars.fuel')} ({selectedFuelTypes.length > 0 ? selectedFuelTypes.length : t('cars.all')})
                   </label>
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 cursor-pointer">
@@ -395,7 +397,7 @@ const Cars = () => {
                           }
                         }}
                       />
-                      <span className="text-sm">Essence</span>
+                      <span className="text-sm">{t('cars.petrol')}</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input 
@@ -410,7 +412,7 @@ const Cars = () => {
                           }
                         }}
                       />
-                      <span className="text-sm">Diesel</span>
+                      <span className="text-sm">{t('cars.diesel')}</span>
                     </label>
                   </div>
                 </div>
@@ -426,7 +428,7 @@ const Cars = () => {
                     setSelectedFuelTypes([]);
                   }}
                 >
-                  Réinitialiser les filtres
+                  {t('cars.resetFilters')}
                 </Button>
               </div>
             </Card>
@@ -437,29 +439,29 @@ const Cars = () => {
             {(loading || dbLoading) && (
               <div className="flex justify-center items-center py-12">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                <span className="ml-3 text-lg">Chargement...</span>
+                <span className="ml-3 text-lg">{t('cars.loading')}</span>
               </div>
             )}
             <div className="flex justify-between items-center">
               <p className="text-muted-foreground">
-                {filteredAndSortedCars.length} véhicule{filteredAndSortedCars.length > 1 ? 's' : ''} disponible{filteredAndSortedCars.length > 1 ? 's' : ''}
+                {filteredAndSortedCars.length} {t('cars.vehiclesAvailable')}
               </p>
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger className="w-[200px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="popular">Plus populaires</SelectItem>
-                  <SelectItem value="price-asc">Prix croissant</SelectItem>
-                  <SelectItem value="price-desc">Prix décroissant</SelectItem>
-                  <SelectItem value="rating">Mieux notés</SelectItem>
+                  <SelectItem value="popular">{t('cars.sortBy.popular')}</SelectItem>
+                  <SelectItem value="price-asc">{t('cars.sortBy.priceAsc')}</SelectItem>
+                  <SelectItem value="price-desc">{t('cars.sortBy.priceDesc')}</SelectItem>
+                  <SelectItem value="rating">{t('cars.sortBy.rating')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             {filteredAndSortedCars.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-lg text-muted-foreground">Aucun véhicule ne correspond à vos critères</p>
+                <p className="text-lg text-muted-foreground">{t('cars.noVehicles')}</p>
               </div>
             ) : (
               <>
@@ -519,11 +521,11 @@ const Cars = () => {
 
                     <div className="flex justify-between items-center mt-4 pt-4 border-t">
                       <div>
-                        <p className="text-sm text-muted-foreground">À partir de</p>
+                        <p className="text-sm text-muted-foreground">{t('activities.startingFrom')}</p>
                         <p className="text-2xl font-bold text-primary">
                           <Price amount={car.price} fromCurrency="XOF" showLoader />
                         </p>
-                        <p className="text-xs text-muted-foreground">par jour</p>
+                        <p className="text-xs text-muted-foreground">{t('cars.perDay')}</p>
                       </div>
                       <Button onClick={() => {
                         setSelectedCar({
@@ -536,7 +538,7 @@ const Cars = () => {
                         });
                         setDialogOpen(true);
                       }}>
-                        Réserver
+                        {t('search.book')}
                       </Button>
                     </div>
                   </CardContent>

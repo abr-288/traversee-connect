@@ -10,7 +10,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Calendar, MapPin, Users, CreditCard, Download, Plane, Hotel, Car, Map as MapIcon, Loader2 } from "lucide-react";
 import { format } from "date-fns";
-import { fr } from "date-fns/locale";
+import { fr, enUS, zhCN } from "date-fns/locale";
+import { useTranslation } from "react-i18next";
 
 interface Booking {
   id: string;
@@ -36,10 +37,19 @@ interface Booking {
 }
 
 const BookingHistory = () => {
+  const { t, i18n } = useTranslation();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all");
   const navigate = useNavigate();
+
+  const getLocale = () => {
+    switch (i18n.language) {
+      case 'en': return enUS;
+      case 'zh': return zhCN;
+      default: return fr;
+    }
+  };
 
   useEffect(() => {
     checkAuth();
@@ -75,7 +85,7 @@ const BookingHistory = () => {
       setBookings(data || []);
     } catch (error) {
       console.error("Error fetching bookings:", error);
-      toast.error("Erreur lors du chargement de vos réservations");
+      toast.error(t('bookingHistory.loadingError'));
     } finally {
       setLoading(false);
     }
@@ -83,10 +93,10 @@ const BookingHistory = () => {
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { variant: any; label: string }> = {
-      pending: { variant: "secondary", label: "En attente" },
-      confirmed: { variant: "default", label: "Confirmée" },
-      cancelled: { variant: "destructive", label: "Annulée" },
-      completed: { variant: "outline", label: "Terminée" }
+      pending: { variant: "secondary", label: t('booking.status.pending') },
+      confirmed: { variant: "default", label: t('booking.status.confirmed') },
+      cancelled: { variant: "destructive", label: t('booking.status.cancelled') },
+      completed: { variant: "outline", label: t('booking.status.completed') }
     };
     const config = variants[status] || variants.pending;
     return <Badge variant={config.variant}>{config.label}</Badge>;
@@ -94,10 +104,10 @@ const BookingHistory = () => {
 
   const getPaymentBadge = (status: string) => {
     const variants: Record<string, { variant: any; label: string }> = {
-      pending: { variant: "secondary", label: "En attente" },
-      paid: { variant: "default", label: "Payé" },
-      failed: { variant: "destructive", label: "Échoué" },
-      refunded: { variant: "outline", label: "Remboursé" }
+      pending: { variant: "secondary", label: t('booking.payment.pending') },
+      paid: { variant: "default", label: t('booking.payment.paid') },
+      failed: { variant: "destructive", label: t('booking.payment.failed') },
+      refunded: { variant: "outline", label: t('booking.payment.refunded') }
     };
     const config = variants[status] || variants.pending;
     return <Badge variant={config.variant}>{config.label}</Badge>;
@@ -121,7 +131,7 @@ const BookingHistory = () => {
 
   const handleDownloadTicket = async (bookingId: string) => {
     try {
-      toast.info("Génération du billet en cours...");
+      toast.info(t('bookingHistory.ticketGenerating'));
       
       const { data, error } = await supabase.functions.invoke("generate-ticket", {
         body: { bookingId },
@@ -130,7 +140,6 @@ const BookingHistory = () => {
       if (error) throw error;
 
       if (data.success) {
-        // Ouvrir dans une nouvelle fenêtre pour impression
         const printWindow = window.open('', '_blank');
         if (printWindow) {
           printWindow.document.write(data.ticket.html);
@@ -139,11 +148,11 @@ const BookingHistory = () => {
             printWindow.print();
           }, 250);
         }
-        toast.success("Billet envoyé par email! Utilisez Ctrl+P pour sauvegarder en PDF");
+        toast.success(t('bookingHistory.ticketSuccess'));
       }
     } catch (error) {
       console.error("Error downloading ticket:", error);
-      toast.error("Erreur lors du téléchargement du billet");
+      toast.error(t('bookingHistory.ticketError'));
     }
   };
 
@@ -165,19 +174,19 @@ const BookingHistory = () => {
       
       <main className="flex-1 container mx-auto px-4 py-6 md:py-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-4">Mes Réservations</h1>
+          <h1 className="text-4xl font-bold mb-4">{t('bookingHistory.title')}</h1>
           <p className="text-muted-foreground text-lg">
-            Consultez et gérez toutes vos réservations
+            {t('bookingHistory.subtitle')}
           </p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-6">
-            <TabsTrigger value="all">Toutes ({bookings.length})</TabsTrigger>
-            <TabsTrigger value="flight">Vols ({filterBookings("flight").length})</TabsTrigger>
-            <TabsTrigger value="hotel">Hôtels ({filterBookings("hotel").length})</TabsTrigger>
-            <TabsTrigger value="car">Voitures ({filterBookings("car").length})</TabsTrigger>
-            <TabsTrigger value="tour">Circuits ({filterBookings("tour").length})</TabsTrigger>
+            <TabsTrigger value="all">{t('bookingHistory.tabs.all')} ({bookings.length})</TabsTrigger>
+            <TabsTrigger value="flight">{t('bookingHistory.tabs.flights')} ({filterBookings("flight").length})</TabsTrigger>
+            <TabsTrigger value="hotel">{t('bookingHistory.tabs.hotels')} ({filterBookings("hotel").length})</TabsTrigger>
+            <TabsTrigger value="car">{t('bookingHistory.tabs.cars')} ({filterBookings("car").length})</TabsTrigger>
+            <TabsTrigger value="tour">{t('bookingHistory.tabs.tours')} ({filterBookings("tour").length})</TabsTrigger>
           </TabsList>
 
           {["all", "flight", "hotel", "car", "tour"].map((tab) => (
@@ -185,9 +194,9 @@ const BookingHistory = () => {
               {filterBookings(tab).length === 0 ? (
                 <Card>
                   <CardContent className="p-12 text-center">
-                    <p className="text-muted-foreground mb-4">Aucune réservation trouvée</p>
+                    <p className="text-muted-foreground mb-4">{t('bookingHistory.noBookings')}</p>
                     <Button onClick={() => navigate("/")}>
-                      Découvrir nos offres
+                      {t('bookingHistory.discoverOffers')}
                     </Button>
                   </CardContent>
                 </Card>
@@ -222,9 +231,9 @@ const BookingHistory = () => {
                             <Calendar className="w-5 h-5 text-primary" />
                           </div>
                           <div>
-                            <p className="text-xs text-muted-foreground">Date de début</p>
+                            <p className="text-xs text-muted-foreground">{t('bookingHistory.startDate')}</p>
                             <p className="font-semibold">
-                              {format(new Date(booking.start_date), "dd MMM yyyy", { locale: fr })}
+                              {format(new Date(booking.start_date), "dd MMM yyyy", { locale: getLocale() })}
                             </p>
                           </div>
                         </div>
@@ -235,9 +244,9 @@ const BookingHistory = () => {
                               <Calendar className="w-5 h-5 text-primary" />
                             </div>
                             <div>
-                              <p className="text-xs text-muted-foreground">Date de fin</p>
+                              <p className="text-xs text-muted-foreground">{t('bookingHistory.endDate')}</p>
                               <p className="font-semibold">
-                                {format(new Date(booking.end_date), "dd MMM yyyy", { locale: fr })}
+                                {format(new Date(booking.end_date), "dd MMM yyyy", { locale: getLocale() })}
                               </p>
                             </div>
                           </div>
@@ -248,8 +257,8 @@ const BookingHistory = () => {
                             <Users className="w-5 h-5 text-primary" />
                           </div>
                           <div>
-                            <p className="text-xs text-muted-foreground">Voyageurs</p>
-                            <p className="font-semibold">{booking.guests} personne(s)</p>
+                            <p className="text-xs text-muted-foreground">{t('bookingHistory.travelers')}</p>
+                            <p className="font-semibold">{booking.guests} {t('bookingHistory.person')}</p>
                           </div>
                         </div>
 
@@ -258,7 +267,7 @@ const BookingHistory = () => {
                             <CreditCard className="w-5 h-5 text-primary" />
                           </div>
                           <div>
-                            <p className="text-xs text-muted-foreground">Montant total</p>
+                            <p className="text-xs text-muted-foreground">{t('bookingHistory.totalAmount')}</p>
                             <p className="font-semibold text-primary">
                               {booking.total_price.toLocaleString()} {booking.currency}
                             </p>
@@ -268,7 +277,7 @@ const BookingHistory = () => {
 
                       {booking.notes && (
                         <div className="bg-muted/50 rounded-lg p-4 mb-4">
-                          <p className="text-sm font-semibold mb-1">Notes :</p>
+                          <p className="text-sm font-semibold mb-1">{t('bookingHistory.notes')} :</p>
                           <p className="text-sm text-muted-foreground">{booking.notes}</p>
                         </div>
                       )}
@@ -281,23 +290,23 @@ const BookingHistory = () => {
                           disabled={booking.payment_status !== 'paid'}
                         >
                           <Download className="w-4 h-4" />
-                          Télécharger le billet
+                          {t('bookingHistory.downloadTicket')}
                         </Button>
                         {booking.status === "confirmed" && booking.payment_status === "paid" && (
                           <Button variant="outline">
-                            Modifier la réservation
+                            {t('bookingHistory.modifyBooking')}
                           </Button>
                         )}
                         {booking.status === "pending" && (
                           <Button className="gradient-primary shadow-primary">
-                            Finaliser le paiement
+                            {t('bookingHistory.finalizePayment')}
                           </Button>
                         )}
                       </div>
 
                       <div className="mt-4 pt-4 border-t border-border">
                         <p className="text-xs text-muted-foreground">
-                          Réservation effectuée le {format(new Date(booking.created_at), "dd MMMM yyyy à HH:mm", { locale: fr })}
+                          {t('bookingHistory.bookingMadeOn')} {format(new Date(booking.created_at), "dd MMMM yyyy HH:mm", { locale: getLocale() })}
                         </p>
                       </div>
                     </CardContent>
