@@ -79,11 +79,6 @@ serve(async (req) => {
       apiPromises.push(searchSkyScrapper(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, rapidApiKey));
     }
 
-    // Flightera API via RapidAPI
-    if (rapidApiKey) {
-      apiPromises.push(searchFlightera(originCode, destinationCode, departureDate, returnDate, adults, finalChildren, finalTravelClass, rapidApiKey));
-    }
-
     if (apiPromises.length === 0) {
       console.log('No API credentials configured, returning mock data');
       return getMockFlights(originCode, destinationCode, departureDate, returnDate, adults, finalTravelClass);
@@ -837,120 +832,6 @@ async function searchSkyScrapper(
     return [];
   } catch (error) {
     console.error('Sky-Scrapper API exception:', error instanceof Error ? error.message : String(error));
-    return [];
-  }
-}
-
-// Flightera API via RapidAPI
-async function searchFlightera(
-  origin: string,
-  destination: string,
-  departureDate: string,
-  returnDate: string | undefined,
-  adults: number,
-  children: number,
-  travelClass: string,
-  rapidApiKey: string
-): Promise<any[]> {
-  try {
-    console.log('Searching flights with Flightera API via RapidAPI...');
-    
-    // Search for flights from origin airport on departure date
-    const flightResponse = await fetch(
-      `https://flightera-flight-data.p.rapidapi.com/flight/search?origin=${origin}&date=${departureDate}`,
-      {
-        method: 'GET',
-        headers: {
-          'X-RapidAPI-Key': rapidApiKey,
-          'X-RapidAPI-Host': 'flightera-flight-data.p.rapidapi.com'
-        }
-      }
-    );
-    
-    if (!flightResponse.ok) {
-      const errorText = await flightResponse.text();
-      console.error('Flightera API error:', flightResponse.status, errorText.substring(0, 300));
-      return [];
-    }
-    
-    const flightData = await flightResponse.json();
-    console.log('Flightera API response received, type:', typeof flightData, Array.isArray(flightData) ? `array of ${flightData.length}` : 'object');
-    
-    // Filter flights going to our destination
-    const flightsArray = Array.isArray(flightData) ? flightData : flightData.data || flightData.flights || [];
-    
-    const filteredFlights = flightsArray.filter((flight: any) => {
-      const destCode = flight.dest || flight.destination?.iata || flight.arrival?.iata || '';
-      return destCode.toUpperCase() === destination.toUpperCase();
-    });
-    
-    console.log(`Flightera: Found ${filteredFlights.length} flights to ${destination} out of ${flightsArray.length} total`);
-    
-    if (filteredFlights.length > 0) {
-      const flights = filteredFlights.slice(0, 15).map((flight: any, index: number) => {
-        // Extract flight info
-        const carrierCode = flight.airline_iata || flight.carrier || flight.airline?.iata || 'XX';
-        const flightNumber = flight.flight_iata || flight.flightNumber || flight.number || '0000';
-        
-        // Get times
-        const departureTime = flight.scheduled_out || flight.departure?.scheduled || flight.dep_time || `${departureDate}T00:00:00`;
-        const arrivalTime = flight.scheduled_in || flight.arrival?.scheduled || flight.arr_time || `${departureDate}T23:59:00`;
-        
-        // Calculate duration if we have times
-        let durationMinutes = 180; // Default 3 hours
-        try {
-          const depDate = new Date(departureTime);
-          const arrDate = new Date(arrivalTime);
-          if (!isNaN(depDate.getTime()) && !isNaN(arrDate.getTime())) {
-            durationMinutes = Math.max(60, Math.round((arrDate.getTime() - depDate.getTime()) / 60000));
-          }
-        } catch (e) {
-          // Use default duration
-        }
-        
-        // Estimate price based on distance (Flightera doesn't provide prices)
-        const basePrice = 150000 + Math.floor(Math.random() * 100000);
-        
-        return {
-          id: `FLTR-${origin}-${destination}-${index}`,
-          itineraries: [{
-            segments: [{
-              departure: {
-                iataCode: origin,
-                at: departureTime,
-              },
-              arrival: {
-                iataCode: destination,
-                at: arrivalTime,
-              },
-              carrierCode: carrierCode,
-              number: flightNumber.replace(/^[A-Z]{2}/, ''),
-              duration: `PT${Math.floor(durationMinutes / 60)}H${durationMinutes % 60}M`,
-            }],
-            duration: `PT${Math.floor(durationMinutes / 60)}H${durationMinutes % 60}M`,
-          }],
-          price: {
-            grandTotal: basePrice.toString(),
-            currency: 'XOF',
-          },
-          validatingAirlineCodes: [carrierCode],
-          travelerPricings: [{
-            fareDetailsBySegment: [{
-              cabin: travelClass || 'ECONOMY',
-            }],
-          }],
-          source: 'flightera'
-        };
-      });
-      
-      console.log(`Found ${flights.length} flights from Flightera`);
-      return flights;
-    }
-    
-    console.log('No flights found in Flightera response for destination:', destination);
-    return [];
-  } catch (error) {
-    console.error('Flightera API exception:', error instanceof Error ? error.message : String(error));
     return [];
   }
 }
