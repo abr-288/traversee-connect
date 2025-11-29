@@ -414,7 +414,7 @@ const Dashboard = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold"><Price amount={stats.totalSpent} fromCurrency="XOF" showLoader /></div>
+              <div className="text-2xl font-bold"><Price amount={stats.totalSpent} fromCurrency="EUR" showLoader /></div>
             </CardContent>
           </Card>
 

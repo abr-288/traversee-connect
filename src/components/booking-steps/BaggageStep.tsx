@@ -128,7 +128,7 @@ export const BaggageStep = ({
 
                   <div className="flex items-center justify-between mt-4">
                     <div className="text-2xl font-bold text-primary">
-                      {option.price === 0 ? "Gratuit" : <Price amount={option.price} fromCurrency="XOF" showLoader />}
+                      {option.price === 0 ? "Gratuit" : <Price amount={option.price} fromCurrency="EUR" showLoader />}
                     </div>
                     {!option.included && (
                       <div className="flex items-center gap-2">
@@ -188,7 +188,7 @@ export const BaggageStep = ({
 
                   <div className="flex items-center justify-between mt-4">
                     <div className="text-2xl font-bold text-primary">
-                      <Price amount={option.price} fromCurrency="XOF" showLoader />
+                      <Price amount={option.price} fromCurrency="EUR" showLoader />
                     </div>
                     <div className="flex items-center gap-2">
                       <Button
@@ -226,7 +226,7 @@ export const BaggageStep = ({
           <div className="flex justify-between items-center">
             <span className="text-lg font-semibold">Total bagages supplémentaires</span>
             <span className="text-2xl font-bold text-primary">
-              <Price amount={getTotalBaggagePrice()} fromCurrency="XOF" showLoader />
+              <Price amount={getTotalBaggagePrice()} fromCurrency="EUR" showLoader />
             </span>
           </div>
         </Card>

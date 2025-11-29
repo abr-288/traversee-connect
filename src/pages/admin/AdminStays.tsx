@@ -27,7 +27,7 @@ export default function AdminStays() {
     description: "",
     duration: "",
     price_per_unit: 0,
-    currency: "XOF",
+    currency: "EUR",
     available: true,
     featured: false,
   });
@@ -131,7 +131,7 @@ export default function AdminStays() {
       description: "",
       duration: "",
       price_per_unit: 0,
-      currency: "XOF",
+      currency: "EUR",
       available: true,
       featured: false,
     });

@@ -119,7 +119,7 @@ export const SummaryStep = ({
         end_date: endDate || startDate,
         guests: adultsCount + childrenCount,
         total_price: getTotalPrice(),
-        currency: "FCFA",
+        currency: "EUR",
         customer_name: `${passengers[0].firstName} ${passengers[0].lastName}`,
         customer_email: "client@example.com", // À récupérer du formulaire
         customer_phone: "+225 00 00 00 00", // À récupérer du formulaire
@@ -312,14 +312,14 @@ export const SummaryStep = ({
               <div className="flex justify-between text-sm">
                 <span>Service ({adultsCount + childrenCount} participants)</span>
                 <span className="font-medium">
-                  <Price amount={getBasePrice()} fromCurrency="XOF" />
+                  <Price amount={getBasePrice()} fromCurrency="EUR" />
                 </span>
               </div>
               {getOptionsPrice() > 0 && (
                 <div className="flex justify-between text-sm">
                   <span>Options</span>
                   <span className="font-medium">
-                    <Price amount={getOptionsPrice()} fromCurrency="XOF" />
+                    <Price amount={getOptionsPrice()} fromCurrency="EUR" />
                   </span>
                 </div>
               )}
@@ -327,7 +327,7 @@ export const SummaryStep = ({
                 <div className="flex justify-between text-sm">
                   <span>Sièges</span>
                   <span className="font-medium">
-                    <Price amount={getPreferencesPrice()} fromCurrency="XOF" />
+                    <Price amount={getPreferencesPrice()} fromCurrency="EUR" />
                   </span>
                 </div>
               )}
@@ -335,7 +335,7 @@ export const SummaryStep = ({
               <div className="flex justify-between items-center">
                 <span className="font-semibold text-lg">Total</span>
                 <span className="font-bold text-2xl text-primary">
-                  <Price amount={getTotalPrice()} fromCurrency="XOF" showLoader />
+                  <Price amount={getTotalPrice()} fromCurrency="EUR" showLoader />
                 </span>
               </div>
             </div>

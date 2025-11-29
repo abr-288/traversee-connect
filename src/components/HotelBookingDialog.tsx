@@ -82,7 +82,7 @@ export const HotelBookingDialog = ({ open, onOpenChange, hotel }: HotelBookingDi
         name: hotel.name,
         type: "hotel",
         price_per_unit: hotel.price,
-        currency: "FCFA",
+        currency: "EUR",
         location: hotel.location,
         destination: hotel.location,
         available: true,
@@ -111,7 +111,7 @@ export const HotelBookingDialog = ({ open, onOpenChange, hotel }: HotelBookingDi
       customer_email: customerEmail,
       customer_phone: customerPhone,
       notes: notes ? `${rooms} chambre(s), ${adults} adulte(s), ${children} enfant(s)\n${notes}` : `${rooms} chambre(s), ${adults} adulte(s), ${children} enfant(s)`,
-      currency: "FCFA",
+      currency: "EUR",
       status: "pending",
       payment_status: "pending",
     }).select().single();

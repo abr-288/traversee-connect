@@ -18,7 +18,7 @@ export function StatsCards({ totalRevenue, totalBookings, pendingBookings, total
           <TrendingUp className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold"><Price amount={totalRevenue} fromCurrency="XOF" showLoader /></div>
+          <div className="text-2xl font-bold"><Price amount={totalRevenue} fromCurrency="EUR" showLoader /></div>
           <p className="text-xs text-muted-foreground">Réservations payées</p>
         </CardContent>
       </Card>

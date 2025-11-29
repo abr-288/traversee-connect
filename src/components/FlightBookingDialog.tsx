@@ -107,7 +107,7 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
         name: `Vol ${flight.from} → ${flight.to}`,
         type: "flight",
         price_per_unit: flight.price,
-        currency: "FCFA",
+        currency: "EUR",
         location: flight.to,
         destination: flight.from,
         available: true,
@@ -136,7 +136,7 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
       customer_email: customerEmail,
       customer_phone: customerPhone,
       notes: notes || null,
-      currency: "FCFA",
+      currency: "EUR",
       status: "pending",
       payment_status: "pending",
       booking_details: {
@@ -379,7 +379,7 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
                       </div>
                       <div className="text-right">
                         <p className="text-3xl font-bold text-primary">
-                          <Price amount={flight.price} fromCurrency="XOF" showLoader />
+                          <Price amount={flight.price} fromCurrency="EUR" showLoader />
                         </p>
                       </div>
                     </div>
@@ -427,7 +427,7 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
                       className="w-full"
                       size="lg"
                     >
-                      Continuer pour <Price amount={flight.price} fromCurrency="XOF" />
+                      Continuer pour <Price amount={flight.price} fromCurrency="EUR" />
                     </Button>
 
                     <button className="w-full text-center text-sm text-primary mt-3 flex items-center justify-center gap-1">
@@ -494,7 +494,7 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
                       className="w-full"
                       size="lg"
                     >
-                      Continuer pour <Price amount={flight.price + 25000} fromCurrency="XOF" />
+                      Continuer pour <Price amount={flight.price + 40} fromCurrency="EUR" />
                     </Button>
 
                     <button className="w-full text-center text-sm text-primary mt-3 flex items-center justify-center gap-1">
@@ -689,7 +689,7 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
               <div className="flex justify-between items-center">
                 <span className="text-lg font-semibold">{t('booking.summary.totalPrice')}</span>
                 <span className="text-2xl font-bold text-primary">
-                  <Price amount={flight.price * formData?.passengers} fromCurrency="XOF" showLoader />
+                  <Price amount={flight.price * formData?.passengers} fromCurrency="EUR" showLoader />
                 </span>
               </div>
             </div>

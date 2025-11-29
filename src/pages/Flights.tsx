@@ -277,7 +277,7 @@ const Flights = () => {
         <PriceCalendar
           departureDate={departureDate}
           onDateSelect={handleDateSelect}
-          currency="XOF"
+          currency="EUR"
           lowestPrice={Math.min(...flights.map(f => f.price))}
         />
       )}
@@ -351,7 +351,7 @@ const Flights = () => {
                       <div className="flex flex-col items-start">
                         <span className="font-semibold text-sm">Le meilleur</span>
                         <span className="text-xs text-muted-foreground">
-                          {filteredAndSortedFlights[0]?.price.toLocaleString()} XOF · {filteredAndSortedFlights[0]?.duration}
+                          {filteredAndSortedFlights[0]?.price.toLocaleString()} EUR · {filteredAndSortedFlights[0]?.duration}
                         </span>
                       </div>
                     </TabsTrigger>
@@ -362,7 +362,7 @@ const Flights = () => {
                       <div className="flex flex-col items-start">
                         <span className="font-semibold text-sm">Le moins cher</span>
                         <span className="text-xs text-muted-foreground">
-                          {Math.min(...filteredAndSortedFlights.map(f => f.price)).toLocaleString()} XOF
+                          {Math.min(...filteredAndSortedFlights.map(f => f.price)).toLocaleString()} EUR
                         </span>
                       </div>
                     </TabsTrigger>
@@ -394,7 +394,7 @@ const Flights = () => {
                       duration={flight.duration}
                       stops={flight.stops}
                       price={flight.price}
-                      currency="XOF"
+                      currency="EUR"
                       onSelect={() => handleBook(flight)}
                     />
                   ))}

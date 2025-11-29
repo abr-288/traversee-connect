@@ -465,12 +465,12 @@ const Hotels = () => {
 
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Prix par nuit: {priceRange[0].toLocaleString()} - {priceRange[1].toLocaleString()} FCFA
+                    Prix par nuit: {priceRange[0].toLocaleString()} - {priceRange[1].toLocaleString()} EUR
                   </label>
                   <Slider
                     min={0}
-                    max={500000}
-                    step={5000}
+                    max={800}
+                    step={10}
                     value={priceRange}
                     onValueChange={setPriceRange}
                     className="mt-4"
@@ -560,12 +560,12 @@ const Hotels = () => {
 
                     <div>
                       <label className="text-sm font-medium mb-2 block">
-                        Prix par nuit: {priceRange[0].toLocaleString()} - {priceRange[1].toLocaleString()} FCFA
+                        Prix par nuit: {priceRange[0].toLocaleString()} - {priceRange[1].toLocaleString()} EUR
                       </label>
                       <Slider
                         min={0}
-                        max={500000}
-                        step={5000}
+                        max={800}
+                        step={10}
                         value={priceRange}
                         onValueChange={setPriceRange}
                         className="mt-4"
@@ -717,7 +717,7 @@ const Hotels = () => {
                         <div>
                           <p className="text-sm text-muted-foreground">Prix réel</p>
                           <p className="text-3xl font-bold text-primary">
-                            {hotel.price.toLocaleString()} <span className="text-lg">FCFA</span>
+                            {hotel.price.toLocaleString()} <span className="text-lg">EUR</span>
                           </p>
                           <p className="text-sm text-muted-foreground">par nuit</p>
                         </div>

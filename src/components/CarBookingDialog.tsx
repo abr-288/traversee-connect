@@ -85,7 +85,7 @@ export const CarBookingDialog = ({ open, onOpenChange, car }: CarBookingDialogPr
         name: car.name,
         type: "car",
         price_per_unit: car.price,
-        currency: "FCFA",
+        currency: "EUR",
         location: pickupLocation,
         available: true,
         description: `${car.category} - ${car.transmission || 'Automatique'} - ${car.seats || 5} places`
@@ -112,7 +112,7 @@ export const CarBookingDialog = ({ open, onOpenChange, car }: CarBookingDialogPr
       customer_email: customerEmail,
       customer_phone: customerPhone,
       notes: notes || null,
-      currency: "FCFA",
+      currency: "EUR",
       status: "pending",
       payment_status: "pending",
       booking_details: {

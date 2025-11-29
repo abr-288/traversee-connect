@@ -137,7 +137,7 @@ export const PreferencesStep = ({
                 </div>
                 <div>
                   <p className="text-sm font-medium">Standard</p>
-                  <p className="text-xs text-muted-foreground"><Price amount={5000} fromCurrency="XOF" /></p>
+                  <p className="text-xs text-muted-foreground"><Price amount={8} fromCurrency="EUR" /></p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -146,7 +146,7 @@ export const PreferencesStep = ({
                 </div>
                 <div>
                   <p className="text-sm font-medium">Espace extra</p>
-                  <p className="text-xs text-muted-foreground"><Price amount={10000} fromCurrency="XOF" /></p>
+                  <p className="text-xs text-muted-foreground"><Price amount={15} fromCurrency="EUR" /></p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -155,7 +155,7 @@ export const PreferencesStep = ({
                 </div>
                 <div>
                   <p className="text-sm font-medium">Avant de l'avion</p>
-                  <p className="text-xs text-muted-foreground"><Price amount={15000} fromCurrency="XOF" /></p>
+                  <p className="text-xs text-muted-foreground"><Price amount={23} fromCurrency="EUR" /></p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -187,7 +187,7 @@ export const PreferencesStep = ({
               <div className="mt-4 p-3 bg-primary/5 rounded-lg">
                 <p className="text-sm text-muted-foreground">Total sièges</p>
                 <p className="text-xl font-bold text-primary">
-                  <Price amount={getTotalSeatsPrice()} fromCurrency="XOF" showLoader />
+                  <Price amount={getTotalSeatsPrice()} fromCurrency="EUR" showLoader />
                 </p>
               </div>
             )}

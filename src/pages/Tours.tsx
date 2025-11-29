@@ -373,12 +373,12 @@ const Tours = () => {
 
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Prix: {priceRange[0].toLocaleString()} - {priceRange[1].toLocaleString()} FCFA
+                    Prix: {priceRange[0].toLocaleString()} - {priceRange[1].toLocaleString()} EUR
                   </label>
                   <Slider
                     min={0}
-                    max={1000000}
-                    step={10000}
+                    max={1500}
+                    step={25}
                     value={priceRange}
                     onValueChange={setPriceRange}
                     className="mt-4"
@@ -478,7 +478,7 @@ const Tours = () => {
                       <div>
                         <p className="text-sm text-muted-foreground">À partir de</p>
                         <p className="text-2xl font-bold text-primary">
-                          {tour.price.toLocaleString()} <span className="text-sm">FCFA</span>
+                          {tour.price.toLocaleString()} <span className="text-sm">EUR</span>
                         </p>
                       </div>
                       <Button onClick={() => {
@@ -486,7 +486,7 @@ const Tours = () => {
                           id: tour.id.toString(),
                           name: tour.name,
                           price_per_unit: tour.price,
-                          currency: "FCFA",
+                          currency: "EUR",
                           type: "tour"
                         });
                         setDialogOpen(true);

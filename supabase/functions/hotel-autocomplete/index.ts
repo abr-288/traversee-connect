@@ -50,16 +50,16 @@ serve(async (req) => {
           if (destData.data && Array.isArray(destData.data)) {
             const suggestions = destData.data.slice(0, 8).map((item: any) => {
               // Estimate average price based on destination type and location
-              let avgPrice = 50000; // Default price in XOF
+              let avgPrice = 80; // Default price in EUR
               
               if (item.search_type === 'CITY') {
                 // Estimate based on number of hotels (more hotels = more variety = potentially lower avg)
                 const hotelCount = item.nr_hotels || 100;
-                if (hotelCount > 500) avgPrice = 45000;
-                else if (hotelCount > 200) avgPrice = 55000;
-                else avgPrice = 65000;
+                if (hotelCount > 500) avgPrice = 70;
+                else if (hotelCount > 200) avgPrice = 85;
+                else avgPrice = 100;
               } else if (item.search_type === 'HOTEL') {
-                avgPrice = 75000; // Hotels directly tend to be mid-range
+                avgPrice = 115; // Hotels directly tend to be mid-range
               }
 
               return {

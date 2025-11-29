@@ -137,7 +137,7 @@ const AdminDashboard = () => {
         type: formData.get("type") as "hotel" | "flight" | "car" | "tour" | "event" | "flight_hotel",
         location: formData.get("location") as string,
         price_per_unit: Number(formData.get("price")),
-        currency: "FCFA",
+        currency: "EUR",
         available: true,
       };
 
@@ -220,7 +220,7 @@ const AdminDashboard = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalRevenue.toLocaleString()} FCFA</div>
+              <div className="text-2xl font-bold">{stats.totalRevenue.toLocaleString()} EUR</div>
             </CardContent>
           </Card>
           <Card>
@@ -298,7 +298,7 @@ const AdminDashboard = () => {
                         </TableCell>
                         <TableCell>{booking.services?.name}</TableCell>
                         <TableCell>{new Date(booking.start_date).toLocaleDateString("fr-FR")}</TableCell>
-                        <TableCell>{Number(booking.total_price).toLocaleString()} FCFA</TableCell>
+                        <TableCell>{Number(booking.total_price).toLocaleString()} EUR</TableCell>
                         <TableCell>
                           <Select
                             value={booking.status}
@@ -398,7 +398,7 @@ const AdminDashboard = () => {
                             </Select>
                           </div>
                           <UnifiedFormField
-                            label="Prix (FCFA)"
+                            label="Prix (EUR)"
                             name="price"
                             type="number"
                             defaultValue={selectedService?.price_per_unit}
@@ -445,7 +445,7 @@ const AdminDashboard = () => {
                           <Badge variant="outline">{service.type}</Badge>
                         </TableCell>
                         <TableCell>{service.location}</TableCell>
-                        <TableCell>{Number(service.price_per_unit).toLocaleString()} FCFA</TableCell>
+                        <TableCell>{Number(service.price_per_unit).toLocaleString()} EUR</TableCell>
                         <TableCell>
                           ⭐ {service.rating || 0} ({service.total_reviews || 0})
                         </TableCell>
