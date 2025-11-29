@@ -15,7 +15,10 @@
     "logout": "Déconnexion",
     "logoutSuccess": "Déconnexion réussie",
     "dashboard": "Tableau de bord",
-    "profile": "Mon Profil"
+    "profile": "Mon Profil",
+    "others": "Autres",
+    "destinations": "Destinations",
+    "stays": "Séjours"
   },
   "hero": {
     "title": "Voyagez partout, réservez en un clic",

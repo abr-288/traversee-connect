@@ -15,7 +15,10 @@
     "logout": "Logout",
     "logoutSuccess": "Logout successful",
     "dashboard": "Dashboard",
-    "profile": "My Profile"
+    "profile": "My Profile",
+    "others": "Others",
+    "destinations": "Destinations",
+    "stays": "Stays"
   },
   "hero": {
     "title": "Travel anywhere, book in one click",
