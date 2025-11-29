@@ -93,7 +93,8 @@ serve(async (req) => {
         results.push(...result.value);
         console.log(`API ${index + 1} returned ${result.value.length} flights`);
       } else if (result.status === 'rejected') {
-        console.error(`API ${index + 1} failed:`, result.reason);
+        // Security: Don't log full error details which may contain API keys or sensitive data
+        console.error(`API ${index + 1} failed`);
       }
     });
 
