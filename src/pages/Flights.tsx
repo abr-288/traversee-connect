@@ -238,6 +238,37 @@ const Flights = () => {
           <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <FlightSearchForm />
           </div>
+
+          {/* Popular Destinations */}
+          <div className="mt-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+            <p className="text-white/80 text-sm mb-3 text-center">Destinations populaires au départ d'Abidjan :</p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {[
+                { from: "ABJ", to: "CDG", fromCity: "Abidjan", toCity: "Paris", flag: "🇫🇷" },
+                { from: "ABJ", to: "DXB", fromCity: "Abidjan", toCity: "Dubai", flag: "🇦🇪" },
+                { from: "ABJ", to: "IST", fromCity: "Abidjan", toCity: "Istanbul", flag: "🇹🇷" },
+                { from: "ABJ", to: "ACC", fromCity: "Abidjan", toCity: "Accra", flag: "🇬🇭" },
+                { from: "ABJ", to: "DKR", fromCity: "Abidjan", toCity: "Dakar", flag: "🇸🇳" },
+                { from: "ABJ", to: "CMN", fromCity: "Abidjan", toCity: "Casablanca", flag: "🇲🇦" },
+                { from: "ABJ", to: "JNB", fromCity: "Abidjan", toCity: "Johannesburg", flag: "🇿🇦" },
+                { from: "ABJ", to: "ADD", fromCity: "Abidjan", toCity: "Addis-Abeba", flag: "🇪🇹" },
+              ].map((route) => {
+                const futureDate = new Date();
+                futureDate.setDate(futureDate.getDate() + 14);
+                const dateStr = futureDate.toISOString().split('T')[0];
+                return (
+                  <Link
+                    key={route.to}
+                    to={`/flights?from=${route.from}&to=${route.to}&date=${dateStr}&adults=1&class=ECONOMY`}
+                    className="px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-medium transition-all hover:scale-105 flex items-center gap-2 border border-white/20"
+                  >
+                    <span>{route.flag}</span>
+                    <span>{route.toCity}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
 
