@@ -44,7 +44,7 @@ const HeroSection = () => {
             <img
               src={slide}
               alt={`Travel destination ${index + 1}`}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover brightness-110 contrast-105"
             />
           </div>
         ))}
