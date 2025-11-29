@@ -6,7 +6,6 @@ import TestimonialsSection from "@/components/TestimonialsSection";
 import Footer from "@/components/Footer";
 import { AITravelAdvisor } from "@/components/AITravelAdvisor";
 import { Boss } from "@/components/Boss";
-import StatsSection from "@/components/StatsSection";
 import FeaturedSubscriptions from "@/components/FeaturedSubscriptions";
 import SpecialOffers from "@/components/SpecialOffers";
 import { SeasonalSuggestions } from "@/components/SeasonalSuggestions";
@@ -20,10 +19,9 @@ const Index = () => {
       <Navbar />
       <main>
         <HeroSection />
-        <StatsSection />
-        <DestinationsSection />
+        
+        {/* Subscriptions Section - Premium First */}
         <FeaturedSubscriptions />
-        <SpecialOffers />
         
         {/* Seasonal Suggestions Section */}
         <section className="py-12 md:py-16 px-4 bg-muted/30">
@@ -40,8 +38,14 @@ const Index = () => {
           </div>
         </section>
         
+        {/* Popular Destinations */}
+        <DestinationsSection />
+        
+        {/* Special Offers */}
+        <SpecialOffers />
+        
         {/* AI Travel Advisor Section */}
-        <section className="py-12 md:py-16 px-4">
+        <section className="py-12 md:py-16 px-4 bg-gradient-to-b from-background to-muted/20">
           <div className="container mx-auto max-w-4xl">
             <div className="text-center mb-6 md:mb-8">
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">
