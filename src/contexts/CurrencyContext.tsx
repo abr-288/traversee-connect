@@ -21,7 +21,7 @@ export const currencies = [
 
 export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [selectedCurrency, setSelectedCurrency] = useState<string>(() => {
-    return localStorage.getItem('currency') || 'XOF';
+    return localStorage.getItem('currency') || 'EUR';
   });
   const { convertCurrency } = useCurrencyExchange();
 
