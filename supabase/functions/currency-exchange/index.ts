@@ -1,4 +1,3 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -37,61 +36,13 @@ serve(async (req) => {
       );
     }
 
-    const rapidApiKey = Deno.env.get('RAPIDAPI_KEY');
-    
-    // Try RapidAPI TripAdvisor first (tripadvisor16.p.rapidapi.com)
-    if (rapidApiKey) {
-      try {
-        const response = await fetch(
-          `https://tripadvisor16.p.rapidapi.com/api/v1/getCurrency`,
-          {
-            headers: {
-              'X-RapidAPI-Key': rapidApiKey,
-              'X-RapidAPI-Host': 'tripadvisor16.p.rapidapi.com',
-            },
-          }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          console.log('TripAdvisor Currency API response:', data);
-          
-          // Process the response and calculate conversion
-          // Note: Adapt this based on actual API response structure
-          if (data && data.rates) {
-            const rate = data.rates[to] / data.rates[from];
-            const converted = amount * rate;
-            
-            console.log('Currency conversion successful (TripAdvisor):', { rate, converted });
-            
-            return new Response(
-              JSON.stringify({
-                success: true,
-                data: {
-                  from,
-                  to,
-                  amount,
-                  converted: parseFloat(converted.toFixed(2)),
-                  rate: parseFloat(rate.toFixed(6)),
-                }
-              }),
-              { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-            );
-          }
-        }
-      } catch (error) {
-        console.error('TripAdvisor API error, falling back:', error);
-      }
-    }
-
-    // Fallback to ExchangeRate-API (free, no API key required)
+    // Use ExchangeRate-API (free, reliable)
     const response = await fetch(
       `https://api.exchangerate-api.com/v4/latest/${normalizedFrom}`
     );
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Currency API error:', response.status, errorText);
+      console.error('Currency API error:', response.status);
       throw new Error(`Currency API error: ${response.status}`);
     }
 
@@ -104,7 +55,7 @@ serve(async (req) => {
     const rate = data.rates[normalizedTo];
     const converted = amount * rate;
 
-    console.log('Currency conversion successful (ExchangeRate-API):', { rate, converted });
+    console.log('Currency conversion successful:', { rate, converted });
 
     return new Response(
       JSON.stringify({
