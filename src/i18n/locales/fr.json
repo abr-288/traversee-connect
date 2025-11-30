@@ -373,7 +373,11 @@
     "error": "Erreur",
     "warning": "Attention",
     "info": "Information",
-    "install": "Installer l'app"
+    "install": "Installer l'app",
+    "lightMode": "Mode clair",
+    "darkMode": "Mode sombre",
+    "systemMode": "Système",
+    "toggleTheme": "Changer le thème"
   },
   "pages": {
     "index": {

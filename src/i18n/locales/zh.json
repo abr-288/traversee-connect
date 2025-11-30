@@ -373,7 +373,11 @@
     "error": "错误",
     "warning": "警告",
     "info": "信息",
-    "install": "安装应用"
+    "install": "安装应用",
+    "lightMode": "浅色模式",
+    "darkMode": "深色模式",
+    "systemMode": "跟随系统",
+    "toggleTheme": "切换主题"
   },
   "pages": {
     "index": {

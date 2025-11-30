@@ -15,6 +15,9 @@ interface ThemeConfig {
     backgroundColor: string;
     foregroundColor: string;
     mutedColor: string;
+    primaryColor?: string;
+    secondaryColor?: string;
+    accentColor?: string;
   };
 }
 
@@ -50,18 +53,46 @@ const FONT_URLS: Record<string, string> = {
   "Work Sans": "https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&display=swap",
 };
 
+type ColorMode = "light" | "dark" | "system";
+
 interface ThemeContextType {
   theme: ThemeConfig;
   loading: boolean;
+  colorMode: ColorMode;
+  isDark: boolean;
+  setColorMode: (mode: ColorMode) => void;
+  toggleColorMode: () => void;
   updateTheme: (newTheme: Partial<ThemeConfig>) => Promise<void>;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+const getSystemPreference = (): boolean => {
+  if (typeof window !== "undefined") {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+  return false;
+};
+
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setTheme] = useState<ThemeConfig>(DEFAULT_THEME);
   const [loading, setLoading] = useState(true);
   const [loadedFonts, setLoadedFonts] = useState<Set<string>>(new Set());
+  const [colorMode, setColorModeState] = useState<ColorMode>(() => {
+    if (typeof window !== "undefined") {
+      return (localStorage.getItem("colorMode") as ColorMode) || "system";
+    }
+    return "system";
+  });
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("colorMode") as ColorMode;
+      if (stored === "dark") return true;
+      if (stored === "light") return false;
+      return getSystemPreference();
+    }
+    return false;
+  });
 
   // Load font dynamically
   const loadFont = (fontName: string) => {
@@ -75,36 +106,83 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Apply theme to CSS variables
-  const applyTheme = (themeConfig: ThemeConfig) => {
+  const applyTheme = (themeConfig: ThemeConfig, dark: boolean) => {
     const root = document.documentElement;
     
     // Load fonts
     loadFont(themeConfig.fontHeading);
     loadFont(themeConfig.fontBody);
 
-    // Apply CSS variables
-    root.style.setProperty("--primary", themeConfig.primaryColor);
-    root.style.setProperty("--secondary", themeConfig.secondaryColor);
-    root.style.setProperty("--accent", themeConfig.accentColor);
-    root.style.setProperty("--muted", themeConfig.mutedColor);
+    // Apply common CSS variables
     root.style.setProperty("--radius", themeConfig.borderRadius);
     root.style.setProperty("--font-heading", themeConfig.fontHeading);
     root.style.setProperty("--font-body", themeConfig.fontBody);
 
-    // Check if dark mode
-    const isDark = root.classList.contains("dark");
-    if (isDark && themeConfig.darkMode) {
+    // Apply color mode
+    if (dark) {
+      root.classList.add("dark");
       root.style.setProperty("--background", themeConfig.darkMode.backgroundColor);
       root.style.setProperty("--foreground", themeConfig.darkMode.foregroundColor);
       root.style.setProperty("--muted", themeConfig.darkMode.mutedColor);
+      root.style.setProperty("--primary", themeConfig.darkMode.primaryColor || themeConfig.primaryColor);
+      root.style.setProperty("--secondary", themeConfig.darkMode.secondaryColor || themeConfig.secondaryColor);
+      root.style.setProperty("--accent", themeConfig.darkMode.accentColor || themeConfig.accentColor);
+      // Card and popover backgrounds for dark mode
+      root.style.setProperty("--card", themeConfig.darkMode.mutedColor);
+      root.style.setProperty("--popover", themeConfig.darkMode.mutedColor);
     } else {
+      root.classList.remove("dark");
       root.style.setProperty("--background", themeConfig.backgroundColor);
       root.style.setProperty("--foreground", themeConfig.foregroundColor);
+      root.style.setProperty("--muted", themeConfig.mutedColor);
+      root.style.setProperty("--primary", themeConfig.primaryColor);
+      root.style.setProperty("--secondary", themeConfig.secondaryColor);
+      root.style.setProperty("--accent", themeConfig.accentColor);
+      // Card and popover backgrounds for light mode
+      root.style.setProperty("--card", themeConfig.backgroundColor);
+      root.style.setProperty("--popover", themeConfig.backgroundColor);
     }
 
     // Apply font families to body
     document.body.style.fontFamily = `"${themeConfig.fontBody}", sans-serif`;
   };
+
+  // Set color mode
+  const setColorMode = (mode: ColorMode) => {
+    setColorModeState(mode);
+    localStorage.setItem("colorMode", mode);
+    
+    let dark: boolean;
+    if (mode === "system") {
+      dark = getSystemPreference();
+    } else {
+      dark = mode === "dark";
+    }
+    
+    setIsDark(dark);
+    applyTheme(theme, dark);
+  };
+
+  // Toggle between light and dark
+  const toggleColorMode = () => {
+    const newMode = isDark ? "light" : "dark";
+    setColorMode(newMode);
+  };
+
+  // Listen for system preference changes
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    
+    const handleChange = (e: MediaQueryListEvent) => {
+      if (colorMode === "system") {
+        setIsDark(e.matches);
+        applyTheme(theme, e.matches);
+      }
+    };
+    
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, [colorMode, theme]);
 
   // Fetch theme from database
   useEffect(() => {
@@ -120,15 +198,19 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
         if (data?.config_value && typeof data.config_value === "object") {
           const configValue = data.config_value as Partial<ThemeConfig>;
-          const fetchedTheme: ThemeConfig = { ...DEFAULT_THEME, ...configValue };
+          const fetchedTheme: ThemeConfig = { 
+            ...DEFAULT_THEME, 
+            ...configValue,
+            darkMode: { ...DEFAULT_THEME.darkMode, ...(configValue.darkMode || {}) }
+          };
           setTheme(fetchedTheme);
-          applyTheme(fetchedTheme);
+          applyTheme(fetchedTheme, isDark);
         } else {
-          applyTheme(DEFAULT_THEME);
+          applyTheme(DEFAULT_THEME, isDark);
         }
       } catch (error) {
         console.error("Error fetching theme:", error);
-        applyTheme(DEFAULT_THEME);
+        applyTheme(DEFAULT_THEME, isDark);
       } finally {
         setLoading(false);
       }
@@ -137,24 +219,21 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     fetchTheme();
   }, []);
 
-  // Re-apply theme when dark mode changes
+  // Apply theme when isDark changes
   useEffect(() => {
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.attributeName === "class") {
-          applyTheme(theme);
-        }
-      });
-    });
-
-    observer.observe(document.documentElement, { attributes: true });
-    return () => observer.disconnect();
-  }, [theme]);
+    if (!loading) {
+      applyTheme(theme, isDark);
+    }
+  }, [isDark, loading]);
 
   const updateTheme = async (newTheme: Partial<ThemeConfig>) => {
-    const updatedTheme = { ...theme, ...newTheme };
+    const updatedTheme = { 
+      ...theme, 
+      ...newTheme,
+      darkMode: { ...theme.darkMode, ...(newTheme.darkMode || {}) }
+    };
     setTheme(updatedTheme);
-    applyTheme(updatedTheme);
+    applyTheme(updatedTheme, isDark);
 
     try {
       await supabase
@@ -167,7 +246,15 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, loading, updateTheme }}>
+    <ThemeContext.Provider value={{ 
+      theme, 
+      loading, 
+      colorMode, 
+      isDark, 
+      setColorMode, 
+      toggleColorMode, 
+      updateTheme 
+    }}>
       {children}
     </ThemeContext.Provider>
   );
