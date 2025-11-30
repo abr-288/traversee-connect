@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
+import { SiteConfigProvider } from "@/contexts/SiteConfigContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { Loader2 } from "lucide-react";
 import { NotificationPrompt } from "@/components/NotificationPrompt";
@@ -39,6 +40,7 @@ const AdminStays = lazy(() => import("./pages/admin/AdminStays"));
 const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
 const AdminSubscriptions = lazy(() => import("./pages/admin/AdminSubscriptions"));
 const AdminEmailTemplates = lazy(() => import("./pages/AdminEmailTemplates"));
+const AdminConfiguration = lazy(() => import("./pages/admin/AdminConfiguration"));
 const Help = lazy(() => import("./pages/Help"));
 const Support = lazy(() => import("./pages/Support"));
 const Install = lazy(() => import("./pages/Install"));
@@ -61,14 +63,15 @@ const PageLoader = () => (
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
-      <CurrencyProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <NotificationPrompt />
-          <BrowserRouter>
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
+      <SiteConfigProvider>
+        <CurrencyProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <NotificationPrompt />
+            <BrowserRouter>
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/home" element={<Index />} />
               <Route path="/flights" element={<Flights />} />
@@ -99,17 +102,19 @@ const App = () => (
               <Route path="/admin/users" element={<AdminUsers />} />
               <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
               <Route path="/admin/email-templates" element={<AdminEmailTemplates />} />
+              <Route path="/admin/configuration" element={<AdminConfiguration />} />
               <Route path="/help" element={<Help />} />
               <Route path="/support" element={<Support />} />
               <Route path="/install" element={<Install />} />
               <Route path="/price-alerts" element={<PriceAlerts />} />
               <Route path="/subscriptions" element={<Subscriptions />} />
               <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-          </BrowserRouter>
-        </TooltipProvider>
-      </CurrencyProvider>
+                </Routes>
+              </Suspense>
+            </BrowserRouter>
+          </TooltipProvider>
+        </CurrencyProvider>
+      </SiteConfigProvider>
     </QueryClientProvider>
   </ErrorBoundary>
 );
