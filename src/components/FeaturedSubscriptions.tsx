@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -26,152 +26,61 @@ import {
   GraduationCap,
   CalendarDays,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Heart,
+  Loader2
 } from "lucide-react";
 
-interface SubscriptionPlan {
+interface SubscriptionPlanDB {
   id: string;
+  plan_id: string;
   name: string;
-  subtitle: string;
-  icon: React.ReactNode;
+  subtitle: string | null;
+  icon: string;
   price: string;
-  priceNote?: string;
+  price_note: string | null;
   features: string[];
-  popular?: boolean;
+  popular: boolean;
   color: string;
+  sort_order: number;
+  is_active: boolean;
 }
 
-const subscriptionPlans: SubscriptionPlan[] = [
-  {
-    id: "corporate",
-    name: "Corporate Mensuelle",
-    subtitle: "Pour les entreprises",
-    icon: <Building2 className="h-6 w-6" />,
-    price: "230€ - 460€",
-    priceNote: "par mois",
-    features: [
-      "Gestion complète des réservations",
-      "Négociation de tarifs corporate",
-      "Support prioritaire 7j/7",
-      "Gestionnaire dédié"
-    ],
-    popular: true,
-    color: "from-primary to-primary/80"
-  },
-  {
-    id: "premium",
-    name: "Premium VIP",
-    subtitle: "Abonnement individuel",
-    icon: <Crown className="h-6 w-6" />,
-    price: "30€ - 55€",
-    priceNote: "par mois",
-    features: [
-      "Réservations prioritaires",
-      "Traitement express visas",
-      "Assistance 24/7",
-      "Alertes exclusives"
-    ],
-    color: "from-amber-500 to-amber-600"
-  },
-  {
-    id: "visa",
-    name: "Assistance Visa+",
-    subtitle: "Personnes & Entreprises",
-    icon: <FileCheck className="h-6 w-6" />,
-    price: "Sur devis",
-    priceNote: "selon destination",
-    features: [
-      "Constitution du dossier",
-      "Prise de rendez-vous",
-      "Coaching entretien",
-      "Suivi prioritaire"
-    ],
-    color: "from-emerald-500 to-emerald-600"
-  },
-  {
-    id: "billets",
-    name: "Billets Pro & Famille",
-    subtitle: "Tarifs négociés",
-    icon: <Plane className="h-6 w-6" />,
-    price: "Jusqu'à -18%",
-    priceNote: "sur les tarifs publics",
-    features: [
-      "Tarifs professionnels",
-      "Options flexibles",
-      "Support complet",
-      "Tous les vols"
-    ],
-    color: "from-blue-500 to-blue-600"
-  },
-  {
-    id: "family",
-    name: "Pack Famille",
-    subtitle: "Voyages en famille",
-    icon: <Users className="h-6 w-6" />,
-    price: "70€",
-    priceNote: "par mois",
-    features: [
-      "Réservations groupées",
-      "Tarifs enfants réduits",
-      "Assurance voyage famille",
-      "Activités enfants incluses"
-    ],
-    color: "from-pink-500 to-pink-600"
-  },
-  {
-    id: "business",
-    name: "Business Traveler",
-    subtitle: "Voyageurs fréquents",
-    icon: <Briefcase className="h-6 w-6" />,
-    price: "115€",
-    priceNote: "par mois",
-    features: [
-      "Check-in prioritaire",
-      "Lounge aéroport inclus",
-      "Modifications illimitées",
-      "Conciergerie voyage"
-    ],
-    color: "from-slate-600 to-slate-700"
-  },
-  {
-    id: "student",
-    name: "Évasion Jeunes",
-    subtitle: "Étudiants & -26 ans",
-    icon: <GraduationCap className="h-6 w-6" />,
-    price: "18€",
-    priceNote: "par mois",
-    features: [
-      "Tarifs étudiants exclusifs",
-      "Bagages supplémentaires",
-      "Annulation flexible",
-      "Bons plans destinations"
-    ],
-    color: "from-violet-500 to-violet-600"
-  },
-  {
-    id: "events",
-    name: "Events & MICE",
-    subtitle: "Séminaires & Incentives",
-    icon: <CalendarDays className="h-6 w-6" />,
-    price: "Sur devis",
-    priceNote: "selon groupe",
-    features: [
-      "Organisation complète",
-      "Logistique événementielle",
-      "Hébergement groupe",
-      "Team building inclus"
-    ],
-    color: "from-orange-500 to-orange-600"
-  }
-];
+const ICON_MAP: Record<string, React.ReactNode> = {
+  Building2: <Building2 className="h-6 w-6" />,
+  Crown: <Crown className="h-6 w-6" />,
+  FileCheck: <FileCheck className="h-6 w-6" />,
+  Plane: <Plane className="h-6 w-6" />,
+  Users: <Users className="h-6 w-6" />,
+  Briefcase: <Briefcase className="h-6 w-6" />,
+  GraduationCap: <GraduationCap className="h-6 w-6" />,
+  CalendarDays: <CalendarDays className="h-6 w-6" />,
+  Star: <Star className="h-6 w-6" />,
+  Heart: <Heart className="h-6 w-6" />,
+};
 
 const ITEMS_PER_PAGE = 4;
+
+interface DisplayPlan {
+  id: string;
+  plan_id: string;
+  name: string;
+  subtitle: string | null;
+  icon: React.ReactNode;
+  price: string;
+  priceNote: string | null;
+  features: string[];
+  popular: boolean;
+  color: string;
+}
 
 const FeaturedSubscriptions = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(0);
+  const [plans, setPlans] = useState<DisplayPlan[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [contactForm, setContactForm] = useState({
     name: "",
     email: "",
@@ -181,21 +90,56 @@ const FeaturedSubscriptions = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const totalPages = Math.ceil(subscriptionPlans.length / ITEMS_PER_PAGE);
-  const currentPlans = subscriptionPlans.slice(
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("subscription_plans")
+          .select("*")
+          .eq("is_active", true)
+          .order("sort_order", { ascending: true });
+
+        if (error) throw error;
+        
+        const formattedPlans: DisplayPlan[] = (data || []).map((p: SubscriptionPlanDB) => ({
+          id: p.id,
+          plan_id: p.plan_id,
+          name: p.name,
+          subtitle: p.subtitle,
+          icon: ICON_MAP[p.icon] || <Building2 className="h-6 w-6" />,
+          price: p.price,
+          priceNote: p.price_note,
+          features: p.features || [],
+          popular: p.popular,
+          color: p.color,
+        }));
+        
+        setPlans(formattedPlans);
+      } catch (error) {
+        console.error("Error fetching subscription plans:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPlans();
+  }, []);
+
+  const totalPages = Math.ceil(plans.length / ITEMS_PER_PAGE);
+  const currentPlans = plans.slice(
     currentPage * ITEMS_PER_PAGE,
     (currentPage + 1) * ITEMS_PER_PAGE
   );
 
   const nextPage = () => {
-    setCurrentPage((prev) => (prev + 1) % totalPages);
+    if (totalPages > 0) setCurrentPage((prev) => (prev + 1) % totalPages);
   };
 
   const prevPage = () => {
-    setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
+    if (totalPages > 0) setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
   };
 
-  const handleContactSubmit = async (e: React.FormEvent, plan: SubscriptionPlan) => {
+  const handleContactSubmit = async (e: React.FormEvent, plan: DisplayPlan) => {
     e.preventDefault();
     setIsSubmitting(true);
     
@@ -203,7 +147,7 @@ const FeaturedSubscriptions = () => {
       const { error } = await supabase
         .from("subscription_requests")
         .insert({
-          plan_id: plan.id,
+          plan_id: plan.plan_id,
           plan_name: plan.name,
           name: contactForm.name.trim(),
           email: contactForm.email.trim(),
@@ -242,6 +186,18 @@ const FeaturedSubscriptions = () => {
     const message = encodeURIComponent(`Bonjour, je suis intéressé(e) par l'offre "${planName}" de Bossiz Conciergerie. Pouvez-vous me donner plus d'informations ?`);
     window.open(`https://wa.me/2250700000000?text=${message}`, "_blank");
   };
+
+  if (isLoading) {
+    return (
+      <section className="py-16 md:py-20 lg:py-24 bg-gradient-to-b from-background via-muted/20 to-background relative overflow-hidden w-full">
+        <div className="flex justify-center items-center py-20">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </section>
+    );
+  }
+
+  if (plans.length === 0) return null;
 
   return (
     <section className="py-16 md:py-20 lg:py-24 bg-gradient-to-b from-background via-muted/20 to-background relative overflow-hidden w-full">

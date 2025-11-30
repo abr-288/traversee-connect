@@ -22,19 +22,19 @@ interface ThemeConfig {
 }
 
 const DEFAULT_THEME: ThemeConfig = {
-  primaryColor: "160 84% 39%",
-  secondaryColor: "160 60% 45%",
+  primaryColor: "220 54% 18%",
+  secondaryColor: "220 45% 30%",
   accentColor: "38 92% 50%",
   backgroundColor: "0 0% 100%",
-  foregroundColor: "160 50% 10%",
-  mutedColor: "160 20% 96%",
+  foregroundColor: "220 54% 18%",
+  mutedColor: "220 20% 96%",
   borderRadius: "0.5rem",
   fontHeading: "Poppins",
   fontBody: "Inter",
   darkMode: {
-    backgroundColor: "160 50% 5%",
-    foregroundColor: "160 20% 98%",
-    mutedColor: "160 30% 15%",
+    backgroundColor: "220 54% 8%",
+    foregroundColor: "220 20% 98%",
+    mutedColor: "220 30% 15%",
   },
 };
 

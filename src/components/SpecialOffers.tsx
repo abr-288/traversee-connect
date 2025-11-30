@@ -3,31 +3,77 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LazyImage } from "@/components/ui/lazy-image";
-import { Clock, Percent, MapPin, Star, ArrowRight } from "lucide-react";
+import { Clock, Percent, MapPin, Star, ArrowRight, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useServices } from "@/hooks/useServices";
 import { useNavigate } from "react-router-dom";
 import { BookingDialog } from "@/components/BookingDialog";
 import { Price } from "@/components/ui/price";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Promotion {
+  id: string;
+  name: string;
+  description: string | null;
+  location: string;
+  image_url: string | null;
+  discount: number;
+  original_price: number;
+  currency: string;
+  expires_at: string | null;
+  rating: number;
+  is_active: boolean;
+}
 
 const SpecialOffers = () => {
   const { t } = useTranslation();
-  const { services, loading } = useServices();
   const navigate = useNavigate();
   const [selectedService, setSelectedService] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [promotions, setPromotions] = useState<Promotion[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Simuler des offres spéciales avec réduction
-  const specialOffers = services
-    .filter(s => s.featured)
-    .slice(0, 3)
-    .map(service => ({
-      ...service,
-      discount: Math.floor(Math.random() * 30) + 10, // 10-40% de réduction
-      expiresIn: Math.floor(Math.random() * 7) + 1 // 1-7 jours
-    }));
+  useEffect(() => {
+    const fetchPromotions = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("promotions")
+          .select("*")
+          .eq("is_active", true)
+          .order("created_at", { ascending: false })
+          .limit(3);
 
-  if (loading || specialOffers.length === 0) return null;
+        if (error) throw error;
+        setPromotions((data as Promotion[]) || []);
+      } catch (error) {
+        console.error("Error fetching promotions:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPromotions();
+  }, []);
+
+  const calculateDaysUntilExpiry = (expiresAt: string | null): number => {
+    if (!expiresAt) return 7; // Default 7 days if no expiry
+    const now = new Date();
+    const expiry = new Date(expiresAt);
+    const diffTime = expiry.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return Math.max(1, diffDays);
+  };
+
+  if (isLoading) {
+    return (
+      <section className="py-20 md:py-24 lg:py-28 bg-gradient-to-br from-primary/5 via-secondary/5 to-background relative overflow-hidden w-full">
+        <div className="flex justify-center items-center py-20">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </section>
+    );
+  }
+
+  if (promotions.length === 0) return null;
 
   return (
     <>
@@ -65,92 +111,97 @@ const SpecialOffers = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
-            {specialOffers.map((offer, index) => (
-              <Card
-                key={offer.id}
-                className="group relative overflow-hidden border-2 border-border/50 hover:border-secondary shadow-2xl hover:shadow-glow transition-all duration-500 animate-slide-up-fade hover-lift rounded-3xl bg-gradient-card"
-                style={{ animationDelay: `${index * 0.15}s` }}
-              >
-                {/* Shine overlay */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20">
-                  <div className="absolute inset-0 animate-shimmer" />
-                </div>
-                
-                <div className="absolute top-6 right-6 z-10">
-                  <Badge className="gradient-primary text-white text-xl px-6 py-3 shadow-glow border-0 font-bold animate-pulse-glow">
-                    -{offer.discount}%
-                  </Badge>
-                </div>
-
-                <div className="relative h-72 overflow-hidden rounded-t-3xl">
-                  <LazyImage
-                    src={offer.image_url || offer.images?.[0] || '/placeholder.svg'}
-                    alt={`Offre spéciale ${offer.name} à ${offer.location} avec -${offer.discount}% de réduction`}
-                    className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:rotate-2"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            {promotions.map((promo, index) => {
+              const daysLeft = calculateDaysUntilExpiry(promo.expires_at);
+              const discountedPrice = Number(promo.original_price) * (1 - promo.discount / 100);
+              
+              return (
+                <Card
+                  key={promo.id}
+                  className="group relative overflow-hidden border-2 border-border/50 hover:border-secondary shadow-2xl hover:shadow-glow transition-all duration-500 animate-slide-up-fade hover-lift rounded-3xl bg-gradient-card"
+                  style={{ animationDelay: `${index * 0.15}s` }}
+                >
+                  {/* Shine overlay */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20">
+                    <div className="absolute inset-0 animate-shimmer" />
+                  </div>
                   
-                  {/* Floating icon */}
-                  <div className="absolute bottom-6 left-6 w-16 h-16 glass rounded-2xl flex items-center justify-center animate-float">
-                    <MapPin className="w-8 h-8 text-white" />
+                  <div className="absolute top-6 right-6 z-10">
+                    <Badge className="gradient-primary text-white text-xl px-6 py-3 shadow-glow border-0 font-bold animate-pulse-glow">
+                      -{promo.discount}%
+                    </Badge>
                   </div>
-                </div>
 
-                <CardContent className="p-6 relative -mt-20 z-10">
-                  <div className="bg-background/95 backdrop-blur-sm rounded-lg p-4 mb-4">
-                    <h3 className="text-xl font-bold text-foreground mb-2 line-clamp-2">
-                      {offer.name}
-                    </h3>
-                    <div className="flex items-center gap-2 text-muted-foreground mb-3">
-                      <MapPin className="w-4 h-4" />
-                      <span className="text-sm">{offer.location}</span>
+                  <div className="relative h-72 overflow-hidden rounded-t-3xl">
+                    <LazyImage
+                      src={promo.image_url || '/placeholder.svg'}
+                      alt={`Offre spéciale ${promo.name} à ${promo.location} avec -${promo.discount}% de réduction`}
+                      className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:rotate-2"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                    
+                    {/* Floating icon */}
+                    <div className="absolute bottom-6 left-6 w-16 h-16 glass rounded-2xl flex items-center justify-center animate-float">
+                      <MapPin className="w-8 h-8 text-white" />
                     </div>
-
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 fill-secondary text-secondary" />
-                        <span className="font-semibold text-sm">{Number(offer.rating || 0).toFixed(1)}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-secondary">
-                        <Clock className="w-4 h-4" />
-                        <span className="text-sm font-medium">{t('offers.expiresIn')} {offer.expiresIn}j</span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-baseline gap-2 mb-4">
-                      <span className="text-2xl font-bold text-primary">
-                        <Price 
-                          amount={Number(offer.price_per_unit) * (1 - offer.discount / 100)} 
-                          fromCurrency={offer.currency}
-                          showLoader 
-                        />
-                      </span>
-                      <span className="text-sm text-muted-foreground line-through">
-                        <Price amount={Number(offer.price_per_unit)} fromCurrency={offer.currency} />
-                      </span>
-                    </div>
-
-                    <Button
-                      className="w-full gap-2 gradient-primary shadow-primary"
-                      onClick={() => {
-                        setSelectedService({
-                          id: offer.id,
-                          name: offer.name,
-                          price_per_unit: Number(offer.price_per_unit) * (1 - offer.discount / 100),
-                          currency: offer.currency,
-                          type: offer.type,
-                          location: offer.location
-                        });
-                        setDialogOpen(true);
-                      }}
-                    >
-                      {t('offers.bookNow')}
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+
+                  <CardContent className="p-6 relative -mt-20 z-10">
+                    <div className="bg-background/95 backdrop-blur-sm rounded-lg p-4 mb-4">
+                      <h3 className="text-xl font-bold text-foreground mb-2 line-clamp-2">
+                        {promo.name}
+                      </h3>
+                      <div className="flex items-center gap-2 text-muted-foreground mb-3">
+                        <MapPin className="w-4 h-4" />
+                        <span className="text-sm">{promo.location}</span>
+                      </div>
+
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-1">
+                          <Star className="w-4 h-4 fill-secondary text-secondary" />
+                          <span className="font-semibold text-sm">{Number(promo.rating || 0).toFixed(1)}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-secondary">
+                          <Clock className="w-4 h-4" />
+                          <span className="text-sm font-medium">{t('offers.expiresIn')} {daysLeft}j</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-baseline gap-2 mb-4">
+                        <span className="text-2xl font-bold text-primary">
+                          <Price 
+                            amount={discountedPrice} 
+                            fromCurrency={promo.currency}
+                            showLoader 
+                          />
+                        </span>
+                        <span className="text-sm text-muted-foreground line-through">
+                          <Price amount={Number(promo.original_price)} fromCurrency={promo.currency} />
+                        </span>
+                      </div>
+
+                      <Button
+                        className="w-full gap-2 gradient-primary shadow-primary"
+                        onClick={() => {
+                          setSelectedService({
+                            id: promo.id,
+                            name: promo.name,
+                            price_per_unit: discountedPrice,
+                            currency: promo.currency,
+                            type: "hotel",
+                            location: promo.location
+                          });
+                          setDialogOpen(true);
+                        }}
+                      >
+                        {t('offers.bookNow')}
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
       </section>
