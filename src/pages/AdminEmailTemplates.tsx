@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { useEmailTemplates, EmailTemplate } from "@/hooks/useEmailTemplates";
 import { useUserRole } from "@/hooks/useUserRole";
-import { Mail, Plus, Edit, Trash2, Eye } from "lucide-react";
+import { Mail, Plus, Edit, Trash2, Eye, Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const AdminEmailTemplates = () => {
@@ -84,9 +83,11 @@ const AdminEmailTemplates = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Chargement...</p>
-      </div>
+      <AdminLayout>
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </AdminLayout>
     );
   }
 
@@ -95,15 +96,13 @@ const AdminEmailTemplates = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Gestion des Templates d'Emails</h1>
-          <p className="text-muted-foreground">Personnalisez les emails envoyés par l'application</p>
-        </div>
-
-        <div className="flex justify-end mb-6">
+    <AdminLayout>
+      <div className="space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold">Templates d'Emails</h1>
+            <p className="text-muted-foreground">Personnalisez les emails envoyés par l'application</p>
+          </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button onClick={() => setSelectedTemplate(null)}>
@@ -203,7 +202,7 @@ const AdminEmailTemplates = () => {
         </div>
 
         <Tabs defaultValue="all" className="w-full">
-          <TabsList className="mb-4">
+          <TabsList className="mb-4 flex-wrap">
             <TabsTrigger value="all">Tous</TabsTrigger>
             {templateTypes.map((type) => (
               <TabsTrigger key={type.value} value={type.value}>
@@ -219,7 +218,7 @@ const AdminEmailTemplates = () => {
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <CardTitle className="flex items-center gap-2">
+                        <CardTitle className="flex items-center gap-2 text-base">
                           <Mail className="h-5 w-5" />
                           {template.name}
                         </CardTitle>
@@ -277,7 +276,7 @@ const AdminEmailTemplates = () => {
                     <Card key={template.id}>
                       <CardHeader>
                         <div className="flex items-start justify-between">
-                          <CardTitle className="flex items-center gap-2">
+                          <CardTitle className="flex items-center gap-2 text-base">
                             <Mail className="h-5 w-5" />
                             {template.name}
                           </CardTitle>
@@ -353,9 +352,8 @@ const AdminEmailTemplates = () => {
             </div>
           </DialogContent>
         </Dialog>
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </AdminLayout>
   );
 };
 
