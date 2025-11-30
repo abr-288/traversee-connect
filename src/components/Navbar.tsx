@@ -19,6 +19,7 @@ import logoDark from "@/assets/logo-dark.png";
 import logoLight from "@/assets/logo-light.png";
 import LanguageSwitcher from "./LanguageSwitcher";
 import CurrencySelector from "./CurrencySelector";
+import DarkModeToggle from "./DarkModeToggle";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -205,6 +206,7 @@ const Navbar = () => {
                 {t("nav.support")}
               </Link>
               
+              <DarkModeToggle variant="compact" className="text-white hover:bg-white/10" />
               <LanguageSwitcher />
             </div>
           </div>
@@ -314,6 +316,10 @@ const Navbar = () => {
               </div>
               
               <div className="flex flex-col gap-3 px-4 pb-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-white/80">{t("common.toggleTheme")}</span>
+                  <DarkModeToggle className="text-white" />
+                </div>
                 <LanguageSwitcher />
                 <CurrencySelector />
               </div>

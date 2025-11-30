@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Loader2, Save, Palette, RotateCcw } from "lucide-react";
+import { Loader2, Save, Palette, RotateCcw, Moon } from "lucide-react";
 import { useTheme, AVAILABLE_FONTS } from "@/contexts/ThemeContext";
 import { useToast } from "@/hooks/use-toast";
 
@@ -299,6 +299,98 @@ export function ThemeConfig() {
                 <Input
                   value={localTheme.mutedColor}
                   onChange={(e) => setLocalTheme((prev) => ({ ...prev, mutedColor: e.target.value }))}
+                  className="flex-1"
+                />
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Dark Mode Colors */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Moon className="h-5 w-5" />
+            Couleurs du mode sombre
+          </CardTitle>
+          <CardDescription>Personnalisez les couleurs pour le mode sombre</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="space-y-2">
+              <Label>Arrière-plan (sombre)</Label>
+              <div className="flex gap-2">
+                <Input
+                  type="color"
+                  value={hslToHex(localTheme.darkMode?.backgroundColor || "160 50% 5%")}
+                  onChange={(e) => {
+                    const hsl = hexToHsl(e.target.value);
+                    setLocalTheme((prev) => ({
+                      ...prev,
+                      darkMode: { ...prev.darkMode, backgroundColor: hsl }
+                    }));
+                  }}
+                  className="w-16 h-10 p-1 cursor-pointer"
+                />
+                <Input
+                  value={localTheme.darkMode?.backgroundColor || ""}
+                  onChange={(e) => setLocalTheme((prev) => ({
+                    ...prev,
+                    darkMode: { ...prev.darkMode, backgroundColor: e.target.value }
+                  }))}
+                  className="flex-1"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Texte (sombre)</Label>
+              <div className="flex gap-2">
+                <Input
+                  type="color"
+                  value={hslToHex(localTheme.darkMode?.foregroundColor || "160 20% 98%")}
+                  onChange={(e) => {
+                    const hsl = hexToHsl(e.target.value);
+                    setLocalTheme((prev) => ({
+                      ...prev,
+                      darkMode: { ...prev.darkMode, foregroundColor: hsl }
+                    }));
+                  }}
+                  className="w-16 h-10 p-1 cursor-pointer"
+                />
+                <Input
+                  value={localTheme.darkMode?.foregroundColor || ""}
+                  onChange={(e) => setLocalTheme((prev) => ({
+                    ...prev,
+                    darkMode: { ...prev.darkMode, foregroundColor: e.target.value }
+                  }))}
+                  className="flex-1"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Atténué (sombre)</Label>
+              <div className="flex gap-2">
+                <Input
+                  type="color"
+                  value={hslToHex(localTheme.darkMode?.mutedColor || "160 30% 15%")}
+                  onChange={(e) => {
+                    const hsl = hexToHsl(e.target.value);
+                    setLocalTheme((prev) => ({
+                      ...prev,
+                      darkMode: { ...prev.darkMode, mutedColor: hsl }
+                    }));
+                  }}
+                  className="w-16 h-10 p-1 cursor-pointer"
+                />
+                <Input
+                  value={localTheme.darkMode?.mutedColor || ""}
+                  onChange={(e) => setLocalTheme((prev) => ({
+                    ...prev,
+                    darkMode: { ...prev.darkMode, mutedColor: e.target.value }
+                  }))}
                   className="flex-1"
                 />
               </div>
