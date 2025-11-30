@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { SiteConfigProvider } from "@/contexts/SiteConfigContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { Loader2 } from "lucide-react";
 import { NotificationPrompt } from "@/components/NotificationPrompt";
@@ -63,58 +64,60 @@ const PageLoader = () => (
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
-      <SiteConfigProvider>
-        <CurrencyProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <NotificationPrompt />
-            <BrowserRouter>
-              <Suspense fallback={<PageLoader />}>
-                <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/home" element={<Index />} />
-              <Route path="/flights" element={<Flights />} />
-              <Route path="/hotels" element={<Hotels />} />
-              <Route path="/cars" element={<Cars />} />
-              <Route path="/tours" element={<Tours />} />
-              <Route path="/destinations" element={<Destinations />} />
-              <Route path="/destinations/:id" element={<DestinationDetail />} />
-              <Route path="/activities" element={<Activities />} />
-              <Route path="/stays" element={<Stays />} />
-              <Route path="/events" element={<Events />} />
-              <Route path="/trains" element={<Trains />} />
-              <Route path="/flight-hotel" element={<FlightHotel />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/booking-history" element={<BookingHistory />} />
-              <Route path="/account" element={<Account />} />
-              <Route path="/payment" element={<Payment />} />
-              <Route path="/confirmation" element={<Confirmation />} />
-              <Route path="/flight-comparison" element={<FlightComparison />} />
-              <Route path="/booking-process" element={<FlightBookingProcess />} />
-              <Route path="/booking/:serviceType" element={<UnifiedBookingProcess />} />
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/bookings" element={<AdminBookings />} />
-              <Route path="/admin/services" element={<AdminServices />} />
-              <Route path="/admin/activities" element={<AdminActivities />} />
-              <Route path="/admin/stays" element={<AdminStays />} />
-              <Route path="/admin/users" element={<AdminUsers />} />
-              <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
-              <Route path="/admin/email-templates" element={<AdminEmailTemplates />} />
-              <Route path="/admin/configuration" element={<AdminConfiguration />} />
-              <Route path="/help" element={<Help />} />
-              <Route path="/support" element={<Support />} />
-              <Route path="/install" element={<Install />} />
-              <Route path="/price-alerts" element={<PriceAlerts />} />
-              <Route path="/subscriptions" element={<Subscriptions />} />
-              <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Suspense>
-            </BrowserRouter>
-          </TooltipProvider>
-        </CurrencyProvider>
-      </SiteConfigProvider>
+      <ThemeProvider>
+        <SiteConfigProvider>
+          <CurrencyProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <NotificationPrompt />
+              <BrowserRouter>
+                <Suspense fallback={<PageLoader />}>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/home" element={<Index />} />
+                    <Route path="/flights" element={<Flights />} />
+                    <Route path="/hotels" element={<Hotels />} />
+                    <Route path="/cars" element={<Cars />} />
+                    <Route path="/tours" element={<Tours />} />
+                    <Route path="/destinations" element={<Destinations />} />
+                    <Route path="/destinations/:id" element={<DestinationDetail />} />
+                    <Route path="/activities" element={<Activities />} />
+                    <Route path="/stays" element={<Stays />} />
+                    <Route path="/events" element={<Events />} />
+                    <Route path="/trains" element={<Trains />} />
+                    <Route path="/flight-hotel" element={<FlightHotel />} />
+                    <Route path="/auth" element={<Auth />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/booking-history" element={<BookingHistory />} />
+                    <Route path="/account" element={<Account />} />
+                    <Route path="/payment" element={<Payment />} />
+                    <Route path="/confirmation" element={<Confirmation />} />
+                    <Route path="/flight-comparison" element={<FlightComparison />} />
+                    <Route path="/booking-process" element={<FlightBookingProcess />} />
+                    <Route path="/booking/:serviceType" element={<UnifiedBookingProcess />} />
+                    <Route path="/admin" element={<AdminDashboard />} />
+                    <Route path="/admin/bookings" element={<AdminBookings />} />
+                    <Route path="/admin/services" element={<AdminServices />} />
+                    <Route path="/admin/activities" element={<AdminActivities />} />
+                    <Route path="/admin/stays" element={<AdminStays />} />
+                    <Route path="/admin/users" element={<AdminUsers />} />
+                    <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
+                    <Route path="/admin/email-templates" element={<AdminEmailTemplates />} />
+                    <Route path="/admin/configuration" element={<AdminConfiguration />} />
+                    <Route path="/help" element={<Help />} />
+                    <Route path="/support" element={<Support />} />
+                    <Route path="/install" element={<Install />} />
+                    <Route path="/price-alerts" element={<PriceAlerts />} />
+                    <Route path="/subscriptions" element={<Subscriptions />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </Suspense>
+              </BrowserRouter>
+            </TooltipProvider>
+          </CurrencyProvider>
+        </SiteConfigProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   </ErrorBoundary>
 );
