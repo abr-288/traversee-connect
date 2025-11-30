@@ -9,8 +9,9 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, Plus, Trash2, Globe, Mail, Palette, Settings, FileText, CreditCard } from "lucide-react";
+import { Loader2, Save, Plus, Trash2, Globe, Mail, Palette, Settings, FileText, CreditCard, Paintbrush } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ThemeConfig } from "@/components/admin/ThemeConfig";
 
 interface ConfigItem {
   id: string;
@@ -107,8 +108,12 @@ export default function AdminConfiguration() {
           </p>
         </div>
 
-        <Tabs defaultValue="branding" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6">
+        <Tabs defaultValue="theme" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7">
+            <TabsTrigger value="theme" className="flex items-center gap-2">
+              <Paintbrush className="h-4 w-4" />
+              <span className="hidden sm:inline">Thème</span>
+            </TabsTrigger>
             <TabsTrigger value="branding" className="flex items-center gap-2">
               <Palette className="h-4 w-4" />
               <span className="hidden sm:inline">Marque</span>
@@ -134,6 +139,11 @@ export default function AdminConfiguration() {
               <span className="hidden sm:inline">Footer</span>
             </TabsTrigger>
           </TabsList>
+
+          {/* Theme Tab */}
+          <TabsContent value="theme" className="space-y-4">
+            <ThemeConfig />
+          </TabsContent>
 
           {/* Branding Tab */}
           <TabsContent value="branding" className="space-y-4">
