@@ -419,6 +419,54 @@ export type Database = {
         }
         Relationships: []
       }
+      promotions: {
+        Row: {
+          created_at: string | null
+          currency: string | null
+          description: string | null
+          discount: number
+          expires_at: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          location: string
+          name: string
+          original_price: number
+          rating: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          discount: number
+          expires_at?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          location: string
+          name: string
+          original_price: number
+          rating?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          discount?: number
+          expires_at?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          location?: string
+          name?: string
+          original_price?: number
+          rating?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       push_subscriptions: {
         Row: {
           auth: string
@@ -641,6 +689,57 @@ export type Database = {
           reviews?: number | null
           type?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      subscription_plans: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          features: string[] | null
+          icon: string
+          id: string
+          is_active: boolean | null
+          name: string
+          plan_id: string
+          popular: boolean | null
+          price: string
+          price_note: string | null
+          sort_order: number | null
+          subtitle: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          features?: string[] | null
+          icon?: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          plan_id: string
+          popular?: boolean | null
+          price: string
+          price_note?: string | null
+          sort_order?: number | null
+          subtitle?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          features?: string[] | null
+          icon?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          plan_id?: string
+          popular?: boolean | null
+          price?: string
+          price_note?: string | null
+          sort_order?: number | null
+          subtitle?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
