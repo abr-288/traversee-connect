@@ -88,6 +88,14 @@ const Hotels = () => {
     });
 
     if (result?.success) {
+      // Check if data is from mock or real APIs
+      const isMockData = result.mock === true;
+      
+      if (isMockData) {
+        console.warn('⚠️ Displaying MOCK hotel data - APIs did not return results');
+        toast.warning("Aucune donnée réelle disponible. Affichage de suggestions d'exemple.");
+      }
+      
       // Transform API data to match display structure with source tracking
       const bookingHotels = (result.data?.booking || []).map((hotel: any) => {
         const price = typeof hotel.price === 'object' && hotel.price?.grandTotal 
@@ -241,9 +249,11 @@ const Hotels = () => {
       
       if (transformedHotels.length > 0) {
         setApiHotels(transformedHotels);
-        toast.success(`${transformedHotels.length} hébergements trouvés avec prix réels`);
+        const sources = Array.from(new Set(transformedHotels.map((h: any) => h.source)));
+        toast.success(`${transformedHotels.length} hébergements trouvés depuis ${sources.length} source(s) API: ${sources.join(', ')}`);
       } else {
-        toast.error("Aucun hébergement trouvé pour cette recherche");
+        setApiHotels([]);
+        toast.error("Aucun hébergement disponible pour cette recherche. Les API n'ont retourné aucun résultat.");
       }
     } else {
       toast.error("Erreur lors de la recherche d'hôtels");
@@ -315,17 +325,19 @@ const Hotels = () => {
 
   // Get unique amenities from hotels for filter
   const availableAmenities = useMemo(() => {
-    const displayHotels = apiHotels.length > 0 ? apiHotels : hotels;
+    const displayHotels = apiHotels.length > 0 ? apiHotels : (hasSearched ? [] : hotels);
     const amenitiesSet = new Set<string>();
     displayHotels.forEach(hotel => {
       hotel.amenities.forEach((amenity: string) => amenitiesSet.add(amenity));
     });
     return Array.from(amenitiesSet).sort();
-  }, [apiHotels]);
+  }, [apiHotels, hasSearched]);
 
   // Filter and sort hotels
   const filteredAndSortedHotels = useMemo(() => {
-    let result = apiHotels.length > 0 ? [...apiHotels] : [...hotels];
+    // If search was performed, ONLY show API results (never fallback to static data)
+    // If no search, show static hotels as suggestions
+    let result = apiHotels.length > 0 ? [...apiHotels] : (hasSearched ? [] : [...hotels]);
 
     // Apply destination filter
     if (filterDestination) {
@@ -618,6 +630,31 @@ const Hotels = () => {
               </div>
             )}
             
+            {/* Data Source Indicator */}
+            {apiHotels.length === 0 && !hasSearched && filteredAndSortedHotels.length > 0 && (
+              <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4">
+                <div className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
+                  <Hotel className="w-5 h-5" />
+                  <span className="font-medium">Suggestions d'hébergements à Abidjan</span>
+                </div>
+                <p className="text-sm text-blue-600 dark:text-blue-400 mt-1">
+                  Utilisez le formulaire de recherche ci-dessus pour voir les prix réels et la disponibilité en temps réel.
+                </p>
+              </div>
+            )}
+
+            {apiHotels.length > 0 && (
+              <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-4">
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                  <Globe className="w-5 h-5" />
+                  <span className="font-medium">Données réelles en temps réel</span>
+                </div>
+                <p className="text-sm text-green-600 dark:text-green-400 mt-1">
+                  Prix et disponibilité actualisés depuis {new Set(apiHotels.map((h: any) => h.source)).size} source(s): {Array.from(new Set(apiHotels.map((h: any) => h.source))).join(', ')}
+                </p>
+              </div>
+            )}
+
             {/* Desktop Header */}
             <div className="hidden lg:flex justify-between items-center">
               <p className="text-muted-foreground">
