@@ -1,15 +1,23 @@
 import { motion } from "framer-motion";
-import { Plane, User, Briefcase, Armchair, CreditCard, Calendar, Clock, MapPin } from "lucide-react";
+import { Plane, User, Briefcase, Armchair, CreditCard, Calendar, Clock, MapPin, LogIn } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { UnifiedSubmitButton } from "@/components/forms/UnifiedSubmitButton";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCreateBooking } from "@/hooks/useCreateBooking";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Price } from "@/components/ui/price";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface Passenger {
   firstName: string;
@@ -65,8 +73,19 @@ export const SummaryStep = ({
   onBack,
 }: SummaryStepProps) => {
   const [paymentMethod, setPaymentMethod] = useState<"mobile" | "card">("mobile");
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { createBooking, loading } = useCreateBooking();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setIsAuthenticated(!!user);
+  };
 
   const getOptionsPrice = () => {
     const optionPrices: Record<string, number> = {
@@ -109,6 +128,14 @@ export const SummaryStep = ({
   };
 
   const handlePayment = async () => {
+    // Vérifier si l'utilisateur est connecté
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      setShowLoginDialog(true);
+      return;
+    }
+
     try {
       const bookingId = await createBooking({
         service_type: serviceType as any,
@@ -121,8 +148,8 @@ export const SummaryStep = ({
         total_price: getTotalPrice(),
         currency: "EUR",
         customer_name: `${passengers[0].firstName} ${passengers[0].lastName}`,
-        customer_email: "client@example.com", // À récupérer du formulaire
-        customer_phone: "+225 00 00 00 00", // À récupérer du formulaire
+        customer_email: user.email || "client@example.com",
+        customer_phone: "+225 00 00 00 00",
         passengers: passengers.map((p) => ({
           first_name: p.firstName,
           last_name: p.lastName,
@@ -145,6 +172,25 @@ export const SummaryStep = ({
     } catch (error) {
       console.error("Erreur lors de la création de la réservation:", error);
     }
+  };
+
+  const handleLoginRedirect = () => {
+    // Sauvegarder l'état de la réservation en cours
+    sessionStorage.setItem('pendingBooking', JSON.stringify({
+      flightData,
+      serviceType,
+      serviceName,
+      servicePrice,
+      serviceLocation,
+      startDate,
+      endDate,
+      passengers,
+      selectedOptions,
+      selectedPreferences,
+      adultsCount,
+      childrenCount,
+    }));
+    navigate('/auth');
   };
 
   return (
@@ -402,6 +448,45 @@ export const SummaryStep = ({
           </Card>
         </div>
       </div>
+
+      {/* Dialog de connexion */}
+      <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <LogIn className="h-5 w-5 text-primary" />
+              Connexion requise
+            </DialogTitle>
+            <DialogDescription>
+              Vous devez être connecté pour procéder au paiement de votre réservation.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <p className="text-sm text-muted-foreground">
+              En vous connectant, vous pourrez :
+            </p>
+            <ul className="text-sm space-y-2 text-muted-foreground">
+              <li className="flex items-center gap-2">
+                <span className="text-primary">✓</span> Suivre vos réservations
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-primary">✓</span> Recevoir vos confirmations par email
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-primary">✓</span> Gérer vos voyages facilement
+              </li>
+            </ul>
+            <div className="flex gap-3 pt-4">
+              <Button variant="outline" onClick={() => setShowLoginDialog(false)} className="flex-1">
+                Annuler
+              </Button>
+              <Button onClick={handleLoginRedirect} className="flex-1">
+                Se connecter
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 };

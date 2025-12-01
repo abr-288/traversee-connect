@@ -376,7 +376,7 @@ export default function Payment() {
                 </>
               )}
               
-              {/* Dates */}
+              {/* Dates - Ne pas afficher date de fin pour vols aller simple */}
               <div className="flex justify-between items-start">
                 <span className="text-muted-foreground">Date de début:</span>
                 <span className="font-medium text-right">
@@ -388,7 +388,7 @@ export default function Payment() {
                 </span>
               </div>
               
-              {booking.end_date && (
+              {booking.end_date && booking.end_date !== booking.start_date && booking.services?.type !== 'flight' && (
                 <div className="flex justify-between items-start">
                   <span className="text-muted-foreground">Date de fin:</span>
                   <span className="font-medium text-right">

@@ -90,6 +90,22 @@ export const BaggageStep = ({
         </p>
       </div>
 
+      {/* Info franchise bagage compagnie */}
+      <Card className="p-4 border-2 border-blue-200 bg-blue-50/50 dark:bg-blue-950/20 dark:border-blue-800">
+        <div className="flex items-start gap-3">
+          <Briefcase className="h-5 w-5 text-blue-600 mt-0.5" />
+          <div>
+            <h4 className="font-semibold text-blue-800 dark:text-blue-300 mb-1">
+              Franchise bagage incluse
+            </h4>
+            <p className="text-sm text-blue-700 dark:text-blue-400">
+              Votre billet inclut <strong>1 bagage cabine de 7kg</strong> (40×30×20cm). 
+              Les bagages en soute supplémentaires peuvent être ajoutés ci-dessous selon vos besoins.
+            </p>
+          </div>
+        </div>
+      </Card>
+
       <div className="grid grid-cols-1 gap-6">
         {/* Bagages cabine */}
         <div className="space-y-4">

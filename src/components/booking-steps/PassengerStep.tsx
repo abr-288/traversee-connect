@@ -1,10 +1,9 @@
 import { motion } from "framer-motion";
-import { User, Users, Calendar, Globe } from "lucide-react";
+import { User, Users, Calendar, Globe, FileText } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { passengersFormSchema } from "@/lib/validation";
 import { z } from "zod";
-import { CountryCodeSelect } from "@/components/CountryCodeSelect";
+import { NationalitySelect } from "@/components/NationalitySelect";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -27,7 +26,66 @@ interface Passenger {
   nationality: string;
   documentType: "passport" | "id_card";
   documentNumber: string;
+  documentIssueDate?: string;
+  documentExpiryDate?: string;
 }
+
+// Schema de validation des passagers avec dates de document
+const passengerSchema = z.object({
+  firstName: z.string()
+    .trim()
+    .min(2, "Le prénom doit contenir au moins 2 caractères")
+    .max(50, "Le prénom doit contenir moins de 50 caractères")
+    .regex(/^[a-zA-ZÀ-ÿ\s\-']+$/, "Le prénom ne peut contenir que des lettres"),
+  lastName: z.string()
+    .trim()
+    .min(2, "Le nom doit contenir au moins 2 caractères")
+    .max(50, "Le nom doit contenir moins de 50 caractères")
+    .regex(/^[a-zA-ZÀ-ÿ\s\-']+$/, "Le nom ne peut contenir que des lettres"),
+  dateOfBirth: z.string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "La date doit être au format AAAA-MM-JJ")
+    .refine((date) => {
+      const birthDate = new Date(date);
+      const today = new Date();
+      const age = today.getFullYear() - birthDate.getFullYear();
+      return age >= 0 && age <= 120;
+    }, "Date de naissance invalide"),
+  nationality: z.string()
+    .trim()
+    .min(2, "La nationalité est requise"),
+  documentType: z.enum(["passport", "id_card"], {
+    errorMap: () => ({ message: "Type de document invalide" }),
+  }),
+  documentNumber: z.string()
+    .trim()
+    .min(5, "Le numéro de document doit contenir au moins 5 caractères")
+    .max(30, "Le numéro de document doit contenir moins de 30 caractères")
+    .regex(/^[A-Z0-9\-]+$/i, "Le numéro ne peut contenir que des lettres, chiffres et tirets"),
+  documentIssueDate: z.string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "La date doit être au format AAAA-MM-JJ")
+    .optional()
+    .or(z.literal("")),
+  documentExpiryDate: z.string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "La date doit être au format AAAA-MM-JJ")
+    .refine((date) => {
+      if (!date) return true;
+      const expiryDate = new Date(date);
+      const today = new Date();
+      // Le document doit être valide au moins 6 mois après la date du voyage
+      const sixMonthsFromNow = new Date();
+      sixMonthsFromNow.setMonth(sixMonthsFromNow.getMonth() + 6);
+      return expiryDate > sixMonthsFromNow;
+    }, "Le document doit être valide au moins 6 mois après le voyage")
+    .optional()
+    .or(z.literal("")),
+});
+
+const passengersFormSchema = z.object({
+  passengers: z.array(passengerSchema).min(1, "Au moins un passager est requis"),
+  termsAccepted: z.boolean().refine((val) => val === true, {
+    message: "Vous devez accepter les conditions générales",
+  }),
+});
 
 interface PassengerStepProps {
   passengers: Passenger[];
@@ -62,6 +120,8 @@ export const PassengerStep = ({
         nationality: "",
         documentType: "passport",
         documentNumber: "",
+        documentIssueDate: "",
+        documentExpiryDate: "",
       }),
       termsAccepted: false,
     },
@@ -204,7 +264,7 @@ export const PassengerStep = ({
                   <FormItem>
                     <FormLabel>Nationalité *</FormLabel>
                     <FormControl>
-                      <CountryCodeSelect
+                      <NationalitySelect
                         value={field.value}
                         onValueChange={field.onChange}
                       />
@@ -249,6 +309,48 @@ export const PassengerStep = ({
                       <Input
                         {...field}
                         placeholder="Ex: 123456789"
+                        className="h-12 border-2"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="passengers.0.documentIssueDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-primary" />
+                      Date d'émission
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="date"
+                        className="h-12 border-2"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="passengers.0.documentExpiryDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-primary" />
+                      Date d'expiration *
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="date"
                         className="h-12 border-2"
                       />
                     </FormControl>
@@ -346,7 +448,7 @@ export const PassengerStep = ({
                         <FormItem>
                           <FormLabel>Nationalité *</FormLabel>
                           <FormControl>
-                            <CountryCodeSelect
+                            <NationalitySelect
                               value={field.value}
                               onValueChange={field.onChange}
                             />
@@ -428,7 +530,7 @@ export const PassengerStep = ({
           <div className="mt-8">
             <Button
               type="submit"
-              className="w-full h-14 text-lg font-semibold bg-primary hover:bg-primary/90"
+              className="w-full h-14 text-lg font-semibold bg-primary hover:bg-primary/90 text-primary-foreground"
               disabled={form.formState.isSubmitting}
             >
               {form.formState.isSubmitting ? "Vérification..." : getNextButtonText()}
