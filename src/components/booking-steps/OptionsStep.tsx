@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { UnifiedSubmitButton } from "@/components/forms/UnifiedSubmitButton";
 import { Price } from "@/components/ui/price";
+import { BaggageInfo } from "./BaggageInfo";
+import { getBaggageAllowance } from "@/utils/baggageUtils";
 
 interface Option {
   id: string;
@@ -22,6 +24,9 @@ interface OptionsStepProps {
   guestsCount: number;
   onNext: () => void;
   onBack: () => void;
+  airline?: string;
+  fareType?: string;
+  cabinClass?: string;
 }
 
 export const OptionsStep = ({
@@ -31,19 +36,30 @@ export const OptionsStep = ({
   guestsCount,
   onNext,
   onBack,
+  airline,
+  fareType = "basic",
+  cabinClass = "ECONOMY",
 }: OptionsStepProps) => {
   
   const getOptionsForService = (): { title: string; subtitle: string; options: Option[] } => {
     switch (serviceType) {
       case "flight":
+        // Get real baggage allowance for the airline
+        const allowance = getBaggageAllowance(airline || "Air France", fareType, cabinClass);
+        const additionalBagPrice = allowance.additionalBagPrice || 30;
+        
         return {
           title: "Sélection des bagages",
-          subtitle: `Ajoutez des bagages pour votre voyage (${guestsCount} passager${guestsCount > 1 ? "s" : ""})`,
+          subtitle: `Ajoutez des bagages supplémentaires pour votre voyage (${guestsCount} passager${guestsCount > 1 ? "s" : ""})`,
           options: [
-            { id: "cabin-small", name: "Bagage cabine 7kg", description: "40x30x20cm - Inclus", price: 0, included: true, icon: <Briefcase className="h-5 w-5" /> },
-            { id: "cabin-large", name: "Bagage cabine 10kg", description: "55x40x23cm", price: 15000, included: false, icon: <Briefcase className="h-5 w-5" /> },
-            { id: "checked-20", name: "Bagage soute 20kg", description: "55x40x23cm", price: 25000, included: false, icon: <Briefcase className="h-5 w-5" /> },
-            { id: "checked-30", name: "Bagage soute 30kg", description: "75x50x30cm", price: 40000, included: false, icon: <Briefcase className="h-5 w-5" /> },
+            { 
+              id: "checked-additional", 
+              name: `Bagage soute supplémentaire ${allowance.checked.weightKg}kg`, 
+              description: "Valise enregistrée en soute", 
+              price: additionalBagPrice, 
+              included: false, 
+              icon: <Briefcase className="h-5 w-5" /> 
+            },
           ],
         };
       case "hotel":
@@ -131,6 +147,15 @@ export const OptionsStep = ({
         <h2 className="text-2xl font-bold text-primary mb-2">{title}</h2>
         <p className="text-muted-foreground">{subtitle}</p>
       </div>
+
+      {/* Show baggage allowance info for flights */}
+      {serviceType === "flight" && airline && (
+        <BaggageInfo 
+          airline={airline}
+          fareType={fareType}
+          cabinClass={cabinClass}
+        />
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {options.map((option) => (

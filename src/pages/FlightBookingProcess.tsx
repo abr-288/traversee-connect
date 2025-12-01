@@ -304,6 +304,9 @@ const FlightBookingProcess = () => {
                 guestsCount={adultsCount + childrenCount}
                 onNext={() => setCurrentStep(3)}
                 onBack={() => setCurrentStep(1)}
+                airline={flightData.airline}
+                fareType={flightData.fare}
+                cabinClass={searchParams.get("class") || "ECONOMY"}
               />
             )}
 
