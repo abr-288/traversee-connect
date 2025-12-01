@@ -15,6 +15,7 @@ import { SummaryStep } from "@/components/booking-steps/SummaryStep";
 import { Price } from "@/components/ui/price";
 import { validateAndCorrectFlightTimes, formatFlightDate } from "@/utils/flightUtils";
 import { BaggageInfo } from "@/components/booking-steps/BaggageInfo";
+import { getCityName, getAirportName } from "@/utils/airportNames";
 
 interface Passenger {
   firstName: string;
@@ -172,6 +173,9 @@ const FlightBookingProcess = () => {
                   <div className="text-center min-w-[50px]">
                     <p className="text-sm font-bold">{flightData.departureTime}</p>
                     <p className="text-[10px] text-muted-foreground">{flightData.origin}</p>
+                    <p className="text-[8px] text-muted-foreground/70 max-w-[80px] truncate" title={getAirportName(flightData.origin)}>
+                      {getAirportName(flightData.origin)}
+                    </p>
                   </div>
                   <div className="flex-1 flex flex-col items-center gap-0.5 min-w-0">
                     <Badge variant="secondary" className="px-1.5 py-0 text-[10px] whitespace-nowrap">
@@ -189,6 +193,9 @@ const FlightBookingProcess = () => {
                       {flightData.isMultiDay && <sup className="text-[8px] text-amber-600 ml-0.5">+{flightData.daysDifference}</sup>}
                     </p>
                     <p className="text-[10px] text-muted-foreground">{flightData.destination}</p>
+                    <p className="text-[8px] text-muted-foreground/70 max-w-[80px] truncate" title={getAirportName(flightData.destination)}>
+                      {getAirportName(flightData.destination)}
+                    </p>
                   </div>
                 </div>
 

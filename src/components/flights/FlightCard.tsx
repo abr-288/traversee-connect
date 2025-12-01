@@ -2,52 +2,7 @@ import { Plane, Clock, CircleCheck, Circle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Price } from "@/components/ui/price";
-
-// Map IATA codes to city names
-const cityNames: Record<string, string> = {
-  'ABJ': 'Abidjan',
-  'CDG': 'Paris CDG',
-  'ORY': 'Paris Orly',
-  'DXB': 'Dubai',
-  'IST': 'Istanbul',
-  'ACC': 'Accra',
-  'DKR': 'Dakar',
-  'CMN': 'Casablanca',
-  'JNB': 'Johannesburg',
-  'ADD': 'Addis-Abeba',
-  'NBO': 'Nairobi',
-  'LOS': 'Lagos',
-  'CAI': 'Le Caire',
-  'JFK': 'New York JFK',
-  'LHR': 'Londres',
-  'AMS': 'Amsterdam',
-  'FRA': 'Francfort',
-  'MAD': 'Madrid',
-  'BCN': 'Barcelone',
-  'ROM': 'Rome',
-  'FCO': 'Rome FCO',
-  'BRU': 'Bruxelles',
-  'GVA': 'Genève',
-  'ZRH': 'Zurich',
-  'DOH': 'Doha',
-  'AUH': 'Abu Dhabi',
-  'RUH': 'Riyad',
-  'JED': 'Djeddah',
-  'BKO': 'Bamako',
-  'OUA': 'Ouagadougou',
-  'LFW': 'Lomé',
-  'COO': 'Cotonou',
-  'DSS': 'Dakar DSS',
-  'ROB': 'Monrovia',
-  'FNA': 'Freetown',
-  'CKY': 'Conakry',
-  'BJL': 'Banjul',
-  'RAK': 'Marrakech',
-  'TUN': 'Tunis',
-  'ALG': 'Alger',
-};
-
-const getCityName = (code: string): string => cityNames[code] || code;
+import { getCityName, getAirportName } from "@/utils/airportNames";
 
 const formatDuration = (duration: string): string => {
   if (!duration) return '';
@@ -130,6 +85,9 @@ export const FlightCard = ({
             <span className="text-xl lg:text-2xl font-bold">{formatTime(departureTime)}</span>
             <span className="text-sm font-medium">{getCityName(departureAirport)}</span>
             <span className="text-xs text-muted-foreground">{departureAirport}</span>
+            <span className="text-[10px] text-muted-foreground/70 max-w-[120px] truncate" title={getAirportName(departureAirport)}>
+              {getAirportName(departureAirport)}
+            </span>
           </div>
 
           {/* Duration & Stops */}
@@ -181,6 +139,9 @@ export const FlightCard = ({
             <span className="text-xl lg:text-2xl font-bold">{formatTime(arrivalTime)}</span>
             <span className="text-sm font-medium">{getCityName(arrivalAirport)}</span>
             <span className="text-xs text-muted-foreground">{arrivalAirport}</span>
+            <span className="text-[10px] text-muted-foreground/70 max-w-[120px] truncate text-right" title={getAirportName(arrivalAirport)}>
+              {getAirportName(arrivalAirport)}
+            </span>
           </div>
         </div>
 
