@@ -29,16 +29,28 @@ const FlightBookingProcess = () => {
   const [currentStep, setCurrentStep] = useState(1);
 
   // Récupération des paramètres du vol
+  const airline = searchParams.get("airline") || "Air Côte d'Ivoire";
+  const airlineCode = searchParams.get("airlineCode") || "";
+  const flightNumber = searchParams.get("flightNumber") || "";
+  
+  // Generate flight number display: use provided number or generate from airline code
+  const displayFlightNumber = flightNumber 
+    ? `${airlineCode || ''}${flightNumber}`.trim() 
+    : airlineCode 
+      ? `${airlineCode}${Math.floor(100 + Math.random() * 900)}`
+      : "";
+  
   const flightData = {
-    origin: searchParams.get("origin") || "Dakar",
-    destination: searchParams.get("destination") || "Abidjan",
+    origin: searchParams.get("from") || searchParams.get("origin") || "ABJ",
+    destination: searchParams.get("to") || searchParams.get("destination") || "CDG",
     departureDate: searchParams.get("departureDate") || new Date().toISOString().split("T")[0],
     returnDate: searchParams.get("returnDate"),
-    departureTime: searchParams.get("departureTime") || "10:00",
-    arrivalTime: searchParams.get("arrivalTime") || "12:30",
+    departureTime: searchParams.get("departure") || searchParams.get("departureTime") || "10:00",
+    arrivalTime: searchParams.get("arrival") || searchParams.get("arrivalTime") || "12:30",
     duration: searchParams.get("duration") || "2h 30m",
-    airline: searchParams.get("airline") || "Air Côte d'Ivoire",
-    flightNumber: searchParams.get("flightNumber") || "HF420",
+    airline: airline,
+    airlineCode: airlineCode,
+    flightNumber: displayFlightNumber,
     price: searchParams.get("price") || "150000",
     stops: parseInt(searchParams.get("stops") || "0"),
     fare: searchParams.get("fare") || "basic",
