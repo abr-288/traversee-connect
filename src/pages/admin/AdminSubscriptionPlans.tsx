@@ -13,6 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2, Loader2, RefreshCw, Star, GripVertical } from "lucide-react";
+import { ImageUpload } from "@/components/admin/ImageUpload";
 
 interface SubscriptionPlan {
   id: string;
@@ -20,6 +21,7 @@ interface SubscriptionPlan {
   name: string;
   subtitle: string | null;
   icon: string;
+  image_url?: string | null;
   price: string;
   price_note: string | null;
   features: string[];
@@ -48,6 +50,7 @@ const emptyPlan: Omit<SubscriptionPlan, "id"> = {
   name: "",
   subtitle: "",
   icon: "Building2",
+  image_url: "",
   price: "",
   price_note: "",
   features: [],
@@ -352,6 +355,13 @@ export default function AdminSubscriptionPlans() {
                   rows={5}
                 />
               </div>
+
+              <ImageUpload
+                value={formData.image_url || ""}
+                onChange={(url) => setFormData({ ...formData, image_url: url })}
+                folder="subscriptions"
+                label="Image du plan (optionnel)"
+              />
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
