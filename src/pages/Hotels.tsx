@@ -91,12 +91,12 @@ const Hotels = () => {
               
               allHotels.push({
                 id: hotel.id || hotel.hotel_id || Math.random().toString(),
-                name: hotel.name || hotel.hotel_name || 'Hôtel',
-                location: hotel.location || hotel.address || destination,
+                name: hotel.name || `Hôtel ${destination}`,
+                location: hotel.location || destination,
                 price: Math.round(price),
                 rating: hotel.rating || hotel.review_score || 4.0,
                 reviews: hotel.reviews || hotel.review_count || 0,
-                image: hotel.image || hotel.main_photo_url || '/placeholder.svg',
+                image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
                 amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
                 source: 'API Réelle'
               });
@@ -171,14 +171,16 @@ const Hotels = () => {
           ? hotel.price 
           : parseFloat(hotel.price?.total || hotel.price || 0);
         
+        console.log('Booking Hotel Data:', { name: hotel.name, image: hotel.image, location: hotel.location });
+        
         return {
           id: hotel.id || hotel.hotel_id || Math.random().toString(),
-          name: hotel.name || hotel.hotel_name || 'Hôtel',
-          location: hotel.location || hotel.address || location,
+          name: hotel.name || 'Hôtel Sans Nom',
+          location: hotel.location || location,
           price: Math.round(price),
           rating: hotel.rating || hotel.review_score || 4.0,
           reviews: hotel.reviews || hotel.review_count || 0,
-          image: hotel.image || hotel.main_photo_url || '/placeholder.svg',
+          image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
           amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
           source: 'Booking.com'
         };
@@ -193,12 +195,12 @@ const Hotels = () => {
         
         return {
           id: hotel.id || hotel.hotel_id || Math.random().toString(),
-          name: hotel.name || hotel.hotel_name || 'Hôtel',
-          location: hotel.location || hotel.address || location,
+          name: hotel.name || 'Hébergement Sans Nom',
+          location: hotel.location || location,
           price: Math.round(price),
           rating: hotel.rating || hotel.review_score || 4.0,
           reviews: hotel.reviews || hotel.review_count || 0,
-          image: hotel.image || hotel.main_photo_url || '/placeholder.svg',
+          image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
           amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
           source: 'Airbnb'
         };
@@ -213,12 +215,12 @@ const Hotels = () => {
         
         return {
           id: hotel.id || hotel.hotel_id || Math.random().toString(),
-          name: hotel.name || hotel.hotel_name || 'Hôtel',
-          location: hotel.location || hotel.address || location,
+          name: hotel.name || 'Hôtel International',
+          location: hotel.location || location,
           price: Math.round(price),
           rating: hotel.rating || hotel.review_score || 4.0,
           reviews: hotel.reviews || hotel.review_count || 0,
-          image: hotel.image || hotel.main_photo_url || '/placeholder.svg',
+          image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
           amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
           source: 'Worldwide Hotels'
         };
@@ -233,12 +235,12 @@ const Hotels = () => {
         
         return {
           id: hotel.id || hotel.hotel_id || Math.random().toString(),
-          name: hotel.name || hotel.hotel_name || 'Hôtel',
-          location: hotel.location || hotel.address || location,
+          name: hotel.name || 'Hôtel',
+          location: hotel.location || location,
           price: Math.round(price),
           rating: hotel.rating || hotel.review_score || 4.0,
           reviews: hotel.reviews || hotel.review_count || 0,
-          image: hotel.image || hotel.main_photo_url || '/placeholder.svg',
+          image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
           amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
           source: 'Hotels.com'
         };
@@ -253,12 +255,12 @@ const Hotels = () => {
         
         return {
           id: hotel.id || hotel.hotel_id || Math.random().toString(),
-          name: hotel.name || hotel.hotel_name || 'Hôtel',
-          location: hotel.location || hotel.address || location,
+          name: hotel.name || 'Hôtel',
+          location: hotel.location || location,
           price: Math.round(price),
           rating: hotel.rating || hotel.review_score || 4.0,
           reviews: hotel.reviews || hotel.review_count || 0,
-          image: hotel.image || hotel.main_photo_url || '/placeholder.svg',
+          image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
           amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
           source: 'Priceline'
         };
@@ -273,12 +275,12 @@ const Hotels = () => {
         
         return {
           id: hotel.id || hotel.hotel_id || Math.random().toString(),
-          name: hotel.name || hotel.hotel_name || 'Hôtel',
-          location: hotel.location || hotel.address || location,
+          name: hotel.name || 'Hôtel',
+          location: hotel.location || location,
           price: Math.round(price),
           rating: hotel.rating || hotel.review_score || 4.0,
           reviews: hotel.reviews || hotel.review_count || 0,
-          image: hotel.image || hotel.main_photo_url || '/placeholder.svg',
+          image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
           amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
           source: 'Amadeus'
         };
@@ -293,12 +295,12 @@ const Hotels = () => {
         
         return {
           id: hotel.id || hotel.hotel_id || Math.random().toString(),
-          name: hotel.name || hotel.hotel_name || 'Hôtel',
-          location: hotel.location || hotel.address || location,
+          name: hotel.name || 'Hôtel',
+          location: hotel.location || location,
           price: Math.round(price),
           rating: hotel.rating || hotel.review_score || 4.0,
           reviews: hotel.reviews || hotel.review_count || 0,
-          image: hotel.image || hotel.main_photo_url || '/placeholder.svg',
+          image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
           amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
           source: 'TripAdvisor'
         };
