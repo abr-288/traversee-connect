@@ -9,9 +9,10 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, Plus, Trash2, Globe, Mail, Palette, Settings, FileText, CreditCard, Paintbrush } from "lucide-react";
+import { Loader2, Save, Plus, Trash2, Globe, Mail, Palette, Settings, FileText, CreditCard, Paintbrush, Upload } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ThemeConfig } from "@/components/admin/ThemeConfig";
+import { ImageUpload } from "@/components/admin/ImageUpload";
 
 interface ConfigItem {
   id: string;
@@ -284,21 +285,30 @@ function BrandingConfig({ config, onSave, saving }: { config?: ConfigItem; onSav
               onChange={(e) => setValue({ ...value, tagline: e.target.value })}
             />
           </div>
-          <div className="space-y-2">
-            <Label>Logo clair (URL)</Label>
-            <Input
-              value={value.logoLight || ""}
-              onChange={(e) => setValue({ ...value, logoLight: e.target.value })}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Logo sombre (URL)</Label>
-            <Input
-              value={value.logoDark || ""}
-              onChange={(e) => setValue({ ...value, logoDark: e.target.value })}
-            />
-          </div>
         </div>
+        
+        <div className="grid gap-4 md:grid-cols-2">
+          <ImageUpload
+            value={value.logoLight || ""}
+            onChange={(url) => setValue({ ...value, logoLight: url })}
+            folder="logos"
+            label="Logo clair (thème sombre)"
+          />
+          <ImageUpload
+            value={value.logoDark || ""}
+            onChange={(url) => setValue({ ...value, logoDark: url })}
+            folder="logos"
+            label="Logo sombre (thème clair)"
+          />
+        </div>
+        
+        <ImageUpload
+          value={value.favicon || ""}
+          onChange={(url) => setValue({ ...value, favicon: url })}
+          folder="logos"
+          label="Favicon"
+        />
+        
         <Button onClick={() => onSave(value)} disabled={saving}>
           {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
           Sauvegarder
@@ -455,38 +465,54 @@ function HeroConfig({ config, onSave, saving }: { config?: ConfigItem; onSave: (
           </div>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <Label>Slides du carousel</Label>
+            <Label className="text-base font-semibold">Slides du carousel</Label>
             <Button type="button" variant="outline" size="sm" onClick={addSlide}>
-              <Plus className="mr-2 h-4 w-4" /> Ajouter
+              <Plus className="mr-2 h-4 w-4" /> Ajouter un slide
             </Button>
           </div>
-          <div className="space-y-2">
+          
+          <div className="space-y-4">
             {value.slides?.map((slide: any, index: number) => (
-              <div key={index} className="flex gap-2 items-center">
-                <Input
-                  placeholder="URL de l'image"
+              <div key={index} className="p-4 border rounded-lg space-y-3 bg-muted/30">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Slide {index + 1}</span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeSlide(index)}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Supprimer
+                  </Button>
+                </div>
+                
+                <ImageUpload
                   value={slide.image || ""}
-                  onChange={(e) => updateSlide(index, "image", e.target.value)}
-                  className="flex-1"
+                  onChange={(url) => updateSlide(index, "image", url)}
+                  folder="hero"
+                  label="Image du slide"
                 />
-                <Input
-                  placeholder="Titre"
-                  value={slide.title || ""}
-                  onChange={(e) => updateSlide(index, "title", e.target.value)}
-                  className="flex-1"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeSlide(index)}
-                >
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
+                
+                <div className="space-y-2">
+                  <Label>Titre du slide (optionnel)</Label>
+                  <Input
+                    placeholder="Ex: Découvrez Paris"
+                    value={slide.title || ""}
+                    onChange={(e) => updateSlide(index, "title", e.target.value)}
+                  />
+                </div>
               </div>
             ))}
+            
+            {(!value.slides || value.slides.length === 0) && (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                Aucun slide configuré. Les images par défaut seront utilisées.
+              </p>
+            )}
           </div>
         </div>
 

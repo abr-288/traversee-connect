@@ -1,0 +1,171 @@
+import { useState, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { supabase } from "@/integrations/supabase/client";
+import { Loader2, Upload, X, Image as ImageIcon } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+interface ImageUploadProps {
+  value: string;
+  onChange: (url: string) => void;
+  folder?: string;
+  label?: string;
+  accept?: string;
+}
+
+export function ImageUpload({ 
+  value, 
+  onChange, 
+  folder = "general",
+  label = "Image",
+  accept = "image/*"
+}: ImageUploadProps) {
+  const [uploading, setUploading] = useState(false);
+  const [preview, setPreview] = useState<string | null>(value || null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Fichier trop volumineux",
+        description: "La taille maximale est de 5 Mo",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast({
+        title: "Format invalide",
+        description: "Veuillez sélectionner une image",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      // Generate unique filename
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from("site-assets")
+        .upload(fileName, file, {
+          cacheControl: "3600",
+          upsert: false,
+        });
+
+      if (error) throw error;
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from("site-assets")
+        .getPublicUrl(data.path);
+
+      const publicUrl = urlData.publicUrl;
+      
+      setPreview(publicUrl);
+      onChange(publicUrl);
+
+      toast({
+        title: "Image téléchargée",
+        description: "L'image a été téléchargée avec succès",
+      });
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      toast({
+        title: "Erreur d'upload",
+        description: error.message || "Impossible de télécharger l'image",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  const handleRemove = () => {
+    setPreview(null);
+    onChange("");
+  };
+
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium">{label}</label>
+      
+      <div className="flex gap-2 items-start">
+        {/* Preview */}
+        {preview ? (
+          <div className="relative w-24 h-24 rounded-lg overflow-hidden border bg-muted">
+            <img
+              src={preview}
+              alt="Preview"
+              className="w-full h-full object-cover"
+              onError={() => setPreview(null)}
+            />
+            <button
+              type="button"
+              onClick={handleRemove}
+              className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          </div>
+        ) : (
+          <div className="w-24 h-24 rounded-lg border-2 border-dashed border-muted-foreground/25 flex items-center justify-center bg-muted">
+            <ImageIcon className="w-8 h-8 text-muted-foreground/50" />
+          </div>
+        )}
+
+        <div className="flex-1 space-y-2">
+          {/* URL Input */}
+          <Input
+            value={value}
+            onChange={(e) => {
+              onChange(e.target.value);
+              setPreview(e.target.value);
+            }}
+            placeholder="URL de l'image ou télécharger"
+            className="text-sm"
+          />
+          
+          {/* Upload Button */}
+          <div className="flex gap-2">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept={accept}
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+            >
+              {uploading ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Upload className="w-4 h-4 mr-2" />
+              )}
+              {uploading ? "Upload..." : "Télécharger"}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
