@@ -79,7 +79,10 @@ const Hotels = () => {
               ...(result.data.hotelscom || []),
               ...(result.data.priceline || []),
               ...(result.data.amadeus || []),
-              ...(result.data.tripadvisor || [])
+              ...(result.data.tripadvisor || []),
+              ...(result.data.skyscanner || []),
+              ...(result.data.agoda || []),
+              ...(result.data.expedia || [])
             ];
 
             hotels.forEach((hotel: any) => {
@@ -306,6 +309,66 @@ const Hotels = () => {
         };
       });
 
+      const skyscannerHotels = (result.data?.skyscanner || []).map((hotel: any) => {
+        const price = typeof hotel.price === 'object' && hotel.price?.grandTotal 
+          ? parseFloat(hotel.price.grandTotal) 
+          : typeof hotel.price === 'number' 
+          ? hotel.price 
+          : parseFloat(hotel.price?.total || hotel.price || 0);
+        
+        return {
+          id: hotel.id || hotel.hotel_id || Math.random().toString(),
+          name: hotel.name || 'Hôtel',
+          location: hotel.location || location,
+          price: Math.round(price),
+          rating: hotel.rating || hotel.review_score || 4.0,
+          reviews: hotel.reviews || hotel.review_count || 0,
+          image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
+          amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
+          source: 'Skyscanner'
+        };
+      });
+
+      const agodaHotels = (result.data?.agoda || []).map((hotel: any) => {
+        const price = typeof hotel.price === 'object' && hotel.price?.grandTotal 
+          ? parseFloat(hotel.price.grandTotal) 
+          : typeof hotel.price === 'number' 
+          ? hotel.price 
+          : parseFloat(hotel.price?.total || hotel.price || 0);
+        
+        return {
+          id: hotel.id || hotel.hotel_id || Math.random().toString(),
+          name: hotel.name || 'Hôtel',
+          location: hotel.location || location,
+          price: Math.round(price),
+          rating: hotel.rating || hotel.review_score || 4.0,
+          reviews: hotel.reviews || hotel.review_count || 0,
+          image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
+          amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
+          source: 'Agoda'
+        };
+      });
+
+      const expediaHotels = (result.data?.expedia || []).map((hotel: any) => {
+        const price = typeof hotel.price === 'object' && hotel.price?.grandTotal 
+          ? parseFloat(hotel.price.grandTotal) 
+          : typeof hotel.price === 'number' 
+          ? hotel.price 
+          : parseFloat(hotel.price?.total || hotel.price || 0);
+        
+        return {
+          id: hotel.id || hotel.hotel_id || Math.random().toString(),
+          name: hotel.name || 'Hôtel',
+          location: hotel.location || location,
+          price: Math.round(price),
+          rating: hotel.rating || hotel.review_score || 4.0,
+          reviews: hotel.reviews || hotel.review_count || 0,
+          image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
+          amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
+          source: 'Expedia'
+        };
+      });
+
       const transformedHotels = [
         ...amadeusHotels,
         ...bookingHotels, 
@@ -313,7 +376,10 @@ const Hotels = () => {
         ...worldwideHotels,
         ...hotelscomHotels,
         ...pricelineHotels,
-        ...tripadvisorHotels
+        ...tripadvisorHotels,
+        ...skyscannerHotels,
+        ...agodaHotels,
+        ...expediaHotels
       ];
       
       if (transformedHotels.length > 0) {

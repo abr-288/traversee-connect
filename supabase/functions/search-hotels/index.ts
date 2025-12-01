@@ -14,6 +14,7 @@ const transformBookingData = (hotels: any[]) => {
                       hotel.name || 
                       hotel.hotel_name_trans ||
                       hotel.property_name ||
+                      hotel.hotelName ||
                       hotel.title ||
                       'Hôtel';
     
@@ -22,32 +23,65 @@ const transformBookingData = (hotels: any[]) => {
                      hotel.address || 
                      hotel.city_in_trans ||
                      hotel.city_name_en ||
+                     hotel.cityName ||
+                     hotel.location ||
                      hotel.countrycode ||
                      '';
     
-    // Extract main image URL
+    // Extract main image URL with multiple fallbacks
     const imageUrl = hotel.main_photo_url || 
                      hotel.photo_main_url || 
                      hotel.max_photo_url ||
                      hotel.max_1280_photo_url ||
+                     hotel.imageUrl ||
+                     hotel.heroImage ||
+                     hotel.mainImage ||
+                     hotel.thumbnail ||
+                     hotel.image ||
+                     (hotel.photos && Array.isArray(hotel.photos) && hotel.photos[0]) ||
+                     (hotel.images && Array.isArray(hotel.images) && hotel.images[0]) ||
                      'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800';
+    
+    // Extract all photo URLs
+    const allImages = hotel.photo_urls || 
+                      hotel.photos || 
+                      hotel.images || 
+                      [imageUrl];
     
     // Extract exact price
     const exactPrice = hotel.min_total_price || 
                        hotel.composite_price_breakdown?.gross_amount_per_night?.value ||
                        hotel.price_breakdown?.gross_price?.value ||
+                       hotel.price?.amount ||
+                       hotel.minPrice ||
                        hotel.price ||
                        50000;
     
+    // Extract rating
+    const rating = hotel.review_score || 
+                   hotel.rating || 
+                   hotel.stars ||
+                   hotel.starRating ||
+                   hotel.guestRating ||
+                   4.0;
+    
+    // Extract review count
+    const reviewCount = hotel.review_nr || 
+                        hotel.reviews_count || 
+                        hotel.review_count ||
+                        hotel.reviewsCount ||
+                        hotel.totalReviews ||
+                        0;
+    
     return {
-      id: hotel.hotel_id || hotel.id,
+      id: hotel.hotel_id || hotel.id || hotel.hotelId,
       name: hotelName,
       location: location,
       price: { grandTotal: Math.round(exactPrice) },
-      rating: hotel.review_score || hotel.rating || 4.0,
-      reviews: hotel.review_nr || hotel.reviews_count || hotel.review_count || 0,
+      rating: typeof rating === 'number' ? rating : parseFloat(rating) || 4.0,
+      reviews: reviewCount,
       image: imageUrl,
-      images: hotel.photo_urls || [imageUrl] || [],
+      images: Array.isArray(allImages) ? allImages : [imageUrl],
       description: hotel.hotel_description || hotel.description || `${hotelName} est un établissement de qualité offrant confort et services exceptionnels.`,
       amenities: hotel.hotel_facilities || hotel.facilities || hotel.amenities || ['Wifi', 'Restaurant', 'Service de Chambre']
     };
@@ -61,21 +95,38 @@ const transformAirbnbData = (listings: any[]) => {
     const listingName = listing.name || 
                         listing.title || 
                         listing.public_address ||
+                        listing.hotelName ||
                         'Hébergement';
+    
+    // Extract main image with multiple fallbacks
+    const mainImage = listing.xl_picture_url || 
+                      listing.picture_url || 
+                      listing.imageUrl ||
+                      listing.heroImage ||
+                      listing.thumbnail ||
+                      (listing.photos && Array.isArray(listing.photos) && listing.photos[0]) ||
+                      (listing.picture_urls && Array.isArray(listing.picture_urls) && listing.picture_urls[0]) ||
+                      'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800';
+    
+    // Extract all images
+    const allImages = listing.picture_urls || 
+                      listing.photos ||
+                      [listing.xl_picture_url, listing.picture_url].filter(Boolean) || 
+                      [mainImage];
     
     return {
       id: listing.id,
       name: listingName,
-      location: listing.city || listing.localized_city || listing.smart_location || '',
+      location: listing.city || listing.localized_city || listing.smart_location || listing.cityName || '',
       price: { 
-        grandTotal: listing.price?.rate || listing.pricing?.rate || 40000 
+        grandTotal: listing.price?.rate || listing.pricing?.rate || listing.price?.amount || 40000 
       },
-      rating: listing.star_rating || listing.avg_rating || 4.0,
-      reviews: listing.reviews_count || listing.review_count || 0,
-      image: listing.xl_picture_url || listing.picture_url || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
-      images: listing.picture_urls || [listing.xl_picture_url] || [],
+      rating: listing.star_rating || listing.avg_rating || listing.rating || 4.0,
+      reviews: listing.reviews_count || listing.review_count || listing.reviewsCount || 0,
+      image: mainImage,
+      images: Array.isArray(allImages) ? allImages : [mainImage],
       description: listing.description || listing.summary || `${listingName} offre un hébergement confortable et bien situé.`,
-      amenities: listing.amenities || ['Wifi', 'Cuisine', 'Espace de Travail']
+      amenities: listing.amenities || listing.facilities || ['Wifi', 'Cuisine', 'Espace de Travail']
     };
   });
 };
@@ -133,6 +184,9 @@ serve(async (req) => {
       priceline: any[];
       tripadvisor: any[];
       amadeus: any[];
+      skyscanner: any[];
+      agoda: any[];
+      expedia: any[];
     } = {
       booking: [],
       airbnb: [],
@@ -141,6 +195,9 @@ serve(async (req) => {
       priceline: [],
       tripadvisor: [],
       amadeus: [],
+      skyscanner: [],
+      agoda: [],
+      expedia: [],
     };
 
     let apiSuccess = false;
@@ -217,7 +274,17 @@ serve(async (req) => {
           if (bookingData.data && bookingData.data.hotels && Array.isArray(bookingData.data.hotels)) {
             results.booking = transformBookingData(bookingData.data.hotels.slice(0, 10));
             apiSuccess = true;
-            console.log('Booking.com results transformed:', results.booking.length);
+            console.log('✅ Booking.com results transformed:', results.booking.length, 'hotels');
+            // Log first hotel details for debugging
+            if (results.booking.length > 0) {
+              const firstHotel = results.booking[0];
+              console.log('Sample Booking.com hotel:', {
+                name: firstHotel.name,
+                image: firstHotel.image.substring(0, 80) + '...',
+                location: firstHotel.location,
+                price: firstHotel.price.grandTotal
+              });
+            }
           } else {
             console.log('Booking.com API returned unexpected structure:', Object.keys(bookingData));
           }
@@ -511,6 +578,183 @@ serve(async (req) => {
       }
     }
 
+    // Search Skyscanner Hotels (skyscanner44.p.rapidapi.com)
+    if (RAPIDAPI_KEY) {
+      console.log('Starting Skyscanner Hotels search');
+      try {
+        const skyscannerParams = new URLSearchParams({
+          query: location,
+          checkin: checkIn,
+          checkout: checkOut,
+          adults: adults.toString(),
+          rooms: (rooms || 1).toString(),
+          currency: 'USD',
+          locale: 'en-US',
+          market: 'US',
+        });
+
+        console.log('Calling Skyscanner Hotels API with params:', Object.fromEntries(skyscannerParams));
+        
+        const skyscannerResponse = await fetch(
+          `https://skyscanner44.p.rapidapi.com/hotels/search?${skyscannerParams}`,
+          {
+            headers: {
+              'X-RapidAPI-Key': RAPIDAPI_KEY,
+              'X-RapidAPI-Host': 'skyscanner44.p.rapidapi.com',
+            },
+          }
+        );
+
+        if (skyscannerResponse.ok) {
+          const skyscannerData = await skyscannerResponse.json();
+          console.log('Skyscanner Hotels API status:', skyscannerResponse.status);
+          console.log('Skyscanner Hotels raw response:', JSON.stringify(skyscannerData).substring(0, 500));
+          
+          if (skyscannerData.data?.hotels && Array.isArray(skyscannerData.data.hotels)) {
+            results.skyscanner = skyscannerData.data.hotels.slice(0, 10).map((hotel: any) => ({
+              id: hotel.id || hotel.hotel_id,
+              name: hotel.name || hotel.hotelName || 'Hotel',
+              location: hotel.location || hotel.address || location,
+              price: { grandTotal: hotel.price?.amount || hotel.minPrice || 50000 },
+              rating: hotel.rating || hotel.stars || 4.0,
+              reviews: hotel.reviewsCount || hotel.reviews || 0,
+              image: hotel.heroImage || hotel.mainImage || hotel.images?.[0] || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
+              images: hotel.images || [hotel.heroImage] || [],
+              description: hotel.description || `${hotel.name} offre un hébergement de qualité.`,
+              amenities: hotel.amenities || ['WiFi', 'Restaurant'],
+            }));
+            apiSuccess = true;
+            console.log('Skyscanner Hotels results transformed:', results.skyscanner.length);
+          } else {
+            console.log('Skyscanner Hotels API returned unexpected structure:', Object.keys(skyscannerData));
+          }
+        } else {
+          const errorText = await skyscannerResponse.text();
+          console.error('Skyscanner Hotels API failed with status:', skyscannerResponse.status);
+          console.error('Skyscanner Hotels error details:', errorText.substring(0, 500));
+        }
+      } catch (error) {
+        console.error('Skyscanner Hotels API exception:', error instanceof Error ? error.message : String(error));
+      }
+    }
+
+    // Search Agoda Hotels (agoda-hotels-api.p.rapidapi.com)
+    if (RAPIDAPI_KEY) {
+      console.log('Starting Agoda Hotels search');
+      try {
+        const agodaParams = new URLSearchParams({
+          location: location,
+          checkIn: checkIn,
+          checkOut: checkOut,
+          adults: adults.toString(),
+          rooms: (rooms || 1).toString(),
+          currency: 'USD',
+        });
+
+        console.log('Calling Agoda Hotels API with params:', Object.fromEntries(agodaParams));
+        
+        const agodaResponse = await fetch(
+          `https://agoda-hotels-api.p.rapidapi.com/hotels/search?${agodaParams}`,
+          {
+            headers: {
+              'X-RapidAPI-Key': RAPIDAPI_KEY,
+              'X-RapidAPI-Host': 'agoda-hotels-api.p.rapidapi.com',
+            },
+          }
+        );
+
+        if (agodaResponse.ok) {
+          const agodaData = await agodaResponse.json();
+          console.log('Agoda Hotels API status:', agodaResponse.status);
+          console.log('Agoda Hotels raw response:', JSON.stringify(agodaData).substring(0, 500));
+          
+          if (agodaData.hotels && Array.isArray(agodaData.hotels)) {
+            results.agoda = agodaData.hotels.slice(0, 10).map((hotel: any) => ({
+              id: hotel.hotelId || hotel.id,
+              name: hotel.hotelName || hotel.name || 'Hotel',
+              location: hotel.cityName || hotel.location || location,
+              price: { grandTotal: hotel.price || hotel.minRate || 50000 },
+              rating: hotel.rating || hotel.starRating || 4.0,
+              reviews: hotel.reviewCount || hotel.reviews || 0,
+              image: hotel.imageUrl || hotel.thumbnailUrl || hotel.images?.[0] || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
+              images: hotel.images || [hotel.imageUrl] || [],
+              description: hotel.description || `${hotel.hotelName || hotel.name} est un établissement recommandé.`,
+              amenities: hotel.facilities || hotel.amenities || ['WiFi', 'Restaurant'],
+            }));
+            apiSuccess = true;
+            console.log('Agoda Hotels results transformed:', results.agoda.length);
+          } else {
+            console.log('Agoda Hotels API returned unexpected structure:', Object.keys(agodaData));
+          }
+        } else {
+          const errorText = await agodaResponse.text();
+          console.error('Agoda Hotels API failed with status:', agodaResponse.status);
+          console.error('Agoda Hotels error details:', errorText.substring(0, 500));
+        }
+      } catch (error) {
+        console.error('Agoda Hotels API exception:', error instanceof Error ? error.message : String(error));
+      }
+    }
+
+    // Search Expedia Hotels (expedia-com-provider.p.rapidapi.com)
+    if (RAPIDAPI_KEY) {
+      console.log('Starting Expedia Hotels search');
+      try {
+        const expediaParams = new URLSearchParams({
+          q: location,
+          checkin: checkIn,
+          checkout: checkOut,
+          adults: adults.toString(),
+          rooms: (rooms || 1).toString(),
+          currency: 'USD',
+          locale: 'en_US',
+        });
+
+        console.log('Calling Expedia Hotels API with params:', Object.fromEntries(expediaParams));
+        
+        const expediaResponse = await fetch(
+          `https://expedia-com-provider.p.rapidapi.com/v2/hotels/search?${expediaParams}`,
+          {
+            headers: {
+              'X-RapidAPI-Key': RAPIDAPI_KEY,
+              'X-RapidAPI-Host': 'expedia-com-provider.p.rapidapi.com',
+            },
+          }
+        );
+
+        if (expediaResponse.ok) {
+          const expediaData = await expediaResponse.json();
+          console.log('Expedia Hotels API status:', expediaResponse.status);
+          console.log('Expedia Hotels raw response:', JSON.stringify(expediaData).substring(0, 500));
+          
+          if (expediaData.hotels && Array.isArray(expediaData.hotels)) {
+            results.expedia = expediaData.hotels.slice(0, 10).map((hotel: any) => ({
+              id: hotel.id || hotel.hotelId,
+              name: hotel.name || hotel.hotelName || 'Hotel',
+              location: hotel.address || hotel.location || location,
+              price: { grandTotal: hotel.price?.total || hotel.averageRate || 50000 },
+              rating: hotel.rating || hotel.guestRating || 4.0,
+              reviews: hotel.reviewsCount || hotel.totalReviews || 0,
+              image: hotel.imageUrl || hotel.thumbnail || hotel.photos?.[0] || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
+              images: hotel.photos || [hotel.imageUrl] || [],
+              description: hotel.description || `${hotel.name} propose un séjour de qualité.`,
+              amenities: hotel.amenities || hotel.facilities || ['WiFi', 'Restaurant'],
+            }));
+            apiSuccess = true;
+            console.log('Expedia Hotels results transformed:', results.expedia.length);
+          } else {
+            console.log('Expedia Hotels API returned unexpected structure:', Object.keys(expediaData));
+          }
+        } else {
+          const errorText = await expediaResponse.text();
+          console.error('Expedia Hotels API failed with status:', expediaResponse.status);
+          console.error('Expedia Hotels error details:', errorText.substring(0, 500));
+        }
+      } catch (error) {
+        console.error('Expedia Hotels API exception:', error instanceof Error ? error.message : String(error));
+      }
+    }
+
     // Search Amadeus Hotels (PRIMARY API - more reliable)
     if (AMADEUS_API_KEY && AMADEUS_API_SECRET) {
       console.log('Starting Amadeus Hotel search');
@@ -646,7 +890,8 @@ serve(async (req) => {
     // If no API results, use mock data
     const totalResults = results.booking.length + results.airbnb.length + results.worldwide.length + 
                          results.hotelscom.length + results.priceline.length + results.tripadvisor.length + 
-                         results.amadeus.length;
+                         results.amadeus.length + results.skyscanner.length + results.agoda.length + 
+                         results.expedia.length;
     
     console.log('=== SEARCH RESULTS SUMMARY ===');
     console.log('API Success:', apiSuccess);
@@ -656,7 +901,10 @@ serve(async (req) => {
       booking: results.booking.length,
       hotelscom: results.hotelscom.length,
       priceline: results.priceline.length,
-      tripadvisor: results.tripadvisor.length
+      tripadvisor: results.tripadvisor.length,
+      skyscanner: results.skyscanner.length,
+      agoda: results.agoda.length,
+      expedia: results.expedia.length
     });
     
     if (!apiSuccess || totalResults === 0) {
@@ -673,14 +921,18 @@ serve(async (req) => {
         data: results,
         count: results.booking.length + results.airbnb.length + results.worldwide.length + 
                results.hotelscom.length + results.priceline.length + results.tripadvisor.length + 
-               results.amadeus.length,
+               results.amadeus.length + results.skyscanner.length + results.agoda.length + 
+               results.expedia.length,
         mock: !apiSuccess || totalResults === 0,
         sources: {
           amadeus: results.amadeus.length,
           booking: results.booking.length,
           hotelscom: results.hotelscom.length,
           priceline: results.priceline.length,
-          tripadvisor: results.tripadvisor.length
+          tripadvisor: results.tripadvisor.length,
+          skyscanner: results.skyscanner.length,
+          agoda: results.agoda.length,
+          expedia: results.expedia.length
         }
       }),
       {
