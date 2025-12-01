@@ -19,6 +19,7 @@ interface MappedFlight {
   id: string;
   airline: string;
   airlineCode: string;
+  flightNumber: string;
   from: string;
   to: string;
   departureTime: string;
@@ -64,8 +65,11 @@ const Flights = () => {
       const firstSegment = segments[0];
       const lastSegment = segments[segments.length - 1] || firstSegment;
 
-      const airlineCode = offer.validatingAirlineCodes?.[0] || "XX";
-      const airline = getAirlineName(airlineCode);
+      const airlineCode = offer.validatingAirlineCodes?.[0] || firstSegment?.carrierCode || "XX";
+      const airline = offer.carrierName || getAirlineName(airlineCode);
+      
+      // Extract flight number from segment
+      const flightNumber = firstSegment?.number || firstSegment?.flightNumber || "";
 
       const priceTotal =
         typeof offer.price === "object" && (offer.price?.grandTotal || offer.price?.total)
@@ -83,6 +87,7 @@ const Flights = () => {
         id: offer.id || Math.random().toString(),
         airline,
         airlineCode,
+        flightNumber,
         from,
         to,
         departureTime: firstSegment?.departure?.at || "",
@@ -166,6 +171,7 @@ const Flights = () => {
       departure: flight.departureTime,
       arrival: flight.arrivalTime,
       class: flight.travelClass,
+      flightNumber: flight.flightNumber,
     };
     setSelectedFlight(adaptedFlight as any);
     setDialogOpen(true);

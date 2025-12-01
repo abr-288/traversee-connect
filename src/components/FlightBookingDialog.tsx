@@ -17,6 +17,8 @@ interface FlightBookingDialogProps {
   flight: {
     id: string;
     airline: string;
+    airlineCode?: string;
+    flightNumber?: string;
     from: string;
     to: string;
     departure: string;
@@ -196,6 +198,13 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
       fare: fare,
       departureDate: departureDate,
     });
+    // Add airline code and flight number
+    if (flight.airlineCode) {
+      params.append('airlineCode', flight.airlineCode);
+    }
+    if (flight.flightNumber) {
+      params.append('flightNumber', flight.flightNumber);
+    }
     if (returnDate) {
       params.append('returnDate', returnDate);
     }
