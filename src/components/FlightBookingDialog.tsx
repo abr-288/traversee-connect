@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,6 +10,7 @@ import { bookingSchema } from "@/lib/validation";
 import { UnifiedForm, UnifiedFormField, UnifiedSubmitButton } from "@/components/forms";
 import { Card } from "@/components/ui/card";
 import { Price } from "@/components/ui/price";
+import { validateAndCorrectFlightTimes, formatFlightDate } from "@/utils/flightUtils";
 
 interface FlightBookingDialogProps {
   open: boolean;
@@ -23,6 +24,8 @@ interface FlightBookingDialogProps {
     to: string;
     departure: string;
     arrival: string;
+    duration?: string;
+    stops?: number;
     price: number;
     class: string;
     departureDate?: string;
@@ -46,6 +49,17 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
   const departureDate = (searchParams && searchParams.departureDate) || flight.departureDate || new Date().toISOString().split('T')[0];
   const returnDate = (searchParams && searchParams.returnDate) || flight.returnDate;
   const tripType = returnDate ? t('booking.dialog.flight.roundTrip') : t('booking.dialog.flight.oneWay');
+  const stops = flight.stops ?? 0;
+
+  // Validate and correct flight times
+  const flightTimes = useMemo(() => {
+    return validateAndCorrectFlightTimes(
+      flight.departure,
+      flight.arrival,
+      flight.duration || '',
+      departureDate
+    );
+  }, [flight.departure, flight.arrival, flight.duration, departureDate]);
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -193,6 +207,8 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
       to: flight.to,
       departure: flight.departure,
       arrival: flight.arrival,
+      duration: flightTimes.duration,
+      stops: stops.toString(),
       price: flight.price.toString(),
       class: flight.class,
       fare: fare,
@@ -210,15 +226,6 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
     }
     navigate(`/booking-process?${params.toString()}`);
     onOpenChange(false);
-  };
-
-  const formatTime = (isoString: string) => {
-    try {
-      const date = new Date(isoString);
-      return date.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
-    } catch {
-      return isoString;
-    }
   };
 
   const handleDownloadTicket = async () => {
@@ -332,11 +339,11 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
                             <div className="px-2 py-0.5 bg-primary/10 text-primary text-xs font-semibold rounded">Départ</div>
                             <Calendar className="h-3 w-3 text-muted-foreground" />
                             <span className="text-xs text-muted-foreground font-medium">
-                              {new Date(departureDate).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                              {formatFlightDate(flightTimes.departureDate, 'long')}
                             </span>
                           </div>
                           <div className="flex items-baseline gap-3">
-                            <p className="text-3xl font-bold text-foreground">{formatTime(flight.departure)}</p>
+                            <p className="text-3xl font-bold text-foreground">{flightTimes.departureTime}</p>
                             <Clock className="h-4 w-4 text-muted-foreground" />
                           </div>
                           <p className="text-base font-semibold">{flight.from}</p>
@@ -349,25 +356,29 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
                         <div className="flex items-center gap-3 py-2">
                           <Clock className="h-5 w-5 text-primary" />
                           <div>
-                            <p className="text-sm font-semibold">Durée totale du vol</p>
-                            <p className="text-xs text-muted-foreground">Temps de trajet estimé</p>
+                            <p className="text-sm font-semibold">Durée totale: {flightTimes.duration}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {stops === 0 ? 'Vol direct' : `${stops} escale${stops > 1 ? 's' : ''}`}
+                            </p>
                           </div>
                         </div>
                         
-                        {/* Stopover Warning if needed */}
-                        <div className="mt-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 rounded-lg p-4">
-                          <div className="flex items-start gap-3">
-                            <Info className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-                            <div>
-                              <p className="text-sm font-semibold text-amber-900 dark:text-amber-100">
-                                Vol avec escale
-                              </p>
-                              <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
-                                Ce vol peut comporter une ou plusieurs escales. Les détails précis des escales et temps d'attente seront communiqués lors de la confirmation.
-                              </p>
+                        {/* Stopover Warning - only if there are stops */}
+                        {stops > 0 && (
+                          <div className="mt-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 rounded-lg p-4">
+                            <div className="flex items-start gap-3">
+                              <Info className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                              <div>
+                                <p className="text-sm font-semibold text-amber-900 dark:text-amber-100">
+                                  Vol avec {stops} escale{stops > 1 ? 's' : ''}
+                                </p>
+                                <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
+                                  Les détails des escales et temps de correspondance seront communiqués lors de la confirmation.
+                                </p>
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        )}
                       </div>
 
                       {/* Arrival */}
@@ -378,11 +389,17 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
                             <div className="px-2 py-0.5 bg-primary/10 text-primary text-xs font-semibold rounded">Arrivée</div>
                             <Calendar className="h-3 w-3 text-muted-foreground" />
                             <span className="text-xs text-muted-foreground font-medium">
-                              {new Date(departureDate).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                              {formatFlightDate(flightTimes.arrivalDate, 'long')}
+                              {flightTimes.isNextDay && (
+                                <span className="ml-2 text-amber-600 dark:text-amber-400">(+1 jour)</span>
+                              )}
+                              {flightTimes.isMultiDay && (
+                                <span className="ml-2 text-amber-600 dark:text-amber-400">(+{flightTimes.daysDifference} jours)</span>
+                              )}
                             </span>
                           </div>
                           <div className="flex items-baseline gap-3">
-                            <p className="text-3xl font-bold text-foreground">{formatTime(flight.arrival)}</p>
+                            <p className="text-3xl font-bold text-foreground">{flightTimes.arrivalTime}</p>
                             <Clock className="h-4 w-4 text-muted-foreground" />
                           </div>
                           <p className="text-base font-semibold">{flight.to}</p>

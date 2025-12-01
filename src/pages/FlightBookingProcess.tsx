@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Plane, Check } from "lucide-react";
@@ -13,6 +13,7 @@ import { OptionsStep } from "@/components/booking-steps/OptionsStep";
 import { PreferencesStep } from "@/components/booking-steps/PreferencesStep";
 import { SummaryStep } from "@/components/booking-steps/SummaryStep";
 import { Price } from "@/components/ui/price";
+import { validateAndCorrectFlightTimes, formatFlightDate } from "@/utils/flightUtils";
 
 interface Passenger {
   firstName: string;
@@ -32,27 +33,46 @@ const FlightBookingProcess = () => {
   const airline = searchParams.get("airline") || "Air Côte d'Ivoire";
   const airlineCode = searchParams.get("airlineCode") || "";
   const flightNumber = searchParams.get("flightNumber") || "";
+  const departureParam = searchParams.get("departure") || searchParams.get("departureTime") || "";
+  const arrivalParam = searchParams.get("arrival") || searchParams.get("arrivalTime") || "";
+  const durationParam = searchParams.get("duration") || "";
+  const stopsParam = parseInt(searchParams.get("stops") || "0");
+  const departureDateParam = searchParams.get("departureDate") || new Date().toISOString().split("T")[0];
   
-  // Generate flight number display: use provided number or generate from airline code
+  // Generate flight number display
   const displayFlightNumber = flightNumber 
-    ? `${airlineCode || ''}${flightNumber}`.trim() 
+    ? `${airlineCode}${flightNumber}`.trim() 
     : airlineCode 
       ? `${airlineCode}${Math.floor(100 + Math.random() * 900)}`
       : "";
+
+  // Validate and correct flight times
+  const flightTimes = useMemo(() => {
+    return validateAndCorrectFlightTimes(
+      departureParam,
+      arrivalParam,
+      durationParam,
+      departureDateParam
+    );
+  }, [departureParam, arrivalParam, durationParam, departureDateParam]);
   
   const flightData = {
     origin: searchParams.get("from") || searchParams.get("origin") || "ABJ",
     destination: searchParams.get("to") || searchParams.get("destination") || "CDG",
-    departureDate: searchParams.get("departureDate") || new Date().toISOString().split("T")[0],
+    departureDate: flightTimes.departureDate,
+    arrivalDate: flightTimes.arrivalDate,
     returnDate: searchParams.get("returnDate"),
-    departureTime: searchParams.get("departure") || searchParams.get("departureTime") || "10:00",
-    arrivalTime: searchParams.get("arrival") || searchParams.get("arrivalTime") || "12:30",
-    duration: searchParams.get("duration") || "2h 30m",
+    departureTime: flightTimes.departureTime,
+    arrivalTime: flightTimes.arrivalTime,
+    duration: flightTimes.duration,
+    isNextDay: flightTimes.isNextDay,
+    isMultiDay: flightTimes.isMultiDay,
+    daysDifference: flightTimes.daysDifference,
     airline: airline,
     airlineCode: airlineCode,
     flightNumber: displayFlightNumber,
     price: searchParams.get("price") || "150000",
-    stops: parseInt(searchParams.get("stops") || "0"),
+    stops: stopsParam,
     fare: searchParams.get("fare") || "basic",
   };
 
@@ -70,10 +90,6 @@ const FlightBookingProcess = () => {
     { number: 3, title: "Sièges", completed: currentStep > 3 },
     { number: 4, title: "Paiement", completed: false },
   ];
-
-  const formatTime = (time: string) => {
-    return time;
-  };
 
   return (
     <div className="min-h-screen bg-background pt-16">
@@ -143,27 +159,46 @@ const FlightBookingProcess = () => {
                   </div>
                 </div>
 
+                {/* Departure info */}
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground">
+                    {formatFlightDate(flightData.departureDate, 'long')}
+                  </p>
+                </div>
+
+                {/* Flight timeline */}
                 <div className="flex items-center gap-2">
-                  <div className="text-center">
-                    <p className="text-base font-bold">{flightData.departureTime}</p>
-                    <p className="text-xs text-muted-foreground">{flightData.origin}</p>
+                  <div className="text-center min-w-[50px]">
+                    <p className="text-sm font-bold">{flightData.departureTime}</p>
+                    <p className="text-[10px] text-muted-foreground">{flightData.origin}</p>
                   </div>
-                  <div className="flex-1 flex flex-col items-center gap-1 min-w-0">
-                    <Badge variant="secondary" className="px-2 py-0.5 text-xs whitespace-nowrap">
+                  <div className="flex-1 flex flex-col items-center gap-0.5 min-w-0">
+                    <Badge variant="secondary" className="px-1.5 py-0 text-[10px] whitespace-nowrap">
                       {flightData.duration}
                     </Badge>
                     <div className="w-full h-[1px] bg-border" />
-                    {flightData.stops > 0 && (
-                      <span className="text-[10px] text-amber-600 dark:text-amber-400">
-                        {flightData.stops} escale{flightData.stops > 1 ? "s" : ""}
-                      </span>
-                    )}
+                    <span className="text-[9px] text-muted-foreground">
+                      {flightData.stops === 0 ? 'Direct' : `${flightData.stops} escale${flightData.stops > 1 ? "s" : ""}`}
+                    </span>
                   </div>
-                  <div className="text-center">
-                    <p className="text-base font-bold">{flightData.arrivalTime}</p>
-                    <p className="text-xs text-muted-foreground">{flightData.destination}</p>
+                  <div className="text-center min-w-[50px]">
+                    <p className="text-sm font-bold">
+                      {flightData.arrivalTime}
+                      {flightData.isNextDay && <sup className="text-[8px] text-amber-600 ml-0.5">+1</sup>}
+                      {flightData.isMultiDay && <sup className="text-[8px] text-amber-600 ml-0.5">+{flightData.daysDifference}</sup>}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground">{flightData.destination}</p>
                   </div>
                 </div>
+
+                {/* Arrival date if different */}
+                {(flightData.isNextDay || flightData.isMultiDay) && (
+                  <div className="text-center">
+                    <p className="text-[10px] text-amber-600 dark:text-amber-400">
+                      Arrivée le {formatFlightDate(flightData.arrivalDate, 'short')}
+                    </p>
+                  </div>
+                )}
 
                 <Separator />
 
