@@ -49,6 +49,73 @@ const Hotels = () => {
   const [selectedHotels, setSelectedHotels] = useState<any[]>([]);
   const [comparisonOpen, setComparisonOpen] = useState(false);
 
+  // Load real hotels from around the world on component mount
+  useEffect(() => {
+    const loadDefaultHotels = async () => {
+      // Popular destinations to fetch real hotels from
+      const destinations = ['Paris', 'Dubai', 'New York', 'Tokyo', 'London'];
+      const today = new Date();
+      const checkIn = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      const checkOut = new Date(today.getTime() + 33 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+      const allHotels: any[] = [];
+
+      for (const destination of destinations) {
+        try {
+          const result = await searchHotels({
+            location: destination,
+            checkIn,
+            checkOut,
+            adults: 2,
+            children: 0,
+            rooms: 1
+          });
+
+          if (result?.success && result.data) {
+            const hotels = [
+              ...(result.data.booking || []),
+              ...(result.data.airbnb || []),
+              ...(result.data.worldwide || []),
+              ...(result.data.hotelscom || []),
+              ...(result.data.priceline || []),
+              ...(result.data.amadeus || []),
+              ...(result.data.tripadvisor || [])
+            ];
+
+            hotels.forEach((hotel: any) => {
+              const price = typeof hotel.price === 'object' && hotel.price?.grandTotal 
+                ? parseFloat(hotel.price.grandTotal) 
+                : typeof hotel.price === 'number' 
+                ? hotel.price 
+                : parseFloat(hotel.price?.total || hotel.price || 0);
+              
+              allHotels.push({
+                id: hotel.id || hotel.hotel_id || Math.random().toString(),
+                name: hotel.name || hotel.hotel_name || 'Hôtel',
+                location: hotel.location || hotel.address || destination,
+                price: Math.round(price),
+                rating: hotel.rating || hotel.review_score || 4.0,
+                reviews: hotel.reviews || hotel.review_count || 0,
+                image: hotel.image || hotel.main_photo_url || '/placeholder.svg',
+                amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
+                source: 'API Réelle'
+              });
+            });
+          }
+        } catch (error) {
+          console.error(`Erreur lors du chargement des hôtels pour ${destination}:`, error);
+        }
+      }
+
+      if (allHotels.length > 0) {
+        setApiHotels(allHotels);
+        toast.success(`${allHotels.length} hôtels réels chargés depuis ${destinations.length} destinations mondiales`);
+      }
+    };
+
+    loadDefaultHotels();
+  }, []);
+
   useEffect(() => {
     const destination = searchParams.get("destination");
     const checkIn = searchParams.get("checkIn");
@@ -647,10 +714,13 @@ const Hotels = () => {
               <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-4">
                 <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
                   <Globe className="w-5 h-5" />
-                  <span className="font-medium">Données réelles en temps réel</span>
+                  <span className="font-medium">{hasSearched ? 'Données réelles en temps réel' : 'Hôtels réels du monde entier'}</span>
                 </div>
                 <p className="text-sm text-green-600 dark:text-green-400 mt-1">
-                  Prix et disponibilité actualisés depuis {new Set(apiHotels.map((h: any) => h.source)).size} source(s): {Array.from(new Set(apiHotels.map((h: any) => h.source))).join(', ')}
+                  {hasSearched 
+                    ? `Prix et disponibilité actualisés depuis ${new Set(apiHotels.map((h: any) => h.source)).size} source(s): ${Array.from(new Set(apiHotels.map((h: any) => h.source))).join(', ')}`
+                    : `${apiHotels.length} hôtels chargés depuis plusieurs destinations populaires avec prix et détails réels`
+                  }
                 </p>
               </div>
             )}
