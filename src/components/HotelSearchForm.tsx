@@ -17,7 +17,7 @@ import { safeValidate } from "@/lib/formHelpers";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { PriceCalendar } from "@/components/flights/PriceCalendar";
+import { HotelPriceCalendar } from "@/components/hotels/HotelPriceCalendar";
 
 /**
  * HotelSearchForm - Recherche d'hôtels avec validation Zod
@@ -272,7 +272,7 @@ export const HotelSearchForm = () => {
         </div>
       )}
 
-      {/* Calendrier de comparaison des prix */}
+      {/* Calendrier de comparaison des prix pour hôtels */}
       {showPriceCalendar && checkIn && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
@@ -280,14 +280,15 @@ export const HotelSearchForm = () => {
           exit={{ opacity: 0, height: 0 }}
           className="mt-4 overflow-hidden"
         >
-          <PriceCalendar
-            departureDate={format(checkIn, "yyyy-MM-dd")}
+          <HotelPriceCalendar
+            checkInDate={format(checkIn, "yyyy-MM-dd")}
             onDateSelect={(dateStr) => {
               setCheckIn(new Date(dateStr));
               handleBlur("checkIn");
             }}
-            lowestPrice={120}
+            basePrice={120}
             viewMode="week"
+            currency="EUR"
           />
         </motion.div>
       )}
