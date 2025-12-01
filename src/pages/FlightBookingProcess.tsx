@@ -14,6 +14,7 @@ import { PreferencesStep } from "@/components/booking-steps/PreferencesStep";
 import { SummaryStep } from "@/components/booking-steps/SummaryStep";
 import { Price } from "@/components/ui/price";
 import { validateAndCorrectFlightTimes, formatFlightDate } from "@/utils/flightUtils";
+import { BaggageInfo } from "@/components/booking-steps/BaggageInfo";
 
 interface Passenger {
   firstName: string;
@@ -232,6 +233,13 @@ const FlightBookingProcess = () => {
                     </span>
                   </div>
                 </div>
+
+                {/* Baggage Information */}
+                <BaggageInfo 
+                  airline={flightData.airline}
+                  fareType={flightData.fare}
+                  cabinClass={searchParams.get("class") || "ECONOMY"}
+                />
               </div>
             </Card>
           </div>
