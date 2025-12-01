@@ -119,6 +119,30 @@ const FlightBookingProcess = () => {
               </h3>
 
               <div className="space-y-4">
+                {/* Airline with Logo */}
+                <div className="flex items-center gap-3 p-3 bg-primary/5 rounded-lg">
+                  <div className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden bg-white border border-border shrink-0">
+                    <img 
+                      src={`https://pics.avs.io/80/80/${flightData.airlineCode}.png`}
+                      alt={`${flightData.airline} logo`}
+                      className="w-10 h-10 object-contain"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        if (target.parentElement) {
+                          target.parentElement.innerHTML = `<span class="text-lg font-bold text-primary">${flightData.airlineCode?.substring(0, 2) || '✈️'}</span>`;
+                        }
+                      }}
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm truncate">{flightData.airline}</p>
+                    {flightData.flightNumber && (
+                      <p className="text-xs text-muted-foreground">Vol {flightData.flightNumber}</p>
+                    )}
+                  </div>
+                </div>
+
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-4 mb-2">
@@ -137,9 +161,6 @@ const FlightBookingProcess = () => {
                         <p className="text-2xl font-bold">{flightData.arrivalTime}</p>
                         <p className="text-sm text-muted-foreground">{flightData.destination}</p>
                       </div>
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {flightData.airline} • Vol {flightData.flightNumber}
                     </div>
                     {flightData.stops > 0 && (
                       <div className="mt-2 text-xs text-amber-600 dark:text-amber-400">

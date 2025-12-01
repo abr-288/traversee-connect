@@ -292,13 +292,26 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
                   {/* Airline Header */}
                   <Card className="p-5 bg-gradient-to-r from-primary/10 to-background border-primary/30 shadow-sm">
                     <div className="flex items-center gap-4">
-                      <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center ring-2 ring-primary/20">
-                        <Plane className="h-7 w-7 text-primary" />
+                      <div className="h-14 w-14 rounded-lg flex items-center justify-center overflow-hidden bg-white border border-border shrink-0">
+                        <img 
+                          src={`https://pics.avs.io/100/100/${flight.airlineCode || 'XX'}.png`}
+                          alt={`${flight.airline} logo`}
+                          className="w-12 h-12 object-contain"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            if (target.parentElement) {
+                              target.parentElement.innerHTML = `<svg class="h-7 w-7 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>`;
+                            }
+                          }}
+                        />
                       </div>
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <p className="text-xs text-muted-foreground uppercase tracking-wide">Compagnie aérienne</p>
-                        <p className="text-xl font-bold text-foreground">{flight.airline}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">Vol · Classe {flight.class}</p>
+                        <p className="text-xl font-bold text-foreground truncate">{flight.airline}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {flight.flightNumber ? `Vol ${flight.airlineCode || ''}${flight.flightNumber}` : `Classe ${flight.class}`}
+                        </p>
                       </div>
                     </div>
                   </Card>
