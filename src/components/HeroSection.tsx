@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Hotel, Car, Plane } from "lucide-react";
@@ -11,8 +11,9 @@ import { FlightSearchForm } from "./FlightSearchForm";
 import { HotelSearchForm } from "./HotelSearchForm";
 import { FlightHotelSearchForm } from "./FlightHotelSearchForm";
 import { CarSearchForm } from "./CarSearchForm";
+import { useSiteConfigContext } from "@/contexts/SiteConfigContext";
 
-const HERO_SLIDES = [heroSlide1, heroSlide2, heroSlide3, heroSlide4, heroSlide5];
+const DEFAULT_SLIDES = [heroSlide1, heroSlide2, heroSlide3, heroSlide4, heroSlide5];
 
 /**
  * HeroSection - Section héro premium avec recherche unifiée
@@ -20,10 +21,19 @@ const HERO_SLIDES = [heroSlide1, heroSlide2, heroSlide3, heroSlide4, heroSlide5]
  */
 const HeroSection = () => {
   const { t } = useTranslation();
+  const { config } = useSiteConfigContext();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [activeTab, setActiveTab] = useState("flight");
   const [scrollY, setScrollY] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
+
+  // Use dynamic slides from config or fallback to defaults
+  const heroSlides = useMemo(() => {
+    if (config.hero.slides && config.hero.slides.length > 0) {
+      return config.hero.slides.map(slide => slide.image);
+    }
+    return DEFAULT_SLIDES;
+  }, [config.hero.slides]);
 
   // Parallax scroll effect
   useEffect(() => {
@@ -42,16 +52,16 @@ const HeroSection = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [heroSlides.length]);
 
   return (
     <section ref={sectionRef} className="relative min-h-[500px] md:min-h-[700px] flex items-center pt-16 md:pt-20 overflow-hidden w-full">
       {/* Background Image Carousel with Parallax Effect */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        {HERO_SLIDES.map((slide, index) => (
+        {heroSlides.map((slide, index) => (
           <div
             key={index}
             className={`absolute inset-0 transition-all duration-1000 ${
@@ -81,10 +91,10 @@ const HeroSection = () => {
       <div className="site-container relative z-10 py-8 md:py-16">
         <div className="max-w-4xl mx-auto text-center mb-8 md:mb-14">
           <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold text-white mb-3 md:mb-6 animate-slide-up-fade drop-shadow-2xl" style={{ animationDelay: '0.1s' }}>
-            {t('hero.title')}
+            {config.hero.title || t('hero.title')}
           </h1>
           <p className="text-base md:text-xl lg:text-2xl text-white/95 mb-6 md:mb-10 font-normal animate-slide-up-fade drop-shadow-lg" style={{ animationDelay: '0.3s' }}>
-            {t('hero.subtitle')}
+            {config.hero.subtitle || t('hero.subtitle')}
           </p>
           
           {/* Decorative elements */}

@@ -20,6 +20,7 @@ import logoLight from "@/assets/logo-light.png";
 import LanguageSwitcher from "./LanguageSwitcher";
 import CurrencySelector from "./CurrencySelector";
 import DarkModeToggle from "./DarkModeToggle";
+import { useSiteConfigContext } from "@/contexts/SiteConfigContext";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -27,6 +28,7 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const { isAdmin, loading: roleLoading } = useUserRole();
   const { isInstallable, isInstalled, install } = usePWA();
+  const { config } = useSiteConfigContext();
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
@@ -79,8 +81,14 @@ const Navbar = () => {
         <div className={`flex items-center justify-between transition-all duration-300 ${isScrolled ? 'h-12' : 'h-16'}`}>
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
-            <img src={logoLight} alt="Bossiz Logo" className={`transition-all duration-300 ${isScrolled ? 'h-10' : 'h-16'} w-auto`} />
-            <span className={`font-bold text-white transition-all duration-300 ${isScrolled ? 'text-lg' : 'text-xl'}`}>Bossiz</span>
+            <img 
+              src={config.branding.logoLight || logoLight} 
+              alt={`${config.branding.siteName} Logo`} 
+              className={`transition-all duration-300 ${isScrolled ? 'h-10' : 'h-16'} w-auto`} 
+            />
+            <span className={`font-bold text-white transition-all duration-300 ${isScrolled ? 'text-lg' : 'text-xl'}`}>
+              {config.branding.siteName}
+            </span>
           </Link>
 
           <div className="hidden lg:flex items-center flex-1 justify-between ml-6">
