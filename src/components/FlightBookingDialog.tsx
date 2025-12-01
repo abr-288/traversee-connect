@@ -11,6 +11,7 @@ import { UnifiedForm, UnifiedFormField, UnifiedSubmitButton } from "@/components
 import { Card } from "@/components/ui/card";
 import { Price } from "@/components/ui/price";
 import { validateAndCorrectFlightTimes, formatFlightDate } from "@/utils/flightUtils";
+import { BaggageInfo } from "@/components/booking-steps/BaggageInfo";
 
 interface FlightBookingDialogProps {
   open: boolean;
@@ -423,6 +424,13 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
                       </div>
                     </div>
                   </Card>
+
+                  {/* Baggage Information */}
+                  <BaggageInfo 
+                    airline={flight.airline}
+                    fareType="basic"
+                    cabinClass={flight.class}
+                  />
                 </div>
               </div>
 
