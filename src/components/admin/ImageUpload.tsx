@@ -52,29 +52,37 @@ export function ImageUpload({
     setUploading(true);
 
     try {
-      // Generate unique filename
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      // Get the session token
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("Non authentifié");
+      }
 
-      // Upload to Supabase Storage
-      const { data, error } = await supabase.storage
-        .from("site-assets")
-        .upload(fileName, file, {
-          cacheControl: "3600",
-          upsert: false,
-        });
+      // Create form data
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", folder);
 
-      if (error) throw error;
+      // Call edge function
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/upload-site-asset`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: formData,
+        }
+      );
 
-      // Get public URL
-      const { data: urlData } = supabase.storage
-        .from("site-assets")
-        .getPublicUrl(data.path);
+      const result = await response.json();
 
-      const publicUrl = urlData.publicUrl;
-      
-      setPreview(publicUrl);
-      onChange(publicUrl);
+      if (!response.ok) {
+        throw new Error(result.error || "Erreur d'upload");
+      }
+
+      setPreview(result.url);
+      onChange(result.url);
 
       toast({
         title: "Image téléchargée",
