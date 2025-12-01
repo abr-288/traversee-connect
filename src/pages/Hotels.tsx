@@ -758,79 +758,116 @@ const Hotels = () => {
                   return (
                 <Card key={hotel.id || index} className={`overflow-hidden hover:shadow-lg transition-all ${isSelected ? 'ring-2 ring-primary' : ''}`}>
                   <div className="grid md:grid-cols-3 gap-6">
-                    <div className="md:col-span-1 relative">
-                      <img
+                    <div className="md:col-span-1 relative group">
+                      <LazyImage
                         src={hotel.image}
                         alt={hotel.name}
-                        className="w-full h-full object-cover min-h-[300px]"
-                        onError={(e) => {
-                          e.currentTarget.src = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800';
-                        }}
+                        className="w-full h-full object-cover min-h-[300px] group-hover:scale-105 transition-transform duration-300"
                       />
-                      <div className="absolute top-2 left-2">
+                      <div className="absolute top-2 left-2 flex gap-2">
                         <Checkbox
                           checked={isSelected}
                           onCheckedChange={() => toggleHotelSelection(hotel)}
                           className="bg-background/90 border-2"
                         />
                       </div>
-                      {(hotel as any).source && (
-                        <Badge className="absolute top-2 right-2 bg-background/90 text-foreground border">
-                          <Globe className="w-3 h-3 mr-1" />
-                          {(hotel as any).source}
-                        </Badge>
-                      )}
+                      <div className="absolute top-2 right-2 flex flex-col gap-2">
+                        {hotel.rating >= 4.5 && (
+                          <Badge className="bg-amber-500 hover:bg-amber-600 text-white border-0">
+                            <Star className="w-3 h-3 mr-1 fill-white" />
+                            Top noté
+                          </Badge>
+                        )}
+                        {hotel.reviews > 200 && (
+                          <Badge className="bg-blue-500 hover:bg-blue-600 text-white border-0">
+                            Populaire
+                          </Badge>
+                        )}
+                        {(hotel as any).source && (
+                          <Badge className="bg-background/90 text-foreground border">
+                            <Globe className="w-3 h-3 mr-1" />
+                            {(hotel as any).source}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                     <CardContent className="md:col-span-2 p-6">
                       <div className="flex justify-between items-start mb-4">
-                        <div>
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-2xl font-semibold">{hotel.name}</h3>
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between gap-3 mb-2">
+                            <h3 className="text-2xl font-semibold line-clamp-2">{hotel.name}</h3>
                           </div>
-                          <div className="flex items-center gap-2 text-muted-foreground mb-2">
+                          <div className="flex items-center gap-2 text-muted-foreground mb-3">
                             <MapPin className="w-4 h-4 flex-shrink-0" />
                             <span className="line-clamp-1">{hotel.location}</span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <div className="flex">
-                              {[...Array(5)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  className={`w-4 h-4 ${
-                                    i < Math.floor(hotel.rating)
-                                      ? "fill-accent text-accent"
-                                      : "text-gray-300"
-                                  }`}
-                                />
-                              ))}
+                          <div className="flex items-center gap-4 mb-3">
+                            <div className="flex items-center gap-2">
+                              <div className="flex">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    className={`w-4 h-4 ${
+                                      i < Math.floor(hotel.rating)
+                                        ? "fill-accent text-accent"
+                                        : "text-gray-300"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                              <span className="font-semibold text-lg">
+                                {hotel.rating.toFixed(1)}
+                              </span>
                             </div>
                             <span className="text-sm text-muted-foreground">
-                              {hotel.rating.toFixed(1)} ({hotel.reviews} avis)
+                              {hotel.reviews} avis
                             </span>
+                            {hotel.rating >= 4.7 && (
+                              <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                                Excellent
+                              </span>
+                            )}
+                            {hotel.rating >= 4.0 && hotel.rating < 4.7 && (
+                              <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                                Très bien
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>
 
-                      <div className="flex gap-3 mb-4 flex-wrap">
-                        {hotel.amenities.slice(0, 4).map((amenity, index) => (
-                          <span
+                      <div className="flex gap-2 mb-4 flex-wrap">
+                        {hotel.amenities.slice(0, 6).map((amenity, index) => (
+                          <Badge
                             key={index}
-                            className="px-3 py-1 bg-muted rounded-full text-sm"
+                            variant="secondary"
+                            className="px-3 py-1 text-xs"
                           >
+                            {amenity === 'Wifi' && <Wifi className="w-3 h-3 mr-1" />}
+                            {amenity.toLowerCase().includes('restaurant') && <UtensilsCrossed className="w-3 h-3 mr-1" />}
+                            {amenity.toLowerCase().includes('parking') && <Car className="w-3 h-3 mr-1" />}
                             {amenity}
-                          </span>
+                          </Badge>
                         ))}
+                        {hotel.amenities.length > 6 && (
+                          <Badge variant="outline" className="px-3 py-1 text-xs">
+                            +{hotel.amenities.length - 6} autres
+                          </Badge>
+                        )}
                       </div>
 
-                      <div className="flex justify-between items-end mt-auto">
+                      <div className="flex justify-between items-end mt-auto pt-4 border-t">
                         <div>
-                          <p className="text-sm text-muted-foreground">Prix réel</p>
-                          <p className="text-3xl font-bold text-primary">
-                            {hotel.price.toLocaleString()} <span className="text-lg">EUR</span>
-                          </p>
-                          <p className="text-sm text-muted-foreground">par nuit</p>
+                          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">À partir de</p>
+                          <div className="flex items-baseline gap-2">
+                            <p className="text-3xl font-bold text-primary">
+                              {hotel.price.toLocaleString()}
+                            </p>
+                            <span className="text-lg font-semibold text-muted-foreground">EUR</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">par nuit • Taxes incluses</p>
                         </div>
-                        <Button size="lg" onClick={() => {
+                        <Button size="lg" className="font-semibold" onClick={() => {
                           setSelectedHotel({
                             id: hotel.id.toString(),
                             name: hotel.name,
@@ -839,7 +876,7 @@ const Hotels = () => {
                           });
                           setDialogOpen(true);
                         }}>
-                          Réserver
+                          Voir les chambres
                         </Button>
                       </div>
                     </CardContent>
