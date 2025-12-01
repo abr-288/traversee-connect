@@ -699,6 +699,7 @@ export type Database = {
           features: string[] | null
           icon: string
           id: string
+          image_url: string | null
           is_active: boolean | null
           name: string
           plan_id: string
@@ -715,6 +716,7 @@ export type Database = {
           features?: string[] | null
           icon?: string
           id?: string
+          image_url?: string | null
           is_active?: boolean | null
           name: string
           plan_id: string
@@ -731,6 +733,7 @@ export type Database = {
           features?: string[] | null
           icon?: string
           id?: string
+          image_url?: string | null
           is_active?: boolean | null
           name?: string
           plan_id?: string
