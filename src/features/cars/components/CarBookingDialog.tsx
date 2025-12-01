@@ -6,6 +6,10 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { toast } from "sonner";
 import { carBookingSchema } from "@/lib/validation";
 import { UnifiedForm, UnifiedFormField, UnifiedSubmitButton } from "@/features/shared";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Phone, Car, UserCheck } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface CarBookingDialogProps {
   open: boolean;
@@ -23,6 +27,7 @@ interface CarBookingDialogProps {
 export const CarBookingDialog = ({ open, onOpenChange, car }: CarBookingDialogProps) => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
+  const [withDriver, setWithDriver] = useState<"yes" | "no">("no");
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -145,101 +150,145 @@ export const CarBookingDialog = ({ open, onOpenChange, car }: CarBookingDialogPr
 
         <UnifiedForm onSubmit={handleSubmit} variant="booking" loading={loading}>
           <div className="space-y-6">
+            {/* Sélection avec/sans chauffeur */}
             <div className="space-y-4">
-              <h3 className="font-semibold text-lg">Lieu et horaire de prise en charge</h3>
-              <UnifiedFormField
-                label="Lieu de prise en charge"
-                name="pickupLocation"
-                placeholder="Abidjan - Aéroport"
-                required
-              />
-              <div className="grid grid-cols-2 gap-4">
-                <UnifiedFormField
-                  label="Date de prise en charge"
-                  name="pickupDate"
-                  type="date"
-                  required
-                />
-                <UnifiedFormField
-                  label="Heure de prise en charge"
-                  name="pickupTime"
-                  type="time"
-                  defaultValue="10:00"
-                  required
-                />
-              </div>
+              <Label className="text-base font-semibold">Avec ou sans chauffeur ?</Label>
+              <RadioGroup value={withDriver} onValueChange={(v) => setWithDriver(v as "yes" | "no")} className="grid grid-cols-2 gap-4">
+                <div className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${withDriver === "no" ? "border-primary bg-primary/5" : "border-border"}`}>
+                  <RadioGroupItem value="no" id="no-driver" />
+                  <Label htmlFor="no-driver" className="flex items-center gap-2 cursor-pointer">
+                    <Car className="h-4 w-4" />
+                    Sans chauffeur
+                  </Label>
+                </div>
+                <div className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${withDriver === "yes" ? "border-primary bg-primary/5" : "border-border"}`}>
+                  <RadioGroupItem value="yes" id="with-driver" />
+                  <Label htmlFor="with-driver" className="flex items-center gap-2 cursor-pointer">
+                    <UserCheck className="h-4 w-4" />
+                    Avec chauffeur
+                  </Label>
+                </div>
+              </RadioGroup>
             </div>
 
-            <div className="space-y-4 pt-4 border-t">
-              <h3 className="font-semibold text-lg">Lieu et horaire de retour</h3>
-              <UnifiedFormField
-                label="Lieu de retour"
-                name="dropoffLocation"
-                placeholder="Abidjan - Aéroport"
-                required
-              />
-              <div className="grid grid-cols-2 gap-4">
-                <UnifiedFormField
-                  label="Date de retour"
-                  name="dropoffDate"
-                  type="date"
-                  required
-                />
-                <UnifiedFormField
-                  label="Heure de retour"
-                  name="dropoffTime"
-                  type="time"
-                  defaultValue="10:00"
-                  required
-                />
-              </div>
-            </div>
+            {/* Info chauffeur */}
+            {withDriver === "yes" && (
+              <Alert className="border-primary/30 bg-primary/5">
+                <Phone className="h-4 w-4 text-primary" />
+                <AlertDescription>
+                  <strong>Service avec chauffeur</strong><br />
+                  Pour une location avec chauffeur, veuillez contacter notre équipe :<br />
+                  <span className="text-primary font-semibold">+225 07 00 00 00 00</span> ou <span className="text-primary font-semibold">support@b-reserve.com</span>
+                </AlertDescription>
+              </Alert>
+            )}
 
-            <div className="space-y-4 pt-4 border-t">
-              <h3 className="font-semibold text-lg">Informations du conducteur</h3>
-              
-              <UnifiedFormField
-                label="Nom complet"
-                name="customerName"
-                placeholder="Nom du conducteur principal"
-                required
-              />
+            {withDriver === "no" && (
+              <>
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-lg">Lieu et horaire de prise en charge</h3>
+                  <UnifiedFormField
+                    label="Lieu de prise en charge"
+                    name="pickupLocation"
+                    placeholder="Abidjan - Aéroport"
+                    required
+                  />
+                  <div className="grid grid-cols-2 gap-4">
+                    <UnifiedFormField
+                      label="Date de prise en charge"
+                      name="pickupDate"
+                      type="date"
+                      required
+                    />
+                    <UnifiedFormField
+                      label="Heure de prise en charge"
+                      name="pickupTime"
+                      type="time"
+                      defaultValue="10:00"
+                      required
+                    />
+                  </div>
+                </div>
 
-              <UnifiedFormField
-                label="Numéro de permis de conduire"
-                name="driverLicense"
-                placeholder="ABC123456"
-                required
-              />
+                <div className="space-y-4 pt-4 border-t">
+                  <h3 className="font-semibold text-lg">Lieu et horaire de retour</h3>
+                  <UnifiedFormField
+                    label="Lieu de retour"
+                    name="dropoffLocation"
+                    placeholder="Abidjan - Aéroport"
+                    required
+                  />
+                  <div className="grid grid-cols-2 gap-4">
+                    <UnifiedFormField
+                      label="Date de retour"
+                      name="dropoffDate"
+                      type="date"
+                      required
+                    />
+                    <UnifiedFormField
+                      label="Heure de retour"
+                      name="dropoffTime"
+                      type="time"
+                      defaultValue="10:00"
+                      required
+                    />
+                  </div>
+                </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <UnifiedFormField
-                  label="Email"
-                  name="customerEmail"
-                  type="email"
-                  placeholder="email@example.com"
-                  required
-                />
-                <UnifiedFormField
-                  label="Téléphone"
-                  name="customerPhone"
-                  type="tel"
-                  placeholder="+225 XX XX XX XX XX"
-                  required
-                />
-              </div>
+                <div className="space-y-4 pt-4 border-t">
+                  <h3 className="font-semibold text-lg">Informations du conducteur</h3>
+                  
+                  <UnifiedFormField
+                    label="Nom complet"
+                    name="customerName"
+                    placeholder="Nom du conducteur principal"
+                    required
+                  />
 
-              <UnifiedFormField
-                label="Informations supplémentaires"
-                name="notes"
-                type="textarea"
-                placeholder="Demandes spéciales, équipements additionnels..."
-              />
-            </div>
+                  <UnifiedFormField
+                    label="Numéro de permis de conduire"
+                    name="driverLicense"
+                    placeholder="ABC123456"
+                    required
+                  />
 
-            <UnifiedSubmitButton variant="booking" loading={loading} fullWidth>
-              Confirmer la réservation
-            </UnifiedSubmitButton>
+                  <UnifiedFormField
+                    label="Numéro de passeport ou pièce d'identité"
+                    name="passportNumber"
+                    placeholder="Numéro de passeport ou CNI"
+                    required
+                  />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <UnifiedFormField
+                      label="Email"
+                      name="customerEmail"
+                      type="email"
+                      placeholder="email@example.com"
+                      required
+                    />
+                    <UnifiedFormField
+                      label="Téléphone"
+                      name="customerPhone"
+                      type="tel"
+                      placeholder="+225 XX XX XX XX XX"
+                      required
+                    />
+                  </div>
+
+                  <UnifiedFormField
+                    label="Informations supplémentaires"
+                    name="notes"
+                    type="textarea"
+                    placeholder="Demandes spéciales, équipements additionnels..."
+                  />
+                </div>
+
+                <UnifiedSubmitButton variant="booking" loading={loading} fullWidth>
+                  Confirmer la réservation
+                </UnifiedSubmitButton>
+              </>
+            )}
           </div>
         </UnifiedForm>
       </DialogContent>
