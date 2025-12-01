@@ -143,30 +143,25 @@ const FlightBookingProcess = () => {
                   </div>
                 </div>
 
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-4 mb-2">
-                      <div>
-                        <p className="text-2xl font-bold">{flightData.departureTime}</p>
-                        <p className="text-sm text-muted-foreground">{flightData.origin}</p>
-                      </div>
-                      <div className="flex-1 flex items-center gap-2">
-                        <Separator className="flex-1" />
-                        <Badge variant="secondary" className="px-2 text-xs">
-                          {flightData.duration}
-                        </Badge>
-                        <Separator className="flex-1" />
-                      </div>
-                      <div className="text-right">
-                        <p className="text-2xl font-bold">{flightData.arrivalTime}</p>
-                        <p className="text-sm text-muted-foreground">{flightData.destination}</p>
-                      </div>
-                    </div>
+                <div className="flex items-center gap-2">
+                  <div className="text-center">
+                    <p className="text-base font-bold">{flightData.departureTime}</p>
+                    <p className="text-xs text-muted-foreground">{flightData.origin}</p>
+                  </div>
+                  <div className="flex-1 flex flex-col items-center gap-1 min-w-0">
+                    <Badge variant="secondary" className="px-2 py-0.5 text-xs whitespace-nowrap">
+                      {flightData.duration}
+                    </Badge>
+                    <div className="w-full h-[1px] bg-border" />
                     {flightData.stops > 0 && (
-                      <div className="mt-2 text-xs text-amber-600 dark:text-amber-400">
-                        ⚠️ {flightData.stops} escale(s)
-                      </div>
+                      <span className="text-[10px] text-amber-600 dark:text-amber-400">
+                        {flightData.stops} escale{flightData.stops > 1 ? "s" : ""}
+                      </span>
                     )}
+                  </div>
+                  <div className="text-center">
+                    <p className="text-base font-bold">{flightData.arrivalTime}</p>
+                    <p className="text-xs text-muted-foreground">{flightData.destination}</p>
                   </div>
                 </div>
 
