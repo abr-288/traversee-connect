@@ -2,25 +2,28 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plane, Hotel, MapPin, Calendar, Users, Check, Loader2, Star, Package } from "lucide-react";
+import { Plane, Hotel, MapPin, Calendar, Users, Check, Loader2, Star, Package, AlertTriangle } from "lucide-react";
 import { useState } from "react";
-import { BookingDialog } from "@/components/BookingDialog";
+import { useNavigate } from "react-router-dom";
 import { FlightHotelSearchForm } from "@/components/FlightHotelSearchForm";
 import { useFlightHotelSearch } from "@/hooks/useFlightHotelSearch";
 import { toast } from "sonner";
 import { LazyImage } from "@/components/ui/lazy-image";
 import bannerFlightHotel from "@/assets/banner-flight-hotel.jpg";
 import { Price } from "@/components/ui/price";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const FlightHotel = () => {
+  const navigate = useNavigate();
   const [selectedFlight, setSelectedFlight] = useState<any>(null);
   const [selectedHotel, setSelectedHotel] = useState<any>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [flights, setFlights] = useState<any[]>([]);
   const [hotels, setHotels] = useState<any[]>([]);
+  const [searchParams, setSearchParams] = useState<any>(null);
   const { searchPackages, loading } = useFlightHotelSearch();
 
   const handleSearch = async (params: any) => {
+    setSearchParams(params);
     const results = await searchPackages(params);
     
     if (results && results.flights && results.hotels) {
@@ -34,17 +37,36 @@ const FlightHotel = () => {
     }
   };
 
+  // Calcul du nombre de nuits
+  const calculateNights = () => {
+    if (!searchParams?.departureDate || !searchParams?.returnDate) return 1;
+    const departure = new Date(searchParams.departureDate);
+    const returnDate = new Date(searchParams.returnDate);
+    const nights = Math.ceil((returnDate.getTime() - departure.getTime()) / (1000 * 60 * 60 * 24));
+    return Math.max(1, nights);
+  };
+
   const calculateTotal = () => {
-    if (!selectedFlight || !selectedHotel) return { original: 0, discounted: 0, savings: 0 };
-    const original = selectedFlight.price + selectedHotel.price;
-    const discounted = original * 0.7; // 30% discount
-    const savings = original - discounted;
-    return { original, discounted, savings };
+    if (!selectedFlight || !selectedHotel) return { flightTotal: 0, hotelTotal: 0, total: 0 };
+    const nights = calculateNights();
+    const rooms = searchParams?.rooms || 1;
+    const passengers = (searchParams?.adults || 1) + (searchParams?.children || 0);
+    
+    const flightTotal = selectedFlight.price * passengers;
+    const hotelTotal = selectedHotel.price * nights * rooms;
+    const total = flightTotal + hotelTotal;
+    
+    return { flightTotal, hotelTotal, total, nights, rooms, passengers };
   };
 
   const handleBooking = () => {
     if (selectedFlight && selectedHotel) {
-      setDialogOpen(true);
+      // Rediriger vers le processus de réservation avec les données
+      const flightParam = encodeURIComponent(JSON.stringify(selectedFlight));
+      const hotelParam = encodeURIComponent(JSON.stringify(selectedHotel));
+      const searchParam = encodeURIComponent(JSON.stringify(searchParams));
+      
+      navigate(`/flight-hotel/booking?flight=${flightParam}&hotel=${hotelParam}&search=${searchParam}`);
     } else {
       toast.error("Veuillez sélectionner un vol et un hôtel");
     }
@@ -231,9 +253,9 @@ const FlightHotel = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span>Votre sélection</span>
-                    {selectedFlight && selectedHotel && (
-                      <span className="text-sm font-normal text-green-600">
-                        Économisez <Price amount={calculateTotal().savings} fromCurrency="EUR" /> (30%)
+                    {selectedFlight && selectedHotel && searchParams && (
+                      <span className="text-sm font-normal text-muted-foreground">
+                        {calculateTotal().nights} nuit{calculateTotal().nights > 1 ? "s" : ""} • {calculateTotal().passengers} passager{calculateTotal().passengers > 1 ? "s" : ""}
                       </span>
                     )}
                   </CardTitle>
@@ -248,7 +270,9 @@ const FlightHotel = () => {
                       {selectedFlight ? (
                         <div className="text-sm">
                           <p className="font-medium">{selectedFlight.airline}</p>
-                          <p className="text-muted-foreground"><Price amount={selectedFlight.price} fromCurrency="EUR" /></p>
+                          <p className="text-muted-foreground">
+                            <Price amount={calculateTotal().flightTotal || selectedFlight.price} fromCurrency="EUR" />
+                          </p>
                         </div>
                       ) : (
                         <p className="text-sm text-muted-foreground">Aucun vol sélectionné</p>
@@ -263,7 +287,9 @@ const FlightHotel = () => {
                       {selectedHotel ? (
                         <div className="text-sm">
                           <p className="font-medium">{selectedHotel.name}</p>
-                          <p className="text-muted-foreground"><Price amount={selectedHotel.price} fromCurrency="EUR" /></p>
+                          <p className="text-muted-foreground">
+                            <Price amount={calculateTotal().hotelTotal || selectedHotel.price} fromCurrency="EUR" />
+                          </p>
                         </div>
                       ) : (
                         <p className="text-sm text-muted-foreground">Aucun hôtel sélectionné</p>
@@ -275,10 +301,10 @@ const FlightHotel = () => {
                       {selectedFlight && selectedHotel ? (
                         <div>
                           <p className="text-2xl font-bold text-primary">
-                            <Price amount={calculateTotal().discounted} fromCurrency="EUR" showLoader />
+                            <Price amount={calculateTotal().total} fromCurrency="EUR" showLoader />
                           </p>
-                          <p className="text-sm text-muted-foreground line-through">
-                            <Price amount={calculateTotal().original} fromCurrency="EUR" />
+                          <p className="text-xs text-muted-foreground">
+                            Vol + {calculateTotal().nights} nuit{calculateTotal().nights > 1 ? "s" : ""} d'hôtel
                           </p>
                         </div>
                       ) : (
@@ -286,6 +312,17 @@ const FlightHotel = () => {
                       )}
                     </div>
                   </div>
+
+                  {/* Avertissement */}
+                  {selectedFlight && selectedHotel && (
+                    <Alert className="mt-4 border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-800">
+                      <AlertTriangle className="h-4 w-4 text-amber-600" />
+                      <AlertDescription className="text-amber-800 dark:text-amber-300 text-sm">
+                        Les disponibilités sont vérifiées lors de la confirmation. En cas d'indisponibilité, 
+                        vous serez contacté pour des alternatives équivalentes.
+                      </AlertDescription>
+                    </Alert>
+                  )}
                 </CardContent>
                 <CardFooter>
                   <Button 
@@ -294,7 +331,7 @@ const FlightHotel = () => {
                     onClick={handleBooking}
                     disabled={!selectedFlight || !selectedHotel}
                   >
-                    Réserver maintenant
+                    Continuer la réservation
                   </Button>
                 </CardFooter>
               </Card>
@@ -303,20 +340,6 @@ const FlightHotel = () => {
         )}
         </div>
       </main>
-
-      {selectedFlight && selectedHotel && (
-        <BookingDialog 
-          open={dialogOpen}
-          onOpenChange={setDialogOpen}
-          service={{
-            id: `${selectedFlight.id}-${selectedHotel.id}`,
-            name: `Vol + Hôtel`,
-            price_per_unit: calculateTotal().discounted,
-            currency: "EUR",
-            type: "package"
-          }}
-        />
-      )}
 
       <Footer />
     </div>

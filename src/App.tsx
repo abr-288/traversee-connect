@@ -33,6 +33,7 @@ const Confirmation = lazy(() => import("./pages/Confirmation"));
 const FlightComparison = lazy(() => import("./pages/FlightComparison"));
 const FlightBookingProcess = lazy(() => import("./pages/FlightBookingProcess"));
 const UnifiedBookingProcess = lazy(() => import("./pages/UnifiedBookingProcess"));
+const FlightHotelBookingProcess = lazy(() => import("./pages/FlightHotelBookingProcess"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminOverview"));
 const AdminBookings = lazy(() => import("./pages/admin/AdminBookings"));
 const AdminServices = lazy(() => import("./pages/admin/AdminServices"));
@@ -89,6 +90,7 @@ const App = () => (
                     <Route path="/events" element={<Events />} />
                     <Route path="/trains" element={<Trains />} />
                     <Route path="/flight-hotel" element={<FlightHotel />} />
+                    <Route path="/flight-hotel/booking" element={<FlightHotelBookingProcess />} />
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/booking-history" element={<BookingHistory />} />
