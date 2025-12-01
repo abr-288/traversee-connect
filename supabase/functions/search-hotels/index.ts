@@ -648,10 +648,23 @@ serve(async (req) => {
                          results.hotelscom.length + results.priceline.length + results.tripadvisor.length + 
                          results.amadeus.length;
     
+    console.log('=== SEARCH RESULTS SUMMARY ===');
+    console.log('API Success:', apiSuccess);
+    console.log('Total Results:', totalResults);
+    console.log('Results by source:', {
+      amadeus: results.amadeus.length,
+      booking: results.booking.length,
+      hotelscom: results.hotelscom.length,
+      priceline: results.priceline.length,
+      tripadvisor: results.tripadvisor.length
+    });
+    
     if (!apiSuccess || totalResults === 0) {
-      console.log('Using mock hotel data for location:', location);
+      console.log('⚠️ NO API RESULTS - Using mock hotel data for location:', location);
       const mockHotels = getMockHotels(location);
       results.booking = mockHotels;
+    } else {
+      console.log('✅ REAL API DATA - Returning results from', totalResults, 'hotels');
     }
 
     return new Response(
@@ -661,7 +674,7 @@ serve(async (req) => {
         count: results.booking.length + results.airbnb.length + results.worldwide.length + 
                results.hotelscom.length + results.priceline.length + results.tripadvisor.length + 
                results.amadeus.length,
-        mock: !apiSuccess,
+        mock: !apiSuccess || totalResults === 0,
         sources: {
           amadeus: results.amadeus.length,
           booking: results.booking.length,
