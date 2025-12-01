@@ -30,6 +30,11 @@ interface MappedFlight {
   travelClass: string;
   departureDate?: string;
   returnDate?: string;
+  baggage?: {
+    cabin: { pieces: number; weightKg: number; included: boolean };
+    checked: { pieces: number; weightKg: number; included: boolean };
+    personalItem: boolean;
+  };
   raw: any;
 }
 
@@ -98,6 +103,7 @@ const Flights = () => {
         travelClass: cabin,
         departureDate: date,
         returnDate,
+        baggage: offer.baggage || undefined,
         raw: offer,
       };
     });
@@ -172,6 +178,7 @@ const Flights = () => {
       arrival: flight.arrivalTime,
       class: flight.travelClass,
       flightNumber: flight.flightNumber,
+      baggage: flight.baggage,
     };
     setSelectedFlight(adaptedFlight as any);
     setDialogOpen(true);

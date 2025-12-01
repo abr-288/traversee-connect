@@ -32,6 +32,11 @@ interface FlightBookingDialogProps {
     class: string;
     departureDate?: string;
     returnDate?: string;
+    baggage?: {
+      cabin: { pieces: number; weightKg: number; included: boolean };
+      checked: { pieces: number; weightKg: number; included: boolean };
+      personalItem: boolean;
+    };
   };
   searchParams?: {
     departureDate: string;
@@ -431,6 +436,7 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
                     airline={flight.airline}
                     fareType="basic"
                     cabinClass={flight.class}
+                    apiBaggageData={flight.baggage}
                   />
                 </div>
               </div>
