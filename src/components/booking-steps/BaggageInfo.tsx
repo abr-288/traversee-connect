@@ -6,22 +6,57 @@ import { Price } from "@/components/ui/price";
 import { getBaggageAllowance, isLowCostCarrier, formatBaggageInfo } from "@/utils/baggageUtils";
 import { cn } from "@/lib/utils";
 
+interface ApiBaggageData {
+  cabin: {
+    pieces: number;
+    weightKg: number;
+    description?: string;
+    included: boolean;
+  };
+  checked: {
+    pieces: number;
+    weightKg: number;
+    included: boolean;
+  };
+  personalItem: boolean;
+  additionalBagPrice?: number;
+}
+
 interface BaggageInfoProps {
   airline: string;
   fareType?: string;
   cabinClass?: string;
   compact?: boolean;
+  apiBaggageData?: ApiBaggageData;
 }
 
 export function BaggageInfo({ 
   airline, 
   fareType = "basic", 
   cabinClass = "ECONOMY",
-  compact = false 
+  compact = false,
+  apiBaggageData
 }: BaggageInfoProps) {
-  const allowance = getBaggageAllowance(airline, fareType, cabinClass);
+  // Use API data if available, otherwise fall back to static policies
+  const staticAllowance = getBaggageAllowance(airline, fareType, cabinClass);
+  
+  // Merge API data with static data structure
+  const allowance = apiBaggageData ? {
+    cabin: {
+      pieces: apiBaggageData.cabin.pieces,
+      weightKg: apiBaggageData.cabin.weightKg,
+      description: apiBaggageData.cabin.description || `Sac${apiBaggageData.cabin.pieces > 1 ? 's' : ''} cabine`
+    },
+    checked: apiBaggageData.checked,
+    personalItem: apiBaggageData.personalItem,
+    additionalBagPrice: apiBaggageData.additionalBagPrice || staticAllowance.additionalBagPrice
+  } : staticAllowance;
+  
   const { cabinText, checkedText, personalItemText } = formatBaggageInfo(allowance);
   const isLowCost = isLowCostCarrier(airline);
+  
+  // For API data, show a badge indicating real-time data
+  const isRealTimeData = !!apiBaggageData;
 
   if (compact) {
     return (
@@ -65,6 +100,11 @@ export function BaggageInfo({
       <div className="flex items-center gap-2 mb-3">
         <Luggage className="h-4 w-4 text-primary" />
         <h4 className="font-semibold text-sm">Bagages inclus</h4>
+        {isRealTimeData && (
+          <Badge variant="outline" className="text-[10px] px-1.5 py-0 text-green-600 border-green-300">
+            Données réelles
+          </Badge>
+        )}
         {isLowCost && (
           <Badge variant="outline" className="text-[10px] px-1.5 py-0 text-amber-600 border-amber-300">
             Low-cost

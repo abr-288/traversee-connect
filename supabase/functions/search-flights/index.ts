@@ -184,6 +184,11 @@ function getMockFlights(origin: string, destination: string, departureDate: stri
           cabin: travelClass || 'ECONOMY',
         }],
       }],
+      baggage: {
+        cabin: { pieces: 1, weightKg: 8, included: true },
+        checked: { pieces: 1, weightKg: 23, included: airline.code !== 'FR' && airline.code !== 'U2' },
+        personalItem: true
+      },
       source: 'mock'
     };
   });
@@ -571,6 +576,25 @@ async function searchKiwi(
         // Log carrier extraction for debugging
         console.log(`Kiwi flight ${index}: carrier=${carrierCode}, segment keys:`, Object.keys(firstSegment));
         
+        // Extract baggage information from API
+        const baggageAllowances = flight.baggageAllowances || flight.baggage || {};
+        const holdBaggage = baggageAllowances.hold || baggageAllowances.checkedBag || {};
+        const cabinBaggage = baggageAllowances.cabin || baggageAllowances.carryOn || {};
+        
+        const baggageInfo = {
+          cabin: {
+            pieces: cabinBaggage.pieces || cabinBaggage.quantity || 1,
+            weightKg: cabinBaggage.weight || cabinBaggage.kilos || 8,
+            included: true
+          },
+          checked: {
+            pieces: holdBaggage.pieces || holdBaggage.quantity || 0,
+            weightKg: holdBaggage.weight || holdBaggage.kilos || 0,
+            included: (holdBaggage.pieces || holdBaggage.quantity || 0) > 0
+          },
+          personalItem: true
+        };
+        
         return {
           id: `KIWI-${origin}-${destination}-${index}`,
           itineraries: [{
@@ -601,6 +625,7 @@ async function searchKiwi(
               cabin: travelClass || 'ECONOMY',
             }],
           }],
+          baggage: baggageInfo,
           source: 'kiwi',
           deepLink: flight.deepLink || flight.shareId
         };
@@ -795,6 +820,37 @@ async function searchSkyScrapper(
         const priceValue = parseFloat(price.toString()) || 0;
         const priceEur = priceValue;
         
+        // Extract baggage information from API
+        const fareOptions = itinerary.pricingOptions || [];
+        const firstFareOption = fareOptions[0] || {};
+        const baggageOptions = firstFareOption.items || [];
+        
+        // Parse baggage data from fare options
+        let cabinBaggage = { pieces: 1, weightKg: 8, included: true };
+        let checkedBaggage = { pieces: 0, weightKg: 0, included: false };
+        
+        baggageOptions.forEach((item: any) => {
+          if (item.id?.includes('cabin') || item.id?.includes('carry_on')) {
+            cabinBaggage = {
+              pieces: item.quantity || 1,
+              weightKg: item.weight || 8,
+              included: item.included !== false
+            };
+          } else if (item.id?.includes('checked') || item.id?.includes('hold')) {
+            checkedBaggage = {
+              pieces: item.quantity || 1,
+              weightKg: item.weight || 23,
+              included: item.included !== false
+            };
+          }
+        });
+        
+        const baggageInfo = {
+          cabin: cabinBaggage,
+          checked: checkedBaggage,
+          personalItem: true
+        };
+        
         return {
           id: `SKY-${origin}-${destination}-${index}`,
           itineraries: [{
@@ -825,6 +881,7 @@ async function searchSkyScrapper(
               cabin: travelClass || 'ECONOMY',
             }],
           }],
+          baggage: baggageInfo,
           source: 'skyscrapper',
           deepLink: itinerary.deepLink
         };

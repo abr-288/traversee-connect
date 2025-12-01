@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Plane, Check } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -29,7 +29,11 @@ interface Passenger {
 const FlightBookingProcess = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
+
+  // Try to get baggage data from location state
+  const baggageData = location.state?.flight?.baggage || location.state?.baggage;
 
   // Récupération des paramètres du vol
   const airline = searchParams.get("airline") || "Air Côte d'Ivoire";
@@ -246,6 +250,7 @@ const FlightBookingProcess = () => {
                   airline={flightData.airline}
                   fareType={flightData.fare}
                   cabinClass={searchParams.get("class") || "ECONOMY"}
+                  apiBaggageData={baggageData}
                 />
               </div>
             </Card>
