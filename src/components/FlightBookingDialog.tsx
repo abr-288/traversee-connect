@@ -12,6 +12,7 @@ import { Card } from "@/components/ui/card";
 import { Price } from "@/components/ui/price";
 import { validateAndCorrectFlightTimes, formatFlightDate } from "@/utils/flightUtils";
 import { BaggageInfo } from "@/components/booking-steps/BaggageInfo";
+import { getCityName, getAirportName } from "@/utils/airportNames";
 
 interface FlightBookingDialogProps {
   open: boolean;
@@ -347,8 +348,8 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
                             <p className="text-3xl font-bold text-foreground">{flightTimes.departureTime}</p>
                             <Clock className="h-4 w-4 text-muted-foreground" />
                           </div>
-                          <p className="text-base font-semibold">{flight.from}</p>
-                          <p className="text-sm text-muted-foreground">Aéroport international</p>
+                          <p className="text-base font-semibold">{getCityName(flight.from)} ({flight.from})</p>
+                          <p className="text-sm text-muted-foreground">{getAirportName(flight.from)}</p>
                         </div>
                       </div>
 
@@ -403,8 +404,8 @@ export const FlightBookingDialog = ({ open, onOpenChange, flight, searchParams =
                             <p className="text-3xl font-bold text-foreground">{flightTimes.arrivalTime}</p>
                             <Clock className="h-4 w-4 text-muted-foreground" />
                           </div>
-                          <p className="text-base font-semibold">{flight.to}</p>
-                          <p className="text-sm text-muted-foreground">Aéroport international</p>
+                          <p className="text-base font-semibold">{getCityName(flight.to)} ({flight.to})</p>
+                          <p className="text-sm text-muted-foreground">{getAirportName(flight.to)}</p>
                         </div>
                       </div>
                     </div>
