@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2, Loader2, RefreshCw, Percent, MapPin, Image } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { ImageUpload } from "@/components/admin/ImageUpload";
 
 interface Promotion {
   id: string;
@@ -322,14 +323,24 @@ export default function AdminPromotions() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>URL Image</Label>
+                  <Label>Note (0-5)</Label>
                   <Input
-                    value={formData.image_url || ""}
-                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                    placeholder="https://..."
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="5"
+                    value={formData.rating}
+                    onChange={(e) => setFormData({ ...formData, rating: parseFloat(e.target.value) || 0 })}
                   />
                 </div>
               </div>
+
+              <ImageUpload
+                value={formData.image_url || ""}
+                onChange={(url) => setFormData({ ...formData, image_url: url })}
+                folder="promotions"
+                label="Image de la promotion"
+              />
 
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
@@ -360,26 +371,13 @@ export default function AdminPromotions() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Note (0-5)</Label>
-                  <Input
-                    type="number"
-                    step="0.1"
-                    min="0"
-                    max="5"
-                    value={formData.rating}
-                    onChange={(e) => setFormData({ ...formData, rating: parseFloat(e.target.value) || 0 })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Date d'expiration</Label>
-                  <Input
-                    type="datetime-local"
-                    value={formData.expires_at ? formData.expires_at.slice(0, 16) : ""}
-                    onChange={(e) => setFormData({ ...formData, expires_at: e.target.value ? new Date(e.target.value).toISOString() : null })}
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label>Date d'expiration</Label>
+                <Input
+                  type="datetime-local"
+                  value={formData.expires_at ? formData.expires_at.slice(0, 16) : ""}
+                  onChange={(e) => setFormData({ ...formData, expires_at: e.target.value ? new Date(e.target.value).toISOString() : null })}
+                />
               </div>
 
               <div className="flex items-center gap-2">
