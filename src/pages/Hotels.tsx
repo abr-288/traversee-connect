@@ -166,208 +166,45 @@ const Hotels = () => {
         toast.warning("Aucune donnée réelle disponible. Affichage de suggestions d'exemple.");
       }
       
+      // Helper function to transform hotel data from any API source
+      const transformHotelData = (hotel: any, sourceName: string) => {
+        const price = typeof hotel.price === 'object' && hotel.price?.grandTotal 
+          ? parseFloat(hotel.price.grandTotal) 
+          : typeof hotel.price === 'number' 
+          ? hotel.price 
+          : parseFloat(hotel.price?.total || hotel.price || 0);
+        
+        return {
+          id: hotel.id || hotel.hotel_id || Math.random().toString(),
+          name: hotel.name || 'Hôtel',
+          location: hotel.location || hotel.address || location,
+          address: hotel.address || '',
+          price: Math.round(price),
+          currency: hotel.currency || 'EUR',
+          rating: hotel.rating || hotel.review_score || 8.0,
+          stars: hotel.stars || Math.ceil((hotel.rating || 8) / 2),
+          reviews: hotel.reviews || hotel.review_count || 0,
+          image: hotel.image || hotel.images?.[0] || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
+          images: hotel.images || [hotel.image],
+          amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
+          description: hotel.description || '',
+          freeCancellation: hotel.freeCancellation || false,
+          breakfast: hotel.breakfast || false,
+          source: sourceName
+        };
+      };
+
       // Transform API data to match display structure with source tracking
-      const bookingHotels = (result.data?.booking || []).map((hotel: any) => {
-        const price = typeof hotel.price === 'object' && hotel.price?.grandTotal 
-          ? parseFloat(hotel.price.grandTotal) 
-          : typeof hotel.price === 'number' 
-          ? hotel.price 
-          : parseFloat(hotel.price?.total || hotel.price || 0);
-        
-        console.log('Booking Hotel Data:', { name: hotel.name, image: hotel.image, location: hotel.location });
-        
-        return {
-          id: hotel.id || hotel.hotel_id || Math.random().toString(),
-          name: hotel.name || 'Hôtel Sans Nom',
-          location: hotel.location || location,
-          price: Math.round(price),
-          rating: hotel.rating || hotel.review_score || 4.0,
-          reviews: hotel.reviews || hotel.review_count || 0,
-          image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
-          amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
-          source: 'Booking.com'
-        };
-      });
-
-      const airbnbHotels = (result.data?.airbnb || []).map((hotel: any) => {
-        const price = typeof hotel.price === 'object' && hotel.price?.grandTotal 
-          ? parseFloat(hotel.price.grandTotal) 
-          : typeof hotel.price === 'number' 
-          ? hotel.price 
-          : parseFloat(hotel.price?.total || hotel.price || 0);
-        
-        return {
-          id: hotel.id || hotel.hotel_id || Math.random().toString(),
-          name: hotel.name || 'Hébergement Sans Nom',
-          location: hotel.location || location,
-          price: Math.round(price),
-          rating: hotel.rating || hotel.review_score || 4.0,
-          reviews: hotel.reviews || hotel.review_count || 0,
-          image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
-          amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
-          source: 'Airbnb'
-        };
-      });
-
-      const worldwideHotels = (result.data?.worldwide || []).map((hotel: any) => {
-        const price = typeof hotel.price === 'object' && hotel.price?.grandTotal 
-          ? parseFloat(hotel.price.grandTotal) 
-          : typeof hotel.price === 'number' 
-          ? hotel.price 
-          : parseFloat(hotel.price?.total || hotel.price || 0);
-        
-        return {
-          id: hotel.id || hotel.hotel_id || Math.random().toString(),
-          name: hotel.name || 'Hôtel International',
-          location: hotel.location || location,
-          price: Math.round(price),
-          rating: hotel.rating || hotel.review_score || 4.0,
-          reviews: hotel.reviews || hotel.review_count || 0,
-          image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
-          amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
-          source: 'Worldwide Hotels'
-        };
-      });
-
-      const hotelscomHotels = (result.data?.hotelscom || []).map((hotel: any) => {
-        const price = typeof hotel.price === 'object' && hotel.price?.grandTotal 
-          ? parseFloat(hotel.price.grandTotal) 
-          : typeof hotel.price === 'number' 
-          ? hotel.price 
-          : parseFloat(hotel.price?.total || hotel.price || 0);
-        
-        return {
-          id: hotel.id || hotel.hotel_id || Math.random().toString(),
-          name: hotel.name || 'Hôtel',
-          location: hotel.location || location,
-          price: Math.round(price),
-          rating: hotel.rating || hotel.review_score || 4.0,
-          reviews: hotel.reviews || hotel.review_count || 0,
-          image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
-          amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
-          source: 'Hotels.com'
-        };
-      });
-
-      const pricelineHotels = (result.data?.priceline || []).map((hotel: any) => {
-        const price = typeof hotel.price === 'object' && hotel.price?.grandTotal 
-          ? parseFloat(hotel.price.grandTotal) 
-          : typeof hotel.price === 'number' 
-          ? hotel.price 
-          : parseFloat(hotel.price?.total || hotel.price || 0);
-        
-        return {
-          id: hotel.id || hotel.hotel_id || Math.random().toString(),
-          name: hotel.name || 'Hôtel',
-          location: hotel.location || location,
-          price: Math.round(price),
-          rating: hotel.rating || hotel.review_score || 4.0,
-          reviews: hotel.reviews || hotel.review_count || 0,
-          image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
-          amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
-          source: 'Priceline'
-        };
-      });
-
-      const amadeusHotels = (result.data?.amadeus || []).map((hotel: any) => {
-        const price = typeof hotel.price === 'object' && hotel.price?.grandTotal 
-          ? parseFloat(hotel.price.grandTotal) 
-          : typeof hotel.price === 'number' 
-          ? hotel.price 
-          : parseFloat(hotel.price?.total || hotel.price || 0);
-        
-        return {
-          id: hotel.id || hotel.hotel_id || Math.random().toString(),
-          name: hotel.name || 'Hôtel',
-          location: hotel.location || location,
-          price: Math.round(price),
-          rating: hotel.rating || hotel.review_score || 4.0,
-          reviews: hotel.reviews || hotel.review_count || 0,
-          image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
-          amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
-          source: 'Amadeus'
-        };
-      });
-
-      const tripadvisorHotels = (result.data?.tripadvisor || []).map((hotel: any) => {
-        const price = typeof hotel.price === 'object' && hotel.price?.grandTotal 
-          ? parseFloat(hotel.price.grandTotal) 
-          : typeof hotel.price === 'number' 
-          ? hotel.price 
-          : parseFloat(hotel.price?.total || hotel.price || 0);
-        
-        return {
-          id: hotel.id || hotel.hotel_id || Math.random().toString(),
-          name: hotel.name || 'Hôtel',
-          location: hotel.location || location,
-          price: Math.round(price),
-          rating: hotel.rating || hotel.review_score || 4.0,
-          reviews: hotel.reviews || hotel.review_count || 0,
-          image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
-          amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
-          source: 'TripAdvisor'
-        };
-      });
-
-      const skyscannerHotels = (result.data?.skyscanner || []).map((hotel: any) => {
-        const price = typeof hotel.price === 'object' && hotel.price?.grandTotal 
-          ? parseFloat(hotel.price.grandTotal) 
-          : typeof hotel.price === 'number' 
-          ? hotel.price 
-          : parseFloat(hotel.price?.total || hotel.price || 0);
-        
-        return {
-          id: hotel.id || hotel.hotel_id || Math.random().toString(),
-          name: hotel.name || 'Hôtel',
-          location: hotel.location || location,
-          price: Math.round(price),
-          rating: hotel.rating || hotel.review_score || 4.0,
-          reviews: hotel.reviews || hotel.review_count || 0,
-          image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
-          amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
-          source: 'Skyscanner'
-        };
-      });
-
-      const agodaHotels = (result.data?.agoda || []).map((hotel: any) => {
-        const price = typeof hotel.price === 'object' && hotel.price?.grandTotal 
-          ? parseFloat(hotel.price.grandTotal) 
-          : typeof hotel.price === 'number' 
-          ? hotel.price 
-          : parseFloat(hotel.price?.total || hotel.price || 0);
-        
-        return {
-          id: hotel.id || hotel.hotel_id || Math.random().toString(),
-          name: hotel.name || 'Hôtel',
-          location: hotel.location || location,
-          price: Math.round(price),
-          rating: hotel.rating || hotel.review_score || 4.0,
-          reviews: hotel.reviews || hotel.review_count || 0,
-          image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
-          amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
-          source: 'Agoda'
-        };
-      });
-
-      const expediaHotels = (result.data?.expedia || []).map((hotel: any) => {
-        const price = typeof hotel.price === 'object' && hotel.price?.grandTotal 
-          ? parseFloat(hotel.price.grandTotal) 
-          : typeof hotel.price === 'number' 
-          ? hotel.price 
-          : parseFloat(hotel.price?.total || hotel.price || 0);
-        
-        return {
-          id: hotel.id || hotel.hotel_id || Math.random().toString(),
-          name: hotel.name || 'Hôtel',
-          location: hotel.location || location,
-          price: Math.round(price),
-          rating: hotel.rating || hotel.review_score || 4.0,
-          reviews: hotel.reviews || hotel.review_count || 0,
-          image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
-          amenities: hotel.amenities || hotel.facilities || ['Wifi', 'Restaurant'],
-          source: 'Expedia'
-        };
-      });
+      const bookingHotels = (result.data?.booking || []).map((hotel: any) => transformHotelData(hotel, 'Booking.com'));
+      const airbnbHotels = (result.data?.airbnb || []).map((hotel: any) => transformHotelData(hotel, 'Airbnb'));
+      const worldwideHotels = (result.data?.worldwide || []).map((hotel: any) => transformHotelData(hotel, 'Worldwide'));
+      const hotelscomHotels = (result.data?.hotelscom || []).map((hotel: any) => transformHotelData(hotel, 'Hotels.com'));
+      const pricelineHotels = (result.data?.priceline || []).map((hotel: any) => transformHotelData(hotel, 'Priceline'));
+      const amadeusHotels = (result.data?.amadeus || []).map((hotel: any) => transformHotelData(hotel, 'Amadeus'));
+      const tripadvisorHotels = (result.data?.tripadvisor || []).map((hotel: any) => transformHotelData(hotel, 'TripAdvisor'));
+      const skyscannerHotels = (result.data?.skyscanner || []).map((hotel: any) => transformHotelData(hotel, 'Skyscanner'));
+      const agodaHotels = (result.data?.agoda || []).map((hotel: any) => transformHotelData(hotel, 'Agoda'));
+      const expediaHotels = (result.data?.expedia || []).map((hotel: any) => transformHotelData(hotel, 'Expedia'));
 
       const transformedHotels = [
         ...amadeusHotels,
@@ -821,6 +658,22 @@ const Hotels = () => {
               <div className="grid gap-6">
                 {paginatedHotels.map((hotel, index) => {
                   const isSelected = selectedHotels.some((h) => h.id === hotel.id);
+                  // Normalize rating - if > 5, it's on 10 scale; otherwise convert to 10
+                  const ratingOn10 = hotel.rating > 5 ? hotel.rating : hotel.rating * 2;
+                  const ratingDisplay = Math.min(ratingOn10, 10).toFixed(1);
+                  // Hotel stars (classification)
+                  const hotelStars = (hotel as any).stars || Math.ceil(hotel.rating);
+                  
+                  // Rating qualifier based on 10 scale
+                  const getRatingQualifier = (rating: number) => {
+                    if (rating >= 9) return { text: 'Exceptionnel', color: 'text-emerald-600 dark:text-emerald-400' };
+                    if (rating >= 8) return { text: 'Excellent', color: 'text-green-600 dark:text-green-400' };
+                    if (rating >= 7) return { text: 'Très bien', color: 'text-blue-600 dark:text-blue-400' };
+                    if (rating >= 6) return { text: 'Bien', color: 'text-sky-600 dark:text-sky-400' };
+                    return { text: 'Correct', color: 'text-gray-600 dark:text-gray-400' };
+                  };
+                  const qualifier = getRatingQualifier(ratingOn10);
+                  
                   return (
                 <Card key={hotel.id || index} className={`overflow-hidden hover:shadow-lg transition-all ${isSelected ? 'ring-2 ring-primary' : ''}`}>
                   <div className="grid md:grid-cols-3 gap-6">
@@ -838,7 +691,7 @@ const Hotels = () => {
                         />
                       </div>
                       <div className="absolute top-2 right-2 flex flex-col gap-2">
-                        {hotel.rating >= 4.5 && (
+                        {ratingOn10 >= 9 && (
                           <Badge className="bg-amber-500 hover:bg-amber-600 text-white border-0">
                             <Star className="w-3 h-3 mr-1 fill-white" />
                             Top noté
@@ -847,6 +700,16 @@ const Hotels = () => {
                         {hotel.reviews > 200 && (
                           <Badge className="bg-blue-500 hover:bg-blue-600 text-white border-0">
                             Populaire
+                          </Badge>
+                        )}
+                        {(hotel as any).freeCancellation && (
+                          <Badge className="bg-green-500 hover:bg-green-600 text-white border-0">
+                            Annulation gratuite
+                          </Badge>
+                        )}
+                        {(hotel as any).breakfast && (
+                          <Badge className="bg-orange-500 hover:bg-orange-600 text-white border-0">
+                            Petit-déj inclus
                           </Badge>
                         )}
                         {(hotel as any).source && (
@@ -867,37 +730,35 @@ const Hotels = () => {
                             <MapPin className="w-4 h-4 flex-shrink-0" />
                             <span className="line-clamp-1">{hotel.location}</span>
                           </div>
-                          <div className="flex items-center gap-4 mb-3">
-                            <div className="flex items-center gap-2">
-                              <div className="flex">
-                                {[...Array(5)].map((_, i) => (
-                                  <Star
-                                    key={i}
-                                    className={`w-4 h-4 ${
-                                      i < Math.floor(hotel.rating)
-                                        ? "fill-accent text-accent"
-                                        : "text-gray-300"
-                                    }`}
-                                  />
-                                ))}
-                              </div>
-                              <span className="font-semibold text-lg">
-                                {hotel.rating.toFixed(1)}
-                              </span>
+                          <div className="flex items-center gap-4 mb-3 flex-wrap">
+                            {/* Hotel star classification */}
+                            <div className="flex items-center gap-1">
+                              {[...Array(Math.min(hotelStars, 5))].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className="w-4 h-4 fill-amber-400 text-amber-400"
+                                />
+                              ))}
+                              {hotelStars < 5 && [...Array(5 - Math.min(hotelStars, 5))].map((_, i) => (
+                                <Star
+                                  key={i + hotelStars}
+                                  className="w-4 h-4 text-gray-300"
+                                />
+                              ))}
                             </div>
-                            <span className="text-sm text-muted-foreground">
-                              {hotel.reviews} avis
+                            {/* Guest rating */}
+                            <div className="flex items-center gap-2 bg-primary/10 px-2 py-1 rounded-md">
+                              <span className="font-bold text-lg text-primary">
+                                {ratingDisplay}
+                              </span>
+                              <span className="text-xs text-muted-foreground">/10</span>
+                            </div>
+                            <span className={`text-sm font-medium ${qualifier.color}`}>
+                              {qualifier.text}
                             </span>
-                            {hotel.rating >= 4.7 && (
-                              <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
-                                Excellent
-                              </span>
-                            )}
-                            {hotel.rating >= 4.0 && hotel.rating < 4.7 && (
-                              <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
-                                Très bien
-                              </span>
-                            )}
+                            <span className="text-sm text-muted-foreground">
+                              ({hotel.reviews.toLocaleString()} avis)
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -929,7 +790,7 @@ const Hotels = () => {
                             <p className="text-3xl font-bold text-primary">
                               {hotel.price.toLocaleString()}
                             </p>
-                            <span className="text-lg font-semibold text-muted-foreground">EUR</span>
+                            <span className="text-lg font-semibold text-muted-foreground">{(hotel as any).currency || 'EUR'}</span>
                           </div>
                           <p className="text-xs text-muted-foreground mt-1">par nuit • Taxes incluses</p>
                         </div>
