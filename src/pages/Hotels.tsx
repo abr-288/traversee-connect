@@ -82,7 +82,10 @@ const Hotels = () => {
               ...(result.data.tripadvisor || []),
               ...(result.data.skyscanner || []),
               ...(result.data.agoda || []),
-              ...(result.data.expedia || [])
+              ...(result.data.expedia || []),
+              ...(result.data.hotels4 || []),
+              ...(result.data.hotelsData || []),
+              ...(result.data.makcorps || [])
             ];
 
             hotels.forEach((hotel: any) => {
@@ -205,6 +208,9 @@ const Hotels = () => {
       const skyscannerHotels = (result.data?.skyscanner || []).map((hotel: any) => transformHotelData(hotel, 'Skyscanner'));
       const agodaHotels = (result.data?.agoda || []).map((hotel: any) => transformHotelData(hotel, 'Agoda'));
       const expediaHotels = (result.data?.expedia || []).map((hotel: any) => transformHotelData(hotel, 'Expedia'));
+      const hotels4Hotels = (result.data?.hotels4 || []).map((hotel: any) => transformHotelData(hotel, 'Hotels4'));
+      const hotelsDataHotels = (result.data?.hotelsData || []).map((hotel: any) => transformHotelData(hotel, 'HotelsData'));
+      const makcorpsHotels = (result.data?.makcorps || []).map((hotel: any) => transformHotelData(hotel, 'Makcorps'));
 
       const transformedHotels = [
         ...amadeusHotels,
@@ -216,7 +222,10 @@ const Hotels = () => {
         ...tripadvisorHotels,
         ...skyscannerHotels,
         ...agodaHotels,
-        ...expediaHotels
+        ...expediaHotels,
+        ...hotels4Hotels,
+        ...hotelsDataHotels,
+        ...makcorpsHotels
       ];
       
       if (transformedHotels.length > 0) {
