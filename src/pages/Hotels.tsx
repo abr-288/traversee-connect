@@ -74,18 +74,12 @@ const Hotels = () => {
           if (result?.success && result.data) {
             const hotels = [
               ...(result.data.booking || []),
-              ...(result.data.airbnb || []),
-              ...(result.data.worldwide || []),
+              ...(result.data.xotelo || []),
               ...(result.data.hotelscom || []),
               ...(result.data.priceline || []),
               ...(result.data.amadeus || []),
               ...(result.data.tripadvisor || []),
-              ...(result.data.skyscanner || []),
-              ...(result.data.agoda || []),
-              ...(result.data.expedia || []),
-              ...(result.data.hotels4 || []),
-              ...(result.data.hotelsData || []),
-              ...(result.data.makcorps || [])
+              ...(result.data.hotels4 || [])
             ];
 
             hotels.forEach((hotel: any) => {
