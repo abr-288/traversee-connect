@@ -19,6 +19,9 @@ import { useTranslation } from "react-i18next";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 
+// Popular locations for default car results
+const DEFAULT_CAR_LOCATIONS = ['Paris', 'Nice', 'Lyon', 'Marseille', 'Bordeaux'];
+
 const Cars = () => {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
@@ -30,6 +33,8 @@ const Cars = () => {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [apiCars, setApiCars] = useState<CarData[]>([]);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [isDefaultResults, setIsDefaultResults] = useState(false);
+  const [loadingDefault, setLoadingDefault] = useState(false);
   
   // Filter states
   const [filterLocation, setFilterLocation] = useState("");
@@ -44,6 +49,7 @@ const Cars = () => {
   const [hasSearched, setHasSearched] = useState(false);
   const itemsPerPage = 12;
 
+  // Load default cars on mount
   useEffect(() => {
     const location = searchParams.get("location");
     const pickupDate = searchParams.get("pickupDate");
@@ -51,9 +57,87 @@ const Cars = () => {
 
     if (location && pickupDate && returnDate) {
       setHasSearched(true);
+      setIsDefaultResults(false);
       handleSearch(location, pickupDate, returnDate);
+    } else {
+      // Load default cars from popular locations
+      loadDefaultCars();
     }
   }, [searchParams]);
+
+  const loadDefaultCars = async () => {
+    setLoadingDefault(true);
+    setIsDefaultResults(true);
+    
+    // Generate dates for next week
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const nextWeek = new Date();
+    nextWeek.setDate(nextWeek.getDate() + 8);
+    
+    const pickupDate = tomorrow.toISOString().split('T')[0];
+    const dropoffDate = nextWeek.toISOString().split('T')[0];
+    
+    try {
+      // Search for cars in multiple popular locations
+      const searchPromises = DEFAULT_CAR_LOCATIONS.map(location =>
+        searchCarRentals({
+          pickupLocation: location,
+          dropoffLocation: location,
+          pickupDate,
+          dropoffDate
+        })
+      );
+      
+      const results = await Promise.all(searchPromises);
+      
+      const allCars: CarData[] = [];
+      results.forEach((result, index) => {
+        if (result?.success && result?.data) {
+          const carsArray = Array.isArray(result.data) ? result.data : [result.data];
+          carsArray.slice(0, 4).forEach((car: any) => {
+            allCars.push({
+              id: car.id || `${DEFAULT_CAR_LOCATIONS[index]}-${Math.random().toString()}`,
+              name: car.name || 'Véhicule',
+              brand: car.brand,
+              model: car.model,
+              category: car.category || 'Standard',
+              price: typeof car.price === 'number' ? car.price : parseFloat(car.price || 50),
+              currency: car.currency || 'EUR',
+              rating: car.rating || 4.5,
+              reviews: car.reviews || 0,
+              image: car.image || '/placeholder.svg',
+              seats: car.seats || 5,
+              transmission: car.transmission || 'Automatique',
+              fuel: car.fuel || 'Essence',
+              luggage: car.luggage || 3,
+              airConditioning: car.airConditioning !== false,
+              provider: car.provider || 'B-Reserve',
+              source: car.source || 'api',
+              unlimitedMileage: car.unlimitedMileage !== false,
+              freeCancellation: car.freeCancellation === true,
+              fuelPolicy: car.fuelPolicy || 'full-to-full',
+              deposit: car.deposit || null,
+              doors: car.doors || 4,
+              engineSize: car.engineSize,
+              year: car.year,
+              pickupLocation: car.pickupLocation || DEFAULT_CAR_LOCATIONS[index],
+              features: car.features || [],
+            });
+          });
+        }
+      });
+      
+      if (allCars.length > 0) {
+        setApiCars(allCars);
+        toast.success(`${allCars.length} véhicules disponibles dans les destinations populaires`);
+      }
+    } catch (error) {
+      console.error('Error loading default cars:', error);
+    } finally {
+      setLoadingDefault(false);
+    }
+  };
 
   const handleSearch = async (pickupLocation: string, pickupDate: string, dropoffDate: string) => {
     const result = await searchCarRentals({
@@ -254,6 +338,19 @@ const Cars = () => {
 
           {/* Results */}
           <div className="lg:col-span-3 space-y-4">
+            {/* Default results badge */}
+            {isDefaultResults && apiCars.length > 0 && (
+              <div className="flex items-center gap-2 p-3 bg-primary/10 border border-primary/20 rounded-xl">
+                <Badge className="bg-primary text-primary-foreground">
+                  <CarIcon className="w-3 h-3 mr-1" />
+                  Véhicules disponibles
+                </Badge>
+                <span className="text-sm text-muted-foreground">
+                  Voitures de location dans les destinations populaires (Paris, Nice, Lyon, Marseille, Bordeaux)
+                </span>
+              </div>
+            )}
+
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 bg-card rounded-xl border">
               <div className="flex items-center gap-3">
@@ -282,15 +379,15 @@ const Cars = () => {
             </div>
 
             {/* Loading */}
-            {loading && (
+            {(loading || loadingDefault) && (
               <div className="flex justify-center items-center py-16">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                <span className="ml-3">Recherche en cours...</span>
+                <span className="ml-3">{loadingDefault ? 'Chargement des véhicules disponibles...' : 'Recherche en cours...'}</span>
               </div>
             )}
 
             {/* Empty State */}
-            {!loading && filteredAndSortedCars.length === 0 && (
+            {!loading && !loadingDefault && filteredAndSortedCars.length === 0 && (
               <div className="text-center py-16 bg-card rounded-xl border">
                 <CarIcon className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-xl font-semibold mb-2">Aucun véhicule trouvé</h3>
@@ -300,7 +397,7 @@ const Cars = () => {
             )}
 
             {/* Results Grid */}
-            {!loading && paginatedCars.length > 0 && (
+            {!loading && !loadingDefault && paginatedCars.length > 0 && (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                   {paginatedCars.map((car) => (
