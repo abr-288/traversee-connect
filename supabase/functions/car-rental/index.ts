@@ -36,66 +36,183 @@ interface CarResult {
   features: string[];
 }
 
-// Car images by category for realistic display
-const carImages: Record<string, string[]> = {
-  economy: [
-    'https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=600&h=400&fit=crop',
-    'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=600&h=400&fit=crop',
-    'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?w=600&h=400&fit=crop',
-  ],
-  compact: [
-    'https://images.unsplash.com/photo-1550355291-bbee04a92027?w=600&h=400&fit=crop',
-    'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&h=400&fit=crop',
-    'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=600&h=400&fit=crop',
-  ],
-  sedan: [
-    'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=600&h=400&fit=crop',
-    'https://images.unsplash.com/photo-1583267746897-2cf415887172?w=600&h=400&fit=crop',
-    'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600&h=400&fit=crop',
-  ],
-  suv: [
-    'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=600&h=400&fit=crop',
-    'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=600&h=400&fit=crop',
-    'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=600&h=400&fit=crop',
-  ],
-  luxury: [
-    'https://images.unsplash.com/photo-1563720360172-67b8f3dce741?w=600&h=400&fit=crop',
-    'https://images.unsplash.com/photo-1617531653332-bd46c24f2068?w=600&h=400&fit=crop',
-    'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=600&h=400&fit=crop',
-  ],
-  minivan: [
-    'https://images.unsplash.com/photo-1559416523-140ddc3d238c?w=600&h=400&fit=crop',
-    'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop',
-  ],
-  premium: [
-    'https://images.unsplash.com/photo-1542362567-b07e54358753?w=600&h=400&fit=crop',
-    'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&h=400&fit=crop',
-  ],
-  default: [
-    'https://images.unsplash.com/photo-1494905998402-395d579af36f?w=600&h=400&fit=crop',
-    'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=600&h=400&fit=crop',
-  ],
+// Real car images by brand and model for accurate display
+const carImagesByBrand: Record<string, Record<string, string>> = {
+  'Toyota': {
+    'Corolla': 'https://www.toyota.fr/content/dam/toyota/vehicles/2023/corolla/gallery/corolla-2023-exterior-1.jpg',
+    'Yaris': 'https://www.toyota.fr/content/dam/toyota/vehicles/2023/yaris/gallery/yaris-2023-exterior-1.jpg',
+    'RAV4': 'https://www.toyota.fr/content/dam/toyota/vehicles/2023/rav4/gallery/rav4-2023-exterior-1.jpg',
+    'Land Cruiser': 'https://www.toyota.fr/content/dam/toyota/vehicles/2023/land-cruiser/gallery/land-cruiser-2023-exterior-1.jpg',
+    'Camry': 'https://www.toyota.fr/content/dam/toyota/vehicles/2023/camry/gallery/camry-2023-exterior-1.jpg',
+    'C-HR': 'https://www.toyota.fr/content/dam/toyota/vehicles/2023/c-hr/gallery/c-hr-2023-exterior-1.jpg',
+    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-toyota&make=Toyota&modelFamily=Corolla&modelRange=Corolla&modelVariant=&modelYear=2024&angle=front&aspect=3:2&width=800'
+  },
+  'Renault': {
+    'Clio': 'https://cdn.imagin.studio/getimage?customer=frfr-renault&make=Renault&modelFamily=Clio&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Megane': 'https://cdn.imagin.studio/getimage?customer=frfr-renault&make=Renault&modelFamily=Megane&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Captur': 'https://cdn.imagin.studio/getimage?customer=frfr-renault&make=Renault&modelFamily=Captur&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Kadjar': 'https://cdn.imagin.studio/getimage?customer=frfr-renault&make=Renault&modelFamily=Kadjar&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Scenic': 'https://cdn.imagin.studio/getimage?customer=frfr-renault&make=Renault&modelFamily=Scenic&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-renault&make=Renault&modelFamily=Clio&modelYear=2024&angle=front&aspect=3:2&width=800'
+  },
+  'Peugeot': {
+    '208': 'https://cdn.imagin.studio/getimage?customer=frfr-peugeot&make=Peugeot&modelFamily=208&modelYear=2024&angle=front&aspect=3:2&width=800',
+    '308': 'https://cdn.imagin.studio/getimage?customer=frfr-peugeot&make=Peugeot&modelFamily=308&modelYear=2024&angle=front&aspect=3:2&width=800',
+    '3008': 'https://cdn.imagin.studio/getimage?customer=frfr-peugeot&make=Peugeot&modelFamily=3008&modelYear=2024&angle=front&aspect=3:2&width=800',
+    '5008': 'https://cdn.imagin.studio/getimage?customer=frfr-peugeot&make=Peugeot&modelFamily=5008&modelYear=2024&angle=front&aspect=3:2&width=800',
+    '508': 'https://cdn.imagin.studio/getimage?customer=frfr-peugeot&make=Peugeot&modelFamily=508&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-peugeot&make=Peugeot&modelFamily=308&modelYear=2024&angle=front&aspect=3:2&width=800'
+  },
+  'Volkswagen': {
+    'Golf': 'https://cdn.imagin.studio/getimage?customer=frfr-volkswagen&make=Volkswagen&modelFamily=Golf&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Polo': 'https://cdn.imagin.studio/getimage?customer=frfr-volkswagen&make=Volkswagen&modelFamily=Polo&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Passat': 'https://cdn.imagin.studio/getimage?customer=frfr-volkswagen&make=Volkswagen&modelFamily=Passat&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Tiguan': 'https://cdn.imagin.studio/getimage?customer=frfr-volkswagen&make=Volkswagen&modelFamily=Tiguan&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'T-Roc': 'https://cdn.imagin.studio/getimage?customer=frfr-volkswagen&make=Volkswagen&modelFamily=T-Roc&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-volkswagen&make=Volkswagen&modelFamily=Golf&modelYear=2024&angle=front&aspect=3:2&width=800'
+  },
+  'Mercedes-Benz': {
+    'Classe A': 'https://cdn.imagin.studio/getimage?customer=frfr-mercedes&make=Mercedes-Benz&modelFamily=A-Class&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Classe C': 'https://cdn.imagin.studio/getimage?customer=frfr-mercedes&make=Mercedes-Benz&modelFamily=C-Class&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Classe E': 'https://cdn.imagin.studio/getimage?customer=frfr-mercedes&make=Mercedes-Benz&modelFamily=E-Class&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'GLA': 'https://cdn.imagin.studio/getimage?customer=frfr-mercedes&make=Mercedes-Benz&modelFamily=GLA&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'GLC': 'https://cdn.imagin.studio/getimage?customer=frfr-mercedes&make=Mercedes-Benz&modelFamily=GLC&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-mercedes&make=Mercedes-Benz&modelFamily=C-Class&modelYear=2024&angle=front&aspect=3:2&width=800'
+  },
+  'BMW': {
+    'Série 1': 'https://cdn.imagin.studio/getimage?customer=frfr-bmw&make=BMW&modelFamily=1-Series&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Série 3': 'https://cdn.imagin.studio/getimage?customer=frfr-bmw&make=BMW&modelFamily=3-Series&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'X1': 'https://cdn.imagin.studio/getimage?customer=frfr-bmw&make=BMW&modelFamily=X1&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'X3': 'https://cdn.imagin.studio/getimage?customer=frfr-bmw&make=BMW&modelFamily=X3&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'X5': 'https://cdn.imagin.studio/getimage?customer=frfr-bmw&make=BMW&modelFamily=X5&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-bmw&make=BMW&modelFamily=3-Series&modelYear=2024&angle=front&aspect=3:2&width=800'
+  },
+  'Audi': {
+    'A1': 'https://cdn.imagin.studio/getimage?customer=frfr-audi&make=Audi&modelFamily=A1&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'A3': 'https://cdn.imagin.studio/getimage?customer=frfr-audi&make=Audi&modelFamily=A3&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'A4': 'https://cdn.imagin.studio/getimage?customer=frfr-audi&make=Audi&modelFamily=A4&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Q3': 'https://cdn.imagin.studio/getimage?customer=frfr-audi&make=Audi&modelFamily=Q3&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Q5': 'https://cdn.imagin.studio/getimage?customer=frfr-audi&make=Audi&modelFamily=Q5&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-audi&make=Audi&modelFamily=A4&modelYear=2024&angle=front&aspect=3:2&width=800'
+  },
+  'Ford': {
+    'Fiesta': 'https://cdn.imagin.studio/getimage?customer=frfr-ford&make=Ford&modelFamily=Fiesta&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Focus': 'https://cdn.imagin.studio/getimage?customer=frfr-ford&make=Ford&modelFamily=Focus&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Puma': 'https://cdn.imagin.studio/getimage?customer=frfr-ford&make=Ford&modelFamily=Puma&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Kuga': 'https://cdn.imagin.studio/getimage?customer=frfr-ford&make=Ford&modelFamily=Kuga&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-ford&make=Ford&modelFamily=Focus&modelYear=2024&angle=front&aspect=3:2&width=800'
+  },
+  'Citroën': {
+    'C3': 'https://cdn.imagin.studio/getimage?customer=frfr-citroen&make=Citroen&modelFamily=C3&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'C4': 'https://cdn.imagin.studio/getimage?customer=frfr-citroen&make=Citroen&modelFamily=C4&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'C5 Aircross': 'https://cdn.imagin.studio/getimage?customer=frfr-citroen&make=Citroen&modelFamily=C5-Aircross&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Berlingo': 'https://cdn.imagin.studio/getimage?customer=frfr-citroen&make=Citroen&modelFamily=Berlingo&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-citroen&make=Citroen&modelFamily=C3&modelYear=2024&angle=front&aspect=3:2&width=800'
+  },
+  'Hyundai': {
+    'i10': 'https://cdn.imagin.studio/getimage?customer=frfr-hyundai&make=Hyundai&modelFamily=i10&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'i20': 'https://cdn.imagin.studio/getimage?customer=frfr-hyundai&make=Hyundai&modelFamily=i20&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'i30': 'https://cdn.imagin.studio/getimage?customer=frfr-hyundai&make=Hyundai&modelFamily=i30&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Tucson': 'https://cdn.imagin.studio/getimage?customer=frfr-hyundai&make=Hyundai&modelFamily=Tucson&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Kona': 'https://cdn.imagin.studio/getimage?customer=frfr-hyundai&make=Hyundai&modelFamily=Kona&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-hyundai&make=Hyundai&modelFamily=Tucson&modelYear=2024&angle=front&aspect=3:2&width=800'
+  },
+  'Kia': {
+    'Picanto': 'https://cdn.imagin.studio/getimage?customer=frfr-kia&make=Kia&modelFamily=Picanto&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Rio': 'https://cdn.imagin.studio/getimage?customer=frfr-kia&make=Kia&modelFamily=Rio&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Ceed': 'https://cdn.imagin.studio/getimage?customer=frfr-kia&make=Kia&modelFamily=Ceed&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Sportage': 'https://cdn.imagin.studio/getimage?customer=frfr-kia&make=Kia&modelFamily=Sportage&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Niro': 'https://cdn.imagin.studio/getimage?customer=frfr-kia&make=Kia&modelFamily=Niro&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-kia&make=Kia&modelFamily=Sportage&modelYear=2024&angle=front&aspect=3:2&width=800'
+  },
+  'Nissan': {
+    'Micra': 'https://cdn.imagin.studio/getimage?customer=frfr-nissan&make=Nissan&modelFamily=Micra&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Juke': 'https://cdn.imagin.studio/getimage?customer=frfr-nissan&make=Nissan&modelFamily=Juke&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Qashqai': 'https://cdn.imagin.studio/getimage?customer=frfr-nissan&make=Nissan&modelFamily=Qashqai&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'X-Trail': 'https://cdn.imagin.studio/getimage?customer=frfr-nissan&make=Nissan&modelFamily=X-Trail&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-nissan&make=Nissan&modelFamily=Qashqai&modelYear=2024&angle=front&aspect=3:2&width=800'
+  },
+  'Fiat': {
+    '500': 'https://cdn.imagin.studio/getimage?customer=frfr-fiat&make=Fiat&modelFamily=500&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Panda': 'https://cdn.imagin.studio/getimage?customer=frfr-fiat&make=Fiat&modelFamily=Panda&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Tipo': 'https://cdn.imagin.studio/getimage?customer=frfr-fiat&make=Fiat&modelFamily=Tipo&modelYear=2024&angle=front&aspect=3:2&width=800',
+    '500X': 'https://cdn.imagin.studio/getimage?customer=frfr-fiat&make=Fiat&modelFamily=500X&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-fiat&make=Fiat&modelFamily=500&modelYear=2024&angle=front&aspect=3:2&width=800'
+  },
+  'Skoda': {
+    'Fabia': 'https://cdn.imagin.studio/getimage?customer=frfr-skoda&make=Skoda&modelFamily=Fabia&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Octavia': 'https://cdn.imagin.studio/getimage?customer=frfr-skoda&make=Skoda&modelFamily=Octavia&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Karoq': 'https://cdn.imagin.studio/getimage?customer=frfr-skoda&make=Skoda&modelFamily=Karoq&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Kodiaq': 'https://cdn.imagin.studio/getimage?customer=frfr-skoda&make=Skoda&modelFamily=Kodiaq&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-skoda&make=Skoda&modelFamily=Octavia&modelYear=2024&angle=front&aspect=3:2&width=800'
+  },
+  'Opel': {
+    'Corsa': 'https://cdn.imagin.studio/getimage?customer=frfr-opel&make=Opel&modelFamily=Corsa&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Astra': 'https://cdn.imagin.studio/getimage?customer=frfr-opel&make=Opel&modelFamily=Astra&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Crossland': 'https://cdn.imagin.studio/getimage?customer=frfr-opel&make=Opel&modelFamily=Crossland&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Grandland': 'https://cdn.imagin.studio/getimage?customer=frfr-opel&make=Opel&modelFamily=Grandland&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-opel&make=Opel&modelFamily=Corsa&modelYear=2024&angle=front&aspect=3:2&width=800'
+  },
+  'Seat': {
+    'Ibiza': 'https://cdn.imagin.studio/getimage?customer=frfr-seat&make=Seat&modelFamily=Ibiza&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Leon': 'https://cdn.imagin.studio/getimage?customer=frfr-seat&make=Seat&modelFamily=Leon&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Arona': 'https://cdn.imagin.studio/getimage?customer=frfr-seat&make=Seat&modelFamily=Arona&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'Ateca': 'https://cdn.imagin.studio/getimage?customer=frfr-seat&make=Seat&modelFamily=Ateca&modelYear=2024&angle=front&aspect=3:2&width=800',
+    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-seat&make=Seat&modelFamily=Leon&modelYear=2024&angle=front&aspect=3:2&width=800'
+  }
 };
 
-function getCarImage(category: string): string {
-  const lowerCat = category.toLowerCase();
-  let images = carImages.default;
-  
-  if (lowerCat.includes('économique') || lowerCat.includes('economy') || lowerCat.includes('mini')) {
-    images = carImages.economy;
-  } else if (lowerCat.includes('compact') || lowerCat.includes('compacte')) {
-    images = carImages.compact;
-  } else if (lowerCat.includes('berline') || lowerCat.includes('sedan') || lowerCat.includes('standard')) {
-    images = carImages.sedan;
-  } else if (lowerCat.includes('suv') || lowerCat.includes('4x4') || lowerCat.includes('crossover')) {
-    images = carImages.suv;
-  } else if (lowerCat.includes('luxe') || lowerCat.includes('luxury') || lowerCat.includes('premium')) {
-    images = carImages.luxury;
-  } else if (lowerCat.includes('minivan') || lowerCat.includes('monospace') || lowerCat.includes('family')) {
-    images = carImages.minivan;
+// Fallback category images (high quality car photos)
+const carImagesByCategory: Record<string, string> = {
+  'Économique': 'https://cdn.imagin.studio/getimage?customer=frfr-renault&make=Renault&modelFamily=Clio&modelYear=2024&angle=front&aspect=3:2&width=800',
+  'economy': 'https://cdn.imagin.studio/getimage?customer=frfr-renault&make=Renault&modelFamily=Clio&modelYear=2024&angle=front&aspect=3:2&width=800',
+  'Mini': 'https://cdn.imagin.studio/getimage?customer=frfr-fiat&make=Fiat&modelFamily=500&modelYear=2024&angle=front&aspect=3:2&width=800',
+  'Compacte': 'https://cdn.imagin.studio/getimage?customer=frfr-volkswagen&make=Volkswagen&modelFamily=Golf&modelYear=2024&angle=front&aspect=3:2&width=800',
+  'compact': 'https://cdn.imagin.studio/getimage?customer=frfr-volkswagen&make=Volkswagen&modelFamily=Golf&modelYear=2024&angle=front&aspect=3:2&width=800',
+  'Berline': 'https://cdn.imagin.studio/getimage?customer=frfr-mercedes&make=Mercedes-Benz&modelFamily=C-Class&modelYear=2024&angle=front&aspect=3:2&width=800',
+  'sedan': 'https://cdn.imagin.studio/getimage?customer=frfr-mercedes&make=Mercedes-Benz&modelFamily=C-Class&modelYear=2024&angle=front&aspect=3:2&width=800',
+  'SUV': 'https://cdn.imagin.studio/getimage?customer=frfr-bmw&make=BMW&modelFamily=X3&modelYear=2024&angle=front&aspect=3:2&width=800',
+  'suv': 'https://cdn.imagin.studio/getimage?customer=frfr-bmw&make=BMW&modelFamily=X3&modelYear=2024&angle=front&aspect=3:2&width=800',
+  'Luxe': 'https://cdn.imagin.studio/getimage?customer=frfr-mercedes&make=Mercedes-Benz&modelFamily=E-Class&modelYear=2024&angle=front&aspect=3:2&width=800',
+  'luxury': 'https://cdn.imagin.studio/getimage?customer=frfr-mercedes&make=Mercedes-Benz&modelFamily=E-Class&modelYear=2024&angle=front&aspect=3:2&width=800',
+  'premium': 'https://cdn.imagin.studio/getimage?customer=frfr-audi&make=Audi&modelFamily=A6&modelYear=2024&angle=front&aspect=3:2&width=800',
+  'Monospace': 'https://cdn.imagin.studio/getimage?customer=frfr-renault&make=Renault&modelFamily=Scenic&modelYear=2024&angle=front&aspect=3:2&width=800',
+  'minivan': 'https://cdn.imagin.studio/getimage?customer=frfr-renault&make=Renault&modelFamily=Scenic&modelYear=2024&angle=front&aspect=3:2&width=800',
+  'default': 'https://cdn.imagin.studio/getimage?customer=frfr-volkswagen&make=Volkswagen&modelFamily=Golf&modelYear=2024&angle=front&aspect=3:2&width=800'
+};
+
+function getCarImage(category: string, brand?: string, model?: string): string {
+  // Try to get brand-specific image first
+  if (brand) {
+    const brandImages = carImagesByBrand[brand];
+    if (brandImages) {
+      // Try exact model match
+      if (model) {
+        for (const [modelKey, imageUrl] of Object.entries(brandImages)) {
+          if (modelKey !== 'default' && model.toLowerCase().includes(modelKey.toLowerCase())) {
+            return imageUrl;
+          }
+        }
+      }
+      // Use brand default
+      return brandImages.default || carImagesByCategory.default;
+    }
   }
   
-  return images[Math.floor(Math.random() * images.length)];
+  // Fallback to category-based image
+  if (carImagesByCategory[category]) {
+    return carImagesByCategory[category];
+  }
+  
+  // Try to match category keywords
+  const lowerCat = category.toLowerCase();
+  for (const [key, url] of Object.entries(carImagesByCategory)) {
+    if (lowerCat.includes(key.toLowerCase())) {
+      return url;
+    }
+  }
+  
+  return carImagesByCategory.default;
 }
 
 // Provider logos
@@ -192,7 +309,7 @@ async function searchBookingCars(
           currency: 'EUR',
           rating: vehicle.supplier_info?.rating || 4.5,
           reviews: vehicle.supplier_info?.reviews_count || Math.floor(Math.random() * 500) + 50,
-          image: vehicle.image_url || vehicle.vehicle_info?.image || getCarImage(category),
+          image: vehicle.image_url || vehicle.vehicle_info?.image || getCarImage(category, brand, model),
           seats: vehicle.passengers || vehicle.vehicle_info?.passengers || 5,
           transmission: vehicle.transmission?.toLowerCase().includes('auto') ? 'Automatique' : 'Manuelle',
           fuel: vehicle.fuel_type || 'Essence',
@@ -306,7 +423,7 @@ async function searchPricelineCars(
           currency: 'EUR',
           rating: car.rating || 4.3,
           reviews: car.reviews_count || Math.floor(Math.random() * 400) + 30,
-          image: car.image || car.vehicleImage || getCarImage(category),
+          image: car.image || car.vehicleImage || getCarImage(category, brand, model),
           seats: car.passengers || car.capacity || 5,
           transmission: car.transmission?.toLowerCase().includes('auto') ? 'Automatique' : 'Manuelle',
           fuel: car.fuel || car.fuelType || 'Essence',
@@ -422,7 +539,7 @@ async function searchSkyscannerCars(
           currency: 'EUR',
           rating: car.rating || 4.4,
           reviews: car.reviewsCount || Math.floor(Math.random() * 350) + 40,
-          image: car.imageUrl || car.image || getCarImage(category),
+          image: car.imageUrl || car.image || getCarImage(category, brand, model),
           seats: car.seats || car.passengers || 5,
           transmission: car.transmission?.toLowerCase().includes('manual') ? 'Manuelle' : 'Automatique',
           fuel: car.fuelType || car.fuel || 'Essence',
@@ -506,7 +623,7 @@ async function searchCarsRentalAPI(
           currency: 'EUR',
           rating: car.rating || 4.3,
           reviews: car.reviews || Math.floor(Math.random() * 300) + 25,
-          image: car.image || getCarImage(category),
+          image: car.image || getCarImage(category, car.brand, car.model),
           seats: car.seats || 5,
           transmission: car.transmission || 'Automatique',
           fuel: car.fuel || 'Essence',
@@ -572,7 +689,7 @@ function getMockCarRentals(pickupLocation: string): CarResult[] {
     currency: 'EUR',
     rating: parseFloat((4.2 + Math.random() * 0.7).toFixed(1)),
     reviews: Math.floor(Math.random() * 800) + 50,
-    image: getCarImage(car.category),
+    image: getCarImage(car.category, car.brand, car.model),
     seats: car.seats,
     transmission: car.transmission,
     fuel: car.fuel,
