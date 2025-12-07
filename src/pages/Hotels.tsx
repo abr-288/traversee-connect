@@ -75,11 +75,8 @@ const Hotels = () => {
             const hotels = [
               ...(result.data.booking || []),
               ...(result.data.xotelo || []),
-              ...(result.data.hotelscom || []),
-              ...(result.data.priceline || []),
               ...(result.data.amadeus || []),
-              ...(result.data.tripadvisor || []),
-              ...(result.data.hotels4 || [])
+              ...(result.data.tripadvisor || [])
             ];
 
             hotels.forEach((hotel: any) => {
@@ -193,33 +190,15 @@ const Hotels = () => {
 
       // Transform API data to match display structure with source tracking
       const bookingHotels = (result.data?.booking || []).map((hotel: any) => transformHotelData(hotel, 'Booking.com'));
-      const airbnbHotels = (result.data?.airbnb || []).map((hotel: any) => transformHotelData(hotel, 'Airbnb'));
-      const worldwideHotels = (result.data?.worldwide || []).map((hotel: any) => transformHotelData(hotel, 'Worldwide'));
-      const hotelscomHotels = (result.data?.hotelscom || []).map((hotel: any) => transformHotelData(hotel, 'Hotels.com'));
-      const pricelineHotels = (result.data?.priceline || []).map((hotel: any) => transformHotelData(hotel, 'Priceline'));
+      const xoteloHotels = (result.data?.xotelo || []).map((hotel: any) => transformHotelData(hotel, 'Xotelo'));
       const amadeusHotels = (result.data?.amadeus || []).map((hotel: any) => transformHotelData(hotel, 'Amadeus'));
       const tripadvisorHotels = (result.data?.tripadvisor || []).map((hotel: any) => transformHotelData(hotel, 'TripAdvisor'));
-      const skyscannerHotels = (result.data?.skyscanner || []).map((hotel: any) => transformHotelData(hotel, 'Skyscanner'));
-      const agodaHotels = (result.data?.agoda || []).map((hotel: any) => transformHotelData(hotel, 'Agoda'));
-      const expediaHotels = (result.data?.expedia || []).map((hotel: any) => transformHotelData(hotel, 'Expedia'));
-      const hotels4Hotels = (result.data?.hotels4 || []).map((hotel: any) => transformHotelData(hotel, 'Hotels4'));
-      const hotelsDataHotels = (result.data?.hotelsData || []).map((hotel: any) => transformHotelData(hotel, 'HotelsData'));
-      const makcorpsHotels = (result.data?.makcorps || []).map((hotel: any) => transformHotelData(hotel, 'Makcorps'));
 
       const transformedHotels = [
-        ...amadeusHotels,
         ...bookingHotels, 
-        ...airbnbHotels, 
-        ...worldwideHotels,
-        ...hotelscomHotels,
-        ...pricelineHotels,
-        ...tripadvisorHotels,
-        ...skyscannerHotels,
-        ...agodaHotels,
-        ...expediaHotels,
-        ...hotels4Hotels,
-        ...hotelsDataHotels,
-        ...makcorpsHotels
+        ...xoteloHotels,
+        ...amadeusHotels,
+        ...tripadvisorHotels
       ];
       
       if (transformedHotels.length > 0) {
