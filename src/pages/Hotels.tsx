@@ -76,7 +76,8 @@ const Hotels = () => {
               ...(result.data.booking || []),
               ...(result.data.xotelo || []),
               ...(result.data.amadeus || []),
-              ...(result.data.tripadvisor || [])
+              ...(result.data.tripadvisor || []),
+              ...(result.data.priceline || [])
             ];
 
             hotels.forEach((hotel: any) => {
@@ -193,12 +194,14 @@ const Hotels = () => {
       const xoteloHotels = (result.data?.xotelo || []).map((hotel: any) => transformHotelData(hotel, 'Xotelo'));
       const amadeusHotels = (result.data?.amadeus || []).map((hotel: any) => transformHotelData(hotel, 'Amadeus'));
       const tripadvisorHotels = (result.data?.tripadvisor || []).map((hotel: any) => transformHotelData(hotel, 'TripAdvisor'));
+      const pricelineHotels = (result.data?.priceline || []).map((hotel: any) => transformHotelData(hotel, 'Priceline'));
 
       const transformedHotels = [
         ...bookingHotels, 
         ...xoteloHotels,
         ...amadeusHotels,
-        ...tripadvisorHotels
+        ...tripadvisorHotels,
+        ...pricelineHotels
       ];
       
       if (transformedHotels.length > 0) {
