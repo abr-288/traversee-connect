@@ -449,16 +449,18 @@ serve(async (req) => {
     const RAPIDAPI_KEY = Deno.env.get('RAPIDAPI_KEY');
     console.log('RAPIDAPI_KEY configured:', RAPIDAPI_KEY ? 'YES' : 'NO');
 
-    const results: {
+const results: {
       booking: any[];
       xotelo: any[];
       tripadvisor: any[];
       amadeus: any[];
+      priceline: any[];
     } = {
       booking: [],
       xotelo: [],
       tripadvisor: [],
       amadeus: [],
+      priceline: [],
     };
 
     let apiSuccess = false;
@@ -813,6 +815,147 @@ serve(async (req) => {
 
     // Hotels4 API removed - requires paid subscription
 
+    // =====================================================
+    // PRICELINE API (priceline-com.p.rapidapi.com)
+    // =====================================================
+    if (RAPIDAPI_KEY) {
+      console.log('Starting Priceline hotel search');
+      try {
+        // First get location ID
+        const pricelineLocationParams = new URLSearchParams({
+          name: location,
+        });
+
+        console.log('Step 1: Searching Priceline location ID:', location);
+        
+        const pricelineLocationResponse = await fetch(
+          `https://priceline-com.p.rapidapi.com/hotels/city/search?${pricelineLocationParams}`,
+          {
+            headers: {
+              'X-RapidAPI-Key': RAPIDAPI_KEY,
+              'X-RapidAPI-Host': 'priceline-com.p.rapidapi.com',
+            },
+          }
+        );
+
+        if (pricelineLocationResponse.ok) {
+          const pricelineLocationData = await pricelineLocationResponse.json();
+          console.log('Priceline location search response:', JSON.stringify(pricelineLocationData).substring(0, 300));
+          
+          // Extract city ID from response
+          let cityId = null;
+          if (pricelineLocationData.data && pricelineLocationData.data.length > 0) {
+            cityId = pricelineLocationData.data[0].cityID || pricelineLocationData.data[0].id;
+            console.log('Found Priceline city ID:', cityId);
+          } else if (pricelineLocationData.getHotelAutoSuggestV2?.results?.result?.[0]) {
+            cityId = pricelineLocationData.getHotelAutoSuggestV2.results.result[0].cityID;
+            console.log('Found Priceline city ID (v2):', cityId);
+          }
+
+          if (cityId) {
+            // Now search hotels
+            const pricelineSearchParams = new URLSearchParams({
+              city_id: cityId.toString(),
+              date_checkin: checkIn,
+              date_checkout: checkOut,
+              rooms: (rooms || 1).toString(),
+              adults: adults.toString(),
+              currency: 'EUR',
+            });
+
+            console.log('Step 2: Searching Priceline hotels with params:', Object.fromEntries(pricelineSearchParams));
+            
+            const pricelineHotelsResponse = await fetch(
+              `https://priceline-com.p.rapidapi.com/hotels/city/listing?${pricelineSearchParams}`,
+              {
+                headers: {
+                  'X-RapidAPI-Key': RAPIDAPI_KEY,
+                  'X-RapidAPI-Host': 'priceline-com.p.rapidapi.com',
+                },
+              }
+            );
+
+            if (pricelineHotelsResponse.ok) {
+              const pricelineData = await pricelineHotelsResponse.json();
+              console.log('Priceline hotels API status:', pricelineHotelsResponse.status);
+              console.log('Priceline hotels raw response:', JSON.stringify(pricelineData).substring(0, 500));
+              
+              // Extract hotels from various response structures
+              let pricelineHotels: any[] = [];
+              if (pricelineData.hotels && Array.isArray(pricelineData.hotels)) {
+                pricelineHotels = pricelineData.hotels;
+              } else if (pricelineData.data && Array.isArray(pricelineData.data)) {
+                pricelineHotels = pricelineData.data;
+              } else if (pricelineData.getHotelExpress?.results?.hotels) {
+                pricelineHotels = pricelineData.getHotelExpress.results.hotels;
+              }
+
+              if (pricelineHotels.length > 0) {
+                results.priceline = pricelineHotels.slice(0, 15).map((hotel: any) => {
+                  let imageUrl = hotel.thumbnailUrl || 
+                                 hotel.thumbnail || 
+                                 hotel.images?.[0]?.url ||
+                                 hotel.hotelPhotos?.[0] ||
+                                 hotel.photo ||
+                                 null;
+                  
+                  if (!isValidImageUrl(imageUrl)) {
+                    imageUrl = getCityPlaceholder(location);
+                  }
+
+                  const hotelName = hotel.name || hotel.hotelName || 'Hôtel';
+                  const hotelLocation = hotel.location || hotel.address?.city || hotel.cityName || location;
+                  const price = hotel.ratesSummary?.minPrice || 
+                               hotel.price?.amount || 
+                               hotel.totalPrice || 
+                               hotel.rate ||
+                               80;
+                  
+                  let rating = hotel.overallGuestRating || hotel.rating || hotel.starRating || 4.0;
+                  if (rating <= 5) rating = rating * 2;
+
+                  return {
+                    id: hotel.hotelId || hotel.id || Math.random().toString(36),
+                    name: hotelName,
+                    location: hotelLocation,
+                    address: hotel.address?.streetAddress || hotel.address || '',
+                    price: { grandTotal: Math.round(parseFloat(price.toString()) || 80) },
+                    currency: 'EUR',
+                    rating: Math.min(rating, 10),
+                    stars: hotel.starRating || hotel.stars || Math.floor(rating / 2),
+                    reviews: hotel.reviewCount || hotel.reviews || 0,
+                    image: imageUrl,
+                    images: hotel.images?.map((i: any) => i.url || i).filter(Boolean) || [imageUrl],
+                    description: hotel.description || `${hotelName} à ${hotelLocation}`,
+                    amenities: hotel.amenities?.map((a: any) => a.name || a) || ['WiFi', 'Restaurant'],
+                    freeCancellation: hotel.freeCancel || false,
+                    breakfast: hotel.breakfast || false,
+                    source: 'priceline',
+                  };
+                });
+                apiSuccess = true;
+                console.log('✅ Priceline results transformed:', results.priceline.length, 'hotels');
+              } else {
+                console.log('Priceline hotels API returned no hotels');
+              }
+            } else {
+              const errorText = await pricelineHotelsResponse.text();
+              console.error('Priceline hotels API failed:', pricelineHotelsResponse.status);
+              console.error('Priceline hotels error:', errorText.substring(0, 300));
+            }
+          } else {
+            console.log('Could not find Priceline city ID for:', location);
+          }
+        } else {
+          const errorText = await pricelineLocationResponse.text();
+          console.error('Priceline location search failed:', pricelineLocationResponse.status);
+          console.error('Priceline location error:', errorText.substring(0, 300));
+        }
+      } catch (error) {
+        console.error('Priceline API exception:', error instanceof Error ? error.message : String(error));
+      }
+    }
+
     if (AMADEUS_API_KEY && AMADEUS_API_SECRET) {
       console.log('Starting Amadeus Hotel search');
       try {
@@ -946,7 +1089,7 @@ serve(async (req) => {
 
     // If no API results, use mock data
     const totalResults = results.booking.length + results.xotelo.length + 
-                         results.tripadvisor.length + results.amadeus.length;
+                         results.tripadvisor.length + results.amadeus.length + results.priceline.length;
     
     console.log('=== SEARCH RESULTS SUMMARY ===');
     console.log('API Success:', apiSuccess);
@@ -956,6 +1099,7 @@ serve(async (req) => {
       booking: results.booking.length,
       xotelo: results.xotelo.length,
       tripadvisor: results.tripadvisor.length,
+      priceline: results.priceline.length,
     });
     
     if (!apiSuccess || totalResults === 0) {
@@ -971,13 +1115,14 @@ serve(async (req) => {
         success: true,
         data: results,
         count: results.booking.length + results.xotelo.length + 
-               results.tripadvisor.length + results.amadeus.length,
+               results.tripadvisor.length + results.amadeus.length + results.priceline.length,
         mock: !apiSuccess || totalResults === 0,
         sources: {
           amadeus: results.amadeus.length,
           booking: results.booking.length,
           xotelo: results.xotelo.length,
           tripadvisor: results.tripadvisor.length,
+          priceline: results.priceline.length,
         }
       }),
       {
