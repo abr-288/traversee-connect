@@ -241,7 +241,7 @@ export const CarCard = ({ car, onBook, onViewDetails }: CarCardProps) => {
               </Button>
               <Button 
                 onClick={() => onBook(car)}
-                className="bg-primary hover:bg-primary/90"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
               >
                 Réserver
               </Button>
