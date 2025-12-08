@@ -120,7 +120,7 @@ const DestinationsSection = () => {
                     </h3>
                     <div className="text-right flex-shrink-0">
                       <p className="text-2xl font-bold text-primary whitespace-nowrap">
-                        <Price amount={parseFloat(destination.price.replace(/\s/g, '')) || 0} fromCurrency="EUR" showLoader />
+                        <Price amount={typeof destination.price === 'number' ? destination.price : parseFloat(String(destination.price).replace(/\s/g, '')) || 0} fromCurrency="EUR" showLoader />
                       </p>
                       <p className="text-xs text-muted-foreground whitespace-nowrap">/ {t('destinations.perNight')}</p>
                     </div>
@@ -199,14 +199,15 @@ const DestinationsSection = () => {
                     <Button 
                       className="flex-1 gradient-primary shadow-primary hover:shadow-xl transition-all"
                       onClick={() => {
-                        const params = new URLSearchParams({
-                          type: 'stay',
-                          name: destination.name,
-                          price: destination.price.replace(/\s/g, ''),
-                          currency: 'EUR',
-                          location: destination.location,
-                          serviceId: destination.id,
-                        });
+                      const priceStr = typeof destination.price === 'number' ? String(destination.price) : String(destination.price).replace(/\s/g, '');
+                      const params = new URLSearchParams({
+                        type: 'stay',
+                        name: destination.name,
+                        price: priceStr,
+                        currency: 'EUR',
+                        location: destination.location,
+                        serviceId: destination.id,
+                      });
                         navigate(`/booking/stay?${params.toString()}`);
                       }}
                     >
