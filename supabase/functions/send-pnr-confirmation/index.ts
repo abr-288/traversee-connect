@@ -182,7 +182,7 @@ serve(async (req) => {
       throw new Error('Booking not found');
     }
 
-    console.log('Sending email to:', booking.customer_email);
+    console.log('Sending PNR confirmation email');
 
     // Generate email HTML
     const htmlContent = generateEmailHTML(booking, pnr);

@@ -117,7 +117,7 @@ const handler = async (req: Request): Promise<Response> => {
       html: welcomeHtml,
     });
 
-    console.log("Newsletter subscription successful via SMTP:", email);
+    console.log("Newsletter subscription successful");
 
     return new Response(
       JSON.stringify({ 

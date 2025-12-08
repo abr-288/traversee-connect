@@ -79,7 +79,7 @@ const handler = async (req: Request): Promise<Response> => {
       currency,
     }: FlightConfirmationRequest = await req.json();
 
-    console.log("Sending flight confirmation to:", customerEmail);
+    console.log("Processing flight confirmation request");
 
     // Generate QR code data
     const qrData = {

@@ -429,7 +429,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     const { bookingId }: BookingPDFEmailRequest = await req.json();
 
-    console.log("Sending booking PDF email for:", bookingId);
+    console.log("Processing booking PDF email request");
 
     // Fetch booking details
     const { data: booking, error } = await supabase
