@@ -192,10 +192,11 @@ const DestinationDetail = () => {
                   <Button 
                     className="w-full gradient-primary shadow-primary hover:shadow-xl transition-all"
                     onClick={() => {
+                      const priceStr = typeof destination.price === 'number' ? String(destination.price) : String(destination.price).replace(/\s/g, '');
                       const params = new URLSearchParams({
                         type: 'stay',
                         name: destination.name,
-                        price: destination.price.replace(/\s/g, ''),
+                        price: priceStr,
                         currency: 'EUR',
                         location: destination.location,
                         serviceId: destination.id,

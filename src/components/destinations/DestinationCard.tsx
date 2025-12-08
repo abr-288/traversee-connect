@@ -185,7 +185,7 @@ export const DestinationCard = ({ destination, index = 0, variant = "default" }:
                 <div className="flex items-baseline gap-1">
                   <Price 
                     amount={destination.price} 
-                    currency={destination.currency || "EUR"} 
+                    fromCurrency={destination.currency || "EUR"} 
                     className="text-xl font-bold text-primary"
                   />
                   <span className="text-xs text-muted-foreground">/pers.</span>
@@ -290,11 +290,11 @@ export const DestinationCard = ({ destination, index = 0, variant = "default" }:
           <div className="flex items-center justify-between pt-2 border-t border-border/50 mt-auto">
             <div>
               <span className="text-xs text-muted-foreground">Dès</span>
-              <Price 
-                amount={destination.price} 
-                currency={destination.currency || "EUR"} 
-                className="text-lg font-bold text-primary"
-              />
+            <Price 
+              amount={destination.price} 
+              fromCurrency={destination.currency || "EUR"} 
+              className="text-lg font-bold text-primary"
+            />
             </div>
             <Button size="sm" onClick={handleViewDetails}>
               Voir plus
