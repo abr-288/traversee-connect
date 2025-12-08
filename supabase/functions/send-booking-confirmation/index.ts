@@ -186,13 +186,40 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Booking ID is required");
     }
 
-    console.log("Sending booking confirmation for:", bookingId);
+    console.log("Processing booking confirmation request");
 
     // Initialize Supabase client with service role
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
+
+    // Rate limiting: Check if confirmation was already sent recently
+    const { data: existingBooking } = await supabase
+      .from("bookings")
+      .select("id, updated_at")
+      .eq("id", bookingId)
+      .single();
+
+    if (existingBooking) {
+      const lastUpdate = new Date(existingBooking.updated_at);
+      const now = new Date();
+      const timeDiff = now.getTime() - lastUpdate.getTime();
+      // Prevent sending more than once per minute
+      if (timeDiff < 60000) {
+        console.log("Rate limit: confirmation email already sent recently");
+        return new Response(
+          JSON.stringify({
+            success: true,
+            message: "Confirmation already sent recently",
+          }),
+          {
+            status: 200,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
+    }
 
     // Fetch booking details
     const { data: booking, error: bookingError } = await supabase
@@ -235,7 +262,7 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Failed to send confirmation email");
     }
 
-    console.log("✅ Confirmation email sent successfully to:", booking.customer_email);
+    console.log("✅ Confirmation email sent successfully");
 
     return new Response(
       JSON.stringify({

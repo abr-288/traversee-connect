@@ -357,7 +357,7 @@ serve(async (req) => {
           }
         ]
       });
-      console.log('Email sent successfully to:', booking.customer_email);
+      console.log('Email sent successfully');
     } catch (emailError) {
       console.error('Error sending email:', emailError);
       // Continue même si l'email échoue
