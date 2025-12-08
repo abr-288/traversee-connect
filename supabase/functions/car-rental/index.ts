@@ -36,33 +36,53 @@ interface CarResult {
   features: string[];
 }
 
-// Real-time car image API using Car Images API
-async function fetchRealTimeCarImage(brand: string, model: string): Promise<string | null> {
+// Real-time car image API using imagin.studio (same as Kiwi/Trip.com)
+function getImaginStudioCarImage(brand: string, model: string, color?: string): string {
+  // imagin.studio API - free tier available, used by major travel sites
+  const make = brand.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const modelFamily = model.toLowerCase().replace(/[^a-z0-9]/g, '').split(' ')[0];
+  const paintColor = color || 'black';
+  
+  // Build imagin.studio URL with parameters for high-quality car renders
+  const params = new URLSearchParams({
+    customer: 'hrjavascript-masede',
+    make: make,
+    modelFamily: modelFamily,
+    paintId: paintColor,
+    angle: '01', // Front 3/4 view (most common in rental sites)
+    width: '800',
+    height: '500',
+    countryCode: 'FR'
+  });
+  
+  return `https://cdn.imagin.studio/getimage?${params.toString()}`;
+}
+
+// Alternative: Car Data Images API from RapidAPI
+async function fetchCarDataImage(brand: string, model: string, rapidApiKey: string): Promise<string | null> {
   try {
-    // Use Car Images API from RapidAPI for real-time images
-    const rapidApiKey = Deno.env.get('RAPIDAPI_KEY');
-    if (!rapidApiKey) return null;
-    
-    // Try Car Images API
+    // Use Car Data API which has reliable image endpoints
     const response = await fetch(
-      `https://car-images1.p.rapidapi.com/cars?make=${encodeURIComponent(brand)}&model=${encodeURIComponent(model)}&limit=1`,
+      `https://car-data.p.rapidapi.com/cars?limit=1&make=${encodeURIComponent(brand)}&model=${encodeURIComponent(model)}`,
       {
         headers: {
           'X-RapidAPI-Key': rapidApiKey,
-          'X-RapidAPI-Host': 'car-images1.p.rapidapi.com',
+          'X-RapidAPI-Host': 'car-data.p.rapidapi.com',
         },
       }
     );
     
     if (response.ok) {
       const data = await response.json();
-      if (data?.images?.[0]) {
-        return data.images[0];
+      if (data?.[0]) {
+        // Car Data API returns car info, use imagin.studio with exact model info
+        const car = data[0];
+        return getImaginStudioCarImage(car.make || brand, car.model || model);
       }
     }
     return null;
   } catch (error) {
-    console.log('Car image API fallback:', error);
+    console.log('Car Data API error, using imagin.studio directly');
     return null;
   }
 }
@@ -183,37 +203,74 @@ const carImagesByCategory: Record<string, string> = {
 };
 
 function getCarImage(category: string, brand?: string, model?: string): string {
-  // Try to get brand-specific image first
+  // PRIORITY 1: Use imagin.studio for real-time car images (like Kiwi/Trip.com)
+  if (brand && model) {
+    return getImaginStudioCarImage(brand, model);
+  }
+  
+  // PRIORITY 2: Use imagin.studio with brand only
   if (brand) {
-    const brandImages = carImagesByBrand[brand];
-    if (brandImages) {
-      // Try exact model match
-      if (model) {
-        for (const [modelKey, imageUrl] of Object.entries(brandImages)) {
-          if (modelKey !== 'default' && model.toLowerCase().includes(modelKey.toLowerCase())) {
-            return imageUrl;
-          }
-        }
-      }
-      // Use brand default
-      return brandImages.default || carImagesByCategory.default;
-    }
+    // Map common models for each brand
+    const defaultModels: Record<string, string> = {
+      'Toyota': 'corolla',
+      'Renault': 'clio',
+      'Peugeot': '308',
+      'Volkswagen': 'golf',
+      'Mercedes-Benz': 'cclass',
+      'BMW': '3series',
+      'Audi': 'a4',
+      'Ford': 'focus',
+      'Hyundai': 'i20',
+      'Kia': 'sportage',
+      'Nissan': 'qashqai',
+      'Fiat': '500',
+      'Citroën': 'c3',
+      'Opel': 'corsa',
+      'Honda': 'civic',
+      'Mazda': '3',
+      'Suzuki': 'swift',
+      'Seat': 'leon',
+      'Skoda': 'octavia',
+      'Volvo': 'xc60'
+    };
+    
+    const defaultModel = defaultModels[brand] || 'sedan';
+    return getImaginStudioCarImage(brand, defaultModel);
   }
   
-  // Fallback to category-based image
-  if (carImagesByCategory[category]) {
-    return carImagesByCategory[category];
+  // PRIORITY 3: Map category to a known car for imagin.studio
+  const categoryToCar: Record<string, { brand: string; model: string }> = {
+    'Économique': { brand: 'toyota', model: 'yaris' },
+    'economy': { brand: 'toyota', model: 'yaris' },
+    'Mini': { brand: 'fiat', model: '500' },
+    'Compacte': { brand: 'volkswagen', model: 'golf' },
+    'compact': { brand: 'volkswagen', model: 'golf' },
+    'Berline': { brand: 'mercedes', model: 'cclass' },
+    'sedan': { brand: 'mercedes', model: 'cclass' },
+    'SUV': { brand: 'bmw', model: 'x5' },
+    'suv': { brand: 'bmw', model: 'x5' },
+    'Luxe': { brand: 'mercedes', model: 'sclass' },
+    'luxury': { brand: 'mercedes', model: 'sclass' },
+    'premium': { brand: 'audi', model: 'a6' },
+    'Monospace': { brand: 'renault', model: 'scenic' },
+    'minivan': { brand: 'renault', model: 'scenic' }
+  };
+  
+  const carMapping = categoryToCar[category] || categoryToCar[category.toLowerCase()];
+  if (carMapping) {
+    return getImaginStudioCarImage(carMapping.brand, carMapping.model);
   }
   
-  // Try to match category keywords
+  // PRIORITY 4: Try category keywords
   const lowerCat = category.toLowerCase();
-  for (const [key, url] of Object.entries(carImagesByCategory)) {
+  for (const [key, mapping] of Object.entries(categoryToCar)) {
     if (lowerCat.includes(key.toLowerCase())) {
-      return url;
+      return getImaginStudioCarImage(mapping.brand, mapping.model);
     }
   }
   
-  return carImagesByCategory.default;
+  // PRIORITY 5: Default fallback using imagin.studio with generic car
+  return getImaginStudioCarImage('toyota', 'corolla');
 }
 
 // Provider logos
