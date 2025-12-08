@@ -36,149 +36,150 @@ interface CarResult {
   features: string[];
 }
 
-// Real car images by brand and model for accurate display
+// Real-time car image API using Car Images API
+async function fetchRealTimeCarImage(brand: string, model: string): Promise<string | null> {
+  try {
+    // Use Car Images API from RapidAPI for real-time images
+    const rapidApiKey = Deno.env.get('RAPIDAPI_KEY');
+    if (!rapidApiKey) return null;
+    
+    // Try Car Images API
+    const response = await fetch(
+      `https://car-images1.p.rapidapi.com/cars?make=${encodeURIComponent(brand)}&model=${encodeURIComponent(model)}&limit=1`,
+      {
+        headers: {
+          'X-RapidAPI-Key': rapidApiKey,
+          'X-RapidAPI-Host': 'car-images1.p.rapidapi.com',
+        },
+      }
+    );
+    
+    if (response.ok) {
+      const data = await response.json();
+      if (data?.images?.[0]) {
+        return data.images[0];
+      }
+    }
+    return null;
+  } catch (error) {
+    console.log('Car image API fallback:', error);
+    return null;
+  }
+}
+
+// High quality car images by brand using verified working URLs
 const carImagesByBrand: Record<string, Record<string, string>> = {
   'Toyota': {
-    'Corolla': 'https://www.toyota.fr/content/dam/toyota/vehicles/2023/corolla/gallery/corolla-2023-exterior-1.jpg',
-    'Yaris': 'https://www.toyota.fr/content/dam/toyota/vehicles/2023/yaris/gallery/yaris-2023-exterior-1.jpg',
-    'RAV4': 'https://www.toyota.fr/content/dam/toyota/vehicles/2023/rav4/gallery/rav4-2023-exterior-1.jpg',
-    'Land Cruiser': 'https://www.toyota.fr/content/dam/toyota/vehicles/2023/land-cruiser/gallery/land-cruiser-2023-exterior-1.jpg',
-    'Camry': 'https://www.toyota.fr/content/dam/toyota/vehicles/2023/camry/gallery/camry-2023-exterior-1.jpg',
-    'C-HR': 'https://www.toyota.fr/content/dam/toyota/vehicles/2023/c-hr/gallery/c-hr-2023-exterior-1.jpg',
-    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-toyota&make=Toyota&modelFamily=Corolla&modelRange=Corolla&modelVariant=&modelYear=2024&angle=front&aspect=3:2&width=800'
+    'Corolla': 'https://images.unsplash.com/photo-1623869675781-80aa31012a5a?w=800&h=500&fit=crop',
+    'Yaris': 'https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800&h=500&fit=crop',
+    'RAV4': 'https://images.unsplash.com/photo-1581540222194-0def2dda95b8?w=800&h=500&fit=crop',
+    'Land Cruiser': 'https://images.unsplash.com/photo-1594611396940-fbea2a9b2f33?w=800&h=500&fit=crop',
+    'Camry': 'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=800&h=500&fit=crop',
+    'default': 'https://images.unsplash.com/photo-1559416523-140ddc3d238c?w=800&h=500&fit=crop'
   },
   'Renault': {
-    'Clio': 'https://cdn.imagin.studio/getimage?customer=frfr-renault&make=Renault&modelFamily=Clio&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Megane': 'https://cdn.imagin.studio/getimage?customer=frfr-renault&make=Renault&modelFamily=Megane&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Captur': 'https://cdn.imagin.studio/getimage?customer=frfr-renault&make=Renault&modelFamily=Captur&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Kadjar': 'https://cdn.imagin.studio/getimage?customer=frfr-renault&make=Renault&modelFamily=Kadjar&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Scenic': 'https://cdn.imagin.studio/getimage?customer=frfr-renault&make=Renault&modelFamily=Scenic&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-renault&make=Renault&modelFamily=Clio&modelYear=2024&angle=front&aspect=3:2&width=800'
+    'Clio': 'https://images.unsplash.com/photo-1601929862217-f1bf94503333?w=800&h=500&fit=crop',
+    'Megane': 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?w=800&h=500&fit=crop',
+    'Captur': 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&h=500&fit=crop',
+    'default': 'https://images.unsplash.com/photo-1601929862217-f1bf94503333?w=800&h=500&fit=crop'
   },
   'Peugeot': {
-    '208': 'https://cdn.imagin.studio/getimage?customer=frfr-peugeot&make=Peugeot&modelFamily=208&modelYear=2024&angle=front&aspect=3:2&width=800',
-    '308': 'https://cdn.imagin.studio/getimage?customer=frfr-peugeot&make=Peugeot&modelFamily=308&modelYear=2024&angle=front&aspect=3:2&width=800',
-    '3008': 'https://cdn.imagin.studio/getimage?customer=frfr-peugeot&make=Peugeot&modelFamily=3008&modelYear=2024&angle=front&aspect=3:2&width=800',
-    '5008': 'https://cdn.imagin.studio/getimage?customer=frfr-peugeot&make=Peugeot&modelFamily=5008&modelYear=2024&angle=front&aspect=3:2&width=800',
-    '508': 'https://cdn.imagin.studio/getimage?customer=frfr-peugeot&make=Peugeot&modelFamily=508&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-peugeot&make=Peugeot&modelFamily=308&modelYear=2024&angle=front&aspect=3:2&width=800'
+    '208': 'https://images.unsplash.com/photo-1609073242909-38e7a2e5c2c0?w=800&h=500&fit=crop',
+    '308': 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&h=500&fit=crop',
+    '3008': 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=500&fit=crop',
+    'default': 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&h=500&fit=crop'
   },
   'Volkswagen': {
-    'Golf': 'https://cdn.imagin.studio/getimage?customer=frfr-volkswagen&make=Volkswagen&modelFamily=Golf&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Polo': 'https://cdn.imagin.studio/getimage?customer=frfr-volkswagen&make=Volkswagen&modelFamily=Polo&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Passat': 'https://cdn.imagin.studio/getimage?customer=frfr-volkswagen&make=Volkswagen&modelFamily=Passat&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Tiguan': 'https://cdn.imagin.studio/getimage?customer=frfr-volkswagen&make=Volkswagen&modelFamily=Tiguan&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'T-Roc': 'https://cdn.imagin.studio/getimage?customer=frfr-volkswagen&make=Volkswagen&modelFamily=T-Roc&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-volkswagen&make=Volkswagen&modelFamily=Golf&modelYear=2024&angle=front&aspect=3:2&width=800'
+    'Golf': 'https://images.unsplash.com/photo-1471479917193-f00955256257?w=800&h=500&fit=crop',
+    'Polo': 'https://images.unsplash.com/photo-1606611013016-969c19ba27bb?w=800&h=500&fit=crop',
+    'Passat': 'https://images.unsplash.com/photo-1612825173281-9a193378527e?w=800&h=500&fit=crop',
+    'Tiguan': 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=500&fit=crop',
+    'default': 'https://images.unsplash.com/photo-1471479917193-f00955256257?w=800&h=500&fit=crop'
   },
   'Mercedes-Benz': {
-    'Classe A': 'https://cdn.imagin.studio/getimage?customer=frfr-mercedes&make=Mercedes-Benz&modelFamily=A-Class&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Classe C': 'https://cdn.imagin.studio/getimage?customer=frfr-mercedes&make=Mercedes-Benz&modelFamily=C-Class&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Classe E': 'https://cdn.imagin.studio/getimage?customer=frfr-mercedes&make=Mercedes-Benz&modelFamily=E-Class&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'GLA': 'https://cdn.imagin.studio/getimage?customer=frfr-mercedes&make=Mercedes-Benz&modelFamily=GLA&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'GLC': 'https://cdn.imagin.studio/getimage?customer=frfr-mercedes&make=Mercedes-Benz&modelFamily=GLC&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-mercedes&make=Mercedes-Benz&modelFamily=C-Class&modelYear=2024&angle=front&aspect=3:2&width=800'
+    'Classe A': 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&h=500&fit=crop',
+    'Classe C': 'https://images.unsplash.com/photo-1617531653332-bd46c24f2068?w=800&h=500&fit=crop',
+    'Classe E': 'https://images.unsplash.com/photo-1563720360172-67b8f3dce741?w=800&h=500&fit=crop',
+    'GLA': 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=500&fit=crop',
+    'GLC': 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=500&fit=crop',
+    'default': 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&h=500&fit=crop'
   },
   'BMW': {
-    'Série 1': 'https://cdn.imagin.studio/getimage?customer=frfr-bmw&make=BMW&modelFamily=1-Series&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Série 3': 'https://cdn.imagin.studio/getimage?customer=frfr-bmw&make=BMW&modelFamily=3-Series&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'X1': 'https://cdn.imagin.studio/getimage?customer=frfr-bmw&make=BMW&modelFamily=X1&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'X3': 'https://cdn.imagin.studio/getimage?customer=frfr-bmw&make=BMW&modelFamily=X3&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'X5': 'https://cdn.imagin.studio/getimage?customer=frfr-bmw&make=BMW&modelFamily=X5&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-bmw&make=BMW&modelFamily=3-Series&modelYear=2024&angle=front&aspect=3:2&width=800'
+    'Série 1': 'https://images.unsplash.com/photo-1556189250-72ba954cfc2b?w=800&h=500&fit=crop',
+    'Série 3': 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&h=500&fit=crop',
+    'X1': 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=500&fit=crop',
+    'X3': 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=800&h=500&fit=crop',
+    'X5': 'https://images.unsplash.com/photo-1616422285623-13ff0162193c?w=800&h=500&fit=crop',
+    'default': 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&h=500&fit=crop'
   },
   'Audi': {
-    'A1': 'https://cdn.imagin.studio/getimage?customer=frfr-audi&make=Audi&modelFamily=A1&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'A3': 'https://cdn.imagin.studio/getimage?customer=frfr-audi&make=Audi&modelFamily=A3&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'A4': 'https://cdn.imagin.studio/getimage?customer=frfr-audi&make=Audi&modelFamily=A4&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Q3': 'https://cdn.imagin.studio/getimage?customer=frfr-audi&make=Audi&modelFamily=Q3&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Q5': 'https://cdn.imagin.studio/getimage?customer=frfr-audi&make=Audi&modelFamily=Q5&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-audi&make=Audi&modelFamily=A4&modelYear=2024&angle=front&aspect=3:2&width=800'
+    'A1': 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=500&fit=crop',
+    'A3': 'https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?w=800&h=500&fit=crop',
+    'A4': 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=500&fit=crop',
+    'Q3': 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=500&fit=crop',
+    'Q5': 'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=800&h=500&fit=crop',
+    'default': 'https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?w=800&h=500&fit=crop'
   },
   'Ford': {
-    'Fiesta': 'https://cdn.imagin.studio/getimage?customer=frfr-ford&make=Ford&modelFamily=Fiesta&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Focus': 'https://cdn.imagin.studio/getimage?customer=frfr-ford&make=Ford&modelFamily=Focus&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Puma': 'https://cdn.imagin.studio/getimage?customer=frfr-ford&make=Ford&modelFamily=Puma&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Kuga': 'https://cdn.imagin.studio/getimage?customer=frfr-ford&make=Ford&modelFamily=Kuga&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-ford&make=Ford&modelFamily=Focus&modelYear=2024&angle=front&aspect=3:2&width=800'
-  },
-  'Citroën': {
-    'C3': 'https://cdn.imagin.studio/getimage?customer=frfr-citroen&make=Citroen&modelFamily=C3&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'C4': 'https://cdn.imagin.studio/getimage?customer=frfr-citroen&make=Citroen&modelFamily=C4&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'C5 Aircross': 'https://cdn.imagin.studio/getimage?customer=frfr-citroen&make=Citroen&modelFamily=C5-Aircross&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Berlingo': 'https://cdn.imagin.studio/getimage?customer=frfr-citroen&make=Citroen&modelFamily=Berlingo&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-citroen&make=Citroen&modelFamily=C3&modelYear=2024&angle=front&aspect=3:2&width=800'
+    'Fiesta': 'https://images.unsplash.com/photo-1551830820-330a71b99659?w=800&h=500&fit=crop',
+    'Focus': 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800&h=500&fit=crop',
+    'Puma': 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=500&fit=crop',
+    'Kuga': 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=500&fit=crop',
+    'default': 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800&h=500&fit=crop'
   },
   'Hyundai': {
-    'i10': 'https://cdn.imagin.studio/getimage?customer=frfr-hyundai&make=Hyundai&modelFamily=i10&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'i20': 'https://cdn.imagin.studio/getimage?customer=frfr-hyundai&make=Hyundai&modelFamily=i20&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'i30': 'https://cdn.imagin.studio/getimage?customer=frfr-hyundai&make=Hyundai&modelFamily=i30&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Tucson': 'https://cdn.imagin.studio/getimage?customer=frfr-hyundai&make=Hyundai&modelFamily=Tucson&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Kona': 'https://cdn.imagin.studio/getimage?customer=frfr-hyundai&make=Hyundai&modelFamily=Kona&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-hyundai&make=Hyundai&modelFamily=Tucson&modelYear=2024&angle=front&aspect=3:2&width=800'
+    'i10': 'https://images.unsplash.com/photo-1629897048514-3dd7414fe72a?w=800&h=500&fit=crop',
+    'i20': 'https://images.unsplash.com/photo-1629897048514-3dd7414fe72a?w=800&h=500&fit=crop',
+    'Tucson': 'https://images.unsplash.com/photo-1637072388637-1f11b05a40c1?w=800&h=500&fit=crop',
+    'Kona': 'https://images.unsplash.com/photo-1637072388637-1f11b05a40c1?w=800&h=500&fit=crop',
+    'default': 'https://images.unsplash.com/photo-1637072388637-1f11b05a40c1?w=800&h=500&fit=crop'
   },
   'Kia': {
-    'Picanto': 'https://cdn.imagin.studio/getimage?customer=frfr-kia&make=Kia&modelFamily=Picanto&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Rio': 'https://cdn.imagin.studio/getimage?customer=frfr-kia&make=Kia&modelFamily=Rio&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Ceed': 'https://cdn.imagin.studio/getimage?customer=frfr-kia&make=Kia&modelFamily=Ceed&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Sportage': 'https://cdn.imagin.studio/getimage?customer=frfr-kia&make=Kia&modelFamily=Sportage&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Niro': 'https://cdn.imagin.studio/getimage?customer=frfr-kia&make=Kia&modelFamily=Niro&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-kia&make=Kia&modelFamily=Sportage&modelYear=2024&angle=front&aspect=3:2&width=800'
+    'Picanto': 'https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=800&h=500&fit=crop',
+    'Rio': 'https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=800&h=500&fit=crop',
+    'Sportage': 'https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=800&h=500&fit=crop',
+    'default': 'https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=800&h=500&fit=crop'
   },
   'Nissan': {
-    'Micra': 'https://cdn.imagin.studio/getimage?customer=frfr-nissan&make=Nissan&modelFamily=Micra&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Juke': 'https://cdn.imagin.studio/getimage?customer=frfr-nissan&make=Nissan&modelFamily=Juke&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Qashqai': 'https://cdn.imagin.studio/getimage?customer=frfr-nissan&make=Nissan&modelFamily=Qashqai&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'X-Trail': 'https://cdn.imagin.studio/getimage?customer=frfr-nissan&make=Nissan&modelFamily=X-Trail&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-nissan&make=Nissan&modelFamily=Qashqai&modelYear=2024&angle=front&aspect=3:2&width=800'
+    'Micra': 'https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800&h=500&fit=crop',
+    'Juke': 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=500&fit=crop',
+    'Qashqai': 'https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800&h=500&fit=crop',
+    'default': 'https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800&h=500&fit=crop'
   },
   'Fiat': {
-    '500': 'https://cdn.imagin.studio/getimage?customer=frfr-fiat&make=Fiat&modelFamily=500&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Panda': 'https://cdn.imagin.studio/getimage?customer=frfr-fiat&make=Fiat&modelFamily=Panda&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Tipo': 'https://cdn.imagin.studio/getimage?customer=frfr-fiat&make=Fiat&modelFamily=Tipo&modelYear=2024&angle=front&aspect=3:2&width=800',
-    '500X': 'https://cdn.imagin.studio/getimage?customer=frfr-fiat&make=Fiat&modelFamily=500X&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-fiat&make=Fiat&modelFamily=500&modelYear=2024&angle=front&aspect=3:2&width=800'
+    '500': 'https://images.unsplash.com/photo-1595787142916-aa0f36cfc545?w=800&h=500&fit=crop',
+    'Panda': 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=500&fit=crop',
+    'default': 'https://images.unsplash.com/photo-1595787142916-aa0f36cfc545?w=800&h=500&fit=crop'
   },
-  'Skoda': {
-    'Fabia': 'https://cdn.imagin.studio/getimage?customer=frfr-skoda&make=Skoda&modelFamily=Fabia&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Octavia': 'https://cdn.imagin.studio/getimage?customer=frfr-skoda&make=Skoda&modelFamily=Octavia&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Karoq': 'https://cdn.imagin.studio/getimage?customer=frfr-skoda&make=Skoda&modelFamily=Karoq&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Kodiaq': 'https://cdn.imagin.studio/getimage?customer=frfr-skoda&make=Skoda&modelFamily=Kodiaq&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-skoda&make=Skoda&modelFamily=Octavia&modelYear=2024&angle=front&aspect=3:2&width=800'
+  'Citroën': {
+    'C3': 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=500&fit=crop',
+    'C4': 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=500&fit=crop',
+    'default': 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=500&fit=crop'
   },
   'Opel': {
-    'Corsa': 'https://cdn.imagin.studio/getimage?customer=frfr-opel&make=Opel&modelFamily=Corsa&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Astra': 'https://cdn.imagin.studio/getimage?customer=frfr-opel&make=Opel&modelFamily=Astra&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Crossland': 'https://cdn.imagin.studio/getimage?customer=frfr-opel&make=Opel&modelFamily=Crossland&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Grandland': 'https://cdn.imagin.studio/getimage?customer=frfr-opel&make=Opel&modelFamily=Grandland&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-opel&make=Opel&modelFamily=Corsa&modelYear=2024&angle=front&aspect=3:2&width=800'
-  },
-  'Seat': {
-    'Ibiza': 'https://cdn.imagin.studio/getimage?customer=frfr-seat&make=Seat&modelFamily=Ibiza&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Leon': 'https://cdn.imagin.studio/getimage?customer=frfr-seat&make=Seat&modelFamily=Leon&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Arona': 'https://cdn.imagin.studio/getimage?customer=frfr-seat&make=Seat&modelFamily=Arona&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'Ateca': 'https://cdn.imagin.studio/getimage?customer=frfr-seat&make=Seat&modelFamily=Ateca&modelYear=2024&angle=front&aspect=3:2&width=800',
-    'default': 'https://cdn.imagin.studio/getimage?customer=frfr-seat&make=Seat&modelFamily=Leon&modelYear=2024&angle=front&aspect=3:2&width=800'
+    'Corsa': 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=500&fit=crop',
+    'Astra': 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=500&fit=crop',
+    'default': 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=500&fit=crop'
   }
 };
 
-// Fallback category images (high quality car photos)
+// Fallback category images (high quality car photos from Unsplash)
 const carImagesByCategory: Record<string, string> = {
-  'Économique': 'https://cdn.imagin.studio/getimage?customer=frfr-renault&make=Renault&modelFamily=Clio&modelYear=2024&angle=front&aspect=3:2&width=800',
-  'economy': 'https://cdn.imagin.studio/getimage?customer=frfr-renault&make=Renault&modelFamily=Clio&modelYear=2024&angle=front&aspect=3:2&width=800',
-  'Mini': 'https://cdn.imagin.studio/getimage?customer=frfr-fiat&make=Fiat&modelFamily=500&modelYear=2024&angle=front&aspect=3:2&width=800',
-  'Compacte': 'https://cdn.imagin.studio/getimage?customer=frfr-volkswagen&make=Volkswagen&modelFamily=Golf&modelYear=2024&angle=front&aspect=3:2&width=800',
-  'compact': 'https://cdn.imagin.studio/getimage?customer=frfr-volkswagen&make=Volkswagen&modelFamily=Golf&modelYear=2024&angle=front&aspect=3:2&width=800',
-  'Berline': 'https://cdn.imagin.studio/getimage?customer=frfr-mercedes&make=Mercedes-Benz&modelFamily=C-Class&modelYear=2024&angle=front&aspect=3:2&width=800',
-  'sedan': 'https://cdn.imagin.studio/getimage?customer=frfr-mercedes&make=Mercedes-Benz&modelFamily=C-Class&modelYear=2024&angle=front&aspect=3:2&width=800',
-  'SUV': 'https://cdn.imagin.studio/getimage?customer=frfr-bmw&make=BMW&modelFamily=X3&modelYear=2024&angle=front&aspect=3:2&width=800',
-  'suv': 'https://cdn.imagin.studio/getimage?customer=frfr-bmw&make=BMW&modelFamily=X3&modelYear=2024&angle=front&aspect=3:2&width=800',
-  'Luxe': 'https://cdn.imagin.studio/getimage?customer=frfr-mercedes&make=Mercedes-Benz&modelFamily=E-Class&modelYear=2024&angle=front&aspect=3:2&width=800',
-  'luxury': 'https://cdn.imagin.studio/getimage?customer=frfr-mercedes&make=Mercedes-Benz&modelFamily=E-Class&modelYear=2024&angle=front&aspect=3:2&width=800',
-  'premium': 'https://cdn.imagin.studio/getimage?customer=frfr-audi&make=Audi&modelFamily=A6&modelYear=2024&angle=front&aspect=3:2&width=800',
-  'Monospace': 'https://cdn.imagin.studio/getimage?customer=frfr-renault&make=Renault&modelFamily=Scenic&modelYear=2024&angle=front&aspect=3:2&width=800',
-  'minivan': 'https://cdn.imagin.studio/getimage?customer=frfr-renault&make=Renault&modelFamily=Scenic&modelYear=2024&angle=front&aspect=3:2&width=800',
-  'default': 'https://cdn.imagin.studio/getimage?customer=frfr-volkswagen&make=Volkswagen&modelFamily=Golf&modelYear=2024&angle=front&aspect=3:2&width=800'
+  'Économique': 'https://images.unsplash.com/photo-1601929862217-f1bf94503333?w=800&h=500&fit=crop',
+  'economy': 'https://images.unsplash.com/photo-1601929862217-f1bf94503333?w=800&h=500&fit=crop',
+  'Mini': 'https://images.unsplash.com/photo-1595787142916-aa0f36cfc545?w=800&h=500&fit=crop',
+  'Compacte': 'https://images.unsplash.com/photo-1471479917193-f00955256257?w=800&h=500&fit=crop',
+  'compact': 'https://images.unsplash.com/photo-1471479917193-f00955256257?w=800&h=500&fit=crop',
+  'Berline': 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&h=500&fit=crop',
+  'sedan': 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&h=500&fit=crop',
+  'SUV': 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=800&h=500&fit=crop',
+  'suv': 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=800&h=500&fit=crop',
+  'Luxe': 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&h=500&fit=crop',
+  'luxury': 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&h=500&fit=crop',
+  'premium': 'https://images.unsplash.com/photo-1563720360172-67b8f3dce741?w=800&h=500&fit=crop',
+  'Monospace': 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&h=500&fit=crop',
+  'minivan': 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&h=500&fit=crop',
+  'default': 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800&h=500&fit=crop'
 };
 
 function getCarImage(category: string, brand?: string, model?: string): string {
