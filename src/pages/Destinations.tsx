@@ -7,11 +7,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, MapPin, Star, TrendingUp, Calendar, Users, Plane, Heart } from "lucide-react";
+import { Search, MapPin, Star, TrendingUp, Calendar, Users, Plane, Heart, Globe, Sun, Compass, Mountain } from "lucide-react";
+import { LazyImage } from "@/components/ui/lazy-image";
+import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 
 const Destinations = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const [favorites, setFavorites] = useState<string[]>([]);
+
+  const toggleFavorite = (city: string) => {
+    setFavorites(prev => 
+      prev.includes(city) ? prev.filter(c => c !== city) : [...prev, city]
+    );
+  };
 
   const popularDestinations = [
     {
@@ -23,6 +34,7 @@ const Destinations = () => {
       rating: 4.8,
       trending: true,
       tags: ["Culture", "Gastronomie", "Shopping"],
+      temperature: "18°C",
     },
     {
       city: "Dubaï",
@@ -33,6 +45,7 @@ const Destinations = () => {
       rating: 4.9,
       trending: true,
       tags: ["Luxe", "Shopping", "Plage"],
+      temperature: "32°C",
     },
     {
       city: "Marrakech",
@@ -43,6 +56,7 @@ const Destinations = () => {
       rating: 4.7,
       trending: false,
       tags: ["Culture", "Aventure", "Gastronomie"],
+      temperature: "28°C",
     },
     {
       city: "New York",
@@ -53,6 +67,7 @@ const Destinations = () => {
       rating: 4.8,
       trending: true,
       tags: ["Culture", "Shopping", "Vie Nocturne"],
+      temperature: "15°C",
     },
     {
       city: "Istanbul",
@@ -63,6 +78,7 @@ const Destinations = () => {
       rating: 4.6,
       trending: false,
       tags: ["Culture", "Histoire", "Gastronomie"],
+      temperature: "22°C",
     },
     {
       city: "Bali",
@@ -73,6 +89,7 @@ const Destinations = () => {
       rating: 4.9,
       trending: true,
       tags: ["Plage", "Nature", "Détente"],
+      temperature: "30°C",
     },
     {
       city: "Le Caire",
@@ -83,6 +100,7 @@ const Destinations = () => {
       rating: 4.5,
       trending: false,
       tags: ["Histoire", "Culture", "Aventure"],
+      temperature: "35°C",
     },
     {
       city: "Rome",
@@ -93,6 +111,7 @@ const Destinations = () => {
       rating: 4.8,
       trending: false,
       tags: ["Histoire", "Culture", "Gastronomie"],
+      temperature: "24°C",
     },
   ];
 
@@ -105,6 +124,7 @@ const Destinations = () => {
       price: "À partir de 230€",
       rating: 4.5,
       tags: ["Culture", "Plage", "Musique"],
+      temperature: "27°C",
     },
     {
       city: "Zanzibar",
@@ -114,6 +134,7 @@ const Destinations = () => {
       price: "À partir de 730€",
       rating: 4.9,
       tags: ["Plage", "Nature", "Détente"],
+      temperature: "29°C",
     },
     {
       city: "Le Cap",
@@ -123,6 +144,7 @@ const Destinations = () => {
       price: "À partir de 795€",
       rating: 4.8,
       tags: ["Nature", "Vin", "Aventure"],
+      temperature: "20°C",
     },
     {
       city: "Essaouira",
@@ -132,6 +154,27 @@ const Destinations = () => {
       price: "À partir de 380€",
       rating: 4.6,
       tags: ["Plage", "Culture", "Sports"],
+      temperature: "23°C",
+    },
+    {
+      city: "Abidjan",
+      country: "Côte d'Ivoire",
+      image: "https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=800",
+      description: "La perle des lagunes",
+      price: "À partir de 180€",
+      rating: 4.4,
+      tags: ["Business", "Culture", "Gastronomie"],
+      temperature: "28°C",
+    },
+    {
+      city: "Nairobi",
+      country: "Kenya",
+      image: "https://images.unsplash.com/photo-1611348524140-53c9a25263d6?w=800",
+      description: "Safari et ville moderne",
+      price: "À partir de 650€",
+      rating: 4.7,
+      tags: ["Safari", "Nature", "Aventure"],
+      temperature: "22°C",
     },
   ];
 
@@ -144,35 +187,177 @@ const Destinations = () => {
       )
     : popularDestinations;
 
+  const DestinationCard = ({ dest, index }: { dest: typeof popularDestinations[0], index: number }) => (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1 }}
+    >
+      <Card className="overflow-hidden hover:shadow-xl transition-all group cursor-pointer h-full">
+        <div className="relative h-48 overflow-hidden">
+          <LazyImage
+            src={dest.image}
+            alt={dest.city}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+          />
+          {'trending' in dest && dest.trending && (
+            <Badge className="absolute top-4 right-4 bg-secondary">
+              <TrendingUp className="mr-1 h-3 w-3" />
+              Tendance
+            </Badge>
+          )}
+          <Button
+            size="icon"
+            variant="ghost"
+            className={`absolute top-4 left-4 bg-white/80 hover:bg-white ${
+              favorites.includes(dest.city) ? 'text-red-500' : ''
+            }`}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleFavorite(dest.city);
+            }}
+          >
+            <Heart className={`h-4 w-4 ${favorites.includes(dest.city) ? 'fill-current' : ''}`} />
+          </Button>
+          {'temperature' in dest && (
+            <div className="absolute bottom-4 right-4 bg-black/70 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
+              <Sun className="h-3 w-3" />
+              {dest.temperature}
+            </div>
+          )}
+        </div>
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between mb-2">
+            <CardTitle className="text-xl">{dest.city}</CardTitle>
+            <div className="flex items-center gap-1">
+              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+              <span className="font-semibold">{dest.rating}</span>
+            </div>
+          </div>
+          <CardDescription className="flex items-center gap-1">
+            <MapPin className="h-3 w-3" />
+            {dest.country}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+            {dest.description}
+          </p>
+          <div className="flex flex-wrap gap-2 mb-4">
+            {dest.tags.map((tag, tagIndex) => (
+              <Badge key={tagIndex} variant="outline" className="text-xs">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-semibold text-primary">
+              {dest.price}
+            </span>
+            <Button
+              size="sm"
+              onClick={() => navigate(`/flights?to=${dest.city}`)}
+            >
+              <Plane className="mr-2 h-4 w-4" />
+              Voir les vols
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+
   return (
     <div className="min-h-screen flex flex-col pt-16">
       <Navbar />
 
       {/* Hero Section */}
-      <div className="relative h-[350px] md:h-[400px] bg-gradient-to-br from-primary via-primary-dark to-primary-darker overflow-hidden">
-        <div className="absolute inset-0 bg-black/30"></div>
+      <div className="relative h-[400px] md:h-[500px] overflow-hidden">
+        <LazyImage
+          src="https://images.unsplash.com/photo-1488085061387-422e29b40080?w=1920"
+          alt="Destinations"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background"></div>
         <div className="relative container mx-auto px-4 h-full flex flex-col justify-center items-center text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-            Explorez le Monde
-          </h1>
-          <p className="text-xl text-white/90 mb-8 max-w-2xl">
-            Découvrez des destinations incroyables et créez des souvenirs inoubliables
-          </p>
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-4"
+          >
+            <Globe className="w-16 h-16 text-white drop-shadow-lg mx-auto" />
+          </motion.div>
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-4xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg"
+          >
+            {t("destinations.title", "Explorez le Monde")}
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-xl text-white/90 mb-8 max-w-2xl"
+          >
+            {t("destinations.subtitle", "Découvrez des destinations incroyables et créez des souvenirs inoubliables")}
+          </motion.p>
 
-          <div className="w-full max-w-2xl">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="w-full max-w-2xl"
+          >
             <div className="relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
                 type="text"
-                placeholder="Rechercher une destination..."
+                placeholder={t("destinations.searchPlaceholder", "Rechercher une destination...")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-12 py-6 text-lg bg-white"
               />
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
+
+      {/* Quick Stats */}
+      <section className="py-8 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card className="text-center p-4">
+              <CardContent className="pt-2">
+                <Globe className="w-8 h-8 text-primary mx-auto mb-2" />
+                <p className="text-2xl font-bold">150+</p>
+                <p className="text-sm text-muted-foreground">Destinations</p>
+              </CardContent>
+            </Card>
+            <Card className="text-center p-4">
+              <CardContent className="pt-2">
+                <Compass className="w-8 h-8 text-primary mx-auto mb-2" />
+                <p className="text-2xl font-bold">50+</p>
+                <p className="text-sm text-muted-foreground">Pays</p>
+              </CardContent>
+            </Card>
+            <Card className="text-center p-4">
+              <CardContent className="pt-2">
+                <Users className="w-8 h-8 text-primary mx-auto mb-2" />
+                <p className="text-2xl font-bold">100K+</p>
+                <p className="text-sm text-muted-foreground">Voyageurs</p>
+              </CardContent>
+            </Card>
+            <Card className="text-center p-4">
+              <CardContent className="pt-2">
+                <Mountain className="w-8 h-8 text-primary mx-auto mb-2" />
+                <p className="text-2xl font-bold">4.8</p>
+                <p className="text-sm text-muted-foreground">Note moyenne</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
 
       {/* Content */}
       <div className="flex-1 bg-background py-12">
@@ -196,125 +381,15 @@ const Destinations = () => {
             <TabsContent value="popular">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {filteredDestinations.map((dest, index) => (
-                  <Card key={index} className="overflow-hidden hover:shadow-xl transition-shadow group cursor-pointer">
-                    <div className="relative h-48 overflow-hidden">
-                      <img
-                        src={dest.image}
-                        alt={dest.city}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                      {dest.trending && (
-                        <Badge className="absolute top-4 right-4 bg-secondary">
-                          <TrendingUp className="mr-1 h-3 w-3" />
-                          Tendance
-                        </Badge>
-                      )}
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="absolute top-4 left-4 bg-white/80 hover:bg-white"
-                      >
-                        <Heart className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <CardHeader>
-                      <div className="flex items-center justify-between mb-2">
-                        <CardTitle className="text-xl">{dest.city}</CardTitle>
-                        <div className="flex items-center gap-1">
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          <span className="font-semibold">{dest.rating}</span>
-                        </div>
-                      </div>
-                      <CardDescription className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
-                        {dest.country}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        {dest.description}
-                      </p>
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {dest.tags.map((tag, tagIndex) => (
-                          <Badge key={tagIndex} variant="outline" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-semibold text-primary">
-                          {dest.price}
-                        </span>
-                        <Button
-                          size="sm"
-                          onClick={() => navigate(`/flights?to=${dest.city}`)}
-                        >
-                          <Plane className="mr-2 h-4 w-4" />
-                          Voir les vols
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <DestinationCard key={dest.city} dest={dest} index={index} />
                 ))}
               </div>
             </TabsContent>
 
             <TabsContent value="africa">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {africanDestinations.map((dest, index) => (
-                  <Card key={index} className="overflow-hidden hover:shadow-xl transition-shadow group cursor-pointer">
-                    <div className="relative h-48 overflow-hidden">
-                      <img
-                        src={dest.image}
-                        alt={dest.city}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="absolute top-4 left-4 bg-white/80 hover:bg-white"
-                      >
-                        <Heart className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <CardHeader>
-                      <div className="flex items-center justify-between mb-2">
-                        <CardTitle className="text-xl">{dest.city}</CardTitle>
-                        <div className="flex items-center gap-1">
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          <span className="font-semibold">{dest.rating}</span>
-                        </div>
-                      </div>
-                      <CardDescription className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
-                        {dest.country}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        {dest.description}
-                      </p>
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {dest.tags.map((tag, tagIndex) => (
-                          <Badge key={tagIndex} variant="outline" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-semibold text-primary">
-                          {dest.price}
-                        </span>
-                        <Button
-                          size="sm"
-                          onClick={() => navigate(`/flights?to=${dest.city}`)}
-                        >
-                          <Plane className="mr-2 h-4 w-4" />
-                          Voir les vols
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <DestinationCard key={dest.city} dest={dest as any} index={index} />
                 ))}
               </div>
             </TabsContent>
@@ -324,69 +399,35 @@ const Destinations = () => {
                 {popularDestinations
                   .filter((dest) => dest.trending)
                   .map((dest, index) => (
-                    <Card key={index} className="overflow-hidden hover:shadow-xl transition-shadow group cursor-pointer">
-                      <div className="relative h-48 overflow-hidden">
-                        <img
-                          src={dest.image}
-                          alt={dest.city}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                        />
-                        <Badge className="absolute top-4 right-4 bg-secondary">
-                          <TrendingUp className="mr-1 h-3 w-3" />
-                          Tendance
-                        </Badge>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="absolute top-4 left-4 bg-white/80 hover:bg-white"
-                        >
-                          <Heart className="h-4 w-4" />
-                        </Button>
-                      </div>
-                      <CardHeader>
-                        <div className="flex items-center justify-between mb-2">
-                          <CardTitle className="text-xl">{dest.city}</CardTitle>
-                          <div className="flex items-center gap-1">
-                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                            <span className="font-semibold">{dest.rating}</span>
-                          </div>
-                        </div>
-                        <CardDescription className="flex items-center gap-1">
-                          <MapPin className="h-3 w-3" />
-                          {dest.country}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-muted-foreground mb-4">
-                          {dest.description}
-                        </p>
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          {dest.tags.map((tag, tagIndex) => (
-                            <Badge key={tagIndex} variant="outline" className="text-xs">
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-semibold text-primary">
-                            {dest.price}
-                          </span>
-                          <Button
-                            size="sm"
-                            onClick={() => navigate(`/flights?to=${dest.city}`)}
-                          >
-                            <Plane className="mr-2 h-4 w-4" />
-                            Voir les vols
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <DestinationCard key={dest.city} dest={dest} index={index} />
                   ))}
               </div>
             </TabsContent>
           </Tabs>
         </div>
       </div>
+
+      {/* Newsletter Section */}
+      <section className="py-12 bg-primary text-primary-foreground">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">
+            {t("destinations.newsletter", "Recevez nos meilleures offres")}
+          </h2>
+          <p className="mb-6 opacity-90 max-w-xl mx-auto">
+            {t("destinations.newsletterSubtitle", "Inscrivez-vous pour recevoir des offres exclusives et des inspirations voyage")}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+            <Input 
+              type="email" 
+              placeholder="Votre email" 
+              className="bg-white/10 border-white/20 text-white placeholder:text-white/60"
+            />
+            <Button variant="secondary">
+              S'inscrire
+            </Button>
+          </div>
+        </div>
+      </section>
 
       <Footer />
     </div>
