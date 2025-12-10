@@ -25,7 +25,7 @@ const Events = lazy(() => import("./pages/Events"));
 const Trains = lazy(() => import("./pages/Trains"));
 const FlightHotel = lazy(() => import("./pages/FlightHotel"));
 const Auth = lazy(() => import("./pages/Auth"));
-const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Dashboard = lazy(() => import("./pages/UserDashboard"));
 const BookingHistory = lazy(() => import("./pages/BookingHistory"));
 const Account = lazy(() => import("./pages/Account"));
 const Payment = lazy(() => import("./pages/Payment"));
