@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import { UserDashboardLayout } from "@/components/dashboard/UserDashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -198,22 +197,22 @@ const Account = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-secondary/10">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-        >
-          <Loader2 className="h-12 w-12 text-primary" />
-        </motion.div>
-      </div>
+      <UserDashboardLayout>
+        <div className="flex-1 flex items-center justify-center">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          >
+            <Loader2 className="h-12 w-12 text-primary" />
+          </motion.div>
+        </div>
+      </UserDashboardLayout>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col pt-16">
-      <Navbar />
-      
-      <div className="flex-1 bg-gradient-to-br from-primary/5 via-background to-secondary/5 py-6 md:py-12 relative overflow-hidden">
+    <UserDashboardLayout>
+      <div className="bg-gradient-to-br from-primary/5 via-background to-secondary/5 py-6 md:py-12 relative overflow-hidden rounded-lg">
         {/* Animated background elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div
@@ -768,9 +767,7 @@ const Account = () => {
           </div>
         </div>
       </div>
-
-      <Footer />
-    </div>
+    </UserDashboardLayout>
   );
 };
 
