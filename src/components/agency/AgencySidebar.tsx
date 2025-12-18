@@ -1,5 +1,5 @@
-import { LayoutDashboard, Package, Activity, Home, Calendar, Users, Crown, Mail, Cog, Percent, Tags, Building2 } from "lucide-react";
-import { useLocation, Link } from "react-router-dom";
+import { LayoutDashboard, Package, Activity, Home, Percent, Settings, LogOut } from "lucide-react";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -11,32 +11,40 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const menuItems = [
-  { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
-  { title: "Réservations", url: "/admin/bookings", icon: Calendar },
-  { title: "Services", url: "/admin/services", icon: Package },
-  { title: "Activités", url: "/admin/activities", icon: Activity },
-  { title: "Séjours", url: "/admin/stays", icon: Home },
-  { title: "Sous-Agences", url: "/admin/agencies", icon: Building2 },
-  { title: "Demandes Abonnements", url: "/admin/subscriptions", icon: Crown },
-  { title: "Plans d'abonnement", url: "/admin/subscription-plans", icon: Tags },
-  { title: "Promotions", url: "/admin/promotions", icon: Percent },
-  { title: "Utilisateurs", url: "/admin/users", icon: Users },
-  { title: "Templates Email", url: "/admin/email-templates", icon: Mail },
-  { title: "Configuration", url: "/admin/configuration", icon: Cog },
+  { title: "Tableau de bord", url: "/agency", icon: LayoutDashboard },
+  { title: "Mes Services", url: "/agency/services", icon: Package },
+  { title: "Mes Activités", url: "/agency/activities", icon: Activity },
+  { title: "Mes Séjours", url: "/agency/stays", icon: Home },
+  { title: "Mes Promotions", url: "/agency/promotions", icon: Percent },
+  { title: "Paramètres", url: "/agency/settings", icon: Settings },
 ];
 
-export function AdminSidebar() {
+export function AgencySidebar() {
   const { state } = useSidebar();
   const location = useLocation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const collapsed = state === "collapsed";
 
   const isActive = (path: string) => {
-    if (path === "/admin") {
+    if (path === "/agency") {
       return location.pathname === path;
     }
     return location.pathname.startsWith(path);
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast({
+      title: "Déconnexion réussie",
+      description: "À bientôt !",
+    });
+    navigate("/");
   };
 
   return (
@@ -44,7 +52,7 @@ export function AdminSidebar() {
       <SidebarContent>
         <div className="p-4 border-b">
           <h2 className={`font-bold text-xl ${collapsed ? "text-center" : ""}`}>
-            {collapsed ? "BR" : "B-Reserve Admin"}
+            {collapsed ? "AG" : "Espace Agence"}
           </h2>
         </div>
 
@@ -70,6 +78,17 @@ export function AdminSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        <div className="mt-auto p-4 border-t">
+          <Button 
+            variant="ghost" 
+            className="w-full justify-start gap-2"
+            onClick={handleLogout}
+          >
+            <LogOut className="h-4 w-4" />
+            {!collapsed && "Déconnexion"}
+          </Button>
+        </div>
       </SidebarContent>
     </Sidebar>
   );

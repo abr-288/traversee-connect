@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       activities: {
         Row: {
+          agency_id: string | null
           available: boolean | null
           category: string
           created_at: string
@@ -35,6 +36,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          agency_id?: string | null
           available?: boolean | null
           category: string
           created_at?: string
@@ -54,6 +56,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          agency_id?: string | null
           available?: boolean | null
           category?: string
           created_at?: string
@@ -70,6 +73,56 @@ export type Database = {
           price_per_unit?: number
           rating?: number | null
           reviews?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activities_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agencies: {
+        Row: {
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          is_visible: boolean | null
+          logo_url: string | null
+          name: string
+          owner_id: string
+          updated_at: string
+        }
+        Insert: {
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_visible?: boolean | null
+          logo_url?: string | null
+          name: string
+          owner_id: string
+          updated_at?: string
+        }
+        Update: {
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_visible?: boolean | null
+          logo_url?: string | null
+          name?: string
+          owner_id?: string
           updated_at?: string
         }
         Relationships: []
@@ -421,6 +474,7 @@ export type Database = {
       }
       promotions: {
         Row: {
+          agency_id: string | null
           created_at: string | null
           currency: string | null
           description: string | null
@@ -436,6 +490,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          agency_id?: string | null
           created_at?: string | null
           currency?: string | null
           description?: string | null
@@ -451,6 +506,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          agency_id?: string | null
           created_at?: string | null
           currency?: string | null
           description?: string | null
@@ -465,7 +521,15 @@ export type Database = {
           rating?: number | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "promotions_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       push_subscriptions: {
         Row: {
@@ -544,6 +608,7 @@ export type Database = {
       }
       services: {
         Row: {
+          agency_id: string | null
           amenities: Json | null
           available: boolean | null
           created_at: string
@@ -564,6 +629,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          agency_id?: string | null
           amenities?: Json | null
           available?: boolean | null
           created_at?: string
@@ -584,6 +650,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          agency_id?: string | null
           amenities?: Json | null
           available?: boolean | null
           created_at?: string
@@ -603,7 +670,15 @@ export type Database = {
           type?: Database["public"]["Enums"]["service_type"]
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "services_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       site_config: {
         Row: {
@@ -637,6 +712,7 @@ export type Database = {
       }
       stays: {
         Row: {
+          agency_id: string | null
           available: boolean | null
           created_at: string
           currency: string
@@ -655,6 +731,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          agency_id?: string | null
           available?: boolean | null
           created_at?: string
           currency?: string
@@ -673,6 +750,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          agency_id?: string | null
           available?: boolean | null
           created_at?: string
           currency?: string
@@ -690,7 +768,15 @@ export type Database = {
           type?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "stays_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscription_plans: {
         Row: {
@@ -822,6 +908,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_agency_owner: {
+        Args: { _agency_id: string; _user_id: string }
         Returns: boolean
       }
     }
