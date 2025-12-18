@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import { UserDashboardLayout } from "@/components/dashboard/UserDashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -158,21 +157,17 @@ const BookingHistory = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex flex-col pt-16">
-        <Navbar />
-        <main className="flex-1 container mx-auto px-4 py-8 flex items-center justify-center">
+      <UserDashboardLayout>
+        <div className="flex-1 flex items-center justify-center">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        </main>
-        <Footer />
-      </div>
+        </div>
+      </UserDashboardLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col pt-16">
-      <Navbar />
-      
-      <main className="flex-1 container mx-auto px-4 py-6 md:py-8">
+    <UserDashboardLayout>
+      <div className="space-y-6">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-4">{t('bookingHistory.title')}</h1>
           <p className="text-muted-foreground text-lg">
@@ -316,10 +311,8 @@ const BookingHistory = () => {
             </TabsContent>
           ))}
         </Tabs>
-      </main>
-
-      <Footer />
-    </div>
+      </div>
+    </UserDashboardLayout>
   );
 };
 
