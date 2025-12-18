@@ -45,6 +45,10 @@ const AdminSubscriptionPlans = lazy(() => import("./pages/admin/AdminSubscriptio
 const AdminPromotions = lazy(() => import("./pages/admin/AdminPromotions"));
 const AdminEmailTemplates = lazy(() => import("./pages/AdminEmailTemplates"));
 const AdminConfiguration = lazy(() => import("./pages/admin/AdminConfiguration"));
+const AdminAgencies = lazy(() => import("./pages/admin/AdminAgencies"));
+const AgencyDashboard = lazy(() => import("./pages/agency/AgencyDashboard"));
+const AgencyServices = lazy(() => import("./pages/agency/AgencyServices"));
+const AgencySettings = lazy(() => import("./pages/agency/AgencySettings"));
 const Help = lazy(() => import("./pages/Help"));
 const Support = lazy(() => import("./pages/Support"));
 const Install = lazy(() => import("./pages/Install"));
@@ -111,6 +115,10 @@ const App = () => (
                     <Route path="/admin/promotions" element={<AdminPromotions />} />
                     <Route path="/admin/email-templates" element={<AdminEmailTemplates />} />
                     <Route path="/admin/configuration" element={<AdminConfiguration />} />
+                    <Route path="/admin/agencies" element={<AdminAgencies />} />
+                    <Route path="/agency" element={<AgencyDashboard />} />
+                    <Route path="/agency/services" element={<AgencyServices />} />
+                    <Route path="/agency/settings" element={<AgencySettings />} />
                     <Route path="/help" element={<Help />} />
                     <Route path="/support" element={<Support />} />
                     <Route path="/install" element={<Install />} />
