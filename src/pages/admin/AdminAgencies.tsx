@@ -45,6 +45,7 @@ interface Agency {
   owner_id: string;
   is_visible: boolean;
   is_active: boolean;
+  commission_rate: number | null;
   created_at: string;
   owner_email?: string;
   owner_name?: string;
@@ -74,6 +75,7 @@ export default function AdminAgencies() {
     owner_id: "",
     is_visible: false,
     is_active: true,
+    commission_rate: 10,
   });
 
   useEffect(() => {
@@ -157,6 +159,7 @@ export default function AdminAgencies() {
             contact_phone: formData.contact_phone || null,
             is_visible: formData.is_visible,
             is_active: formData.is_active,
+            commission_rate: formData.commission_rate,
           })
           .eq("id", editingAgency.id);
 
@@ -179,6 +182,7 @@ export default function AdminAgencies() {
             owner_id: formData.owner_id,
             is_visible: formData.is_visible,
             is_active: formData.is_active,
+            commission_rate: formData.commission_rate,
           })
           .select()
           .single();
@@ -227,6 +231,7 @@ export default function AdminAgencies() {
       owner_id: agency.owner_id,
       is_visible: agency.is_visible,
       is_active: agency.is_active,
+      commission_rate: agency.commission_rate ?? 10,
     });
     setIsDialogOpen(true);
   };
@@ -286,6 +291,7 @@ export default function AdminAgencies() {
       owner_id: "",
       is_visible: false,
       is_active: true,
+      commission_rate: 10,
     });
   };
 
@@ -387,6 +393,18 @@ export default function AdminAgencies() {
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       rows={3}
                     />
+                  <div className="space-y-2">
+                    <Label htmlFor="commission_rate">Taux de commission (%)</Label>
+                    <Input
+                      id="commission_rate"
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.5"
+                      value={formData.commission_rate}
+                      onChange={(e) => setFormData({ ...formData, commission_rate: parseFloat(e.target.value) || 0 })}
+                    />
+                  </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-6">
@@ -439,6 +457,7 @@ export default function AdminAgencies() {
                 <TableHead>Agence</TableHead>
                 <TableHead>Contact</TableHead>
                 <TableHead>Propriétaire</TableHead>
+                <TableHead>Commission</TableHead>
                 <TableHead>Visibilité</TableHead>
                 <TableHead>Statut</TableHead>
                 <TableHead>Créée le</TableHead>
@@ -448,13 +467,13 @@ export default function AdminAgencies() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8">
+                  <TableCell colSpan={8} className="text-center py-8">
                     Chargement...
                   </TableCell>
                 </TableRow>
               ) : filteredAgencies.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                     <Building2 className="h-12 w-12 mx-auto mb-2 opacity-50" />
                     Aucune agence trouvée
                   </TableCell>
@@ -495,6 +514,11 @@ export default function AdminAgencies() {
                     </TableCell>
                     <TableCell>
                       <p className="text-sm">{agency.owner_name}</p>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="font-mono">
+                        {agency.commission_rate ?? 10}%
+                      </Badge>
                     </TableCell>
                     <TableCell>
                       {agency.is_visible ? (
