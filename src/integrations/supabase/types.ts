@@ -87,6 +87,7 @@ export type Database = {
       }
       agencies: {
         Row: {
+          commission_rate: number | null
           contact_email: string | null
           contact_phone: string | null
           created_at: string
@@ -100,6 +101,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          commission_rate?: number | null
           contact_email?: string | null
           contact_phone?: string | null
           created_at?: string
@@ -113,6 +115,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          commission_rate?: number | null
           contact_email?: string | null
           contact_phone?: string | null
           created_at?: string
@@ -194,6 +197,60 @@ export type Database = {
             columns: ["service_id"]
             isOneToOne: false
             referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commissions: {
+        Row: {
+          agency_id: string
+          booking_amount: number
+          booking_id: string
+          commission_amount: number
+          commission_rate: number
+          created_at: string
+          id: string
+          paid_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          agency_id: string
+          booking_amount: number
+          booking_id: string
+          commission_amount: number
+          commission_rate: number
+          created_at?: string
+          id?: string
+          paid_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          agency_id?: string
+          booking_amount?: number
+          booking_id?: string
+          commission_amount?: number
+          commission_rate?: number
+          created_at?: string
+          id?: string
+          paid_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commissions_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commissions_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: true
+            referencedRelation: "bookings"
             referencedColumns: ["id"]
           },
         ]

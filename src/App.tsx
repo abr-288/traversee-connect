@@ -46,6 +46,7 @@ const AdminPromotions = lazy(() => import("./pages/admin/AdminPromotions"));
 const AdminEmailTemplates = lazy(() => import("./pages/AdminEmailTemplates"));
 const AdminConfiguration = lazy(() => import("./pages/admin/AdminConfiguration"));
 const AdminAgencies = lazy(() => import("./pages/admin/AdminAgencies"));
+const AdminCommissions = lazy(() => import("./pages/admin/AdminCommissions"));
 const AgencyDashboard = lazy(() => import("./pages/agency/AgencyDashboard"));
 const AgencyServices = lazy(() => import("./pages/agency/AgencyServices"));
 const AgencySettings = lazy(() => import("./pages/agency/AgencySettings"));
@@ -116,6 +117,7 @@ const App = () => (
                     <Route path="/admin/email-templates" element={<AdminEmailTemplates />} />
                     <Route path="/admin/configuration" element={<AdminConfiguration />} />
                     <Route path="/admin/agencies" element={<AdminAgencies />} />
+                    <Route path="/admin/commissions" element={<AdminCommissions />} />
                     <Route path="/agency" element={<AgencyDashboard />} />
                     <Route path="/agency/services" element={<AgencyServices />} />
                     <Route path="/agency/settings" element={<AgencySettings />} />
