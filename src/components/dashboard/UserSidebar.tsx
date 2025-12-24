@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { 
   LayoutDashboard, 
   Calendar, 
@@ -8,7 +9,8 @@ import {
   MapPin,
   Plane,
   HelpCircle,
-  LogOut
+  LogOut,
+  Building2
 } from "lucide-react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -43,6 +45,24 @@ export function UserSidebar({ userProfile }: UserSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const collapsed = state === "collapsed";
+  const [isSubAgency, setIsSubAgency] = useState(false);
+
+  useEffect(() => {
+    const checkSubAgencyRole = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: roles } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+          .eq("role", "sub_agency")
+          .maybeSingle();
+        
+        setIsSubAgency(!!roles);
+      }
+    };
+    checkSubAgencyRole();
+  }, []);
 
   const menuItems = [
     { 
@@ -92,6 +112,12 @@ export function UserSidebar({ userProfile }: UserSidebarProps) {
       icon: Settings 
     },
   ];
+
+  const agencyItem = { 
+    title: "Espace Agence", 
+    url: "/agency", 
+    icon: Building2 
+  };
 
   const isActive = (path: string) => {
     if (path === "/dashboard") {
@@ -167,6 +193,33 @@ export function UserSidebar({ userProfile }: UserSidebarProps) {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {isSubAgency && (
+          <SidebarGroup>
+            <SidebarGroupLabel>
+              {!collapsed && "Mon Agence"}
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <Link 
+                      to={agencyItem.url}
+                      className={`flex items-center gap-3 ${
+                        isActive(agencyItem.url) 
+                          ? "bg-primary/10 text-primary font-medium" 
+                          : "hover:bg-muted"
+                      }`}
+                    >
+                      <agencyItem.icon className="h-5 w-5 shrink-0" />
+                      {!collapsed && <span>{agencyItem.title}</span>}
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
 
         <SidebarGroup>
           <SidebarGroupLabel>
