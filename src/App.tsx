@@ -49,6 +49,9 @@ const AdminAgencies = lazy(() => import("./pages/admin/AdminAgencies"));
 const AdminCommissions = lazy(() => import("./pages/admin/AdminCommissions"));
 const AgencyDashboard = lazy(() => import("./pages/agency/AgencyDashboard"));
 const AgencyServices = lazy(() => import("./pages/agency/AgencyServices"));
+const AgencyActivities = lazy(() => import("./pages/agency/AgencyActivities"));
+const AgencyStays = lazy(() => import("./pages/agency/AgencyStays"));
+const AgencyPromotions = lazy(() => import("./pages/agency/AgencyPromotions"));
 const AgencySettings = lazy(() => import("./pages/agency/AgencySettings"));
 const Help = lazy(() => import("./pages/Help"));
 const Support = lazy(() => import("./pages/Support"));
@@ -120,6 +123,9 @@ const App = () => (
                     <Route path="/admin/commissions" element={<AdminCommissions />} />
                     <Route path="/agency" element={<AgencyDashboard />} />
                     <Route path="/agency/services" element={<AgencyServices />} />
+                    <Route path="/agency/activities" element={<AgencyActivities />} />
+                    <Route path="/agency/stays" element={<AgencyStays />} />
+                    <Route path="/agency/promotions" element={<AgencyPromotions />} />
                     <Route path="/agency/settings" element={<AgencySettings />} />
                     <Route path="/help" element={<Help />} />
                     <Route path="/support" element={<Support />} />

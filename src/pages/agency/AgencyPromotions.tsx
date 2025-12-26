@@ -30,53 +30,49 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2, Package, Search } from "lucide-react";
+import { Plus, Pencil, Trash2, Percent, Search } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
-interface Service {
+interface Promotion {
   id: string;
   name: string;
-  type: string;
   description: string | null;
   location: string;
-  price_per_unit: number;
+  original_price: number;
+  discount: number;
   currency: string;
-  available: boolean;
+  is_active: boolean;
+  expires_at: string | null;
   image_url: string | null;
   created_at: string;
 }
 
-const serviceTypes = [
-  { value: "flight", label: "Vol" },
-  { value: "hotel", label: "Hôtel" },
-  { value: "car", label: "Voiture" },
-];
-
-export default function AgencyServices() {
+export default function AgencyPromotions() {
   const { toast } = useToast();
-  const [services, setServices] = useState<Service[]>([]);
+  const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [agencyId, setAgencyId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingService, setEditingService] = useState<Service | null>(null);
+  const [editingPromotion, setEditingPromotion] = useState<Promotion | null>(null);
   const [formData, setFormData] = useState({
     name: "",
-    type: "hotel",
     description: "",
     location: "",
-    price_per_unit: "",
-    currency: "EUR",
-    available: true,
+    original_price: "",
+    discount: "",
+    currency: "XOF",
+    is_active: true,
+    expires_at: "",
     image_url: "",
   });
 
   useEffect(() => {
-    fetchAgencyAndServices();
+    fetchAgencyAndPromotions();
   }, []);
 
-  const fetchAgencyAndServices = async () => {
+  const fetchAgencyAndPromotions = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
@@ -90,15 +86,15 @@ export default function AgencyServices() {
     setAgencyId(agency.id);
 
     const { data, error } = await supabase
-      .from("services")
+      .from("promotions")
       .select("*")
       .eq("agency_id", agency.id)
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("Error fetching services:", error);
+      console.error("Error fetching promotions:", error);
     } else {
-      setServices(data || []);
+      setPromotions(data || []);
     }
     setLoading(false);
   };
@@ -108,38 +104,39 @@ export default function AgencyServices() {
     if (!agencyId) return;
 
     try {
-      const serviceData = {
+      const promotionData = {
         name: formData.name,
-        type: formData.type as any,
         description: formData.description || null,
         location: formData.location,
-        price_per_unit: parseFloat(formData.price_per_unit),
+        original_price: parseFloat(formData.original_price),
+        discount: parseInt(formData.discount),
         currency: formData.currency,
-        available: formData.available,
+        is_active: formData.is_active,
+        expires_at: formData.expires_at || null,
         image_url: formData.image_url || null,
         agency_id: agencyId,
       };
 
-      if (editingService) {
+      if (editingPromotion) {
         const { error } = await supabase
-          .from("services")
-          .update(serviceData)
-          .eq("id", editingService.id);
+          .from("promotions")
+          .update(promotionData)
+          .eq("id", editingPromotion.id);
 
         if (error) throw error;
-        toast({ title: "Succès", description: "Service mis à jour" });
+        toast({ title: "Succès", description: "Promotion mise à jour" });
       } else {
         const { error } = await supabase
-          .from("services")
-          .insert(serviceData);
+          .from("promotions")
+          .insert(promotionData);
 
         if (error) throw error;
-        toast({ title: "Succès", description: "Service créé" });
+        toast({ title: "Succès", description: "Promotion créée" });
       }
 
       setIsDialogOpen(false);
       resetForm();
-      fetchAgencyAndServices();
+      fetchAgencyAndPromotions();
     } catch (error: any) {
       toast({
         title: "Erreur",
@@ -149,96 +146,86 @@ export default function AgencyServices() {
     }
   };
 
-  const handleEdit = (service: Service) => {
-    setEditingService(service);
+  const handleEdit = (promotion: Promotion) => {
+    setEditingPromotion(promotion);
     setFormData({
-      name: service.name,
-      type: service.type,
-      description: service.description || "",
-      location: service.location,
-      price_per_unit: service.price_per_unit.toString(),
-      currency: service.currency,
-      available: service.available,
-      image_url: service.image_url || "",
+      name: promotion.name,
+      description: promotion.description || "",
+      location: promotion.location,
+      original_price: promotion.original_price.toString(),
+      discount: promotion.discount.toString(),
+      currency: promotion.currency || "XOF",
+      is_active: promotion.is_active,
+      expires_at: promotion.expires_at ? promotion.expires_at.split("T")[0] : "",
+      image_url: promotion.image_url || "",
     });
     setIsDialogOpen(true);
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Supprimer ce service ?")) return;
+    if (!confirm("Supprimer cette promotion ?")) return;
 
-    const { error } = await supabase.from("services").delete().eq("id", id);
+    const { error } = await supabase.from("promotions").delete().eq("id", id);
     if (error) {
       toast({ title: "Erreur", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Succès", description: "Service supprimé" });
-      fetchAgencyAndServices();
+      toast({ title: "Succès", description: "Promotion supprimée" });
+      fetchAgencyAndPromotions();
     }
   };
 
   const resetForm = () => {
-    setEditingService(null);
+    setEditingPromotion(null);
     setFormData({
       name: "",
-      type: "hotel",
       description: "",
       location: "",
-      price_per_unit: "",
-      currency: "EUR",
-      available: true,
+      original_price: "",
+      discount: "",
+      currency: "XOF",
+      is_active: true,
+      expires_at: "",
       image_url: "",
     });
   };
 
-  const filteredServices = services.filter((s) =>
-    s.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredPromotions = promotions.filter((p) =>
+    p.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const calculateDiscountedPrice = (original: number, discount: number) => {
+    return original - (original * discount / 100);
+  };
 
   return (
     <AgencyLayout>
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-2xl font-bold">Mes Services</h1>
-            <p className="text-muted-foreground">Gérez vos services de voyage</p>
+            <h1 className="text-2xl font-bold">Mes Promotions</h1>
+            <p className="text-muted-foreground">Gérez vos offres promotionnelles</p>
           </div>
           <Dialog open={isDialogOpen} onOpenChange={(open) => {
             setIsDialogOpen(open);
             if (!open) resetForm();
           }}>
             <DialogTrigger asChild>
-              <Button><Plus className="h-4 w-4 mr-2" />Nouveau Service</Button>
+              <Button><Plus className="h-4 w-4 mr-2" />Nouvelle Promotion</Button>
             </DialogTrigger>
             <DialogContent className="max-w-lg">
               <DialogHeader>
                 <DialogTitle>
-                  {editingService ? "Modifier le service" : "Nouveau service"}
+                  {editingPromotion ? "Modifier la promotion" : "Nouvelle promotion"}
                 </DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Nom *</Label>
-                    <Input
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Type *</Label>
-                    <Select
-                      value={formData.type}
-                      onValueChange={(v) => setFormData({ ...formData, type: v })}
-                    >
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {serviceTypes.map((t) => (
-                          <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div className="space-y-2">
+                  <Label>Nom de l'offre *</Label>
+                  <Input
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    required
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Localisation *</Label>
@@ -248,13 +235,24 @@ export default function AgencyServices() {
                     required
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label>Prix *</Label>
+                    <Label>Prix original *</Label>
                     <Input
                       type="number"
-                      value={formData.price_per_unit}
-                      onChange={(e) => setFormData({ ...formData, price_per_unit: e.target.value })}
+                      value={formData.original_price}
+                      onChange={(e) => setFormData({ ...formData, original_price: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Réduction (%) *</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      max="99"
+                      value={formData.discount}
+                      onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
                       required
                     />
                   </div>
@@ -266,12 +264,20 @@ export default function AgencyServices() {
                     >
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="EUR">EUR</SelectItem>
                         <SelectItem value="XOF">XOF</SelectItem>
+                        <SelectItem value="EUR">EUR</SelectItem>
                         <SelectItem value="USD">USD</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Date d'expiration</Label>
+                  <Input
+                    type="date"
+                    value={formData.expires_at}
+                    onChange={(e) => setFormData({ ...formData, expires_at: e.target.value })}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Description</Label>
@@ -290,16 +296,16 @@ export default function AgencyServices() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Switch
-                    checked={formData.available}
-                    onCheckedChange={(c) => setFormData({ ...formData, available: c })}
+                    checked={formData.is_active}
+                    onCheckedChange={(c) => setFormData({ ...formData, is_active: c })}
                   />
-                  <Label>Disponible</Label>
+                  <Label>Active</Label>
                 </div>
                 <div className="flex justify-end gap-2">
                   <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                     Annuler
                   </Button>
-                  <Button type="submit">{editingService ? "Mettre à jour" : "Créer"}</Button>
+                  <Button type="submit">{editingPromotion ? "Mettre à jour" : "Créer"}</Button>
                 </div>
               </form>
             </DialogContent>
@@ -320,10 +326,12 @@ export default function AgencyServices() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Service</TableHead>
-                <TableHead>Type</TableHead>
+                <TableHead>Promotion</TableHead>
                 <TableHead>Localisation</TableHead>
-                <TableHead>Prix</TableHead>
+                <TableHead>Prix original</TableHead>
+                <TableHead>Réduction</TableHead>
+                <TableHead>Prix final</TableHead>
+                <TableHead>Expire le</TableHead>
                 <TableHead>Statut</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -331,36 +339,45 @@ export default function AgencyServices() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8">Chargement...</TableCell>
+                  <TableCell colSpan={8} className="text-center py-8">Chargement...</TableCell>
                 </TableRow>
-              ) : filteredServices.length === 0 ? (
+              ) : filteredPromotions.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                    <Package className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                    Aucun service
+                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                    <Percent className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    Aucune promotion
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredServices.map((service) => (
-                  <TableRow key={service.id}>
-                    <TableCell className="font-medium">{service.name}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">
-                        {serviceTypes.find((t) => t.value === service.type)?.label || service.type}
-                      </Badge>
+                filteredPromotions.map((promotion) => (
+                  <TableRow key={promotion.id}>
+                    <TableCell className="font-medium">{promotion.name}</TableCell>
+                    <TableCell>{promotion.location}</TableCell>
+                    <TableCell className="line-through text-muted-foreground">
+                      {promotion.original_price} {promotion.currency}
                     </TableCell>
-                    <TableCell>{service.location}</TableCell>
-                    <TableCell>{service.price_per_unit} {service.currency}</TableCell>
                     <TableCell>
-                      <Badge variant={service.available ? "default" : "secondary"}>
-                        {service.available ? "Disponible" : "Indisponible"}
+                      <Badge variant="destructive">-{promotion.discount}%</Badge>
+                    </TableCell>
+                    <TableCell className="font-semibold text-green-600">
+                      {calculateDiscountedPrice(promotion.original_price, promotion.discount).toFixed(0)} {promotion.currency}
+                    </TableCell>
+                    <TableCell>
+                      {promotion.expires_at 
+                        ? format(new Date(promotion.expires_at), "dd MMM yyyy", { locale: fr })
+                        : "-"
+                      }
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={promotion.is_active ? "default" : "secondary"}>
+                        {promotion.is_active ? "Active" : "Inactive"}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" onClick={() => handleEdit(service)}>
+                      <Button variant="ghost" size="icon" onClick={() => handleEdit(promotion)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleDelete(service.id)}>
+                      <Button variant="ghost" size="icon" onClick={() => handleDelete(promotion.id)}>
                         <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
                     </TableCell>
