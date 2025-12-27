@@ -67,16 +67,16 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       <div className="min-h-screen flex w-full bg-muted/10">
         <AdminSidebar />
         
-        <div className="flex-1 flex flex-col">
-          <header className="h-16 border-b bg-background flex items-center justify-between px-6">
-            <SidebarTrigger />
-            <Button variant="ghost" onClick={handleLogout} className="gap-2">
+        <div className="flex-1 flex flex-col min-w-0">
+          <header className="h-14 md:h-16 border-b bg-background flex items-center justify-between px-3 md:px-6 sticky top-0 z-50">
+            <SidebarTrigger className="touch-target" />
+            <Button variant="ghost" onClick={handleLogout} className="gap-2 text-sm md:text-base">
               <LogOut className="h-4 w-4" />
-              Déconnexion
+              <span className="hidden sm:inline">Déconnexion</span>
             </Button>
           </header>
 
-          <main className="flex-1 p-6 overflow-auto">
+          <main className="flex-1 p-3 md:p-6 overflow-auto">
             {children}
           </main>
         </div>

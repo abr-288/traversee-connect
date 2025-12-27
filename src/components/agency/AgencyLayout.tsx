@@ -83,15 +83,15 @@ export function AgencyLayout({ children }: AgencyLayoutProps) {
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
         <AgencySidebar />
-        <div className="flex-1 flex flex-col">
-          <header className="h-16 border-b flex items-center justify-between px-4 bg-background">
-            <div className="flex items-center gap-4">
-              <SidebarTrigger />
-              <span className="font-medium text-lg">{agencyName}</span>
+        <div className="flex-1 flex flex-col min-w-0">
+          <header className="h-14 md:h-16 border-b flex items-center justify-between px-3 md:px-4 bg-background sticky top-0 z-50">
+            <div className="flex items-center gap-2 md:gap-4 min-w-0">
+              <SidebarTrigger className="touch-target flex-shrink-0" />
+              <span className="font-medium text-sm md:text-lg truncate">{agencyName}</span>
             </div>
             <DarkModeToggle />
           </header>
-          <main className="flex-1 p-6 overflow-auto">
+          <main className="flex-1 p-3 md:p-6 overflow-auto">
             {children}
           </main>
         </div>
