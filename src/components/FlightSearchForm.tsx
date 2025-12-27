@@ -183,7 +183,7 @@ export const FlightSearchForm = () => {
       )}
 
       {/* Trip Type Selector */}
-      <div className="flex gap-3 mb-4 md:mb-6">
+      <div className="flex gap-2 md:gap-3 mb-4 md:mb-6 overflow-x-auto pb-2">
         {[
           { value: "round-trip", label: t("search.roundTrip") },
           { value: "one-way", label: t("search.oneWay") }
@@ -198,7 +198,7 @@ export const FlightSearchForm = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className={cn(
-              "px-6 py-2.5 rounded-xl font-semibold transition-all duration-200",
+              "px-4 md:px-6 py-2 md:py-2.5 rounded-xl font-semibold transition-all duration-200 text-sm md:text-base whitespace-nowrap flex-shrink-0",
               "border-2",
               tripType === value
                 ? "bg-primary text-white border-primary shadow-lg"
@@ -323,9 +323,9 @@ export const FlightSearchForm = () => {
       </div>
 
       {/* Passengers & Class */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4 mt-3 md:mt-4">
+      <div className="grid grid-cols-2 gap-2 md:gap-4 mt-3 md:mt-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">
+          <label className="text-xs md:text-sm font-medium text-foreground">
             {t("search.adults")}
           </label>
           <Select 
@@ -335,13 +335,13 @@ export const FlightSearchForm = () => {
               handleBlur("adults");
             }}
           >
-            <SelectTrigger className={cn("h-11", errors.adults && touched.adults && "border-destructive")}>
+            <SelectTrigger className={cn("h-10 md:h-11 text-sm", errors.adults && touched.adults && "border-destructive")}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
                 <SelectItem key={num} value={num.toString()}>
-                  {num} {num > 1 ? t("search.adults").toLowerCase() : t("search.adults").toLowerCase().slice(0, -1)}
+                  {num}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -352,7 +352,7 @@ export const FlightSearchForm = () => {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">{t("search.children")}</label>
+          <label className="text-xs md:text-sm font-medium text-foreground">{t("search.children")}</label>
           <Select 
             value={children.toString()} 
             onValueChange={(value) => {
@@ -360,7 +360,7 @@ export const FlightSearchForm = () => {
               handleBlur("children");
             }}
           >
-            <SelectTrigger className={cn("h-11", errors.children && touched.children && "border-destructive")}>
+            <SelectTrigger className={cn("h-10 md:h-11 text-sm", errors.children && touched.children && "border-destructive")}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -377,7 +377,7 @@ export const FlightSearchForm = () => {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">Bébés (0-2 ans)</label>
+          <label className="text-xs md:text-sm font-medium text-foreground">Bébés</label>
           <Select 
             value={infants.toString()} 
             onValueChange={(value) => {
@@ -385,7 +385,7 @@ export const FlightSearchForm = () => {
               handleBlur("infants");
             }}
           >
-            <SelectTrigger className={cn("h-11", errors.infants && touched.infants && "border-destructive")}>
+            <SelectTrigger className={cn("h-10 md:h-11 text-sm", errors.infants && touched.infants && "border-destructive")}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -402,7 +402,7 @@ export const FlightSearchForm = () => {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">{t("search.class.title")}</label>
+          <label className="text-xs md:text-sm font-medium text-foreground">{t("search.class.title")}</label>
           <Select 
             value={travelClass} 
             onValueChange={(value) => {
@@ -410,7 +410,7 @@ export const FlightSearchForm = () => {
               handleBlur("travelClass");
             }}
           >
-            <SelectTrigger className={cn("h-11", errors.travelClass && touched.travelClass && "border-destructive")}>
+            <SelectTrigger className={cn("h-10 md:h-11 text-sm", errors.travelClass && touched.travelClass && "border-destructive")}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

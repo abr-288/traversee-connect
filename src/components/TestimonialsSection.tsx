@@ -80,30 +80,30 @@ const TestimonialsSection = () => {
   }, [emblaApi, onSelect]);
 
   return (
-    <section className="py-20 md:py-24 lg:py-28 bg-gradient-to-b from-muted/30 via-accent/10 to-background relative overflow-hidden w-full">
+    <section className="py-12 md:py-20 lg:py-28 bg-gradient-to-b from-muted/30 via-accent/10 to-background relative overflow-hidden w-full">
       {/* Background decoration */}
       <div className="absolute inset-0 gradient-mesh opacity-40" />
-      <div className="absolute top-20 left-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl animate-float" />
-      <div className="absolute bottom-20 right-20 w-72 h-72 bg-secondary/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
+      <div className="absolute top-20 left-20 w-40 md:w-64 h-40 md:h-64 bg-primary/5 rounded-full blur-3xl animate-float" />
+      <div className="absolute bottom-20 right-20 w-48 md:w-72 h-48 md:h-72 bg-secondary/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
       
       <div className="site-container relative z-10">
-        <div className="text-center mb-14 md:mb-16 animate-slide-up-fade">
-          <div className="inline-block mb-4">
-            <span className="px-4 py-2 rounded-full bg-secondary/10 text-secondary text-sm font-semibold">
+        <div className="text-center mb-8 md:mb-14 lg:mb-16 animate-slide-up-fade px-4">
+          <div className="inline-block mb-3 md:mb-4">
+            <span className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-secondary/10 text-secondary text-xs md:text-sm font-semibold">
               ⭐ Avis Clients
             </span>
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gradient mb-6">
+          <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold text-gradient mb-4 md:mb-6">
             {t('testimonials.title')}
           </h2>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-sm md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto">
             {t('testimonials.subtitle')}
           </p>
           
           {/* Decorative line */}
-          <div className="flex justify-center gap-2 mt-8">
-            <div className="w-16 h-1.5 bg-gradient-primary rounded-full" />
-            <div className="w-8 h-1.5 bg-secondary/50 rounded-full" />
+          <div className="flex justify-center gap-2 mt-4 md:mt-8">
+            <div className="w-12 md:w-16 h-1 md:h-1.5 bg-gradient-primary rounded-full" />
+            <div className="w-6 md:w-8 h-1 md:h-1.5 bg-secondary/50 rounded-full" />
           </div>
         </div>
 
@@ -129,55 +129,55 @@ const TestimonialsSection = () => {
           </Button>
 
           {/* Embla Carousel */}
-          <div className="overflow-hidden" ref={emblaRef}>
-            <div className="flex gap-6 md:gap-8">
+          <div className="overflow-hidden px-2 md:px-0" ref={emblaRef}>
+            <div className="flex gap-4 md:gap-6 lg:gap-8">
               {testimonials.map((testimonial, index) => (
                 <div 
                   key={testimonial.id}
-                  className="flex-[0_0_100%] md:flex-[0_0_calc(50%-1rem)] lg:flex-[0_0_calc(33.333%-1.5rem)] min-w-0"
+                  className="flex-[0_0_85%] sm:flex-[0_0_70%] md:flex-[0_0_calc(50%-1rem)] lg:flex-[0_0_calc(33.333%-1.5rem)] min-w-0"
                 >
                   <Card 
-                    className="group border-2 border-border/50 hover:border-secondary/50 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift rounded-2xl bg-gradient-card relative overflow-hidden h-full"
+                    className="group border-2 border-border/50 hover:border-secondary/50 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift rounded-xl md:rounded-2xl bg-gradient-card relative overflow-hidden h-full"
                   >
                     {/* Shimmer effect */}
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
                       <div className="absolute inset-0 animate-shimmer" />
                     </div>
                     
-                    <CardContent className="p-8 md:p-10 relative z-10 h-full flex flex-col">
+                    <CardContent className="p-5 md:p-8 lg:p-10 relative z-10 h-full flex flex-col">
                       {/* Quote icon with glow effect */}
-                      <div className="mb-6 relative">
-                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center group-hover:animate-pulse-glow">
-                          <Quote className="w-8 h-8 text-primary group-hover:text-secondary transition-colors" />
+                      <div className="mb-4 md:mb-6 relative">
+                        <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center group-hover:animate-pulse-glow">
+                          <Quote className="w-6 h-6 md:w-8 md:h-8 text-primary group-hover:text-secondary transition-colors" />
                         </div>
                       </div>
 
                       {/* Rating stars with animation */}
-                      <div className="flex gap-1 mb-6">
+                      <div className="flex gap-1 mb-4 md:mb-6">
                         {[...Array(testimonial.rating)].map((_, i) => (
                           <Star 
                             key={i} 
-                            className="w-5 h-5 fill-secondary text-secondary group-hover:scale-110 transition-transform" 
+                            className="w-4 h-4 md:w-5 md:h-5 fill-secondary text-secondary group-hover:scale-110 transition-transform" 
                             style={{ transitionDelay: `${i * 0.05}s` }}
                           />
                         ))}
                       </div>
 
                       {/* Comment with enhanced typography */}
-                      <p className="text-muted-foreground group-hover:text-foreground mb-8 italic text-base md:text-lg leading-relaxed transition-colors flex-1">
+                      <p className="text-muted-foreground group-hover:text-foreground mb-4 md:mb-8 italic text-sm md:text-base lg:text-lg leading-relaxed transition-colors flex-1">
                         "{t(testimonial.commentKey)}"
                       </p>
 
                       {/* Author info with enhanced styling */}
-                      <div className="flex items-center gap-4 pt-6 border-t border-border/50">
-                        <Avatar className="w-14 h-14 gradient-primary ring-2 ring-secondary/20 group-hover:ring-secondary transition-all">
-                          <AvatarFallback className="gradient-primary text-white font-bold text-lg">
+                      <div className="flex items-center gap-3 md:gap-4 pt-4 md:pt-6 border-t border-border/50">
+                        <Avatar className="w-10 h-10 md:w-14 md:h-14 gradient-primary ring-2 ring-secondary/20 group-hover:ring-secondary transition-all">
+                          <AvatarFallback className="gradient-primary text-white font-bold text-sm md:text-lg">
                             {testimonial.avatar}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-bold text-foreground text-lg">{testimonial.name}</p>
-                          <p className="text-sm text-muted-foreground">{t(testimonial.roleKey)}</p>
+                          <p className="font-bold text-foreground text-sm md:text-lg">{testimonial.name}</p>
+                          <p className="text-xs md:text-sm text-muted-foreground">{t(testimonial.roleKey)}</p>
                         </div>
                       </div>
                     </CardContent>

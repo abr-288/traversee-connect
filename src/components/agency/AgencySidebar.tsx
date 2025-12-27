@@ -48,16 +48,16 @@ export function AgencySidebar() {
   };
 
   return (
-    <Sidebar className={collapsed ? "w-16" : "w-64"} collapsible="icon">
-      <SidebarContent>
-        <div className="p-4 border-b">
-          <h2 className={`font-bold text-xl ${collapsed ? "text-center" : ""}`}>
+    <Sidebar className={collapsed ? "w-14" : "w-60 md:w-64"} collapsible="icon">
+      <SidebarContent className="flex flex-col h-full">
+        <div className="p-3 md:p-4 border-b flex-shrink-0">
+          <h2 className={`font-bold text-lg md:text-xl ${collapsed ? "text-center" : ""}`}>
             {collapsed ? "AG" : "Espace Agence"}
           </h2>
         </div>
 
-        <SidebarGroup>
-          <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
+        <SidebarGroup className="flex-1 overflow-y-auto">
+          <SidebarGroupLabel className="text-xs px-3">Menu Principal</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
@@ -65,12 +65,12 @@ export function AgencySidebar() {
                   <SidebarMenuButton asChild>
                     <Link 
                       to={item.url}
-                      className={`flex items-center gap-3 ${
+                      className={`flex items-center gap-2 md:gap-3 py-2 md:py-2.5 ${
                         isActive(item.url) ? "bg-accent text-accent-foreground font-medium" : ""
                       }`}
                     >
-                      <item.icon className="h-5 w-5" />
-                      {!collapsed && <span>{item.title}</span>}
+                      <item.icon className="h-4 w-4 md:h-5 md:w-5 flex-shrink-0" />
+                      {!collapsed && <span className="text-sm md:text-base truncate">{item.title}</span>}
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -79,14 +79,14 @@ export function AgencySidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <div className="mt-auto p-4 border-t">
+        <div className="mt-auto p-3 md:p-4 border-t flex-shrink-0">
           <Button 
             variant="ghost" 
-            className="w-full justify-start gap-2"
+            className="w-full justify-start gap-2 text-sm"
             onClick={handleLogout}
           >
-            <LogOut className="h-4 w-4" />
-            {!collapsed && "Déconnexion"}
+            <LogOut className="h-4 w-4 flex-shrink-0" />
+            {!collapsed && <span className="truncate">Déconnexion</span>}
           </Button>
         </div>
       </SidebarContent>
