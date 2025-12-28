@@ -129,8 +129,9 @@ export const paymentProcessSchema = z.object({
     .positive("Amount must be positive")
     .max(10000000, "Amount exceeds maximum allowed"),
   currency: z.string()
-    .length(3, "Currency must be 3 characters")
-    .regex(/^[A-Z]{3}$/, "Currency must be uppercase letters"),
+    .min(3, "Currency must be at least 3 characters")
+    .max(4, "Currency must be at most 4 characters")
+    .regex(/^[A-Z]{3,4}$/, "Currency must be uppercase letters"),
   paymentMethod: z.enum(["card", "mobile_money", "bank_transfer", "wave", "all"], {
     errorMap: () => ({ message: "Invalid payment method" })
   }),
@@ -148,7 +149,9 @@ export const paymentProcessSchema = z.object({
       z.string()
         .regex(/^\+?[0-9]{8,15}$/, "Phone must be 8-15 digits")
         .optional()
-    )
+    ),
+    address: z.string().max(255).optional(),
+    city: z.string().max(100).optional()
   })
 });
 
