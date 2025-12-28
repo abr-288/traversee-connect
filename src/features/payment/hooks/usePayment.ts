@@ -70,8 +70,8 @@ export const usePayment = () => {
         throw new Error("Cette réservation a été annulée et ne peut être payée");
       }
 
-      // Convert FCFA to ISO standard EUR for payment processing
-      const isoCurrency = booking.currency === "FCFA" ? "EUR" : booking.currency;
+      // Convert FCFA to XOF (ISO standard for CFA Franc)
+      const isoCurrency = booking.currency === "FCFA" ? "XOF" : booking.currency;
       
       const { data, error } = await supabase.functions.invoke("process-payment", {
         body: {
