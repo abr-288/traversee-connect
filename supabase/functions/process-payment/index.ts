@@ -1,230 +1,463 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { paymentProcessSchema, validateData, createValidationErrorResponse, sanitizeString } from "../_shared/zodValidation.ts";
+
+// ============================================================
+// EDGE FUNCTION: process-payment
+// Description: Initie un paiement via CinetPay
+// Auteur: B-Reserve
+// Version: 2.0.0 - Production Ready
+// ============================================================
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Fonction utilitaire pour créer une réponse JSON
+function jsonResponse(data: object, status: number = 200): Response {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+}
+
+// Fonction utilitaire pour créer une réponse d'erreur
+function errorResponse(message: string, status: number = 400, details?: string): Response {
+  console.error(`❌ Error [${status}]: ${message}`);
+  if (details) {
+    console.error(`   Details: ${details}`);
+  }
+  return jsonResponse({
+    success: false,
+    error: message,
+    code: status,
+  }, status);
+}
+
+// Validation du montant
+function validateAmount(amount: unknown): { valid: boolean; value: number; error?: string } {
+  if (amount === undefined || amount === null) {
+    return { valid: false, value: 0, error: "Le montant est requis" };
+  }
+  
+  const numAmount = Number(amount);
+  
+  if (isNaN(numAmount)) {
+    return { valid: false, value: 0, error: "Le montant doit être un nombre" };
+  }
+  
+  if (numAmount <= 0) {
+    return { valid: false, value: 0, error: "Le montant doit être supérieur à 0" };
+  }
+  
+  if (numAmount > 10000000) {
+    return { valid: false, value: 0, error: "Le montant dépasse le maximum autorisé (10,000,000)" };
+  }
+  
+  // CinetPay requiert un montant entier en XOF
+  return { valid: true, value: Math.round(numAmount) };
+}
+
+// Validation de la devise
+function validateCurrency(currency: unknown): { valid: boolean; value: string; error?: string } {
+  if (!currency || typeof currency !== 'string') {
+    return { valid: false, value: '', error: "La devise est requise" };
+  }
+  
+  const upperCurrency = currency.toUpperCase().trim();
+  
+  // Conversion FCFA vers XOF (code ISO standard)
+  if (upperCurrency === 'FCFA') {
+    return { valid: true, value: 'XOF' };
+  }
+  
+  // Devises supportées par CinetPay
+  const supportedCurrencies = ['XOF', 'XAF', 'CDF', 'GNF', 'USD', 'EUR'];
+  
+  if (!supportedCurrencies.includes(upperCurrency)) {
+    return { valid: false, value: '', error: `Devise non supportée: ${upperCurrency}. Devises acceptées: ${supportedCurrencies.join(', ')}` };
+  }
+  
+  return { valid: true, value: upperCurrency };
+}
+
+// Nettoyage et formatage du numéro de téléphone
+function formatPhoneNumber(phone: string | undefined | null): string {
+  if (!phone) return '';
+  
+  // Supprimer tous les caractères non numériques sauf +
+  let cleaned = phone.toString().replace(/[^\d+]/g, '');
+  
+  // Supprimer le + au début si présent
+  if (cleaned.startsWith('+')) {
+    cleaned = cleaned.substring(1);
+  }
+  
+  // Ajouter le préfixe Côte d'Ivoire si nécessaire
+  if (cleaned.startsWith('0')) {
+    cleaned = '225' + cleaned.substring(1);
+  } else if (!cleaned.startsWith('225') && cleaned.length <= 10) {
+    cleaned = '225' + cleaned;
+  }
+  
+  return cleaned;
+}
+
+// Nettoyage des chaînes
+function sanitizeString(input: string | undefined | null, maxLength: number = 100): string {
+  if (!input) return '';
+  return input.toString().trim().substring(0, maxLength);
+}
+
+// Génération d'un ID de transaction unique
+function generateTransactionId(bookingId: string): string {
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+  return `TXN-${bookingId.substring(0, 8)}-${timestamp}-${random}`;
+}
+
 serve(async (req) => {
+  // Gestion des requêtes CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
+  console.log('');
+  console.log('╔════════════════════════════════════════════════════════════╗');
+  console.log('║            PROCESS PAYMENT - CINETPAY                       ║');
+  console.log('╚════════════════════════════════════════════════════════════╝');
+  console.log(`📅 Timestamp: ${new Date().toISOString()}`);
+
   try {
-    console.log('=== PAYMENT REQUEST START ===');
+    // ================================================================
+    // ÉTAPE 1: Vérification de l'authentification
+    // ================================================================
+    console.log('\n📋 Étape 1: Vérification de l\'authentification...');
     
-    // Authentication
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      throw new Error('Missing authorization header');
+      return errorResponse('Header d\'autorisation manquant', 401);
     }
 
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: authHeader } } }
-    );
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
+    
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.error('❌ Configuration Supabase manquante');
+      return errorResponse('Configuration serveur incomplète', 500);
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } }
+    });
 
     const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
     if (userError || !user) {
-      throw new Error('Unauthorized');
+      console.error('❌ Authentification échouée:', userError?.message || 'Utilisateur non trouvé');
+      return errorResponse('Non autorisé - Veuillez vous connecter', 401);
+    }
+    
+    console.log('✅ Utilisateur authentifié');
+
+    // ================================================================
+    // ÉTAPE 2: Parsing et validation du body
+    // ================================================================
+    console.log('\n📋 Étape 2: Validation des données de paiement...');
+    
+    let body: any;
+    try {
+      body = await req.json();
+    } catch (parseError) {
+      return errorResponse('Corps de la requête invalide - JSON attendu', 400);
+    }
+    
+    console.log('   - bookingId:', body.bookingId ? '✓' : '✗');
+    console.log('   - amount:', body.amount);
+    console.log('   - currency:', body.currency);
+    console.log('   - paymentMethod:', body.paymentMethod);
+    console.log('   - customerInfo:', body.customerInfo ? '✓' : '✗');
+
+    // Validation du bookingId
+    if (!body.bookingId || typeof body.bookingId !== 'string') {
+      return errorResponse('ID de réservation manquant ou invalide', 400);
     }
 
-    // Parse and validate request body with Zod
-    const body = await req.json();
-    
-    const validation = validateData(paymentProcessSchema, body);
-    
-    if (!validation.success) {
-      return createValidationErrorResponse(validation.errors!, corsHeaders);
+    // Validation du montant
+    const amountValidation = validateAmount(body.amount);
+    if (!amountValidation.valid) {
+      return errorResponse(amountValidation.error!, 400);
     }
 
-    const requestData = validation.data!;
-    
-    // Security: Log minimal non-sensitive information only
-    console.log('Payment request validated');
-    console.log('Method:', requestData.paymentMethod);
+    // Validation de la devise
+    const currencyValidation = validateCurrency(body.currency);
+    if (!currencyValidation.valid) {
+      return errorResponse(currencyValidation.error!, 400);
+    }
 
-    // Get CinetPay credentials
+    // Validation des infos client
+    if (!body.customerInfo || typeof body.customerInfo !== 'object') {
+      return errorResponse('Informations client manquantes', 400);
+    }
+
+    const customerEmail = sanitizeString(body.customerInfo.email, 255);
+    const customerName = sanitizeString(body.customerInfo.name, 100);
+    const customerPhone = formatPhoneNumber(body.customerInfo.phone);
+
+    if (!customerEmail || !customerEmail.includes('@')) {
+      return errorResponse('Email client invalide', 400);
+    }
+
+    if (!customerName || customerName.length < 2) {
+      return errorResponse('Nom client invalide (minimum 2 caractères)', 400);
+    }
+
+    console.log('✅ Données validées');
+    console.log('   - Montant:', amountValidation.value, currencyValidation.value);
+    console.log('   - Méthode:', body.paymentMethod);
+
+    // ================================================================
+    // ÉTAPE 3: Vérification des credentials CinetPay
+    // ================================================================
+    console.log('\n📋 Étape 3: Vérification de la configuration CinetPay...');
+    
     const cinetpayApiKey = Deno.env.get('CINETPAY_API_KEY');
     const cinetpaySiteId = Deno.env.get('CINETPAY_SITE_ID');
     
-    if (!cinetpayApiKey || !cinetpaySiteId) {
-      console.error('❌ CinetPay credentials missing');
-      throw new Error('Payment gateway not configured');
-    }
-
-    // Format phone number for Côte d'Ivoire (+225) and sanitize
-    let formattedPhone = sanitizeString((requestData.customerInfo.phone as string | undefined) || '', 20).replace(/[\s\-\(\)]/g, '');
-    
-    // Normalize to include country code
-    if (!formattedPhone.startsWith('+')) {
-      if (formattedPhone.startsWith('0')) {
-        formattedPhone = '225' + formattedPhone.substring(1);
-      } else if (!formattedPhone.startsWith('225')) {
-        formattedPhone = '225' + formattedPhone;
-      }
-    } else {
-      // Remove + sign as CinetPay expects format without +
-      formattedPhone = formattedPhone.substring(1);
+    if (!cinetpayApiKey) {
+      console.error('❌ CINETPAY_API_KEY non configurée');
+      return errorResponse('Passerelle de paiement non configurée (API Key)', 500);
     }
     
-    console.log('Customer data formatted');
-
-    // Generate unique transaction ID
-    const transactionId = `TXN-${requestData.bookingId}-${Date.now()}`;
+    if (!cinetpaySiteId) {
+      console.error('❌ CINETPAY_SITE_ID non configuré');
+      return errorResponse('Passerelle de paiement non configurée (Site ID)', 500);
+    }
     
-    // Determine payment channels based on method
-    // CinetPay valid channels: ALL, MOBILE_MONEY, WALLET, CREDIT_CARD, INTERNATIONAL_CARD
+    console.log('✅ Credentials CinetPay présents');
+
+    // ================================================================
+    // ÉTAPE 4: Préparation du payload CinetPay
+    // ================================================================
+    console.log('\n📋 Étape 4: Préparation du payload CinetPay...');
+    
+    const transactionId = generateTransactionId(body.bookingId);
+    console.log('   - Transaction ID:', transactionId);
+
+    // Déterminer les canaux de paiement
     let channels = 'ALL';
-    if (requestData.paymentMethod === 'card') {
-      channels = 'CREDIT_CARD';
-    } else if (requestData.paymentMethod === 'mobile_money') {
-      channels = 'MOBILE_MONEY';
-    } else if (requestData.paymentMethod === 'wave') {
-      channels = 'WALLET'; // Wave uses WALLET channel in CinetPay
-    } else if (requestData.paymentMethod === 'bank_transfer') {
-      channels = 'CREDIT_CARD'; // Bank transfers use CREDIT_CARD channel
-    }
-
-    // Split customer name and sanitize
-    const sanitizedName = sanitizeString(requestData.customerInfo.name || '', 100);
-    const sanitizedEmail = sanitizeString(requestData.customerInfo.email || '', 255);
+    const paymentMethod = (body.paymentMethod || 'all').toLowerCase();
     
-    const nameParts = sanitizedName.trim().split(' ');
-    const firstName = nameParts[0] || sanitizedName;
+    switch (paymentMethod) {
+      case 'card':
+        channels = 'CREDIT_CARD';
+        break;
+      case 'mobile_money':
+        channels = 'MOBILE_MONEY';
+        break;
+      case 'wave':
+        channels = 'WALLET';
+        break;
+      case 'bank_transfer':
+        channels = 'CREDIT_CARD';
+        break;
+      default:
+        channels = 'ALL';
+    }
+    console.log('   - Channels:', channels);
+
+    // Séparer prénom/nom
+    const nameParts = customerName.split(' ').filter(p => p.length > 0);
+    const firstName = nameParts[0] || 'Client';
     let lastName = nameParts.slice(1).join(' ') || firstName;
     
-    // CinetPay requires lastName to be at least 2 characters
+    // CinetPay requiert un nom de famille d'au moins 2 caractères
     if (lastName.length < 2) {
       lastName = firstName.length >= 2 ? firstName : 'Client';
     }
 
-    // Build CinetPay payload
+    // URLs de retour et notification
+    const returnUrl = 'https://traversee-connect.lovable.app/dashboard?tab=bookings';
+    const notifyUrl = `${supabaseUrl}/functions/v1/payment-callback`;
+
+    console.log('   - Return URL:', returnUrl);
+    console.log('   - Notify URL:', notifyUrl);
+
     const cinetpayPayload = {
       apikey: cinetpayApiKey,
       site_id: cinetpaySiteId,
       transaction_id: transactionId,
-      amount: requestData.amount,
-      currency: requestData.currency === 'FCFA' ? 'XOF' : requestData.currency,
-      description: `Booking #${requestData.bookingId}`,
+      amount: amountValidation.value,
+      currency: currencyValidation.value,
+      description: `Réservation #${body.bookingId.substring(0, 8)}`,
       customer_name: firstName,
       customer_surname: lastName,
-      customer_email: sanitizedEmail,
-      customer_phone_number: formattedPhone,
-      customer_address: 'N/A',
-      customer_city: 'Abidjan',
+      customer_email: customerEmail,
+      customer_phone_number: customerPhone || '225000000000',
+      customer_address: sanitizeString(body.customerInfo.address, 255) || 'N/A',
+      customer_city: sanitizeString(body.customerInfo.city, 100) || 'Abidjan',
       customer_country: 'CI',
       customer_state: 'CI',
       customer_zip_code: '00225',
-      notify_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/payment-callback`,
-      return_url: `https://traversee-connect.lovable.app/dashboard?tab=bookings`,
+      notify_url: notifyUrl,
+      return_url: returnUrl,
       channels: channels,
       lang: 'fr',
       metadata: JSON.stringify({
-        booking_id: requestData.bookingId,
+        booking_id: body.bookingId,
         user_id: user.id,
-        payment_method: requestData.paymentMethod
+        payment_method: paymentMethod,
+        created_at: new Date().toISOString(),
       }),
     };
 
-    console.log('=== CINETPAY REQUEST INITIATED ===');
-    console.log('Channels:', channels);
-    console.log('Currency:', cinetpayPayload.currency);
+    console.log('✅ Payload préparé');
 
-    // Call CinetPay API
-    const cinetpayResponse = await fetch('https://api-checkout.cinetpay.com/v2/payment', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: JSON.stringify(cinetpayPayload),
-    });
-
-    const cinetpayData = await cinetpayResponse.json();
+    // ================================================================
+    // ÉTAPE 5: Appel à l'API CinetPay
+    // ================================================================
+    console.log('\n📋 Étape 5: Appel à l\'API CinetPay...');
+    console.log('   - URL: https://api-checkout.cinetpay.com/v2/payment');
     
-    console.log('=== CINETPAY RESPONSE RECEIVED ===');
-    console.log('HTTP Status:', cinetpayResponse.status);
-    console.log('Response Code:', cinetpayData.code);
-    console.log('Payment URL Present:', !!cinetpayData.data?.payment_url);
-
-    // Log non-sensitive error details from CinetPay when payment creation fails
-    if (cinetpayData.code !== '201') {
-      console.error('❌ Payment creation failed with code:', cinetpayData.code);
-      if (cinetpayData.message || cinetpayData.description) {
-        console.error('CinetPay error message:', cinetpayData.message || 'N/A');
-        console.error('CinetPay error description:', cinetpayData.description || 'N/A');
+    let cinetpayResponse: Response;
+    let cinetpayData: any;
+    
+    try {
+      cinetpayResponse = await fetch('https://api-checkout.cinetpay.com/v2/payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(cinetpayPayload),
+      });
+      
+      console.log('   - HTTP Status:', cinetpayResponse.status);
+      
+      const responseText = await cinetpayResponse.text();
+      
+      try {
+        cinetpayData = JSON.parse(responseText);
+      } catch (jsonError) {
+        console.error('❌ Réponse CinetPay non-JSON:', responseText.substring(0, 200));
+        return errorResponse('Réponse invalide de la passerelle de paiement', 502);
       }
-      // Do not log the full error message as it may contain sensitive data
-      throw new Error('Payment creation failed');
+      
+    } catch (fetchError) {
+      console.error('❌ Erreur réseau lors de l\'appel CinetPay:', fetchError);
+      return errorResponse('Impossible de contacter la passerelle de paiement. Veuillez réessayer.', 503);
     }
 
+    console.log('   - Response Code:', cinetpayData.code);
+    console.log('   - Message:', cinetpayData.message || 'N/A');
+
+    // ================================================================
+    // ÉTAPE 6: Traitement de la réponse CinetPay
+    // ================================================================
+    console.log('\n📋 Étape 6: Traitement de la réponse CinetPay...');
+    
+    // CinetPay retourne '201' pour une création réussie
+    if (cinetpayData.code !== '201') {
+      console.error('❌ Création du paiement échouée');
+      console.error('   - Code:', cinetpayData.code);
+      console.error('   - Message:', cinetpayData.message || 'Inconnu');
+      console.error('   - Description:', cinetpayData.description || 'N/A');
+      
+      // Messages d'erreur personnalisés selon le code
+      let userMessage = 'La création du paiement a échoué';
+      
+      if (cinetpayData.code === '401' || cinetpayData.code === '403') {
+        userMessage = 'Erreur de configuration de la passerelle de paiement';
+      } else if (cinetpayData.code === '422') {
+        userMessage = 'Données de paiement invalides';
+      } else if (cinetpayData.message) {
+        userMessage = cinetpayData.message;
+      }
+      
+      return errorResponse(userMessage, 400, `CinetPay code: ${cinetpayData.code}`);
+    }
+
+    // Vérifier la présence de l'URL de paiement
     if (!cinetpayData.data?.payment_url) {
-      console.error('❌ Payment URL missing in response');
-      throw new Error('No payment URL received');
+      console.error('❌ URL de paiement manquante dans la réponse');
+      return errorResponse('URL de paiement non reçue. Veuillez réessayer.', 502);
     }
 
-    // Save payment to database
+    console.log('✅ Paiement créé avec succès');
+    console.log('   - Payment URL:', cinetpayData.data.payment_url.substring(0, 50) + '...');
+
+    // ================================================================
+    // ÉTAPE 7: Enregistrement en base de données
+    // ================================================================
+    console.log('\n📋 Étape 7: Enregistrement du paiement...');
+    
     const { data: payment, error: paymentError } = await supabase
       .from('payments')
       .insert({
-        booking_id: requestData.bookingId,
+        booking_id: body.bookingId,
         user_id: user.id,
-        amount: requestData.amount,
-        currency: requestData.currency === 'FCFA' ? 'XOF' : requestData.currency,
-        payment_method: requestData.paymentMethod,
+        amount: amountValidation.value,
+        currency: currencyValidation.value,
+        payment_method: paymentMethod,
         payment_provider: 'cinetpay',
         transaction_id: transactionId,
         status: 'pending',
         payment_data: {
           transaction_id: transactionId,
           payment_url: cinetpayData.data.payment_url,
-          payment_token: cinetpayData.data.payment_token,
+          payment_token: cinetpayData.data.payment_token || null,
           channels: channels,
           cinetpay_code: cinetpayData.code,
+          created_at: new Date().toISOString(),
         },
       })
       .select()
       .single();
 
     if (paymentError) {
-      console.error('❌ Database error occurred');
-      // Do not log the full error as it may contain sensitive data
-      throw new Error('Failed to save payment record');
+      console.error('❌ Erreur d\'enregistrement:', paymentError.message);
+      // On retourne quand même l'URL car le paiement est créé côté CinetPay
+      console.warn('⚠️ Le paiement est créé mais non enregistré localement');
+    } else {
+      console.log('✅ Paiement enregistré avec succès');
+      console.log('   - Payment ID:', payment.id);
     }
 
-    console.log('✅ Payment record created successfully');
-    console.log('=== PAYMENT REQUEST COMPLETED ===');
+    // ================================================================
+    // SUCCÈS FINAL
+    // ================================================================
+    console.log('\n╔════════════════════════════════════════════════════════════╗');
+    console.log('║                    ✅ SUCCÈS                                ║');
+    console.log('╚════════════════════════════════════════════════════════════╝');
+    console.log('');
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        payment_url: cinetpayData.data.payment_url,
-        transaction_id: transactionId,
-        payment_id: payment.id,
-      }),
-      {
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+    return jsonResponse({
+      success: true,
+      payment_url: cinetpayData.data.payment_url,
+      transaction_id: transactionId,
+      payment_id: payment?.id || null,
+    }, 200);
+
   } catch (error) {
-    // Security: Only log error type, not details which may contain sensitive data
-    console.error('❌ Payment processing error:', error instanceof Error ? error.constructor.name : 'Unknown');
+    // ================================================================
+    // GESTION DES ERREURS NON CATCHÉES
+    // ================================================================
+    console.log('\n╔════════════════════════════════════════════════════════════╗');
+    console.log('║                    ❌ ERREUR                                ║');
+    console.log('╚════════════════════════════════════════════════════════════╝');
     
-    // Return generic error message to client
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: error instanceof Error ? error.message : 'Payment processing failed',
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+    const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
+    const errorType = error instanceof Error ? error.constructor.name : 'UnknownError';
+    
+    console.error('Type:', errorType);
+    console.error('Message:', errorMessage);
+    console.error('Stack:', error instanceof Error ? error.stack : 'N/A');
+    console.log('');
+
+    return jsonResponse({
+      success: false,
+      error: 'Une erreur inattendue est survenue lors du traitement du paiement. Veuillez réessayer.',
+      code: 500,
+    }, 500);
   }
 });

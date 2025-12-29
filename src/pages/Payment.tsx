@@ -267,26 +267,75 @@ export default function Payment() {
 
       clearTimeout(timeoutId);
 
+      // Gestion détaillée des erreurs de l'edge function
       if (error) {
-        throw error;
+        console.error("Erreur edge function:", error);
+        
+        // Extraire le message d'erreur
+        let errorMessage = "Une erreur est survenue lors du traitement du paiement";
+        
+        if (error.message) {
+          errorMessage = error.message;
+        } else if (typeof error === 'string') {
+          errorMessage = error;
+        }
+        
+        throw new Error(errorMessage);
       }
 
-      if (!data?.success) {
-        throw new Error(data?.error || "Échec de la création du paiement");
+      // Vérifier le succès de la réponse
+      if (!data) {
+        throw new Error("Aucune réponse reçue du serveur de paiement");
+      }
+
+      if (!data.success) {
+        // Afficher le message d'erreur spécifique de l'edge function
+        const errorMsg = data.error || "Échec de la création du paiement";
+        throw new Error(errorMsg);
       }
 
       if (!data.payment_url) {
-        throw new Error("URL de paiement non reçue");
+        throw new Error("URL de paiement non reçue. Veuillez réessayer.");
       }
 
-      // Redirect to payment provider
+      // Succès - afficher un toast avant la redirection
+      toast({
+        title: "Redirection vers le paiement",
+        description: "Vous allez être redirigé vers la page de paiement sécurisée...",
+      });
 
-      // Redirect to payment provider page
-      window.location.href = data.payment_url;
+      // Petit délai pour permettre l'affichage du toast
+      setTimeout(() => {
+        window.location.href = data.payment_url;
+      }, 500);
+      
     } catch (error: any) {
       clearTimeout(timeoutId);
       
-      const userMessage = getUserFriendlyErrorMessage(error);
+      console.error("Erreur de paiement:", error);
+      
+      // Déterminer le message d'erreur approprié
+      let userMessage = "Une erreur inattendue est survenue";
+      
+      if (error instanceof Error) {
+        userMessage = error.message;
+      } else if (error?.message) {
+        userMessage = error.message;
+      } else if (typeof error === 'string') {
+        userMessage = error;
+      }
+      
+      // Messages spécifiques pour certaines erreurs
+      if (userMessage.includes("401") || userMessage.includes("Non autorisé") || userMessage.includes("Unauthorized")) {
+        userMessage = "Session expirée. Veuillez vous reconnecter.";
+      } else if (userMessage.includes("timeout") || userMessage.includes("TIMEOUT")) {
+        userMessage = "Le serveur met trop de temps à répondre. Veuillez réessayer.";
+      } else if (userMessage.includes("network") || userMessage.includes("fetch")) {
+        userMessage = "Problème de connexion. Vérifiez votre connexion internet.";
+      } else if (userMessage.includes("502") || userMessage.includes("503")) {
+        userMessage = "Le service de paiement est temporairement indisponible. Veuillez réessayer.";
+      }
+      
       setGeneralError(userMessage);
       
       toast({
