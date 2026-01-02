@@ -50,6 +50,23 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close menu on route change
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location.pathname]);
+
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMenuOpen]);
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setIsLoggedIn(!!session);
@@ -66,6 +83,7 @@ const Navbar = () => {
     await supabase.auth.signOut();
     toast.success(t("nav.logoutSuccess"));
     navigate("/");
+    setIsMenuOpen(false);
   };
 
   const handleInstall = async () => {
@@ -77,16 +95,16 @@ const Navbar = () => {
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 bg-primary border-b border-primary-light w-full transition-all duration-300 ${isScrolled ? 'shadow-lg' : ''}`}>
-      <div className="w-full px-4 xl:px-6">
-        <div className={`flex items-center justify-between transition-all duration-300 ${isScrolled ? 'h-12' : 'h-16'}`}>
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
+      <div className="w-full px-3 sm:px-4 xl:px-6">
+        <div className={`flex items-center justify-between transition-all duration-300 ${isScrolled ? 'h-14' : 'h-16'}`}>
+          {/* Logo - Plus compact sur mobile */}
+          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 group flex-shrink-0">
             <img 
               src={config.branding.logoLight || logoLight} 
               alt={`${config.branding.siteName} Logo`} 
-              className={`transition-all duration-300 ${isScrolled ? 'h-10' : 'h-16'} w-auto`} 
+              className={`transition-all duration-300 ${isScrolled ? 'h-8 sm:h-10' : 'h-10 sm:h-14 lg:h-16'} w-auto`} 
             />
-            <span className={`font-bold text-white transition-all duration-300 ${isScrolled ? 'text-lg' : 'text-xl'}`}>
+            <span className={`font-bold text-white transition-all duration-300 hidden xs:inline ${isScrolled ? 'text-base sm:text-lg' : 'text-lg sm:text-xl'}`}>
               {config.branding.siteName}
             </span>
           </Link>
@@ -219,184 +237,156 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Button - Plus grand pour touch */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="lg:hidden p-2 text-white hover:text-secondary transition-smooth"
+            className="lg:hidden p-3 -mr-2 text-white hover:text-secondary transition-smooth touch-target"
+            aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
           >
             {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
+      </div>
 
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="lg:hidden py-4 border-t border-primary-light animate-fade-in">
-            <div className="flex flex-col">
-              {/* Section Navigation */}
-              <div className="px-4 pb-2">
-                <p className="text-xs font-semibold text-white/60 uppercase tracking-wider">
-                  Navigation
-                </p>
-              </div>
+      {/* Mobile Menu - Fullscreen overlay */}
+      {isMenuOpen && (
+        <div className="lg:hidden fixed inset-0 top-14 sm:top-16 bg-primary z-50 overflow-y-auto safe-area-bottom animate-fade-in">
+          <div className="flex flex-col min-h-full pb-20">
+            {/* Section Navigation */}
+            <div className="px-4 pt-4 pb-2">
+              <p className="text-xs font-semibold text-white/50 uppercase tracking-wider">
+                Navigation
+              </p>
+            </div>
+            
+            <div className="flex flex-col px-3">
+              {[
+                { to: "/flights", icon: Plane, label: t("nav.flights") },
+                { to: "/hotels", icon: Hotel, label: t("nav.hotels") },
+                { to: "/flight-hotel", icon: PlaneTakeoff, label: t("nav.flightHotel") },
+                { to: "/cars", icon: Car, label: t("nav.carRental") },
+                { to: "/trains", icon: Train, label: t("nav.trains") },
+                { to: "/events", icon: Calendar, label: t("nav.events") },
+                { to: "/destinations", icon: MapPin, label: t("nav.destinations") },
+                { to: "/stays", icon: Compass, label: t("nav.stays") },
+              ].map(({ to, icon: Icon, label }) => (
+                <Link
+                  key={to}
+                  to={to}
+                  className={`flex items-center gap-4 px-4 py-4 rounded-xl transition-all duration-200 touch-target ${
+                    isActive(to) 
+                      ? 'bg-white/10 text-secondary' 
+                      : 'text-white hover:bg-white/5 active:bg-white/10'
+                  }`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <Icon className={`w-5 h-5 ${isActive(to) ? 'text-secondary' : 'text-white/70'}`} />
+                  <span className="text-base font-medium">{label}</span>
+                </Link>
+              ))}
               
-              <div className="flex flex-col gap-1 px-2 pb-3">
-                <Link
-                  to="/flights"
-                  className="text-white hover:bg-white/10 rounded-lg transition-all duration-200 text-sm font-medium px-3 py-2.5 flex items-center gap-3 hover:translate-x-1"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <Plane className="w-4 h-4 text-secondary" />
-                  {t("nav.flights")}
-                </Link>
-                <Link
-                  to="/hotels"
-                  className="text-white hover:bg-white/10 rounded-lg transition-all duration-200 text-sm font-medium px-3 py-2.5 flex items-center gap-3 hover:translate-x-1"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <Hotel className="w-4 h-4 text-secondary" />
-                  {t("nav.hotels")}
-                </Link>
-                <Link
-                  to="/flight-hotel"
-                  className="text-white hover:bg-white/10 rounded-lg transition-all duration-200 text-sm font-medium px-3 py-2.5 flex items-center gap-3 hover:translate-x-1"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <PlaneTakeoff className="w-4 h-4 text-secondary" />
-                  {t("nav.flightHotel")}
-                </Link>
-                <Link
-                  to="/trains"
-                  className="text-white hover:bg-white/10 rounded-lg transition-all duration-200 text-sm font-medium px-3 py-2.5 flex items-center gap-3 hover:translate-x-1"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <Train className="w-4 h-4 text-secondary" />
-                  {t("nav.trains")}
-                </Link>
-                <Link
-                  to="/events"
-                  className="text-white hover:bg-white/10 rounded-lg transition-all duration-200 text-sm font-medium px-3 py-2.5 flex items-center gap-3 hover:translate-x-1"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <Calendar className="w-4 h-4 text-secondary" />
-                  {t("nav.events")}
-                </Link>
-                <Link
-                  to="/cars"
-                  className="text-white hover:bg-white/10 rounded-lg transition-all duration-200 text-sm font-medium px-3 py-2.5 flex items-center gap-3 hover:translate-x-1"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <Car className="w-4 h-4 text-secondary" />
-                  {t("nav.carRental")}
-                </Link>
-                <Link
-                  to="/subscriptions"
-                  className="text-secondary hover:bg-white/10 rounded-lg transition-all duration-200 text-sm font-medium px-3 py-2.5 flex items-center gap-3 hover:translate-x-1"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <Crown className="w-4 h-4 text-secondary" />
-                  {t("nav.subscriptions")}
-                </Link>
+              {/* Subscriptions - Highlighted */}
+              <Link
+                to="/subscriptions"
+                className="flex items-center gap-4 px-4 py-4 rounded-xl bg-secondary/10 border border-secondary/30 mt-2 touch-target"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Crown className="w-5 h-5 text-secondary" />
+                <span className="text-base font-semibold text-secondary">{t("nav.subscriptions")}</span>
+              </Link>
+            </div>
+
+            {/* Séparateur */}
+            <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-4 mx-4" />
+
+            {/* Support */}
+            <div className="px-3">
+              <Link
+                to="/support"
+                className="flex items-center gap-4 px-4 py-4 rounded-xl text-white hover:bg-white/5 active:bg-white/10 transition-all duration-200 touch-target"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <HelpCircle className="w-5 h-5 text-white/70" />
+                <span className="text-base font-medium">{t("nav.support")}</span>
+              </Link>
+            </div>
+
+            {/* Séparateur */}
+            <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-4 mx-4" />
+
+            {/* Section Préférences */}
+            <div className="px-4 pb-2">
+              <p className="text-xs font-semibold text-white/50 uppercase tracking-wider">
+                Préférences
+              </p>
+            </div>
+            
+            <div className="flex flex-col gap-4 px-4 py-2">
+              <div className="flex items-center justify-between py-2">
+                <span className="text-base text-white/90">{t("common.toggleTheme")}</span>
+                <DarkModeToggle className="text-white" />
               </div>
-
-              {/* Séparateur */}
-              <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-2"></div>
-
-              {/* Section Support */}
-              <div className="px-2 py-2">
-                <Link
-                  to="/support"
-                  className="text-white hover:bg-white/10 rounded-lg transition-all duration-200 text-sm font-medium px-3 py-2.5 flex items-center gap-3 hover:translate-x-1"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <HelpCircle className="w-4 h-4 text-secondary" />
-                  {t("nav.support")}
-                </Link>
-              </div>
-
-              {/* Séparateur */}
-              <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-2"></div>
-
-              {/* Section Préférences */}
-              <div className="px-4 pb-2 pt-2">
-                <p className="text-xs font-semibold text-white/60 uppercase tracking-wider">
-                  Préférences
-                </p>
-              </div>
-              
-              <div className="flex flex-col gap-3 px-4 pb-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-white/80">{t("common.toggleTheme")}</span>
-                  <DarkModeToggle className="text-white" />
-                </div>
+              <div className="py-2">
                 <LanguageSwitcher />
+              </div>
+              <div className="py-2">
                 <CurrencySelector />
               </div>
+            </div>
 
-              {/* Séparateur */}
-              <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-2"></div>
+            {/* Séparateur */}
+            <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-4 mx-4" />
 
-              {/* Section Compte */}
-              <div className="px-4 pb-2 pt-2">
-                <p className="text-xs font-semibold text-white/60 uppercase tracking-wider">
-                  {isLoggedIn ? "Mon Compte" : "Connexion"}
-                </p>
-              </div>
+            {/* Section Compte - Fixed at bottom feel */}
+            <div className="mt-auto px-4 pb-2">
+              <p className="text-xs font-semibold text-white/50 uppercase tracking-wider">
+                {isLoggedIn ? "Mon Compte" : "Connexion"}
+              </p>
+            </div>
 
-              <div className="flex flex-col gap-2 px-4 pb-2">
-                {isLoggedIn ? (
-                  <>
-                    {isAdmin && (
-                      <Link to="/admin" className="w-full" onClick={() => setIsMenuOpen(false)}>
-                        <Button variant="outline" className="w-full gap-2 text-sm text-white border-white/20 hover:bg-white/10 justify-start">
-                          <LayoutDashboard className="w-4 h-4" />
-                          {t("nav.admin")}
-                        </Button>
-                      </Link>
-                    )}
-                    <Link to="/account" className="w-full" onClick={() => setIsMenuOpen(false)}>
-                      <Button className="w-full gap-2 text-sm bg-secondary hover:bg-secondary/90 text-primary justify-start">
-                        <UserCircle2 className="w-4 h-4" />
-                        {t("nav.profile")}
+            <div className="flex flex-col gap-3 px-4 pb-6">
+              {isLoggedIn ? (
+                <>
+                  {isAdmin && (
+                    <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="outline" className="w-full h-12 gap-3 text-base text-white border-white/20 hover:bg-white/10 justify-start">
+                        <LayoutDashboard className="w-5 h-5" />
+                        {t("nav.admin")}
                       </Button>
                     </Link>
-                    <Link to="/dashboard" className="w-full" onClick={() => setIsMenuOpen(false)}>
-                      <Button variant="outline" className="w-full gap-2 text-sm text-white border-white/20 hover:bg-white/10 justify-start">
-                        <LayoutDashboard className="w-4 h-4" />
-                        {t("nav.dashboard")}
-                      </Button>
-                    </Link>
-                    <Button 
-                      className="w-full gap-2 text-sm bg-destructive hover:bg-destructive/90 text-destructive-foreground justify-start" 
-                      onClick={() => {
-                        handleLogout();
-                        setIsMenuOpen(false);
-                      }}
-                    >
-                      <LogOut className="w-4 h-4" />
-                      {t("nav.logout")}
+                  )}
+                  <Link to="/account" onClick={() => setIsMenuOpen(false)}>
+                    <Button className="w-full h-12 gap-3 text-base bg-secondary hover:bg-secondary/90 text-primary justify-start">
+                      <UserCircle2 className="w-5 h-5" />
+                      {t("nav.profile")}
                     </Button>
-                  </>
-                ) : (
-                  <>
-                    <Link to="/auth" className="w-full" onClick={() => setIsMenuOpen(false)}>
-                      <Button className="w-full gap-2 text-sm bg-secondary hover:bg-secondary/90 text-primary justify-start">
-                        <User className="w-4 h-4" />
-                        {t("nav.login")}
-                      </Button>
-                    </Link>
-                    <Link to="/auth" className="w-full" onClick={() => setIsMenuOpen(false)}>
-                      <Button variant="outline" className="w-full gap-2 text-sm text-white border-white/20 hover:bg-white/10 justify-start">
-                        <User className="w-4 h-4" />
-                        {t("nav.signup")}
-                      </Button>
-                    </Link>
-                  </>
-                )}
-              </div>
+                  </Link>
+                  <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="outline" className="w-full h-12 gap-3 text-base text-white border-white/20 hover:bg-white/10 justify-start">
+                      <LayoutDashboard className="w-5 h-5" />
+                      {t("nav.dashboard")}
+                    </Button>
+                  </Link>
+                  <Button 
+                    className="w-full h-12 gap-3 text-base bg-destructive hover:bg-destructive/90 text-destructive-foreground justify-start" 
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="w-5 h-5" />
+                    {t("nav.logout")}
+                  </Button>
+                </>
+              ) : (
+                <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
+                  <Button className="w-full h-12 gap-3 text-base bg-secondary hover:bg-secondary/90 text-primary justify-start">
+                    <User className="w-5 h-5" />
+                    {t("nav.login")}
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </nav>
   );
 };

@@ -23,6 +23,7 @@ import { PriceCalendar } from "@/components/flights/PriceCalendar";
 /**
  * FlightSearchForm - Recherche de vols avec UnifiedForm
  * Design premium type Opodo/Booking avec identité Bossiz
+ * Optimisé pour mobile
  */
 export const FlightSearchForm = () => {
   const { t } = useTranslation();
@@ -59,11 +60,9 @@ export const FlightSearchForm = () => {
       tripType,
     };
 
-    // Validation complète mais on ne garde que les erreurs des champs touchés
     const validation = safeValidate(flightSearchSchema, formData);
     
     if (!validation.success) {
-      // Ne garder que les erreurs des champs touchés
       const filteredErrors: Record<string, string> = {};
       Object.keys(validation.errors).forEach(key => {
         if (touched[key]) {
@@ -72,7 +71,6 @@ export const FlightSearchForm = () => {
       });
       setErrors(filteredErrors);
     } else {
-      // Clear errors for touched fields
       const clearedErrors = { ...errors };
       Object.keys(touched).forEach(key => {
         delete clearedErrors[key];
@@ -94,7 +92,6 @@ export const FlightSearchForm = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Marquer tous les champs comme touchés
     setTouched({
       origin: true,
       destination: true,
@@ -107,7 +104,6 @@ export const FlightSearchForm = () => {
       tripType: true,
     });
 
-    // Validation complète avant soumission
     const formData: FlightSearchInput = {
       origin: from,
       destination: to,
@@ -130,7 +126,6 @@ export const FlightSearchForm = () => {
         variant: "destructive",
       });
       
-      // Scroll vers la première erreur
       const firstErrorField = Object.keys(validation.errors)[0];
       document.getElementById(firstErrorField)?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
@@ -152,7 +147,6 @@ export const FlightSearchForm = () => {
 
   const hasErrors = Object.keys(errors).length > 0;
 
-  // Calcul de la progression du formulaire
   const totalFields = tripType === "round-trip" ? 7 : 6;
   const completedFields = [
     from,
@@ -165,25 +159,25 @@ export const FlightSearchForm = () => {
 
   return (
     <UnifiedForm onSubmit={handleSearch} variant="search" className="max-w-6xl mx-auto">
-      {/* Barre de progression */}
+      {/* Barre de progression - Plus compact sur mobile */}
       <FormProgressBar 
         totalFields={totalFields} 
         completedFields={completedFields}
-        className="mb-4 md:mb-6"
+        className="mb-3 sm:mb-4 md:mb-6"
       />
 
       {/* Alert d'erreur générale */}
       {hasErrors && (
-        <Alert variant="destructive" className="mb-4">
+        <Alert variant="destructive" className="mb-3 sm:mb-4">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
+          <AlertDescription className="text-sm">
             Veuillez corriger les erreurs dans le formulaire
           </AlertDescription>
         </Alert>
       )}
 
-      {/* Trip Type Selector */}
-      <div className="flex gap-2 md:gap-3 mb-4 md:mb-6 overflow-x-auto pb-2">
+      {/* Trip Type Selector - Optimisé mobile */}
+      <div className="flex gap-2 mb-3 sm:mb-4 md:mb-6">
         {[
           { value: "round-trip", label: t("search.roundTrip") },
           { value: "one-way", label: t("search.oneWay") }
@@ -195,13 +189,12 @@ export const FlightSearchForm = () => {
               setTripType(value as "round-trip" | "one-way");
               handleBlur("tripType");
             }}
-            whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className={cn(
-              "px-4 md:px-6 py-2 md:py-2.5 rounded-xl font-semibold transition-all duration-200 text-sm md:text-base whitespace-nowrap flex-shrink-0",
-              "border-2",
+              "flex-1 sm:flex-none px-3 sm:px-4 md:px-6 py-2.5 sm:py-2.5 md:py-2.5 rounded-lg sm:rounded-xl font-medium transition-all duration-200 text-sm sm:text-sm md:text-base",
+              "border-2 touch-target",
               tripType === value
-                ? "bg-primary text-white border-primary shadow-lg"
+                ? "bg-primary text-white border-primary shadow-md"
                 : "bg-white text-foreground border-border hover:border-primary/50"
             )}
           >
@@ -210,9 +203,10 @@ export const FlightSearchForm = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4">
+      {/* Origin & Destination - Stack on mobile */}
+      <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-12 sm:gap-3 md:gap-4">
         {/* From */}
-        <div className="md:col-span-5">
+        <div className="sm:col-span-5">
           <div className="space-y-1">
             <UnifiedAutocomplete
               label={t("search.departure")}
@@ -225,7 +219,6 @@ export const FlightSearchForm = () => {
               placeholder={t("search.cityOrAirport")}
               required
               className={errors.origin && touched.origin ? "border-destructive" : ""}
-              helpText="Saisissez le nom de la ville ou le code de l'aéroport (ex: Paris ou CDG)"
             />
             {errors.origin && touched.origin && (
               <p className="text-xs text-destructive mt-1 animate-in slide-in-from-top-1">
@@ -235,21 +228,21 @@ export const FlightSearchForm = () => {
           </div>
         </div>
 
-        {/* Swap Button */}
-        <div className="md:col-span-2 flex items-center justify-center pt-6">
+        {/* Swap Button - Hidden on mobile, inline button instead */}
+        <div className="sm:col-span-2 flex items-center justify-center">
           <Button
             type="button"
             variant="outline"
             size="icon"
             onClick={handleSwap}
-            className="h-12 w-12 rounded-full border-2 hover:border-primary hover:bg-primary/5 transition-all shadow-md hidden md:flex"
+            className="h-10 w-10 sm:h-12 sm:w-12 rounded-full border-2 hover:border-primary hover:bg-primary/5 transition-all shadow-sm sm:mt-6"
           >
-            <ArrowRightLeft className="h-5 w-5" />
+            <ArrowRightLeft className="h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
         </div>
 
         {/* To */}
-        <div className="md:col-span-5">
+        <div className="sm:col-span-5">
           <div className="space-y-1">
             <UnifiedAutocomplete
               label={t("search.to")}
@@ -262,7 +255,6 @@ export const FlightSearchForm = () => {
               placeholder={t("search.cityOrAirport")}
               required
               className={errors.destination && touched.destination ? "border-destructive" : ""}
-              helpText="Choisissez votre destination finale"
             />
             {errors.destination && touched.destination && (
               <p className="text-xs text-destructive mt-1 animate-in slide-in-from-top-1">
@@ -273,59 +265,55 @@ export const FlightSearchForm = () => {
         </div>
       </div>
 
-      {/* Dates */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 mt-3 md:mt-4">
+      {/* Dates - Stack on mobile */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
         {/* Departure Date */}
-        <div>
-          <div className="space-y-1">
-            <UnifiedDatePicker
-              label={t("search.departure")}
-              placeholder={t("flights.departureDate")}
-              value={departureDate}
-              onChange={(date) => {
-                setDepartureDate(date);
-                handleBlur("departureDate");
-              }}
-              minDate={new Date()}
-              required
-            />
-            {errors.departureDate && touched.departureDate && (
-              <p className="text-xs text-destructive mt-1 animate-in slide-in-from-top-1">
-                {errors.departureDate}
-              </p>
-            )}
-          </div>
+        <div className="space-y-1">
+          <UnifiedDatePicker
+            label={t("search.departure")}
+            placeholder={t("flights.departureDate")}
+            value={departureDate}
+            onChange={(date) => {
+              setDepartureDate(date);
+              handleBlur("departureDate");
+            }}
+            minDate={new Date()}
+            required
+          />
+          {errors.departureDate && touched.departureDate && (
+            <p className="text-xs text-destructive mt-1 animate-in slide-in-from-top-1">
+              {errors.departureDate}
+            </p>
+          )}
         </div>
 
         {/* Return Date */}
         {tripType === "round-trip" && (
-          <div>
-            <div className="space-y-1">
-              <UnifiedDatePicker
-                label={t("search.return")}
-                placeholder={t("flights.returnDate")}
-                value={returnDate}
-                onChange={(date) => {
-                  setReturnDate(date);
-                  handleBlur("returnDate");
-                }}
-                minDate={departureDate || new Date()}
-                required
-              />
-              {errors.returnDate && touched.returnDate && (
-                <p className="text-xs text-destructive mt-1 animate-in slide-in-from-top-1">
-                  {errors.returnDate}
-                </p>
-              )}
-            </div>
+          <div className="space-y-1">
+            <UnifiedDatePicker
+              label={t("search.return")}
+              placeholder={t("flights.returnDate")}
+              value={returnDate}
+              onChange={(date) => {
+                setReturnDate(date);
+                handleBlur("returnDate");
+              }}
+              minDate={departureDate || new Date()}
+              required
+            />
+            {errors.returnDate && touched.returnDate && (
+              <p className="text-xs text-destructive mt-1 animate-in slide-in-from-top-1">
+                {errors.returnDate}
+              </p>
+            )}
           </div>
         )}
       </div>
 
-      {/* Passengers & Class */}
-      <div className="grid grid-cols-2 gap-2 md:gap-4 mt-3 md:mt-4">
-        <div className="space-y-2">
-          <label className="text-xs md:text-sm font-medium text-foreground">
+      {/* Passengers & Class - 2x2 grid on mobile */}
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4 mt-3">
+        <div className="space-y-1.5">
+          <label className="text-xs sm:text-sm font-medium text-foreground">
             {t("search.adults")}
           </label>
           <Select 
@@ -335,7 +323,7 @@ export const FlightSearchForm = () => {
               handleBlur("adults");
             }}
           >
-            <SelectTrigger className={cn("h-10 md:h-11 text-sm", errors.adults && touched.adults && "border-destructive")}>
+            <SelectTrigger className={cn("h-11 sm:h-11 text-sm touch-target", errors.adults && touched.adults && "border-destructive")}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -346,13 +334,10 @@ export const FlightSearchForm = () => {
               ))}
             </SelectContent>
           </Select>
-          {errors.adults && touched.adults && (
-            <p className="text-xs text-destructive animate-in slide-in-from-top-1">{errors.adults}</p>
-          )}
         </div>
 
-        <div className="space-y-2">
-          <label className="text-xs md:text-sm font-medium text-foreground">{t("search.children")}</label>
+        <div className="space-y-1.5">
+          <label className="text-xs sm:text-sm font-medium text-foreground">{t("search.children")}</label>
           <Select 
             value={children.toString()} 
             onValueChange={(value) => {
@@ -360,7 +345,7 @@ export const FlightSearchForm = () => {
               handleBlur("children");
             }}
           >
-            <SelectTrigger className={cn("h-10 md:h-11 text-sm", errors.children && touched.children && "border-destructive")}>
+            <SelectTrigger className={cn("h-11 sm:h-11 text-sm touch-target", errors.children && touched.children && "border-destructive")}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -371,13 +356,10 @@ export const FlightSearchForm = () => {
               ))}
             </SelectContent>
           </Select>
-          {errors.children && touched.children && (
-            <p className="text-xs text-destructive animate-in slide-in-from-top-1">{errors.children}</p>
-          )}
         </div>
 
-        <div className="space-y-2">
-          <label className="text-xs md:text-sm font-medium text-foreground">Bébés</label>
+        <div className="space-y-1.5">
+          <label className="text-xs sm:text-sm font-medium text-foreground">Bébés</label>
           <Select 
             value={infants.toString()} 
             onValueChange={(value) => {
@@ -385,7 +367,7 @@ export const FlightSearchForm = () => {
               handleBlur("infants");
             }}
           >
-            <SelectTrigger className={cn("h-10 md:h-11 text-sm", errors.infants && touched.infants && "border-destructive")}>
+            <SelectTrigger className={cn("h-11 sm:h-11 text-sm touch-target", errors.infants && touched.infants && "border-destructive")}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -396,13 +378,10 @@ export const FlightSearchForm = () => {
               ))}
             </SelectContent>
           </Select>
-          {errors.infants && touched.infants && (
-            <p className="text-xs text-destructive animate-in slide-in-from-top-1">{errors.infants}</p>
-          )}
         </div>
 
-        <div className="space-y-2">
-          <label className="text-xs md:text-sm font-medium text-foreground">{t("search.class.title")}</label>
+        <div className="space-y-1.5">
+          <label className="text-xs sm:text-sm font-medium text-foreground">{t("search.class.title")}</label>
           <Select 
             value={travelClass} 
             onValueChange={(value) => {
@@ -410,7 +389,7 @@ export const FlightSearchForm = () => {
               handleBlur("travelClass");
             }}
           >
-            <SelectTrigger className={cn("h-10 md:h-11 text-sm", errors.travelClass && touched.travelClass && "border-destructive")}>
+            <SelectTrigger className={cn("h-11 sm:h-11 text-sm touch-target", errors.travelClass && touched.travelClass && "border-destructive")}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -420,24 +399,21 @@ export const FlightSearchForm = () => {
               <SelectItem value="first">{t("search.class.first")}</SelectItem>
             </SelectContent>
           </Select>
-          {errors.travelClass && touched.travelClass && (
-            <p className="text-xs text-destructive animate-in slide-in-from-top-1">{errors.travelClass}</p>
-          )}
         </div>
       </div>
 
-      {/* Comparateur de prix - Affichage conditionnel */}
+      {/* Comparateur de prix */}
       {departureDate && (
-        <div className="mt-4">
+        <div className="mt-3">
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={() => setShowPriceCalendar(!showPriceCalendar)}
-            className="w-full md:w-auto"
+            className="w-full sm:w-auto h-10 text-sm"
           >
             <TrendingDown className="h-4 w-4 mr-2" />
-            {showPriceCalendar ? "Masquer" : "Comparer"} les prix par date
+            {showPriceCalendar ? "Masquer" : "Comparer"} les prix
           </Button>
         </div>
       )}
@@ -448,7 +424,7 @@ export const FlightSearchForm = () => {
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
-          className="mt-4 overflow-hidden"
+          className="mt-3 overflow-hidden"
         >
           <PriceCalendar
             departureDate={format(departureDate, "yyyy-MM-dd")}
@@ -462,12 +438,12 @@ export const FlightSearchForm = () => {
         </motion.div>
       )}
 
-      {/* Submit Button */}
-      <div className="mt-4 md:mt-6">
+      {/* Submit Button - Full width on mobile */}
+      <div className="mt-4 sm:mt-5 md:mt-6">
         <UnifiedSubmitButton 
           variant="search"
           disabled={hasErrors}
-          className={hasErrors ? "opacity-50 cursor-not-allowed" : ""}
+          className={cn("w-full h-12 sm:h-11 text-base sm:text-sm touch-target", hasErrors && "opacity-50 cursor-not-allowed")}
         >
           {t("search.search")}
         </UnifiedSubmitButton>
