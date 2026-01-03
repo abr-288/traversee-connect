@@ -115,20 +115,20 @@ const AnimatedFormField = ({
   return (
     <motion.div 
       variants={itemVariants}
-      className="space-y-2"
+      className="space-y-1.5 md:space-y-2"
     >
-      <Label htmlFor={name} className="flex items-center gap-2 text-sm font-medium">
-        {icon}
+      <Label htmlFor={name} className="flex items-center gap-2 text-xs md:text-sm font-medium text-foreground/80">
+        <span className="text-primary">{icon}</span>
         {label}
       </Label>
-      <div className="relative">
+      <div className="relative group">
         <motion.div
           animate={{
             boxShadow: isFocused 
-              ? "0 0 0 3px hsl(var(--primary) / 0.2)" 
+              ? "0 0 0 3px hsl(var(--primary) / 0.15)" 
               : "0 0 0 0px transparent"
           }}
-          className="rounded-lg overflow-hidden"
+          className="rounded-xl overflow-hidden"
         >
           <Input
             id={name}
@@ -139,12 +139,12 @@ const AnimatedFormField = ({
             onChange={(e) => onChange(e.target.value)}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            className={`transition-all duration-300 pr-10 ${
+            className={`h-12 md:h-11 text-base md:text-sm rounded-xl border-2 bg-background/50 backdrop-blur-sm transition-all duration-300 pr-12 placeholder:text-muted-foreground/50 ${
               error 
-                ? "border-destructive focus:ring-destructive" 
+                ? "border-destructive/50 focus:border-destructive focus:ring-destructive/20" 
                 : isFocused 
-                  ? "border-primary" 
-                  : ""
+                  ? "border-primary/50 bg-background" 
+                  : "border-border/50 hover:border-border"
             }`}
           />
         </motion.div>
@@ -152,14 +152,14 @@ const AnimatedFormField = ({
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors p-1 rounded-lg hover:bg-primary/10"
           >
             <motion.div
               initial={false}
               animate={{ rotate: showPassword ? 180 : 0 }}
               transition={{ duration: 0.2 }}
             >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              {showPassword ? <EyeOff className="h-5 w-5 md:h-4 md:w-4" /> : <Eye className="h-5 w-5 md:h-4 md:w-4" />}
             </motion.div>
           </button>
         )}
@@ -167,13 +167,13 @@ const AnimatedFormField = ({
       <AnimatePresence mode="wait">
         {error && (
           <motion.p
-            initial={{ opacity: 0, y: -10, height: 0 }}
+            initial={{ opacity: 0, y: -5, height: 0 }}
             animate={{ opacity: 1, y: 0, height: "auto" }}
-            exit={{ opacity: 0, y: -10, height: 0 }}
-            className="text-xs text-destructive flex items-center gap-1"
+            exit={{ opacity: 0, y: -5, height: 0 }}
+            className="text-xs text-destructive flex items-center gap-1.5 pt-0.5"
           >
-            <AlertCircle className="h-3 w-3" />
-            {error}
+            <AlertCircle className="h-3 w-3 flex-shrink-0" />
+            <span>{error}</span>
           </motion.p>
         )}
       </AnimatePresence>
@@ -415,33 +415,33 @@ const Auth = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary via-primary/80 to-secondary relative overflow-hidden flex items-center justify-center p-4">
-      {/* Animated background elements */}
+    <div className="min-h-screen bg-gradient-to-br from-primary via-primary/90 to-secondary relative overflow-hidden flex items-center justify-center p-4 md:p-6">
+      {/* Animated background elements - simplified for mobile */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
           animate={{ y: [-10, 10, -10], rotate: [-2, 2, -2] }}
           transition={{ duration: 6, repeat: Infinity }}
-          className="absolute top-20 left-10 w-64 h-64 bg-white/5 rounded-full blur-3xl"
+          className="absolute -top-20 -left-20 w-48 md:w-64 h-48 md:h-64 bg-white/5 rounded-full blur-3xl"
         />
         <motion.div
           animate={{ y: [10, -10, 10], rotate: [2, -2, 2] }}
           transition={{ duration: 8, repeat: Infinity, delay: 2 }}
-          className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/10 rounded-full blur-3xl"
+          className="absolute -bottom-20 -right-20 w-64 md:w-96 h-64 md:h-96 bg-secondary/10 rounded-full blur-3xl"
         />
         <motion.div
           animate={{ scale: [1, 1.1, 1] }}
           transition={{ duration: 10, repeat: Infinity, delay: 1 }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-primary/5 rounded-full blur-3xl"
         />
         
-        {/* Floating icons */}
-        {[...Array(6)].map((_, i) => (
+        {/* Floating icons - fewer on mobile */}
+        {[...Array(4)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute text-white/10"
+            className="absolute text-white/10 hidden md:block"
             style={{
-              top: `${15 + i * 15}%`,
-              left: `${10 + i * 15}%`,
+              top: `${15 + i * 20}%`,
+              left: `${10 + i * 20}%`,
             }}
             animate={{
               y: [0, -30, 0],
@@ -454,7 +454,7 @@ const Auth = () => {
               delay: i * 0.5,
             }}
           >
-            <Plane className="w-8 h-8" />
+            <Plane className="w-6 h-6 md:w-8 md:h-8" />
           </motion.div>
         ))}
       </div>
@@ -464,30 +464,30 @@ const Auth = () => {
         initial="hidden"
         animate="visible"
         exit="exit"
-        className="relative z-10 w-full max-w-md"
+        className="relative z-10 w-full max-w-[440px]"
       >
-        <Card className="backdrop-blur-xl bg-background/95 border-white/20 shadow-2xl">
-          <CardHeader className="text-center pb-2">
+        <Card className="backdrop-blur-xl bg-background/95 border-0 shadow-2xl shadow-black/20 rounded-2xl md:rounded-3xl overflow-hidden">
+          <CardHeader className="text-center pb-2 pt-6 md:pt-8 px-5 md:px-8">
             <motion.div 
-              className="flex justify-center mb-4"
+              className="flex justify-center mb-3 md:mb-4"
               animate={{ scale: [1, 1.02, 1] }}
               transition={{ duration: 3, repeat: Infinity }}
             >
               <motion.img 
                 src={logoLight}
                 alt="B-Reserve Logo"
-                className="h-16 w-auto"
+                className="h-12 md:h-16 w-auto"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               />
             </motion.div>
             <motion.div variants={itemVariants}>
-              <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              <CardTitle className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                 B-Reserve
               </CardTitle>
             </motion.div>
             <motion.div variants={itemVariants}>
-              <CardDescription className="text-base">
+              <CardDescription className="text-sm md:text-base text-muted-foreground mt-1">
                 {t('auth.yourAgency')}
               </CardDescription>
             </motion.div>
@@ -495,7 +495,7 @@ const Auth = () => {
             {/* Security badge */}
             <motion.div 
               variants={itemVariants}
-              className="flex items-center justify-center gap-2 mt-3 text-xs text-muted-foreground"
+              className="inline-flex items-center justify-center gap-2 mt-3 text-xs text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-full mx-auto"
             >
               <Shield className="h-3 w-3 text-green-500" />
               <span>{t('auth.secureConnection')}</span>
@@ -503,7 +503,7 @@ const Auth = () => {
             </motion.div>
           </CardHeader>
           
-          <CardContent className="pt-4">
+          <CardContent className="pt-4 pb-6 md:pb-8 px-5 md:px-8">
             <AnimatePresence mode="wait">
               {showUpdatePassword ? (
                 <motion.div
@@ -513,13 +513,13 @@ const Auth = () => {
                   animate="visible"
                   exit="exit"
                 >
-                  <form onSubmit={handleUpdatePassword} className="space-y-4">
+                  <form onSubmit={handleUpdatePassword} className="space-y-4 md:space-y-5">
                     <AnimatedFormField
                       label="Nouveau mot de passe"
                       name="password"
                       type="password"
                       placeholder="••••••••"
-                      icon={<Lock className="h-4 w-4 text-primary" />}
+                      icon={<Lock className="h-4 w-4" />}
                       error={updateErrors.password}
                       value={updateForm.password}
                       onChange={(value) => setUpdateForm({ ...updateForm, password: value })}
@@ -530,7 +530,7 @@ const Auth = () => {
                       name="confirmPassword"
                       type="password"
                       placeholder="••••••••"
-                      icon={<Lock className="h-4 w-4 text-primary" />}
+                      icon={<Lock className="h-4 w-4" />}
                       error={updateErrors.confirmPassword}
                       value={updateForm.confirmPassword}
                       onChange={(value) => setUpdateForm({ ...updateForm, confirmPassword: value })}
@@ -539,7 +539,7 @@ const Auth = () => {
                     <motion.div variants={itemVariants}>
                       <Button 
                         type="submit" 
-                        className="w-full gradient-primary" 
+                        className="w-full gradient-primary h-12 md:h-11 text-base font-semibold rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow" 
                         disabled={loading}
                       >
                         {loading ? (
@@ -572,18 +572,18 @@ const Auth = () => {
                     <Button
                       variant="ghost"
                       onClick={() => setShowResetPassword(false)}
-                      className="mb-2 hover:bg-primary/10"
+                      className="mb-2 hover:bg-primary/10 rounded-xl h-10"
                     >
                       ← Retour à la connexion
                     </Button>
                   </motion.div>
-                  <form onSubmit={handleResetPassword} className="space-y-4">
+                  <form onSubmit={handleResetPassword} className="space-y-4 md:space-y-5">
                     <AnimatedFormField
                       label="Email"
                       name="email"
                       type="email"
                       placeholder="votre@email.com"
-                      icon={<Mail className="h-4 w-4 text-primary" />}
+                      icon={<Mail className="h-4 w-4" />}
                       error={resetErrors.email}
                       value={resetForm.email}
                       onChange={(value) => setResetForm({ email: value })}
@@ -591,7 +591,7 @@ const Auth = () => {
                     <motion.div variants={itemVariants}>
                       <Button 
                         type="submit" 
-                        className="w-full gradient-primary" 
+                        className="w-full gradient-primary h-12 md:h-11 text-base font-semibold rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow" 
                         disabled={loading}
                       >
                         {loading ? (
@@ -618,16 +618,16 @@ const Auth = () => {
                 >
                   <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                     <motion.div variants={itemVariants}>
-                      <TabsList className="grid w-full grid-cols-2 mb-6">
+                      <TabsList className="grid w-full grid-cols-2 mb-5 md:mb-6 h-11 md:h-10 bg-muted/50 p-1 rounded-xl">
                         <TabsTrigger 
                           value="signin"
-                          className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-300"
+                          className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg text-sm font-medium transition-all duration-300"
                         >
                           {t('auth.login')}
                         </TabsTrigger>
                         <TabsTrigger 
                           value="signup"
-                          className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-300"
+                          className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg text-sm font-medium transition-all duration-300"
                         >
                           {t('auth.signup')}
                         </TabsTrigger>
@@ -638,7 +638,7 @@ const Auth = () => {
                       <TabsContent value="signin" className="mt-0">
                         <motion.form 
                           onSubmit={handleSignIn} 
-                          className="space-y-4"
+                          className="space-y-4 md:space-y-5"
                           variants={containerVariants}
                           initial="hidden"
                           animate="visible"
@@ -648,7 +648,7 @@ const Auth = () => {
                             name="email"
                             type="email"
                             placeholder="votre@email.com"
-                            icon={<Mail className="h-4 w-4 text-primary" />}
+                            icon={<Mail className="h-4 w-4" />}
                             error={signInErrors.email}
                             value={signInForm.email}
                             onChange={(value) => setSignInForm({ ...signInForm, email: value })}
@@ -658,16 +658,27 @@ const Auth = () => {
                             name="password"
                             type="password"
                             placeholder="••••••••"
-                            icon={<Lock className="h-4 w-4 text-primary" />}
+                            icon={<Lock className="h-4 w-4" />}
                             error={signInErrors.password}
                             value={signInForm.password}
                             onChange={(value) => setSignInForm({ ...signInForm, password: value })}
                             showPasswordToggle
                           />
+                          
+                          <motion.button
+                            variants={itemVariants}
+                            type="button"
+                            onClick={() => setShowResetPassword(true)}
+                            className="text-sm text-primary hover:text-primary/80 transition-colors font-medium"
+                            whileHover={{ scale: 1.02 }}
+                          >
+                            Mot de passe oublié ?
+                          </motion.button>
+                          
                           <motion.div variants={itemVariants}>
                             <Button 
                               type="submit" 
-                              className="w-full gradient-primary h-12 text-base font-semibold" 
+                              className="w-full gradient-primary h-12 md:h-11 text-base font-semibold rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all active:scale-[0.98]" 
                               disabled={loading}
                             >
                               {loading ? (
@@ -690,12 +701,12 @@ const Auth = () => {
                           </motion.div>
                           
                           {/* Divider */}
-                          <motion.div variants={itemVariants} className="relative my-4">
+                          <motion.div variants={itemVariants} className="relative my-5 md:my-4">
                             <div className="absolute inset-0 flex items-center">
-                              <div className="w-full border-t border-border" />
+                              <div className="w-full border-t border-border/50" />
                             </div>
                             <div className="relative flex justify-center text-xs uppercase">
-                              <span className="bg-background px-2 text-muted-foreground">ou</span>
+                              <span className="bg-background px-3 text-muted-foreground font-medium">ou</span>
                             </div>
                           </motion.div>
                           
@@ -704,7 +715,7 @@ const Auth = () => {
                             <Button 
                               type="button"
                               variant="outline"
-                              className="w-full h-12 text-base font-medium border-2 hover:bg-muted/50 transition-all duration-300"
+                              className="w-full h-12 md:h-11 text-base font-medium border-2 border-border/50 hover:border-border hover:bg-muted/50 transition-all duration-300 rounded-xl active:scale-[0.98]"
                               disabled={loading}
                               onClick={handleGoogleSignIn}
                             >
@@ -734,23 +745,13 @@ const Auth = () => {
                               </motion.div>
                             </Button>
                           </motion.div>
-                          
-                          <motion.button
-                            variants={itemVariants}
-                            type="button"
-                            onClick={() => setShowResetPassword(true)}
-                            className="w-full text-sm text-muted-foreground hover:text-primary transition-colors py-2"
-                            whileHover={{ scale: 1.02 }}
-                          >
-                            Mot de passe oublié ?
-                          </motion.button>
                         </motion.form>
                       </TabsContent>
 
                       <TabsContent value="signup" className="mt-0">
                         <motion.form 
                           onSubmit={handleSignUp} 
-                          className="space-y-4"
+                          className="space-y-4 md:space-y-5"
                           variants={containerVariants}
                           initial="hidden"
                           animate="visible"
@@ -760,7 +761,7 @@ const Auth = () => {
                             name="fullName"
                             type="text"
                             placeholder="Jean Dupont"
-                            icon={<User className="h-4 w-4 text-primary" />}
+                            icon={<User className="h-4 w-4" />}
                             error={signUpErrors.fullName}
                             value={signUpForm.fullName}
                             onChange={(value) => setSignUpForm({ ...signUpForm, fullName: value })}
@@ -770,7 +771,7 @@ const Auth = () => {
                             name="email"
                             type="email"
                             placeholder="votre@email.com"
-                            icon={<Mail className="h-4 w-4 text-primary" />}
+                            icon={<Mail className="h-4 w-4" />}
                             error={signUpErrors.email}
                             value={signUpForm.email}
                             onChange={(value) => setSignUpForm({ ...signUpForm, email: value })}
@@ -780,7 +781,7 @@ const Auth = () => {
                             name="password"
                             type="password"
                             placeholder="••••••••"
-                            icon={<Lock className="h-4 w-4 text-primary" />}
+                            icon={<Lock className="h-4 w-4" />}
                             error={signUpErrors.password}
                             value={signUpForm.password}
                             onChange={(value) => setSignUpForm({ ...signUpForm, password: value })}
@@ -792,13 +793,13 @@ const Auth = () => {
                             <motion.div
                               initial={{ opacity: 0, height: 0 }}
                               animate={{ opacity: 1, height: "auto" }}
-                              className="space-y-2"
+                              className="space-y-1.5"
                             >
                               <div className="flex gap-1">
                                 {[...Array(5)].map((_, i) => (
                                   <motion.div
                                     key={i}
-                                    className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${
+                                    className={`h-1 md:h-1.5 flex-1 rounded-full transition-colors duration-300 ${
                                       i < passwordStrength ? strengthColors[passwordStrength - 1] : "bg-muted"
                                     }`}
                                     initial={{ scaleX: 0 }}
@@ -808,7 +809,7 @@ const Auth = () => {
                                 ))}
                               </div>
                               <p className="text-xs text-muted-foreground">
-                                Force: {strengthLabels[passwordStrength - 1] || "Très faible"}
+                                Force: <span className="font-medium">{strengthLabels[passwordStrength - 1] || "Très faible"}</span>
                               </p>
                             </motion.div>
                           )}
@@ -816,7 +817,7 @@ const Auth = () => {
                           <motion.div variants={itemVariants}>
                             <Button 
                               type="submit" 
-                              className="w-full gradient-primary h-12 text-base font-semibold" 
+                              className="w-full gradient-primary h-12 md:h-11 text-base font-semibold rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all active:scale-[0.98]" 
                               disabled={loading}
                             >
                               {loading ? (
@@ -839,12 +840,12 @@ const Auth = () => {
                           </motion.div>
                           
                           {/* Divider */}
-                          <motion.div variants={itemVariants} className="relative my-4">
+                          <motion.div variants={itemVariants} className="relative my-5 md:my-4">
                             <div className="absolute inset-0 flex items-center">
-                              <div className="w-full border-t border-border" />
+                              <div className="w-full border-t border-border/50" />
                             </div>
                             <div className="relative flex justify-center text-xs uppercase">
-                              <span className="bg-background px-2 text-muted-foreground">ou</span>
+                              <span className="bg-background px-3 text-muted-foreground font-medium">ou</span>
                             </div>
                           </motion.div>
                           
@@ -853,7 +854,7 @@ const Auth = () => {
                             <Button 
                               type="button"
                               variant="outline"
-                              className="w-full h-12 text-base font-medium border-2 hover:bg-muted/50 transition-all duration-300"
+                              className="w-full h-12 md:h-11 text-base font-medium border-2 border-border/50 hover:border-border hover:bg-muted/50 transition-all duration-300 rounded-xl active:scale-[0.98]"
                               disabled={loading}
                               onClick={handleGoogleSignIn}
                             >
@@ -886,12 +887,12 @@ const Auth = () => {
                           
                           <motion.p 
                             variants={itemVariants}
-                            className="text-xs text-center text-muted-foreground"
+                            className="text-xs text-center text-muted-foreground leading-relaxed pt-2"
                           >
                             En vous inscrivant, vous acceptez nos{" "}
-                            <a href="#" className="text-primary hover:underline">conditions d'utilisation</a>
+                            <a href="#" className="text-primary hover:underline font-medium">conditions d'utilisation</a>
                             {" "}et notre{" "}
-                            <a href="#" className="text-primary hover:underline">politique de confidentialité</a>
+                            <a href="#" className="text-primary hover:underline font-medium">politique de confidentialité</a>
                           </motion.p>
                         </motion.form>
                       </TabsContent>
