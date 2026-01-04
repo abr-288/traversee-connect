@@ -12,7 +12,7 @@ import { NotificationCenter, Notification } from "@/components/dashboard/Notific
 import { BookingCard } from "@/components/dashboard/BookingCard";
 import { UpcomingReminders } from "@/components/dashboard/UpcomingReminders";
 import { BookingCalendar } from "@/components/dashboard/BookingCalendar";
-import { CurrencyDebugPanel } from "@/components/CurrencyDebugPanel";
+
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { useOfflineBookings } from "@/hooks/useOfflineBookings";
 import { Price } from "@/components/ui/price";
@@ -418,7 +418,7 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          <CurrencyDebugPanel />
+          
         </div>
 
         <div className="mb-8">

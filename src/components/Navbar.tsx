@@ -18,7 +18,7 @@ import { useTranslation } from "react-i18next";
 import logoDark from "@/assets/logo-dark.png";
 import logoLight from "@/assets/logo-light.png";
 import LanguageSwitcher from "./LanguageSwitcher";
-import CurrencySelector from "./CurrencySelector";
+
 import DarkModeToggle from "./DarkModeToggle";
 import { useSiteConfigContext } from "@/contexts/SiteConfigContext";
 
@@ -328,9 +328,6 @@ const Navbar = () => {
               </div>
               <div className="py-2">
                 <LanguageSwitcher />
-              </div>
-              <div className="py-2">
-                <CurrencySelector />
               </div>
             </div>
 

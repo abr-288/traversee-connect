@@ -1,6 +1,5 @@
 import { memo } from 'react';
-import { usePrice } from '@/hooks/usePrice';
-import { Loader2 } from 'lucide-react';
+import { useCurrency } from '@/contexts/CurrencyContext';
 
 interface PriceProps {
   amount: number;
@@ -12,21 +11,15 @@ interface PriceProps {
 
 export const Price = memo(({ 
   amount, 
-  fromCurrency = 'EUR',
+  fromCurrency = 'XOF',
   className = '', 
   showCurrency = true,
   showLoader = false 
 }: PriceProps) => {
-  const { formattedPrice, isConverting } = usePrice(amount, fromCurrency);
-
-  if (isConverting && showLoader) {
-    return (
-      <span className={`inline-flex items-center gap-2 ${className}`}>
-        <Loader2 className="w-3 h-3 animate-spin" />
-        <span>...</span>
-      </span>
-    );
-  }
+  const { formatPrice } = useCurrency();
+  
+  // All prices displayed in XOF without conversion
+  const formattedPrice = formatPrice(amount);
 
   return <span className={className}>{formattedPrice}</span>;
 });
