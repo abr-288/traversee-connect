@@ -1,9 +1,90 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+const CACHE_TTL_HOURS = 1; // Cache duration in hours
+
+// Initialize Supabase client for cache operations
+function getSupabaseClient() {
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  return createClient(supabaseUrl, supabaseServiceKey);
+}
+
+// Generate cache key from search parameters
+function getCacheKey(query?: string | null, category?: string | null): string {
+  const q = query?.toLowerCase().trim() || 'default';
+  const c = category?.toLowerCase().trim() || 'all';
+  return `destinations_${q}_${c}`;
+}
+
+// Get cached destinations from database
+async function getCachedDestinations(cacheKey: string): Promise<{ destinations: any[]; source: string } | null> {
+  try {
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase
+      .from('destinations_cache')
+      .select('destinations, source')
+      .eq('cache_key', cacheKey)
+      .gt('expires_at', new Date().toISOString())
+      .single();
+    
+    if (error || !data) {
+      console.log(`Cache miss for key: ${cacheKey}`);
+      return null;
+    }
+    
+    console.log(`Cache hit for key: ${cacheKey}`);
+    return { destinations: data.destinations, source: `${data.source}-cached` };
+  } catch (e) {
+    console.error('Cache read error:', e);
+    return null;
+  }
+}
+
+// Store destinations in cache
+async function setCachedDestinations(cacheKey: string, destinations: any[], source: string): Promise<void> {
+  try {
+    const supabase = getSupabaseClient();
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + CACHE_TTL_HOURS);
+    
+    const { error } = await supabase
+      .from('destinations_cache')
+      .upsert({
+        cache_key: cacheKey,
+        destinations,
+        source,
+        expires_at: expiresAt.toISOString(),
+      }, { onConflict: 'cache_key' });
+    
+    if (error) {
+      console.error('Cache write error:', error);
+    } else {
+      console.log(`Cached ${destinations.length} destinations with key: ${cacheKey}`);
+    }
+    
+    // Clean expired cache entries (async, don't wait)
+    cleanExpiredCache().catch(console.log);
+  } catch (e) {
+    console.error('Cache store error:', e);
+  }
+}
+
+// Clean expired cache entries
+async function cleanExpiredCache(): Promise<void> {
+  try {
+    const supabase = getSupabaseClient();
+    await supabase.rpc('clean_expired_destinations_cache');
+    console.log('Expired cache entries cleaned');
+  } catch (e) {
+    console.log('Cache cleanup skipped:', e);
+  }
+}
 
 interface Destination {
   id: string;
@@ -399,6 +480,24 @@ serve(async (req) => {
     const searchQuery = url.searchParams.get('query');
     const category = url.searchParams.get('category');
     
+    // Generate cache key
+    const cacheKey = getCacheKey(searchQuery, category);
+    
+    // Check cache first
+    const cached = await getCachedDestinations(cacheKey);
+    if (cached) {
+      console.log(`Returning cached destinations for: ${cacheKey}`);
+      return new Response(
+        JSON.stringify({ 
+          destinations: cached.destinations, 
+          source: cached.source, 
+          total: cached.destinations.length,
+          cached: true 
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
     const rapidApiKey = Deno.env.get('RAPIDAPI_KEY');
     
     if (!rapidApiKey) {
@@ -416,8 +515,11 @@ serve(async (req) => {
         destinations = destinations.filter(d => d.category.toLowerCase() === category.toLowerCase());
       }
       
+      // Cache fallback results too
+      await setCachedDestinations(cacheKey, destinations, 'fallback');
+      
       return new Response(
-        JSON.stringify({ destinations, source: 'fallback', total: destinations.length }),
+        JSON.stringify({ destinations, source: 'fallback', total: destinations.length, cached: false }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -458,11 +560,15 @@ serve(async (req) => {
     console.log(`Total unique destinations: ${uniqueDestinations.length}`);
 
     if (uniqueDestinations.length > 0) {
+      // Cache the API results
+      await setCachedDestinations(cacheKey, uniqueDestinations, 'tripadvisor');
+      
       return new Response(
         JSON.stringify({ 
           destinations: uniqueDestinations, 
           source: 'tripadvisor', 
-          total: uniqueDestinations.length 
+          total: uniqueDestinations.length,
+          cached: false 
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
@@ -476,15 +582,18 @@ serve(async (req) => {
       fallback = fallback.filter(d => d.category.toLowerCase() === category.toLowerCase());
     }
     
+    // Cache fallback too
+    await setCachedDestinations(cacheKey, fallback, 'fallback');
+    
     return new Response(
-      JSON.stringify({ destinations: fallback, source: 'fallback', total: fallback.length }),
+      JSON.stringify({ destinations: fallback, source: 'fallback', total: fallback.length, cached: false }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
     console.error('Error in search-destinations function:', error);
     return new Response(
-      JSON.stringify({ destinations: getFallbackDestinations(), source: 'error-fallback' }),
+      JSON.stringify({ destinations: getFallbackDestinations(), source: 'error-fallback', cached: false }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

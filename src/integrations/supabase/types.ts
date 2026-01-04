@@ -285,6 +285,33 @@ export type Database = {
         }
         Relationships: []
       }
+      destinations_cache: {
+        Row: {
+          cache_key: string
+          created_at: string
+          destinations: Json
+          expires_at: string
+          id: string
+          source: string
+        }
+        Insert: {
+          cache_key: string
+          created_at?: string
+          destinations: Json
+          expires_at: string
+          id?: string
+          source?: string
+        }
+        Update: {
+          cache_key?: string
+          created_at?: string
+          destinations?: Json
+          expires_at?: string
+          id?: string
+          source?: string
+        }
+        Relationships: []
+      }
       email_templates: {
         Row: {
           created_at: string | null
@@ -960,6 +987,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      clean_expired_destinations_cache: { Args: never; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
