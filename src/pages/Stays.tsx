@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Calendar, Star, Sparkles, Loader2, Palmtree, Wifi, Coffee, Car, Waves, Shield, Clock, Heart, Users, CheckCircle } from "lucide-react";
 import { WeatherWidget } from "@/components/WeatherWidget";
-import { CurrencyConverter } from "@/components/CurrencyConverter";
+
 import { StaySearchForm } from "@/components/StaySearchForm";
 import { BookingDialog } from "@/components/BookingDialog";
 import { useState, useEffect } from "react";
@@ -121,10 +121,9 @@ const Stays = () => {
       
       <main className="flex-1 container mx-auto px-4 py-8">
 
-        {/* Weather and Currency Widgets */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        {/* Weather Widget */}
+        <div className="mb-8">
           <WeatherWidget city="Abidjan" />
-          <CurrencyConverter />
         </div>
 
         {/* Titre section résultats */}

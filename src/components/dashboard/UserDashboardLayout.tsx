@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { UserSidebar } from "./UserSidebar";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
-import CurrencySelector from "@/components/CurrencySelector";
+
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
 import { Home } from "lucide-react";
@@ -76,7 +76,6 @@ export function UserDashboardLayout({ children }: UserDashboardLayoutProps) {
               </Link>
             </div>
             <div className="flex items-center gap-2">
-              <CurrencySelector />
               <LanguageSwitcher />
               <DarkModeToggle />
             </div>
