@@ -58,27 +58,10 @@ function validateAmount(amount: unknown): { valid: boolean; value: number; error
   return { valid: true, value: Math.round(numAmount) };
 }
 
-// Validation de la devise
+// Validation de la devise - XOF uniquement
 function validateCurrency(currency: unknown): { valid: boolean; value: string; error?: string } {
-  if (!currency || typeof currency !== 'string') {
-    return { valid: false, value: '', error: "La devise est requise" };
-  }
-  
-  const upperCurrency = currency.toUpperCase().trim();
-  
-  // Conversion FCFA vers XOF (code ISO standard)
-  if (upperCurrency === 'FCFA') {
-    return { valid: true, value: 'XOF' };
-  }
-  
-  // Devises supportées par CinetPay
-  const supportedCurrencies = ['XOF', 'XAF', 'CDF', 'GNF', 'USD', 'EUR'];
-  
-  if (!supportedCurrencies.includes(upperCurrency)) {
-    return { valid: false, value: '', error: `Devise non supportée: ${upperCurrency}. Devises acceptées: ${supportedCurrencies.join(', ')}` };
-  }
-  
-  return { valid: true, value: upperCurrency };
+  // Toujours utiliser XOF - devise unique de la plateforme
+  return { valid: true, value: 'XOF' };
 }
 
 // Nettoyage et formatage du numéro de téléphone
