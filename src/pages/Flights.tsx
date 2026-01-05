@@ -13,6 +13,7 @@ import { FlightFilters } from "@/components/flights/FlightFilters";
 import { FlightCard } from "@/components/flights/FlightCard";
 import { Button } from "@/components/ui/button";
 import { LazyImage } from "@/components/ui/lazy-image";
+import { Price } from "@/components/ui/price";
 import bannerFlights from "@/assets/banner-flights.jpg";
 
 interface MappedFlight {
@@ -364,7 +365,7 @@ const Flights = () => {
                       <div className="flex flex-col items-start">
                         <span className="font-semibold text-sm">Le meilleur</span>
                         <span className="text-xs text-muted-foreground">
-                          {filteredAndSortedFlights[0]?.price.toLocaleString()} EUR · {filteredAndSortedFlights[0]?.duration}
+                          <Price amount={filteredAndSortedFlights[0]?.price || 0} fromCurrency="EUR" /> · {filteredAndSortedFlights[0]?.duration}
                         </span>
                       </div>
                     </TabsTrigger>
@@ -375,7 +376,7 @@ const Flights = () => {
                       <div className="flex flex-col items-start">
                         <span className="font-semibold text-sm">Le moins cher</span>
                         <span className="text-xs text-muted-foreground">
-                          {Math.min(...filteredAndSortedFlights.map(f => f.price)).toLocaleString()} EUR
+                          <Price amount={Math.min(...filteredAndSortedFlights.map(f => f.price))} fromCurrency="EUR" />
                         </span>
                       </div>
                     </TabsTrigger>

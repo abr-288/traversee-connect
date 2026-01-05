@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Users, Package, CreditCard, TrendingUp, Edit, Trash2, Plus } from "lucide-react";
 import { UnifiedForm, UnifiedFormField, UnifiedSubmitButton } from "@/components/forms";
+import { Price } from "@/components/ui/price";
 import {
   Table,
   TableBody,
@@ -220,7 +221,7 @@ const AdminDashboard = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalRevenue.toLocaleString()} EUR</div>
+              <div className="text-2xl font-bold"><Price amount={stats.totalRevenue} fromCurrency="XOF" /></div>
             </CardContent>
           </Card>
           <Card>
@@ -298,7 +299,7 @@ const AdminDashboard = () => {
                         </TableCell>
                         <TableCell>{booking.services?.name}</TableCell>
                         <TableCell>{new Date(booking.start_date).toLocaleDateString("fr-FR")}</TableCell>
-                        <TableCell>{Number(booking.total_price).toLocaleString()} EUR</TableCell>
+                        <TableCell><Price amount={Number(booking.total_price)} fromCurrency="XOF" /></TableCell>
                         <TableCell>
                           <Select
                             value={booking.status}
@@ -445,7 +446,7 @@ const AdminDashboard = () => {
                           <Badge variant="outline">{service.type}</Badge>
                         </TableCell>
                         <TableCell>{service.location}</TableCell>
-                        <TableCell>{Number(service.price_per_unit).toLocaleString()} EUR</TableCell>
+                        <TableCell><Price amount={Number(service.price_per_unit)} fromCurrency="XOF" /></TableCell>
                         <TableCell>
                           ⭐ {service.rating || 0} ({service.total_reviews || 0})
                         </TableCell>

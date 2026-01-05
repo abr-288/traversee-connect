@@ -236,7 +236,7 @@ export const SeatsStep = ({
                           ? "cursor-pointer"
                           : ""
                       } ${!seat.available ? "cursor-not-allowed opacity-50" : ""}`}
-                      title={seat.available ? `Siège ${seat.id} - ${seat.price.toLocaleString()} EUR` : "Non disponible"}
+                      title={seat.available ? `Siège ${seat.id} - ${Math.round(seat.price * 656).toLocaleString()} FCFA` : "Non disponible"}
                     >
                       {seat.available ? (
                         <Armchair className="h-4 w-4" />
