@@ -17,6 +17,7 @@ import { getAirlineName } from "@/utils/airlineNames";
 import { Loader2, TrendingDown, TrendingUp, Plane, ArrowRight } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { Price } from "@/components/ui/price";
 
 interface FlightData {
   airline: string;
@@ -342,7 +343,7 @@ const FlightComparison = () => {
                     <Plane className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{avgMarketPrice.toLocaleString()} EUR</div>
+                    <div className="text-2xl font-bold"><Price amount={avgMarketPrice} fromCurrency="EUR" /></div>
                     <p className="text-xs text-muted-foreground mt-1">
                       Sur {flights.length} vols analysés
                     </p>
@@ -357,7 +358,7 @@ const FlightComparison = () => {
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold text-green-600">
-                        {cheapestAirline.minPrice.toLocaleString()} EUR
+                        <Price amount={cheapestAirline.minPrice} fromCurrency="EUR" />
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">{cheapestAirline.airline}</p>
                     </CardContent>
@@ -372,7 +373,7 @@ const FlightComparison = () => {
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold text-red-600">
-                        {mostExpensiveAirline.maxPrice.toLocaleString()} EUR
+                        <Price amount={mostExpensiveAirline.maxPrice} fromCurrency="EUR" />
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">{mostExpensiveAirline.airline}</p>
                     </CardContent>

@@ -11,6 +11,7 @@ import { BookingDialog } from "@/components/BookingDialog";
 import { TourSearchForm } from "@/components/TourSearchForm";
 import { Pagination } from "@/components/Pagination";
 import { LazyImage } from "@/components/ui/lazy-image";
+import { Price } from "@/components/ui/price";
 import bannerTours from "@/assets/banner-tours.jpg";
 
 const Tours = () => {
@@ -373,7 +374,7 @@ const Tours = () => {
 
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Prix: {priceRange[0].toLocaleString()} - {priceRange[1].toLocaleString()} EUR
+                    Prix: <Price amount={priceRange[0]} fromCurrency="XOF" /> - <Price amount={priceRange[1]} fromCurrency="XOF" />
                   </label>
                   <Slider
                     min={0}
@@ -478,7 +479,7 @@ const Tours = () => {
                       <div>
                         <p className="text-sm text-muted-foreground">À partir de</p>
                         <p className="text-2xl font-bold text-primary">
-                          {tour.price.toLocaleString()} <span className="text-sm">EUR</span>
+                          <Price amount={tour.price} fromCurrency="XOF" />
                         </p>
                       </div>
                       <Button onClick={() => {
@@ -486,7 +487,7 @@ const Tours = () => {
                           id: tour.id.toString(),
                           name: tour.name,
                           price_per_unit: tour.price,
-                          currency: "EUR",
+                          currency: "XOF",
                           type: "tour"
                         });
                         setDialogOpen(true);

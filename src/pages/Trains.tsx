@@ -16,6 +16,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { BookingDialog } from "@/components/BookingDialog";
 import { toast } from "sonner";
 import { LazyImage } from "@/components/ui/lazy-image";
+import { Price } from "@/components/ui/price";
 import bannerTrains from "@/assets/banner-trains.jpg";
 
 interface MappedTrain {
@@ -331,8 +332,8 @@ const Trains = () => {
                         onValueChange={(value) => setPriceRange(value as [number, number])}
                       />
                       <div className="flex justify-between text-sm">
-                        <span>{priceRange[0].toLocaleString()} EUR</span>
-                        <span>{priceRange[1].toLocaleString()} EUR</span>
+                        <span><Price amount={priceRange[0]} fromCurrency="XOF" /></span>
+                        <span><Price amount={priceRange[1]} fromCurrency="XOF" /></span>
                       </div>
                     </CardContent>
                   </Card>
@@ -468,7 +469,7 @@ const Trains = () => {
 
                           <div className="md:col-span-4 text-right">
                             <p className="text-3xl font-bold text-primary mb-1">
-                              {train.price.toLocaleString()} EUR
+                              <Price amount={train.price} fromCurrency="EUR" />
                             </p>
                             <p className="text-sm text-muted-foreground mb-4">par personne</p>
                             <Button onClick={() => handleBook(train)} className="w-full">

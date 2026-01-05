@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { WidgetConfig } from "@/hooks/useDashboardPreferences";
+import { Price } from "@/components/ui/price";
 
 const COLORS = {
   pending: "#f59e0b",
@@ -117,7 +118,7 @@ export function CustomizableDashboard({ widgetsConfig, stats }: CustomizableDash
                         <p className="text-sm text-muted-foreground">{booking.customer_email}</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-semibold">{Number(booking.total_price).toLocaleString()} EUR</p>
+                        <p className="font-semibold"><Price amount={Number(booking.total_price)} fromCurrency="XOF" /></p>
                         <Badge variant={
                           booking.status === "confirmed" ? "default" :
                           booking.status === "pending" ? "secondary" :
