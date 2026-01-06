@@ -14,6 +14,7 @@ import { validateWithSchema, getUserFriendlyErrorMessage } from "@/lib/formHelpe
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import ErrorBoundary, { ErrorFallback } from "@/components/ErrorBoundary";
 import PaymentMethodSelector from "@/components/PaymentMethodSelector";
+import { Price } from "@/components/ui/price";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -487,7 +488,7 @@ export default function Payment() {
                 <div className="flex justify-between items-center">
                   <span className="text-muted-foreground text-lg">Montant total:</span>
                   <span className="font-bold text-2xl text-primary">
-                    {booking.total_price.toLocaleString()} {booking.currency}
+                    <Price amount={booking.total_price} fromCurrency={booking.currency} />
                   </span>
                 </div>
               </div>
@@ -640,7 +641,7 @@ export default function Payment() {
                     Traitement...
                   </>
                 ) : (
-                  `Payer ${booking.total_price.toLocaleString()} ${booking.currency}`
+                  <>Payer <Price amount={booking.total_price} fromCurrency={booking.currency} /></>
                 )}
               </Button>
 
@@ -666,7 +667,7 @@ export default function Payment() {
                 <p>
                   Une demande de paiement de{" "}
                   <strong className="text-foreground">
-                    {booking?.total_price?.toLocaleString()} {booking?.currency}
+                    <Price amount={booking?.total_price || 0} fromCurrency={booking?.currency} />
                   </strong>{" "}
                   sera envoyée au numéro:
                 </p>

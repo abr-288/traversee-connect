@@ -11,6 +11,7 @@ import { Calendar, MapPin, Users, CreditCard, Download, Plane, Hotel, Car, Map a
 import { format } from "date-fns";
 import { fr, enUS, zhCN } from "date-fns/locale";
 import { useTranslation } from "react-i18next";
+import { Price } from "@/components/ui/price";
 
 interface Booking {
   id: string;
@@ -264,7 +265,7 @@ const BookingHistory = () => {
                           <div>
                             <p className="text-xs text-muted-foreground">{t('bookingHistory.totalAmount')}</p>
                             <p className="font-semibold text-primary">
-                              {booking.total_price.toLocaleString()} {booking.currency}
+                              <Price amount={booking.total_price} fromCurrency={booking.currency} />
                             </p>
                           </div>
                         </div>

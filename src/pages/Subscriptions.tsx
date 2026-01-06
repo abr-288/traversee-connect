@@ -64,7 +64,7 @@ const subscriptionPlans: SubscriptionPlan[] = [
     name: "Corporate Mensuelle",
     subtitle: "Pour les entreprises",
     icon: <Building2 className="h-8 w-8" />,
-    price: "230€ - 460€",
+    price: "150 000 - 300 000 FCFA",
     priceNote: "par mois selon la taille",
     features: [
       "Gestion complète des réservations de billets",
@@ -95,7 +95,7 @@ const subscriptionPlans: SubscriptionPlan[] = [
     name: "Premium VIP",
     subtitle: "Abonnement individuel",
     icon: <Crown className="h-8 w-8" />,
-    price: "30€ - 55€",
+    price: "20 000 - 36 000 FCFA",
     priceNote: "par mois",
     features: [
       "Réservations prioritaires",
@@ -164,7 +164,7 @@ const subscriptionPlans: SubscriptionPlan[] = [
     name: "Pack Famille",
     subtitle: "Voyages en famille",
     icon: <Users className="h-8 w-8" />,
-    price: "70€",
+    price: "46 000 FCFA",
     priceNote: "par mois",
     features: [
       "Réservations groupées simplifiées",
@@ -187,7 +187,7 @@ const subscriptionPlans: SubscriptionPlan[] = [
     name: "Business Traveler",
     subtitle: "Voyageurs fréquents",
     icon: <Briefcase className="h-8 w-8" />,
-    price: "115€",
+    price: "75 000 FCFA",
     priceNote: "par mois",
     features: [
       "Check-in prioritaire tous aéroports",
@@ -210,7 +210,7 @@ const subscriptionPlans: SubscriptionPlan[] = [
     name: "Évasion Jeunes",
     subtitle: "Étudiants & -26 ans",
     icon: <GraduationCap className="h-8 w-8" />,
-    price: "18€",
+    price: "12 000 FCFA",
     priceNote: "par mois",
     features: [
       "Tarifs étudiants exclusifs (-25%)",

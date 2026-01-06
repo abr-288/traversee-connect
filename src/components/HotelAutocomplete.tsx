@@ -3,6 +3,7 @@ import { MapPin, Hotel, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { Price } from "@/components/ui/price";
 
 interface Suggestion {
   id: string;
@@ -176,7 +177,7 @@ export const HotelAutocomplete = ({
                   {suggestion.average_price && (
                     <div className="flex flex-col items-end flex-shrink-0">
                       <span className="text-xs font-semibold text-primary">
-                        {suggestion.average_price.toLocaleString('fr-FR')} F
+                        <Price amount={suggestion.average_price} fromCurrency="EUR" />
                       </span>
                       <span className="text-[10px] text-muted-foreground">
                         Prix moyen/nuit
@@ -193,7 +194,7 @@ export const HotelAutocomplete = ({
                   </p>
                   {suggestion.price_range && (
                     <span className="text-[10px] text-muted-foreground whitespace-nowrap">
-                      {suggestion.price_range.min.toLocaleString('fr-FR')} - {suggestion.price_range.max.toLocaleString('fr-FR')} F
+                      <Price amount={suggestion.price_range.min} fromCurrency="EUR" /> - <Price amount={suggestion.price_range.max} fromCurrency="EUR" />
                     </span>
                   )}
                 </div>

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Plane, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Price } from "@/components/ui/price";
 
 interface Suggestion {
   name: string;
@@ -117,7 +118,9 @@ export const AirportAutocomplete = ({
                   </div>
                   {suggestion.averagePrice && (
                     <div className="text-right flex-shrink-0">
-                      <p className="font-semibold text-primary">{suggestion.averagePrice}€</p>
+                      <p className="font-semibold text-primary">
+                        <Price amount={suggestion.averagePrice} fromCurrency="EUR" />
+                      </p>
                       {suggestion.priceRange && (
                         <p className="text-xs text-muted-foreground">{suggestion.priceRange}</p>
                       )}
