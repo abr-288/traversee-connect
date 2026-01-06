@@ -403,7 +403,7 @@ const Confirmation = () => {
                     {t('confirmation.amountPaid')}
                   </h3>
                   <div className="text-4xl font-bold text-primary mb-2">
-                    <Price amount={booking.total_price} fromCurrency="EUR" />
+                    <Price amount={booking.total_price} fromCurrency={booking.currency || "XOF"} />
                   </div>
                   <Badge 
                     variant={booking.payment_status === 'paid' ? 'default' : 'secondary'}

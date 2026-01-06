@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Price } from "@/components/ui/price";
 
 const AdminBookings = () => {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -163,7 +164,7 @@ const AdminBookings = () => {
                     {new Date(booking.start_date).toLocaleDateString("fr-FR")}
                   </TableCell>
                   <TableCell className="font-medium">
-                    {Number(booking.total_price).toLocaleString()} {booking.currency}
+                    <Price amount={Number(booking.total_price)} fromCurrency={booking.currency} />
                   </TableCell>
                   <TableCell>
                     <Badge
