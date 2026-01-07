@@ -338,7 +338,60 @@
     "loginNow": "Login",
     "welcomeBack": "Welcome back",
     "createAccount": "Create an account",
-    "fullName": "Full name"
+    "fullName": "Full name",
+    "or": "or",
+    "continueWithGoogle": "Continue with Google",
+    "termsAgreement": "By signing up, you agree to our",
+    "termsOfUse": "terms of use",
+    "and": "and our",
+    "privacyPolicy": "privacy policy",
+    "passwordStrength": {
+      "veryWeak": "Very weak",
+      "weak": "Weak",
+      "medium": "Medium",
+      "strong": "Strong",
+      "veryStrong": "Very strong"
+    },
+    "yourAgency": "Your trusted travel agency",
+    "secureConnection": "Secure SSL connection",
+    "validation": {
+      "emailRequired": "Email is required",
+      "emailInvalid": "Invalid email format",
+      "emailTooLong": "Email cannot exceed 255 characters",
+      "passwordMin": "Password must be at least 8 characters",
+      "passwordMax": "Password cannot exceed 128 characters",
+      "passwordUppercase": "Password must contain at least one uppercase letter",
+      "passwordLowercase": "Password must contain at least one lowercase letter",
+      "passwordNumber": "Password must contain at least one number",
+      "nameMin": "Name must be at least 2 characters",
+      "nameMax": "Name cannot exceed 100 characters",
+      "nameInvalid": "Name contains invalid characters",
+      "passwordRequired": "Password is required",
+      "passwordMismatch": "Passwords do not match"
+    },
+    "errors": {
+      "existingAccount": "Existing account",
+      "existingAccountDesc": "An account already exists with this email. Log in or reset your password.",
+      "signupError": "Signup error",
+      "invalidCredentials": "Invalid credentials",
+      "invalidCredentialsDesc": "Invalid email or password. Please check your information.",
+      "loginError": "Login error",
+      "googleError": "Google error"
+    },
+    "success": {
+      "signup": "Signup successful",
+      "signupDesc": "Check your email to confirm your account",
+      "login": "Login successful",
+      "loginDesc": "Welcome to B-Reserve!",
+      "resetSent": "Email sent",
+      "resetSentDesc": "Check your inbox to reset your password",
+      "passwordUpdated": "Password updated",
+      "passwordUpdatedDesc": "Your password has been changed successfully"
+    },
+    "updatePassword": "New password",
+    "updatePasswordDesc": "Enter your new password below",
+    "confirmNewPassword": "Confirm new password",
+    "updateBtn": "Update"
   },
   "errors": {
     "generic": "An error occurred",
@@ -755,61 +808,6 @@
       "other": "Passenger"
     },
     "bornOn": "Born on"
-  },
-  "auth": {
-    "or": "or",
-    "continueWithGoogle": "Continue with Google",
-    "termsAgreement": "By signing up, you agree to our",
-    "termsOfUse": "terms of use",
-    "and": "and our",
-    "privacyPolicy": "privacy policy",
-    "passwordStrength": {
-      "veryWeak": "Very weak",
-      "weak": "Weak",
-      "medium": "Medium",
-      "strong": "Strong",
-      "veryStrong": "Very strong"
-    },
-    "yourAgency": "Your trusted travel agency",
-    "secureConnection": "Secure SSL connection",
-    "validation": {
-      "emailRequired": "Email is required",
-      "emailInvalid": "Invalid email format",
-      "emailTooLong": "Email cannot exceed 255 characters",
-      "passwordMin": "Password must be at least 8 characters",
-      "passwordMax": "Password cannot exceed 128 characters",
-      "passwordUppercase": "Password must contain at least one uppercase letter",
-      "passwordLowercase": "Password must contain at least one lowercase letter",
-      "passwordNumber": "Password must contain at least one number",
-      "nameMin": "Name must be at least 2 characters",
-      "nameMax": "Name cannot exceed 100 characters",
-      "nameInvalid": "Name contains invalid characters",
-      "passwordRequired": "Password is required",
-      "passwordMismatch": "Passwords do not match"
-    },
-    "errors": {
-      "existingAccount": "Existing account",
-      "existingAccountDesc": "An account already exists with this email. Log in or reset your password.",
-      "signupError": "Signup error",
-      "invalidCredentials": "Invalid credentials",
-      "invalidCredentialsDesc": "Invalid email or password. Please check your information.",
-      "loginError": "Login error",
-      "googleError": "Google error"
-    },
-    "success": {
-      "signup": "Signup successful",
-      "signupDesc": "Check your email to confirm your account",
-      "login": "Login successful",
-      "loginDesc": "Welcome to B-Reserve!",
-      "resetSent": "Email sent",
-      "resetSentDesc": "Check your inbox to reset your password",
-      "passwordUpdated": "Password updated",
-      "passwordUpdatedDesc": "Your password has been changed successfully"
-    },
-    "updatePassword": "New password",
-    "updatePasswordDesc": "Enter your new password below",
-    "confirmNewPassword": "Confirm new password",
-    "updateBtn": "Update"
   },
   "dashboardPage": {
     "title": "My Dashboard",

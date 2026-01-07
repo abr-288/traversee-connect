@@ -415,18 +415,18 @@ const Auth = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary via-primary/90 to-secondary relative overflow-hidden flex items-center justify-center p-4 md:p-6">
-      {/* Animated background elements - simplified for mobile */}
+    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 relative overflow-hidden flex items-center justify-center p-4 md:p-6">
+      {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
           animate={{ y: [-10, 10, -10], rotate: [-2, 2, -2] }}
           transition={{ duration: 6, repeat: Infinity }}
-          className="absolute -top-20 -left-20 w-48 md:w-64 h-48 md:h-64 bg-white/5 rounded-full blur-3xl"
+          className="absolute -top-20 -left-20 w-48 md:w-64 h-48 md:h-64 bg-primary/10 rounded-full blur-3xl"
         />
         <motion.div
           animate={{ y: [10, -10, 10], rotate: [2, -2, 2] }}
           transition={{ duration: 8, repeat: Infinity, delay: 2 }}
-          className="absolute -bottom-20 -right-20 w-64 md:w-96 h-64 md:h-96 bg-secondary/10 rounded-full blur-3xl"
+          className="absolute -bottom-20 -right-20 w-64 md:w-96 h-64 md:h-96 bg-secondary/15 rounded-full blur-3xl"
         />
         <motion.div
           animate={{ scale: [1, 1.1, 1] }}
@@ -434,11 +434,11 @@ const Auth = () => {
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-primary/5 rounded-full blur-3xl"
         />
         
-        {/* Floating icons - fewer on mobile */}
+        {/* Floating icons */}
         {[...Array(4)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute text-white/10 hidden md:block"
+            className="absolute text-primary/20 hidden md:block"
             style={{
               top: `${15 + i * 20}%`,
               left: `${10 + i * 20}%`,
@@ -466,7 +466,7 @@ const Auth = () => {
         exit="exit"
         className="relative z-10 w-full max-w-[440px]"
       >
-        <Card className="backdrop-blur-xl bg-background/95 border-0 shadow-2xl shadow-black/20 rounded-2xl md:rounded-3xl overflow-hidden">
+        <Card className="backdrop-blur-xl bg-card border border-border/50 shadow-2xl shadow-primary/10 rounded-2xl md:rounded-3xl overflow-hidden">
           <CardHeader className="text-center pb-2 pt-6 md:pt-8 px-5 md:px-8">
             <motion.div 
               className="flex justify-center mb-3 md:mb-4"
