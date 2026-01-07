@@ -59,14 +59,14 @@ const HeroSection = () => {
   }, [heroSlides.length]);
 
   return (
-    <section ref={sectionRef} className="relative min-h-[480px] sm:min-h-[550px] md:min-h-[700px] flex items-center pt-16 sm:pt-20 overflow-hidden w-full">
+    <section ref={sectionRef} className="relative min-h-[520px] sm:min-h-[600px] md:min-h-[750px] flex items-center pt-20 sm:pt-24 overflow-hidden w-full">
       {/* Background Image Carousel with Parallax Effect */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         {heroSlides.map((slide, index) => (
           <div
             key={index}
-            className={`absolute inset-0 transition-all duration-1000 ${
-              index === currentSlide ? "opacity-100 scale-100" : "opacity-0 scale-105"
+            className={`absolute inset-0 transition-all duration-1200 ease-out ${
+              index === currentSlide ? "opacity-100 scale-100" : "opacity-0 scale-110"
             }`}
             style={{
               transform: `translateY(${scrollY}px) scale(1.1)`,
@@ -76,38 +76,46 @@ const HeroSection = () => {
             <img
               src={slide}
               alt={`Travel destination ${index + 1}`}
-              className="w-full h-full object-cover brightness-110 contrast-105"
+              className="w-full h-full object-cover"
             />
           </div>
         ))}
-        <div className="absolute inset-0 gradient-hero" />
-        <div className="absolute inset-0 gradient-mesh opacity-60" />
+        {/* Modern dark overlay with gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/70 via-primary/50 to-primary/80" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/60 via-transparent to-primary/60" />
         
         {/* Animated particles/shapes - Hidden on mobile */}
-        <div className="hidden sm:block absolute top-20 left-10 w-72 h-72 bg-secondary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '0s' }} />
-        <div className="hidden sm:block absolute bottom-20 right-10 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
+        <div className="hidden sm:block absolute top-20 left-10 w-80 h-80 bg-secondary/20 rounded-full blur-[100px] animate-float" style={{ animationDelay: '0s' }} />
+        <div className="hidden sm:block absolute bottom-20 right-10 w-96 h-96 bg-secondary/15 rounded-full blur-[120px] animate-float" style={{ animationDelay: '1s' }} />
+        <div className="hidden md:block absolute top-1/2 left-1/4 w-64 h-64 bg-white/5 rounded-full blur-[80px] animate-float" style={{ animationDelay: '2s' }} />
       </div>
 
       {/* Content */}
-      <div className="site-container relative z-10 py-4 sm:py-8 md:py-16">
-        <div className="max-w-4xl mx-auto text-center mb-4 sm:mb-8 md:mb-14 px-2">
-          <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-7xl font-bold text-white mb-2 sm:mb-3 md:mb-6 animate-slide-up-fade drop-shadow-2xl leading-tight" style={{ animationDelay: '0.1s' }}>
+      <div className="site-container relative z-10 py-6 sm:py-10 md:py-16">
+        <div className="max-w-4xl mx-auto text-center mb-6 sm:mb-10 md:mb-14 px-2">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-4 sm:mb-6 animate-slide-up-fade" style={{ animationDelay: '0s' }}>
+            <span className="w-2 h-2 rounded-full bg-secondary animate-pulse" />
+            <span className="text-white/90 text-xs sm:text-sm font-medium">{t('hero.badge', 'Votre voyage commence ici')}</span>
+          </div>
+          
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-3 sm:mb-4 md:mb-6 animate-slide-up-fade drop-shadow-2xl leading-tight tracking-tight" style={{ animationDelay: '0.1s' }}>
             {config.hero.title || t('hero.title')}
           </h1>
-          <p className="text-sm sm:text-base md:text-xl lg:text-2xl text-white/95 mb-4 sm:mb-6 md:mb-10 font-normal animate-slide-up-fade drop-shadow-lg leading-relaxed" style={{ animationDelay: '0.3s' }}>
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/90 mb-6 sm:mb-8 md:mb-10 font-light animate-slide-up-fade drop-shadow-lg leading-relaxed max-w-3xl mx-auto" style={{ animationDelay: '0.3s' }}>
             {config.hero.subtitle || t('hero.subtitle')}
           </p>
           
-          {/* Decorative elements - Smaller on mobile */}
-          <div className="flex justify-center gap-1.5 sm:gap-2 animate-slide-up-fade" style={{ animationDelay: '0.5s' }}>
-            <div className="w-12 sm:w-20 h-0.5 sm:h-1 bg-secondary rounded-full" />
-            <div className="w-1 h-1 bg-secondary rounded-full mt-0 hidden sm:block" />
-            <div className="w-1 h-1 bg-secondary rounded-full mt-0 hidden sm:block" />
+          {/* Decorative elements */}
+          <div className="flex justify-center items-center gap-3 animate-slide-up-fade" style={{ animationDelay: '0.5s' }}>
+            <div className="w-16 sm:w-24 h-[2px] bg-gradient-to-r from-transparent via-secondary to-secondary rounded-full" />
+            <div className="w-2 h-2 bg-secondary rounded-full animate-pulse" />
+            <div className="w-16 sm:w-24 h-[2px] bg-gradient-to-l from-transparent via-secondary to-secondary rounded-full" />
           </div>
         </div>
 
         {/* Search Card - Avec système UnifiedForm */}
-        <div className="max-w-6xl mx-auto glass rounded-xl sm:rounded-2xl md:rounded-3xl shadow-xl hover:shadow-2xl overflow-hidden animate-scale-in border border-white/20 sm:border-2 hover-lift" style={{ animationDelay: '0.6s' }}>
+        <div className="max-w-6xl mx-auto bg-white/95 dark:bg-card/95 backdrop-blur-md rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden animate-scale-in border border-white/30" style={{ animationDelay: '0.6s' }}>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             {/* Tabs - Horizontal scroll on mobile */}
             <TabsList className="w-full h-auto p-0 bg-background border-b flex justify-start overflow-x-auto rounded-none gap-0 scroll-snap-x">
