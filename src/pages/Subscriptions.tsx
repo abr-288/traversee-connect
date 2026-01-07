@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import Navbar from "@/components/Navbar";
@@ -19,8 +19,6 @@ import {
   Plane, 
   Check, 
   MessageCircle, 
-  Phone,
-  Mail,
   ArrowRight,
   Star,
   Shield,
@@ -29,7 +27,9 @@ import {
   Sparkles,
   Briefcase,
   GraduationCap,
-  CalendarDays
+  CalendarDays,
+  Heart,
+  Loader2
 } from "lucide-react";
 
 const containerVariants = {
@@ -45,230 +45,97 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 }
 };
 
-interface SubscriptionPlan {
+interface SubscriptionPlanDB {
   id: string;
+  plan_id: string;
   name: string;
-  subtitle: string;
-  icon: React.ReactNode;
+  subtitle: string | null;
+  icon: string;
   price: string;
-  priceNote?: string;
-  features: string[];
-  advantages: string[];
-  popular?: boolean;
-  color: string;
+  price_note: string | null;
+  features: string[] | null;
+  popular: boolean | null;
+  color: string | null;
+  sort_order: number | null;
+  is_active: boolean | null;
 }
 
-const subscriptionPlans: SubscriptionPlan[] = [
-  {
-    id: "corporate",
-    name: "Corporate Mensuelle",
-    subtitle: "Pour les entreprises",
-    icon: <Building2 className="h-8 w-8" />,
-    price: "150 000 - 300 000 FCFA",
-    priceNote: "par mois selon la taille",
-    features: [
-      "Gestion complète des réservations de billets",
-      "Recherches de tarifs optimisés",
-      "Options (blocage de tarif, pré-réservation)",
-      "Modifications, reports, demandes spéciales",
-      "Suivi voyage et assistance 7j/7",
-      "Négociation de tarifs corporate",
-      "Gestion du budget voyage",
-      "Assistance visa complète",
-      "Réservations hôtels & transferts",
-      "Conciergerie business",
-      "Support prioritaire 7j/7",
-      "Gestionnaire dédié Bossiz"
-    ],
-    advantages: [
-      "Suppression totale de la charge administrative",
-      "Réduction des coûts grâce à nos outils pro",
-      "Accès prioritaire, délais réduits",
-      "Suivi centralisé des dépenses",
-      "Un seul point de contact, zéro stress"
-    ],
-    popular: true,
-    color: "from-primary to-primary/80"
-  },
-  {
-    id: "premium",
-    name: "Premium VIP",
-    subtitle: "Abonnement individuel",
-    icon: <Crown className="h-8 w-8" />,
-    price: "20 000 - 36 000 FCFA",
-    priceNote: "par mois",
-    features: [
-      "Réservations prioritaires",
-      "Traitement express visas",
-      "Assistance 24/7",
-      "Gestion de voyage ultra-personnalisée",
-      "Alertes et bons plans exclusifs",
-      "Accès aux offres VIP"
-    ],
-    advantages: [
-      "Jamais de stress pour les voyages",
-      "Service VIP personnalisé",
-      "Réduction du prix global des billets",
-      "Assistance pro en cas de problème"
-    ],
-    color: "from-amber-500 to-amber-600"
-  },
-  {
-    id: "visa",
-    name: "Assistance Visa+",
-    subtitle: "Personnes & Entreprises",
-    icon: <FileCheck className="h-8 w-8" />,
-    price: "Sur devis",
-    priceNote: "selon la destination",
-    features: [
-      "Constitution du dossier complet",
-      "Vérification de conformité",
-      "Prise de rendez-vous ambassade",
-      "Coaching entretien ambassade",
-      "Suivi prioritaire du dossier",
-      "Assistance jusqu'à la délivrance"
-    ],
-    advantages: [
-      "Dossier sécurisé et conforme",
-      "Zéro erreur administrative",
-      "Gain de temps considérable",
-      "Suivi dédié personnalisé"
-    ],
-    color: "from-emerald-500 to-emerald-600"
-  },
-  {
-    id: "billets",
-    name: "Billets Pro & Famille",
-    subtitle: "Tarifs négociés",
-    icon: <Plane className="h-8 w-8" />,
-    price: "Jusqu'à -18%",
-    priceNote: "sur les tarifs publics",
-    features: [
-      "Accès aux tarifs professionnels",
-      "Options flexibles (modification, bagages)",
-      "Support avant/pendant/après voyage",
-      "Recherche multicanal automatisée",
-      "Réservation groupes et familles",
-      "Négociation des meilleurs prix"
-    ],
-    advantages: [
-      "Économies significatives garanties",
-      "Flexibilité maximale",
-      "Accompagnement complet",
-      "Accès à tous les vols"
-    ],
-    color: "from-blue-500 to-blue-600"
-  },
-  {
-    id: "family",
-    name: "Pack Famille",
-    subtitle: "Voyages en famille",
-    icon: <Users className="h-8 w-8" />,
-    price: "46 000 FCFA",
-    priceNote: "par mois",
-    features: [
-      "Réservations groupées simplifiées",
-      "Tarifs enfants réduits (-50%)",
-      "Assurance voyage famille complète",
-      "Activités enfants incluses",
-      "Sièges côte à côte garantis",
-      "Bagages supplémentaires enfants"
-    ],
-    advantages: [
-      "Voyages en famille sans stress",
-      "Économies sur chaque voyage",
-      "Tout inclus pour les petits",
-      "Organisation simplifiée"
-    ],
-    color: "from-pink-500 to-pink-600"
-  },
-  {
-    id: "business",
-    name: "Business Traveler",
-    subtitle: "Voyageurs fréquents",
-    icon: <Briefcase className="h-8 w-8" />,
-    price: "75 000 FCFA",
-    priceNote: "par mois",
-    features: [
-      "Check-in prioritaire tous aéroports",
-      "Accès lounge aéroport inclus",
-      "Modifications illimitées gratuites",
-      "Conciergerie voyage dédiée",
-      "Fast-track sécurité",
-      "Chauffeur aéroport inclus"
-    ],
-    advantages: [
-      "Gain de temps considérable",
-      "Confort premium garanti",
-      "Flexibilité totale",
-      "Image professionnelle"
-    ],
-    color: "from-slate-600 to-slate-700"
-  },
-  {
-    id: "student",
-    name: "Évasion Jeunes",
-    subtitle: "Étudiants & -26 ans",
-    icon: <GraduationCap className="h-8 w-8" />,
-    price: "12 000 FCFA",
-    priceNote: "par mois",
-    features: [
-      "Tarifs étudiants exclusifs (-25%)",
-      "Bagages supplémentaires gratuits",
-      "Annulation flexible 48h",
-      "Bons plans destinations",
-      "Assurance études à l'étranger",
-      "Réseau d'entraide voyageurs"
-    ],
-    advantages: [
-      "Budget maîtrisé garanti",
-      "Flexibilité étudiante",
-      "Communauté de voyageurs",
-      "Expériences uniques"
-    ],
-    color: "from-violet-500 to-violet-600"
-  },
-  {
-    id: "events",
-    name: "Events & MICE",
-    subtitle: "Séminaires & Incentives",
-    icon: <CalendarDays className="h-8 w-8" />,
-    price: "Sur devis",
-    priceNote: "selon le groupe",
-    features: [
-      "Organisation événementielle complète",
-      "Logistique transport groupe",
-      "Hébergement groupe négocié",
-      "Team building sur mesure",
-      "Gestion badges et accréditations",
-      "Coordination sur place"
-    ],
-    advantages: [
-      "Événement clé en main",
-      "Économies d'échelle",
-      "Un seul interlocuteur",
-      "Succès garanti"
-    ],
-    color: "from-orange-500 to-orange-600"
-  }
-];
+const ICON_MAP: Record<string, React.ReactNode> = {
+  Building2: <Building2 className="h-8 w-8" />,
+  Crown: <Crown className="h-8 w-8" />,
+  FileCheck: <FileCheck className="h-8 w-8" />,
+  Plane: <Plane className="h-8 w-8" />,
+  Users: <Users className="h-8 w-8" />,
+  Briefcase: <Briefcase className="h-8 w-8" />,
+  GraduationCap: <GraduationCap className="h-8 w-8" />,
+  CalendarDays: <CalendarDays className="h-8 w-8" />,
+  Star: <Star className="h-8 w-8" />,
+  Heart: <Heart className="h-8 w-8" />,
+};
+
+interface DisplayPlan {
+  id: string;
+  plan_id: string;
+  name: string;
+  subtitle: string | null;
+  icon: React.ReactNode;
+  price: string;
+  priceNote: string | null;
+  features: string[];
+  popular: boolean;
+  color: string;
+}
 
 export default function Subscriptions() {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [plans, setPlans] = useState<DisplayPlan[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [contactForm, setContactForm] = useState({
     name: "",
     email: "",
     phone: "",
     company: "",
-    plan: "",
     message: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [openDialog, setOpenDialog] = useState<string | null>(null);
 
-  const handleContactSubmit = async (e: React.FormEvent, plan: SubscriptionPlan) => {
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("subscription_plans")
+          .select("*")
+          .eq("is_active", true)
+          .order("sort_order", { ascending: true });
+
+        if (error) throw error;
+        
+        const formattedPlans: DisplayPlan[] = (data || []).map((p: SubscriptionPlanDB) => ({
+          id: p.id,
+          plan_id: p.plan_id,
+          name: p.name,
+          subtitle: p.subtitle,
+          icon: ICON_MAP[p.icon] || <Building2 className="h-8 w-8" />,
+          price: p.price,
+          priceNote: p.price_note,
+          features: p.features || [],
+          popular: p.popular || false,
+          color: p.color || "from-primary to-primary/80",
+        }));
+        
+        setPlans(formattedPlans);
+      } catch (error) {
+        console.error("Error fetching subscription plans:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPlans();
+  }, []);
+
+  const handleContactSubmit = async (e: React.FormEvent, plan: DisplayPlan) => {
     e.preventDefault();
     setIsSubmitting(true);
     
@@ -276,7 +143,7 @@ export default function Subscriptions() {
       const { error } = await supabase
         .from("subscription_requests")
         .insert({
-          plan_id: plan.id,
+          plan_id: plan.plan_id,
           plan_name: plan.name,
           name: contactForm.name.trim(),
           email: contactForm.email.trim(),
@@ -288,8 +155,8 @@ export default function Subscriptions() {
       if (error) throw error;
     
       toast({
-        title: "Demande envoyée !",
-        description: "Notre équipe vous contactera dans les plus brefs délais.",
+        title: t("subscriptions.requestSent", "Demande envoyée !"),
+        description: t("subscriptions.contactSoon", "Notre équipe vous contactera dans les plus brefs délais."),
       });
     
       setContactForm({
@@ -297,15 +164,13 @@ export default function Subscriptions() {
         email: "",
         phone: "",
         company: "",
-        plan: "",
         message: ""
       });
-      setOpenDialog(null);
     } catch (error: any) {
       console.error("Error submitting subscription request:", error);
       toast({
-        title: "Erreur",
-        description: "Une erreur est survenue. Veuillez réessayer.",
+        title: t("common.error", "Erreur"),
+        description: t("common.tryAgain", "Une erreur est survenue. Veuillez réessayer."),
         variant: "destructive",
       });
     } finally {
@@ -337,27 +202,27 @@ export default function Subscriptions() {
             <motion.div variants={itemVariants} className="text-center max-w-3xl mx-auto">
               <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
                 <Sparkles className="w-3 h-3 mr-1" />
-                Bossiz Conciergerie
+                {t("subscriptions.badge", "Bossiz Conciergerie")}
               </Badge>
               <h1 className="text-3xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-primary/80 to-secondary bg-clip-text text-transparent">
-                Nos Offres d'Abonnement
+                {t("subscriptions.title", "Nos Offres d'Abonnement")}
               </h1>
               <p className="text-lg text-muted-foreground mb-8">
-                Découvrez nos formules adaptées à vos besoins. Voyagez sereinement avec un service premium à votre disposition.
+                {t("subscriptions.subtitle", "Découvrez nos formules adaptées à vos besoins. Voyagez sereinement avec un service premium à votre disposition.")}
               </p>
               
               <div className="flex flex-wrap justify-center gap-4 mb-8">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Shield className="w-4 h-4 text-primary" />
-                  <span>Service garanti</span>
+                  <span>{t("subscriptions.guaranteed", "Service garanti")}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Clock className="w-4 h-4 text-primary" />
-                  <span>Assistance 24/7</span>
+                  <span>{t("subscriptions.support247", "Assistance 24/7")}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Users className="w-4 h-4 text-primary" />
-                  <span>+1000 clients satisfaits</span>
+                  <span>{t("subscriptions.clients", "+1000 clients satisfaits")}</span>
                 </div>
               </div>
             </motion.div>
@@ -367,188 +232,173 @@ export default function Subscriptions() {
         {/* Plans Section */}
         <section className="py-12 md:py-16">
           <div className="container mx-auto px-4">
-            <motion.div 
-              className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={containerVariants}
-            >
-              {subscriptionPlans.map((plan) => (
-                <motion.div key={plan.id} variants={itemVariants}>
-                  <Card className={`relative h-full overflow-hidden transition-all duration-300 hover:shadow-xl ${plan.popular ? 'ring-2 ring-primary' : ''}`}>
-                    {plan.popular && (
-                      <div className="absolute top-4 right-4">
-                        <Badge className="bg-primary text-primary-foreground">
-                          <Star className="w-3 h-3 mr-1" />
-                          Populaire
-                        </Badge>
-                      </div>
-                    )}
-                    
-                    <CardHeader className="pb-4">
-                      <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${plan.color} flex items-center justify-center text-white mb-4`}>
-                        {plan.icon}
-                      </div>
-                      <CardTitle className="text-2xl">{plan.name}</CardTitle>
-                      <CardDescription className="text-base">{plan.subtitle}</CardDescription>
-                      <div className="mt-4">
-                        <span className="text-3xl font-bold text-foreground">{plan.price}</span>
-                        {plan.priceNote && (
-                          <span className="text-sm text-muted-foreground ml-2">{plan.priceNote}</span>
-                        )}
-                      </div>
-                    </CardHeader>
-                    
-                    <CardContent className="space-y-6">
-                      <div>
-                        <h4 className="font-semibold mb-3 text-foreground">Services inclus :</h4>
-                        <ul className="space-y-2">
-                          {plan.features.map((feature, index) => (
-                            <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
-                              <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                              <span>{feature}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+            {isLoading ? (
+              <div className="flex justify-center items-center py-20">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+              </div>
+            ) : plans.length === 0 ? (
+              <div className="text-center py-20">
+                <p className="text-muted-foreground">{t("subscriptions.noPlans", "Aucun abonnement disponible pour le moment.")}</p>
+              </div>
+            ) : (
+              <motion.div 
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={containerVariants}
+              >
+                {plans.map((plan) => (
+                  <motion.div key={plan.id} variants={itemVariants}>
+                    <Card className={`relative h-full overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${plan.popular ? 'ring-2 ring-primary' : ''}`}>
+                      {plan.popular && (
+                        <div className="absolute top-4 right-4">
+                          <Badge className="bg-primary text-primary-foreground">
+                            <Star className="w-3 h-3 mr-1" />
+                            {t("subscriptions.popular", "Populaire")}
+                          </Badge>
+                        </div>
+                      )}
                       
-                      <div className="pt-4 border-t">
-                        <h4 className="font-semibold mb-3 text-foreground">Vos avantages :</h4>
-                        <ul className="space-y-2">
-                          {plan.advantages.map((advantage, index) => (
-                            <li key={index} className="flex items-start gap-2 text-sm">
-                              <Sparkles className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
-                              <span className="text-foreground">{advantage}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </CardContent>
-                    
-                    <CardFooter className="flex flex-col gap-3 pt-6">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button 
-                            className="w-full" 
-                            size="lg"
-                            onClick={() => setSelectedPlan(plan.id)}
-                          >
-                            Souscrire maintenant
-                            <ArrowRight className="w-4 h-4 ml-2" />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-md">
-                          <DialogHeader>
-                            <DialogTitle>Souscrire à {plan.name}</DialogTitle>
-                            <DialogDescription>
-                              Remplissez ce formulaire et notre équipe vous contactera rapidement.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <form onSubmit={(e) => handleContactSubmit(e, plan)} className="space-y-4 mt-4">
-                            <div className="grid grid-cols-2 gap-4">
+                      <CardHeader className="pb-4">
+                        <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${plan.color} flex items-center justify-center text-white mb-4`}>
+                          {plan.icon}
+                        </div>
+                        <CardTitle className="text-xl">{plan.name}</CardTitle>
+                        <CardDescription className="text-sm">{plan.subtitle}</CardDescription>
+                        <div className="mt-4">
+                          <span className="text-2xl font-bold text-foreground">{plan.price}</span>
+                          {plan.priceNote && (
+                            <span className="text-xs text-muted-foreground ml-2">{plan.priceNote}</span>
+                          )}
+                        </div>
+                      </CardHeader>
+                      
+                      <CardContent className="space-y-4">
+                        <div>
+                          <h4 className="font-semibold mb-3 text-foreground text-sm">{t("subscriptions.includedServices", "Services inclus :")}</h4>
+                          <ul className="space-y-2">
+                            {plan.features.slice(0, 6).map((feature, index) => (
+                              <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
+                                <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                                <span>{feature}</span>
+                              </li>
+                            ))}
+                            {plan.features.length > 6 && (
+                              <li className="text-xs text-muted-foreground italic">
+                                +{plan.features.length - 6} {t("subscriptions.moreFeatures", "autres avantages...")}
+                              </li>
+                            )}
+                          </ul>
+                        </div>
+                      </CardContent>
+                      
+                      <CardFooter className="flex flex-col gap-3 pt-4">
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button className="w-full" size="lg">
+                              {t("subscriptions.subscribe", "Souscrire")}
+                              <ArrowRight className="w-4 h-4 ml-2" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-md">
+                            <DialogHeader>
+                              <DialogTitle>{t("subscriptions.subscribeTo", "Souscrire à")} {plan.name}</DialogTitle>
+                              <DialogDescription>
+                                {t("subscriptions.fillForm", "Remplissez ce formulaire et notre équipe vous contactera rapidement.")}
+                              </DialogDescription>
+                            </DialogHeader>
+                            <form onSubmit={(e) => handleContactSubmit(e, plan)} className="space-y-4 mt-4">
+                              <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                  <Label htmlFor={`name-${plan.id}`}>{t("subscriptions.fullName", "Nom complet")} *</Label>
+                                  <Input
+                                    id={`name-${plan.id}`}
+                                    value={contactForm.name}
+                                    onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
+                                    required
+                                  />
+                                </div>
+                                <div className="space-y-2">
+                                  <Label htmlFor={`phone-${plan.id}`}>{t("subscriptions.phone", "Téléphone")} *</Label>
+                                  <Input
+                                    id={`phone-${plan.id}`}
+                                    type="tel"
+                                    value={contactForm.phone}
+                                    onChange={(e) => setContactForm({...contactForm, phone: e.target.value})}
+                                    required
+                                  />
+                                </div>
+                              </div>
                               <div className="space-y-2">
-                                <Label htmlFor="name">Nom complet *</Label>
+                                <Label htmlFor={`email-${plan.id}`}>{t("subscriptions.email", "Email")} *</Label>
                                 <Input
-                                  id="name"
-                                  value={contactForm.name}
-                                  onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
+                                  id={`email-${plan.id}`}
+                                  type="email"
+                                  value={contactForm.email}
+                                  onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
                                   required
                                 />
                               </div>
                               <div className="space-y-2">
-                                <Label htmlFor="phone">Téléphone *</Label>
+                                <Label htmlFor={`company-${plan.id}`}>{t("subscriptions.company", "Entreprise")}</Label>
                                 <Input
-                                  id="phone"
-                                  type="tel"
-                                  value={contactForm.phone}
-                                  onChange={(e) => setContactForm({...contactForm, phone: e.target.value})}
-                                  required
-                                />
-                              </div>
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="email">Email *</Label>
-                              <Input
-                                id="email"
-                                type="email"
-                                value={contactForm.email}
-                                onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
-                                required
-                              />
-                            </div>
-                            {plan.id === "corporate" && (
-                              <div className="space-y-2">
-                                <Label htmlFor="company">Entreprise</Label>
-                                <Input
-                                  id="company"
+                                  id={`company-${plan.id}`}
                                   value={contactForm.company}
                                   onChange={(e) => setContactForm({...contactForm, company: e.target.value})}
                                 />
                               </div>
-                            )}
-                            <div className="space-y-2">
-                              <Label htmlFor="message">Message (optionnel)</Label>
-                              <Textarea
-                                id="message"
-                                value={contactForm.message}
-                                onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
-                                placeholder="Précisez vos besoins..."
-                                rows={3}
-                              />
-                            </div>
-                            <Button type="submit" className="w-full" disabled={isSubmitting}>
-                              {isSubmitting ? "Envoi en cours..." : "Envoyer ma demande"}
-                            </Button>
-                          </form>
-                        </DialogContent>
-                      </Dialog>
-                      
-                      <Button 
-                        variant="outline" 
-                        className="w-full"
-                        onClick={() => openWhatsApp(plan.name)}
-                      >
-                        <MessageCircle className="w-4 h-4 mr-2" />
-                        Nous contacter sur WhatsApp
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                </motion.div>
-              ))}
-            </motion.div>
+                              <div className="space-y-2">
+                                <Label htmlFor={`message-${plan.id}`}>{t("subscriptions.messageOptional", "Message (optionnel)")}</Label>
+                                <Textarea
+                                  id={`message-${plan.id}`}
+                                  value={contactForm.message}
+                                  onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
+                                  placeholder={t("subscriptions.specifyNeeds", "Précisez vos besoins...")}
+                                  rows={3}
+                                />
+                              </div>
+                              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                                {isSubmitting ? t("subscriptions.sending", "Envoi en cours...") : t("subscriptions.sendRequest", "Envoyer ma demande")}
+                              </Button>
+                            </form>
+                          </DialogContent>
+                        </Dialog>
+                        
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="w-full"
+                          onClick={() => openWhatsApp(plan.name)}
+                        >
+                          <MessageCircle className="w-4 h-4 mr-2" />
+                          WhatsApp
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
           </div>
         </section>
 
-        {/* Contact CTA Section */}
-        <section className="py-12 md:py-16 mt-8 md:mt-12 border-t border-border/50 bg-gradient-to-br from-primary/5 via-background to-secondary/5">
-          <div className="container mx-auto px-4">
-            <motion.div 
-              className="max-w-2xl mx-auto text-center"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+        {/* Contact Section */}
+        <section className="py-16 bg-muted/30">
+          <div className="container mx-auto px-4 text-center">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">
+              {t("subscriptions.needHelp", "Besoin d'aide pour choisir ?")}
+            </h2>
+            <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
+              {t("subscriptions.contactUs", "Notre équipe est disponible pour vous conseiller et trouver la formule qui correspond parfaitement à vos besoins.")}
+            </p>
+            <Button 
+              size="lg" 
+              onClick={() => openWhatsApp("conseil personnalisé")}
             >
-              <h2 className="text-2xl md:text-3xl font-bold mb-4">
-                Besoin d'une offre sur mesure ?
-              </h2>
-              <p className="text-muted-foreground mb-8">
-                Notre équipe est à votre disposition pour créer une offre personnalisée adaptée à vos besoins spécifiques.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <Button size="lg" onClick={() => openWhatsApp("Offre personnalisée")}>
-                  <Phone className="w-4 h-4 mr-2" />
-                  Appelez-nous
-                </Button>
-                <Button size="lg" variant="outline" asChild>
-                  <a href="mailto:contact@bossiz.com">
-                    <Mail className="w-4 h-4 mr-2" />
-                    contact@bossiz.com
-                  </a>
-                </Button>
-              </div>
-            </motion.div>
+              <MessageCircle className="w-5 h-5 mr-2" />
+              {t("subscriptions.contactWhatsApp", "Nous contacter sur WhatsApp")}
+            </Button>
           </div>
         </section>
       </main>
