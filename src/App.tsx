@@ -1,76 +1,16 @@
-import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { SiteConfigProvider } from "@/contexts/SiteConfigContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import { Loader2 } from "lucide-react";
 import { NotificationPrompt } from "@/components/NotificationPrompt";
-
-// Lazy load route components for code splitting
-const Index = lazy(() => import("./pages/Index"));
-const Flights = lazy(() => import("./pages/Flights"));
-const Hotels = lazy(() => import("./pages/Hotels"));
-const Cars = lazy(() => import("./pages/Cars"));
-const Tours = lazy(() => import("./pages/Tours"));
-const Destinations = lazy(() => import("./pages/Destinations"));
-const DestinationDetail = lazy(() => import("./pages/DestinationDetail"));
-const Activities = lazy(() => import("./pages/Activities"));
-const Stays = lazy(() => import("./pages/Stays"));
-const Events = lazy(() => import("./pages/Events"));
-const Trains = lazy(() => import("./pages/Trains"));
-const FlightHotel = lazy(() => import("./pages/FlightHotel"));
-const Auth = lazy(() => import("./pages/Auth"));
-const Dashboard = lazy(() => import("./pages/UserDashboard"));
-const BookingHistory = lazy(() => import("./pages/BookingHistory"));
-const Account = lazy(() => import("./pages/Account"));
-const Payment = lazy(() => import("./pages/Payment"));
-const Confirmation = lazy(() => import("./pages/Confirmation"));
-const FlightComparison = lazy(() => import("./pages/FlightComparison"));
-const FlightBookingProcess = lazy(() => import("./pages/FlightBookingProcess"));
-const UnifiedBookingProcess = lazy(() => import("./pages/UnifiedBookingProcess"));
-const FlightHotelBookingProcess = lazy(() => import("./pages/FlightHotelBookingProcess"));
-const AdminDashboard = lazy(() => import("./pages/admin/AdminOverview"));
-const AdminBookings = lazy(() => import("./pages/admin/AdminBookings"));
-const AdminServices = lazy(() => import("./pages/admin/AdminServices"));
-const AdminActivities = lazy(() => import("./pages/admin/AdminActivities"));
-const AdminStays = lazy(() => import("./pages/admin/AdminStays"));
-const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
-const AdminSubscriptions = lazy(() => import("./pages/admin/AdminSubscriptions"));
-const AdminSubscriptionPlans = lazy(() => import("./pages/admin/AdminSubscriptionPlans"));
-const AdminPromotions = lazy(() => import("./pages/admin/AdminPromotions"));
-const AdminEmailTemplates = lazy(() => import("./pages/AdminEmailTemplates"));
-const AdminConfiguration = lazy(() => import("./pages/admin/AdminConfiguration"));
-const AdminAgencies = lazy(() => import("./pages/admin/AdminAgencies"));
-const AdminCommissions = lazy(() => import("./pages/admin/AdminCommissions"));
-const AgencyDashboard = lazy(() => import("./pages/agency/AgencyDashboard"));
-const AgencyServices = lazy(() => import("./pages/agency/AgencyServices"));
-const AgencyActivities = lazy(() => import("./pages/agency/AgencyActivities"));
-const AgencyStays = lazy(() => import("./pages/agency/AgencyStays"));
-const AgencyPromotions = lazy(() => import("./pages/agency/AgencyPromotions"));
-const AgencySettings = lazy(() => import("./pages/agency/AgencySettings"));
-const Help = lazy(() => import("./pages/Help"));
-const Support = lazy(() => import("./pages/Support"));
-const Install = lazy(() => import("./pages/Install"));
-const PriceAlerts = lazy(() => import("./pages/PriceAlerts"));
-const Subscriptions = lazy(() => import("./pages/Subscriptions"));
-const NotFound = lazy(() => import("./pages/NotFound"));
+import AnimatedRoutes from "@/components/AnimatedRoutes";
 
 const queryClient = new QueryClient();
-
-// Loading fallback component
-const PageLoader = () => (
-  <div className="min-h-screen flex items-center justify-center bg-background">
-    <div className="flex flex-col items-center gap-4">
-      <Loader2 className="w-12 h-12 animate-spin text-primary" />
-      <p className="text-muted-foreground">Chargement...</p>
-    </div>
-  </div>
-);
 
 const App = () => (
   <ErrorBoundary>
@@ -83,58 +23,7 @@ const App = () => (
               <Sonner />
               <NotificationPrompt />
               <BrowserRouter>
-                <Suspense fallback={<PageLoader />}>
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/home" element={<Index />} />
-                    <Route path="/flights" element={<Flights />} />
-                    <Route path="/hotels" element={<Hotels />} />
-                    <Route path="/cars" element={<Cars />} />
-                    <Route path="/tours" element={<Tours />} />
-                    <Route path="/destinations" element={<Destinations />} />
-                    <Route path="/destinations/:id" element={<DestinationDetail />} />
-                    <Route path="/activities" element={<Activities />} />
-                    <Route path="/stays" element={<Stays />} />
-                    <Route path="/events" element={<Events />} />
-                    <Route path="/trains" element={<Trains />} />
-                    <Route path="/flight-hotel" element={<FlightHotel />} />
-                    <Route path="/flight-hotel/booking" element={<FlightHotelBookingProcess />} />
-                    <Route path="/auth" element={<Auth />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/booking-history" element={<BookingHistory />} />
-                    <Route path="/account" element={<Account />} />
-                    <Route path="/payment" element={<Payment />} />
-                    <Route path="/confirmation" element={<Confirmation />} />
-                    <Route path="/flight-comparison" element={<FlightComparison />} />
-                    <Route path="/booking-process" element={<FlightBookingProcess />} />
-                    <Route path="/booking/:serviceType" element={<UnifiedBookingProcess />} />
-                    <Route path="/admin" element={<AdminDashboard />} />
-                    <Route path="/admin/bookings" element={<AdminBookings />} />
-                    <Route path="/admin/services" element={<AdminServices />} />
-                    <Route path="/admin/activities" element={<AdminActivities />} />
-                    <Route path="/admin/stays" element={<AdminStays />} />
-                    <Route path="/admin/users" element={<AdminUsers />} />
-                    <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
-                    <Route path="/admin/subscription-plans" element={<AdminSubscriptionPlans />} />
-                    <Route path="/admin/promotions" element={<AdminPromotions />} />
-                    <Route path="/admin/email-templates" element={<AdminEmailTemplates />} />
-                    <Route path="/admin/configuration" element={<AdminConfiguration />} />
-                    <Route path="/admin/agencies" element={<AdminAgencies />} />
-                    <Route path="/admin/commissions" element={<AdminCommissions />} />
-                    <Route path="/agency" element={<AgencyDashboard />} />
-                    <Route path="/agency/services" element={<AgencyServices />} />
-                    <Route path="/agency/activities" element={<AgencyActivities />} />
-                    <Route path="/agency/stays" element={<AgencyStays />} />
-                    <Route path="/agency/promotions" element={<AgencyPromotions />} />
-                    <Route path="/agency/settings" element={<AgencySettings />} />
-                    <Route path="/help" element={<Help />} />
-                    <Route path="/support" element={<Support />} />
-                    <Route path="/install" element={<Install />} />
-                    <Route path="/price-alerts" element={<PriceAlerts />} />
-                    <Route path="/subscriptions" element={<Subscriptions />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </Suspense>
+                <AnimatedRoutes />
               </BrowserRouter>
             </TooltipProvider>
           </CurrencyProvider>
