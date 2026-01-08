@@ -60,34 +60,53 @@ const HeroSection = () => {
 
   return (
     <section ref={sectionRef} className="relative min-h-[520px] sm:min-h-[600px] md:min-h-[750px] flex items-center pt-20 sm:pt-24 overflow-hidden w-full">
-      {/* Background Image Carousel with Parallax Effect */}
+      {/* Background Image Carousel with Parallax Effect - GPU Optimized */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         {heroSlides.map((slide, index) => (
           <div
             key={index}
-            className={`absolute inset-0 transition-all duration-1200 ease-out ${
-              index === currentSlide ? "opacity-100 scale-100" : "opacity-0 scale-110"
+            className={`absolute inset-0 transition-opacity duration-1000 ease-out ${
+              index === currentSlide ? "opacity-100" : "opacity-0"
             }`}
             style={{
-              transform: `translateY(${scrollY}px) scale(1.1)`,
-              willChange: 'transform'
+              transform: `translate3d(0, ${scrollY}px, 0) scale(1.1)`,
+              willChange: index === currentSlide ? 'transform, opacity' : 'auto',
+              backfaceVisibility: 'hidden',
+              perspective: 1000,
+              WebkitBackfaceVisibility: 'hidden'
             }}
           >
             <img
               src={slide}
               alt={`Travel destination ${index + 1}`}
               className="w-full h-full object-cover"
+              loading={index === 0 ? "eager" : "lazy"}
             />
           </div>
         ))}
-        {/* Modern dark overlay with gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/70 via-primary/50 to-primary/80" />
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/60 via-transparent to-primary/60" />
+        {/* Modern dark overlay with gradient - GPU accelerated */}
+        <div 
+          className="absolute inset-0 bg-gradient-to-b from-primary/70 via-primary/50 to-primary/80"
+          style={{ transform: 'translate3d(0, 0, 0)' }}
+        />
+        <div 
+          className="absolute inset-0 bg-gradient-to-r from-primary/60 via-transparent to-primary/60"
+          style={{ transform: 'translate3d(0, 0, 0)' }}
+        />
         
-        {/* Animated particles/shapes - Hidden on mobile */}
-        <div className="hidden sm:block absolute top-20 left-10 w-80 h-80 bg-secondary/20 rounded-full blur-[100px] animate-float" style={{ animationDelay: '0s' }} />
-        <div className="hidden sm:block absolute bottom-20 right-10 w-96 h-96 bg-secondary/15 rounded-full blur-[120px] animate-float" style={{ animationDelay: '1s' }} />
-        <div className="hidden md:block absolute top-1/2 left-1/4 w-64 h-64 bg-white/5 rounded-full blur-[80px] animate-float" style={{ animationDelay: '2s' }} />
+        {/* Animated particles/shapes - Hidden on mobile, GPU optimized */}
+        <div 
+          className="hidden sm:block absolute top-20 left-10 w-80 h-80 bg-secondary/20 rounded-full blur-[100px] animate-float-gpu" 
+          style={{ animationDelay: '0s', transform: 'translate3d(0, 0, 0)' }} 
+        />
+        <div 
+          className="hidden sm:block absolute bottom-20 right-10 w-96 h-96 bg-secondary/15 rounded-full blur-[120px] animate-float-gpu" 
+          style={{ animationDelay: '1s', transform: 'translate3d(0, 0, 0)' }} 
+        />
+        <div 
+          className="hidden md:block absolute top-1/2 left-1/4 w-64 h-64 bg-white/5 rounded-full blur-[80px] animate-float-gpu" 
+          style={{ animationDelay: '2s', transform: 'translate3d(0, 0, 0)' }} 
+        />
       </div>
 
       {/* Content */}

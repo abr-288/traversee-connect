@@ -484,4 +484,68 @@ All colors MUST be HSL.
     scroll-snap-align: start;
     flex-shrink: 0;
   }
+  
+  /* GPU-accelerated animations for mobile performance */
+  @keyframes float-gpu {
+    0%, 100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(0, -20px, 0);
+    }
+  }
+  
+  @keyframes slide-up-fade {
+    0% {
+      opacity: 0;
+      transform: translate3d(0, 20px, 0);
+    }
+    100% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+  
+  @keyframes scale-in-gpu {
+    0% {
+      opacity: 0;
+      transform: translate3d(0, 0, 0) scale(0.95);
+    }
+    100% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+  }
+  
+  .animate-float-gpu {
+    animation: float-gpu 6s ease-in-out infinite;
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  
+  .animate-slide-up-fade {
+    animation: slide-up-fade 0.6s ease-out forwards;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  
+  .animate-scale-in {
+    animation: scale-in-gpu 0.5s ease-out forwards;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  
+  /* Reduce motion for accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-float-gpu,
+    .animate-slide-up-fade,
+    .animate-scale-in {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
 }
