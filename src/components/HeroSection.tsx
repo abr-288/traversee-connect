@@ -59,7 +59,7 @@ const HeroSection = () => {
   }, [heroSlides.length]);
 
   return (
-    <section ref={sectionRef} className="relative min-h-[520px] sm:min-h-[600px] md:min-h-[750px] flex items-center pt-20 sm:pt-24 overflow-hidden w-full">
+    <section ref={sectionRef} className="relative min-h-[420px] sm:min-h-[480px] md:min-h-[580px] flex items-center pt-16 sm:pt-20 overflow-hidden w-full">
       {/* Background Image Carousel with Parallax Effect - GPU Optimized */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         {heroSlides.map((slide, index) => (
@@ -110,18 +110,18 @@ const HeroSection = () => {
       </div>
 
       {/* Content */}
-      <div className="site-container relative z-10 py-6 sm:py-10 md:py-16">
-        <div className="max-w-4xl mx-auto text-center mb-6 sm:mb-10 md:mb-14 px-2">
+      <div className="site-container relative z-10 py-4 sm:py-6 md:py-10">
+        <div className="max-w-4xl mx-auto text-center mb-4 sm:mb-6 md:mb-8 px-2">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-4 sm:mb-6 animate-slide-up-fade" style={{ animationDelay: '0s' }}>
-            <span className="w-2 h-2 rounded-full bg-secondary animate-pulse" />
-            <span className="text-white/90 text-xs sm:text-sm font-medium">{t('hero.badge', 'Votre voyage commence ici')}</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-3 sm:mb-4 animate-slide-up-fade" style={{ animationDelay: '0s' }}>
+            <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
+            <span className="text-white/90 text-xs font-medium">{t('hero.badge', 'Votre voyage commence ici')}</span>
           </div>
           
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-3 sm:mb-4 md:mb-6 animate-slide-up-fade drop-shadow-2xl leading-tight tracking-tight" style={{ animationDelay: '0.1s' }}>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 sm:mb-3 md:mb-4 animate-slide-up-fade drop-shadow-2xl leading-tight tracking-tight" style={{ animationDelay: '0.1s' }}>
             {config.hero.title || t('hero.title')}
           </h1>
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/90 mb-6 sm:mb-8 md:mb-10 font-light animate-slide-up-fade drop-shadow-lg leading-relaxed max-w-3xl mx-auto" style={{ animationDelay: '0.3s' }}>
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/90 mb-4 sm:mb-5 md:mb-6 font-light animate-slide-up-fade drop-shadow-lg leading-relaxed max-w-3xl mx-auto" style={{ animationDelay: '0.3s' }}>
             {config.hero.subtitle || t('hero.subtitle')}
           </p>
           
