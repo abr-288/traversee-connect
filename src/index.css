@@ -69,37 +69,50 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 210 30% 8%;
-    --foreground: 210 20% 98%;
+    --background: 222 47% 6%;
+    --foreground: 210 40% 98%;
 
-    --card: 210 25% 12%;
-    --card-foreground: 210 20% 98%;
+    --card: 222 47% 10%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 210 25% 12%;
-    --popover-foreground: 210 20% 98%;
+    --popover: 222 47% 12%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 225 45% 20%;
-    --primary-foreground: 0 0% 100%;
-    --primary-light: 225 45% 30%;
-    --primary-dark: 225 45% 14%;
+    /* Primary - Plus lumineux et visible en mode sombre */
+    --primary: 158 100% 45%;
+    --primary-foreground: 222 47% 8%;
+    --primary-light: 158 100% 55%;
+    --primary-dark: 158 100% 35%;
 
-    --secondary: 158 100% 48%;
-    --secondary-foreground: 225 45% 18%;
+    /* Secondary - Contraste amélioré */
+    --secondary: 222 47% 18%;
+    --secondary-foreground: 210 40% 98%;
     
-    --accent-green: 158 100% 48%;
+    --accent-green: 158 100% 50%;
 
-    --muted: 210 25% 16%;
-    --muted-foreground: 210 15% 65%;
+    /* Muted - Meilleur contraste pour le texte */
+    --muted: 222 40% 16%;
+    --muted-foreground: 215 20% 70%;
 
-    --accent: 190 100% 18%;
-    --accent-foreground: 190 100% 65%;
+    /* Accent - Plus visible */
+    --accent: 222 47% 20%;
+    --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 72% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 25% 20%;
-    --input: 210 25% 20%;
-    --ring: 158 100% 48%;
+    /* Bordures et inputs - Plus visibles */
+    --border: 222 30% 25%;
+    --input: 222 30% 18%;
+    --ring: 158 100% 50%;
+    
+    /* Shadows for dark mode */
+    --shadow-sm: 0 2px 8px hsl(0 0% 0% / 0.3);
+    --shadow-md: 0 4px 16px hsl(0 0% 0% / 0.4);
+    --shadow-lg: 0 8px 32px hsl(0 0% 0% / 0.5);
+    --shadow-xl: 0 20px 60px hsl(0 0% 0% / 0.6);
+    --shadow-primary: 0 8px 24px hsl(158 100% 45% / 0.25);
+    --shadow-glow: 0 0 40px hsl(158 100% 50% / 0.3);
   }
 }
 
