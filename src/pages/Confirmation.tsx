@@ -54,15 +54,53 @@ const Confirmation = () => {
 
   useEffect(() => {
     loadBooking();
-    
-    const interval = setInterval(() => {
-      if (booking?.status === 'pending') {
-        loadBooking();
-      }
-    }, 5000);
-
-    return () => clearInterval(interval);
   }, [bookingId]);
+
+  // Real-time subscription for instant status updates
+  useEffect(() => {
+    if (!bookingId) return;
+
+    const channel = supabase
+      .channel(`booking-status-${bookingId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'bookings',
+          filter: `id=eq.${bookingId}`
+        },
+        (payload) => {
+          console.log('Booking updated in real-time:', payload);
+          setBooking((prev: any) => ({
+            ...prev,
+            ...payload.new,
+            services: prev?.services,
+            passengers: prev?.passengers
+          }));
+          
+          // Show toast notification on status change
+          if (payload.new.payment_status === 'paid' && payload.old?.payment_status !== 'paid') {
+            toast.success(t('confirmation.paymentReceived'), {
+              description: t('confirmation.confirmedDesc'),
+              duration: 5000,
+            });
+          } else if (payload.new.status === 'confirmed' && payload.old?.status !== 'confirmed') {
+            toast.success(t('confirmation.bookingConfirmed'), {
+              description: t('confirmation.confirmedDesc'),
+              duration: 5000,
+            });
+          }
+        }
+      )
+      .subscribe((status) => {
+        console.log('Realtime subscription status:', status);
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [bookingId, t]);
 
   const loadBooking = async () => {
     if (!bookingId) {
