@@ -42,7 +42,7 @@ const PaymentTest = () => {
     customerName: "Test Client",
     customerEmail: "test@example.com",
     customerPhone: "+2250700000000",
-    paymentMethod: "MOBILE_MONEY"
+    paymentMethod: "mobile_money"
   });
 
   const serviceIcons = {
@@ -139,11 +139,14 @@ const PaymentTest = () => {
             bookingId: booking.id,
             amount: testConfig.amount,
             currency: "XOF",
-            customerEmail: testConfig.customerEmail,
-            customerPhone: testConfig.customerPhone,
-            customerName: testConfig.customerName,
-            paymentMethod: testConfig.paymentMethod,
-            description: `Test Payment - ${serviceLabels[testConfig.serviceType]}`
+            paymentMethod: testConfig.paymentMethod.toLowerCase(),
+            customerInfo: {
+              name: testConfig.customerName,
+              email: testConfig.customerEmail,
+              phone: testConfig.customerPhone,
+              address: "Abidjan",
+              city: "Abidjan"
+            }
           }
         }
       );
@@ -303,19 +306,19 @@ const PaymentTest = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="MOBILE_MONEY">
+                    <SelectItem value="mobile_money">
                       <div className="flex items-center gap-2">
                         <Smartphone className="h-4 w-4" />
                         Mobile Money
                       </div>
                     </SelectItem>
-                    <SelectItem value="WAVE">
+                    <SelectItem value="wave">
                       <div className="flex items-center gap-2">
                         <Smartphone className="h-4 w-4" />
                         Wave
                       </div>
                     </SelectItem>
-                    <SelectItem value="CREDIT_CARD">
+                    <SelectItem value="card">
                       <div className="flex items-center gap-2">
                         <CreditCard className="h-4 w-4" />
                         Carte bancaire
