@@ -59,7 +59,7 @@ const HeroSection = () => {
   }, [heroSlides.length]);
 
   return (
-    <section ref={sectionRef} className="relative min-h-[420px] sm:min-h-[480px] md:min-h-[580px] flex items-center pt-16 sm:pt-20 overflow-hidden w-full">
+    <section ref={sectionRef} className="relative min-h-[280px] sm:min-h-[320px] md:min-h-[380px] flex items-center overflow-hidden w-full">
       {/* Background Image Carousel with Parallax Effect - GPU Optimized */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         {heroSlides.map((slide, index) => (
@@ -96,89 +96,78 @@ const HeroSection = () => {
         
         {/* Animated particles/shapes - Hidden on mobile, GPU optimized */}
         <div 
-          className="hidden sm:block absolute top-20 left-10 w-80 h-80 bg-secondary/20 rounded-full blur-[100px] animate-float-gpu" 
+          className="hidden sm:block absolute top-10 left-10 w-60 h-60 bg-secondary/20 rounded-full blur-[80px] animate-float-gpu" 
           style={{ animationDelay: '0s', transform: 'translate3d(0, 0, 0)' }} 
         />
         <div 
-          className="hidden sm:block absolute bottom-20 right-10 w-96 h-96 bg-secondary/15 rounded-full blur-[120px] animate-float-gpu" 
+          className="hidden sm:block absolute bottom-10 right-10 w-72 h-72 bg-secondary/15 rounded-full blur-[100px] animate-float-gpu" 
           style={{ animationDelay: '1s', transform: 'translate3d(0, 0, 0)' }} 
-        />
-        <div 
-          className="hidden md:block absolute top-1/2 left-1/4 w-64 h-64 bg-white/5 rounded-full blur-[80px] animate-float-gpu" 
-          style={{ animationDelay: '2s', transform: 'translate3d(0, 0, 0)' }} 
         />
       </div>
 
       {/* Content */}
-      <div className="site-container relative z-10 py-4 sm:py-6 md:py-10">
-        <div className="max-w-4xl mx-auto text-center mb-4 sm:mb-6 md:mb-8 px-2">
+      <div className="site-container relative z-10 py-3 sm:py-4 md:py-6">
+        <div className="max-w-3xl mx-auto text-center mb-3 sm:mb-4 md:mb-5 px-2">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-3 sm:mb-4 animate-slide-up-fade" style={{ animationDelay: '0s' }}>
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-2 sm:mb-3 animate-slide-up-fade" style={{ animationDelay: '0s' }}>
             <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
-            <span className="text-white/90 text-xs font-medium">{t('hero.badge', 'Votre voyage commence ici')}</span>
+            <span className="text-white/90 text-[10px] sm:text-xs font-medium">{t('hero.badge', 'Votre voyage commence ici')}</span>
           </div>
           
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 sm:mb-3 md:mb-4 animate-slide-up-fade drop-shadow-2xl leading-tight tracking-tight" style={{ animationDelay: '0.1s' }}>
+          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-1.5 sm:mb-2 md:mb-3 animate-slide-up-fade drop-shadow-2xl leading-tight tracking-tight" style={{ animationDelay: '0.1s' }}>
             {config.hero.title || t('hero.title')}
           </h1>
-          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/90 mb-4 sm:mb-5 md:mb-6 font-light animate-slide-up-fade drop-shadow-lg leading-relaxed max-w-3xl mx-auto" style={{ animationDelay: '0.3s' }}>
+          <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white/90 mb-2 sm:mb-3 md:mb-4 font-light animate-slide-up-fade drop-shadow-lg leading-relaxed max-w-2xl mx-auto" style={{ animationDelay: '0.3s' }}>
             {config.hero.subtitle || t('hero.subtitle')}
           </p>
-          
-          {/* Decorative elements */}
-          <div className="flex justify-center items-center gap-3 animate-slide-up-fade" style={{ animationDelay: '0.5s' }}>
-            <div className="w-16 sm:w-24 h-[2px] bg-gradient-to-r from-transparent via-secondary to-secondary rounded-full" />
-            <div className="w-2 h-2 bg-secondary rounded-full animate-pulse" />
-            <div className="w-16 sm:w-24 h-[2px] bg-gradient-to-l from-transparent via-secondary to-secondary rounded-full" />
-          </div>
         </div>
 
-        {/* Search Card - Avec système UnifiedForm */}
-        <div className="max-w-6xl mx-auto bg-white/95 dark:bg-card/95 backdrop-blur-md rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden animate-scale-in border border-white/30" style={{ animationDelay: '0.6s' }}>
+        {/* Search Card - Compact */}
+        <div className="max-w-5xl mx-auto bg-white/95 dark:bg-card/95 backdrop-blur-md rounded-xl sm:rounded-2xl shadow-xl overflow-hidden animate-scale-in border border-white/30" style={{ animationDelay: '0.4s' }}>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            {/* Tabs - Horizontal scroll on mobile */}
+            {/* Tabs - Compact */}
             <TabsList className="w-full h-auto p-0 bg-background border-b flex justify-start overflow-x-auto rounded-none gap-0 scroll-snap-x">
               <TabsTrigger 
                 value="flight" 
-                className="gap-1 sm:gap-1.5 md:gap-2 py-2.5 sm:py-3 md:py-4 px-3 sm:px-4 md:px-6 rounded-none data-[state=active]:bg-background data-[state=active]:border-b-2 data-[state=active]:border-secondary flex-shrink-0 scroll-snap-item min-w-fit"
+                className="gap-1 sm:gap-1.5 py-2 sm:py-2.5 px-2.5 sm:px-3 md:px-4 rounded-none data-[state=active]:bg-background data-[state=active]:border-b-2 data-[state=active]:border-secondary flex-shrink-0 scroll-snap-item min-w-fit"
               >
-                <Plane className="w-4 h-4 sm:w-4 sm:h-4 md:w-5 md:h-5" />
-                <span className="text-xs sm:text-sm md:text-base whitespace-nowrap">{t('nav.flights')}</span>
+                <Plane className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span className="text-[11px] sm:text-xs md:text-sm whitespace-nowrap">{t('nav.flights')}</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="hotel" 
-                className="gap-1 sm:gap-1.5 md:gap-2 py-2.5 sm:py-3 md:py-4 px-3 sm:px-4 md:px-6 rounded-none data-[state=active]:bg-background data-[state=active]:border-b-2 data-[state=active]:border-secondary flex-shrink-0 scroll-snap-item min-w-fit"
+                className="gap-1 sm:gap-1.5 py-2 sm:py-2.5 px-2.5 sm:px-3 md:px-4 rounded-none data-[state=active]:bg-background data-[state=active]:border-b-2 data-[state=active]:border-secondary flex-shrink-0 scroll-snap-item min-w-fit"
               >
-                <Hotel className="w-4 h-4 sm:w-4 sm:h-4 md:w-5 md:h-5" />
-                <span className="text-xs sm:text-sm md:text-base whitespace-nowrap">{t('nav.hotels')}</span>
+                <Hotel className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span className="text-[11px] sm:text-xs md:text-sm whitespace-nowrap">{t('nav.hotels')}</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="flight-hotel" 
-                className="gap-1 sm:gap-1.5 md:gap-2 py-2.5 sm:py-3 md:py-4 px-3 sm:px-4 md:px-6 rounded-none data-[state=active]:bg-background data-[state=active]:border-b-2 data-[state=active]:border-secondary flex-shrink-0 scroll-snap-item min-w-fit"
+                className="gap-1 sm:gap-1.5 py-2 sm:py-2.5 px-2.5 sm:px-3 md:px-4 rounded-none data-[state=active]:bg-background data-[state=active]:border-b-2 data-[state=active]:border-secondary flex-shrink-0 scroll-snap-item min-w-fit"
               >
-                <Plane className="w-3 h-3 sm:w-3 sm:h-3 md:w-4 md:h-4" />
-                <Hotel className="w-3 h-3 sm:w-3 sm:h-3 md:w-4 md:h-4" />
-                <span className="text-xs sm:text-sm md:text-base whitespace-nowrap">{t('nav.flightHotel')}</span>
+                <Plane className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                <Hotel className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                <span className="text-[11px] sm:text-xs md:text-sm whitespace-nowrap">{t('nav.flightHotel')}</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="car" 
-                className="gap-1 sm:gap-1.5 md:gap-2 py-2.5 sm:py-3 md:py-4 px-3 sm:px-4 md:px-6 rounded-none data-[state=active]:bg-background data-[state=active]:border-b-2 data-[state=active]:border-secondary flex-shrink-0 scroll-snap-item min-w-fit"
+                className="gap-1 sm:gap-1.5 py-2 sm:py-2.5 px-2.5 sm:px-3 md:px-4 rounded-none data-[state=active]:bg-background data-[state=active]:border-b-2 data-[state=active]:border-secondary flex-shrink-0 scroll-snap-item min-w-fit"
               >
-                <Car className="w-4 h-4 sm:w-4 sm:h-4 md:w-5 md:h-5" />
-                <span className="text-xs sm:text-sm md:text-base whitespace-nowrap">{t('nav.carRental')}</span>
+                <Car className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span className="text-[11px] sm:text-xs md:text-sm whitespace-nowrap">{t('nav.carRental')}</span>
               </TabsTrigger>
             </TabsList>
 
-            {/* Formulaires avec UnifiedForm - Padding réduit sur mobile */}
-            <TabsContent value="flight" className="p-3 sm:p-4 md:p-6">
+            {/* Formulaires compacts */}
+            <TabsContent value="flight" className="p-2.5 sm:p-3 md:p-4">
               <FlightSearchForm />
             </TabsContent>
 
-            <TabsContent value="hotel" className="p-3 sm:p-4 md:p-6">
+            <TabsContent value="hotel" className="p-2.5 sm:p-3 md:p-4">
               <HotelSearchForm />
             </TabsContent>
 
-            <TabsContent value="flight-hotel" className="p-3 sm:p-4 md:p-6">
+            <TabsContent value="flight-hotel" className="p-2.5 sm:p-3 md:p-4">
               <FlightHotelSearchForm 
                 onSearch={(params) => {
                   // Navigation handled by the form
@@ -186,7 +175,7 @@ const HeroSection = () => {
               />
             </TabsContent>
 
-            <TabsContent value="car" className="p-3 sm:p-4 md:p-6">
+            <TabsContent value="car" className="p-2.5 sm:p-3 md:p-4">
               <CarSearchForm />
             </TabsContent>
           </Tabs>
