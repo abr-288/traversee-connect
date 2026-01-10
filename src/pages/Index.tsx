@@ -9,6 +9,7 @@ import { Boss } from "@/components/Boss";
 import FeaturedSubscriptions from "@/components/FeaturedSubscriptions";
 import SpecialOffers from "@/components/SpecialOffers";
 import { SeasonalSuggestions } from "@/components/SeasonalSuggestions";
+import PromoBanner from "@/components/PromoBanner";
 import { useTranslation } from "react-i18next";
 
 const Index = () => {
@@ -18,6 +19,11 @@ const Index = () => {
     <div className="min-h-screen bg-background overflow-x-hidden">
       <Navbar />
       <main>
+        {/* Promo Banner - Sticky top */}
+        <div className="pt-16">
+          <PromoBanner />
+        </div>
+        
         {/* Hero - Full Bleed */}
         <HeroSection />
         

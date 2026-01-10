@@ -158,26 +158,26 @@ export const FlightSearchForm = () => {
   ].filter(Boolean).length;
 
   return (
-    <UnifiedForm onSubmit={handleSearch} variant="search" className="max-w-6xl mx-auto">
-      {/* Barre de progression - Plus compact sur mobile */}
+    <UnifiedForm onSubmit={handleSearch} variant="search" className="max-w-5xl mx-auto">
+      {/* Barre de progression - Compacte */}
       <FormProgressBar 
         totalFields={totalFields} 
         completedFields={completedFields}
-        className="mb-3 sm:mb-4 md:mb-6"
+        className="mb-2 sm:mb-3"
       />
 
       {/* Alert d'erreur générale */}
       {hasErrors && (
-        <Alert variant="destructive" className="mb-3 sm:mb-4">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription className="text-sm">
+        <Alert variant="destructive" className="mb-2 sm:mb-3 py-2">
+          <AlertCircle className="h-3.5 w-3.5" />
+          <AlertDescription className="text-xs">
             Veuillez corriger les erreurs dans le formulaire
           </AlertDescription>
         </Alert>
       )}
 
-      {/* Trip Type Selector - Optimisé mobile */}
-      <div className="flex gap-2 mb-3 sm:mb-4 md:mb-6">
+      {/* Trip Type Selector - Compact */}
+      <div className="flex gap-1.5 mb-2 sm:mb-3">
         {[
           { value: "round-trip", label: t("search.roundTrip") },
           { value: "one-way", label: t("search.oneWay") }
@@ -191,10 +191,10 @@ export const FlightSearchForm = () => {
             }}
             whileTap={{ scale: 0.98 }}
             className={cn(
-              "flex-1 sm:flex-none px-3 sm:px-4 md:px-6 py-2.5 sm:py-2.5 md:py-2.5 rounded-lg sm:rounded-xl font-medium transition-all duration-200 text-sm sm:text-sm md:text-base",
-              "border-2 touch-target",
+              "flex-1 sm:flex-none px-2.5 sm:px-3 md:px-4 py-2 rounded-lg font-medium transition-all duration-200 text-xs sm:text-sm",
+              "border touch-target",
               tripType === value
-                ? "bg-primary text-white border-primary shadow-md"
+                ? "bg-primary text-white border-primary shadow-sm"
                 : "bg-white text-foreground border-border hover:border-primary/50"
             )}
           >
@@ -203,72 +203,63 @@ export const FlightSearchForm = () => {
         ))}
       </div>
 
-      {/* Origin & Destination - Stack on mobile */}
-      <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-12 sm:gap-3 md:gap-4">
+      {/* Origin & Destination - Compact */}
+      <div className="space-y-2 sm:space-y-0 sm:grid sm:grid-cols-12 sm:gap-2">
         {/* From */}
         <div className="sm:col-span-5">
-          <div className="space-y-1">
-            <UnifiedAutocomplete
-              label={t("search.departure")}
-              type="airport"
-              value={from}
-              onChange={(value) => {
-                setFrom(value);
-                handleBlur("origin");
-              }}
-              placeholder={t("search.cityOrAirport")}
-              required
-              className={errors.origin && touched.origin ? "border-destructive" : ""}
-            />
-            {errors.origin && touched.origin && (
-              <p className="text-xs text-destructive mt-1 animate-in slide-in-from-top-1">
-                {errors.origin}
-              </p>
-            )}
-          </div>
+          <UnifiedAutocomplete
+            label={t("search.departure")}
+            type="airport"
+            value={from}
+            onChange={(value) => {
+              setFrom(value);
+              handleBlur("origin");
+            }}
+            placeholder={t("search.cityOrAirport")}
+            required
+            className={cn("h-9 text-sm", errors.origin && touched.origin ? "border-destructive" : "")}
+          />
+          {errors.origin && touched.origin && (
+            <p className="text-[10px] text-destructive mt-0.5">{errors.origin}</p>
+          )}
         </div>
 
-        {/* Swap Button - Hidden on mobile, inline button instead */}
+        {/* Swap Button */}
         <div className="sm:col-span-2 flex items-center justify-center">
           <Button
             type="button"
             variant="outline"
             size="icon"
             onClick={handleSwap}
-            className="h-10 w-10 sm:h-12 sm:w-12 rounded-full border-2 hover:border-primary hover:bg-primary/5 transition-all shadow-sm sm:mt-6"
+            className="h-8 w-8 rounded-full border hover:border-primary hover:bg-primary/5 transition-all sm:mt-5"
           >
-            <ArrowRightLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+            <ArrowRightLeft className="h-3.5 w-3.5" />
           </Button>
         </div>
 
         {/* To */}
         <div className="sm:col-span-5">
-          <div className="space-y-1">
-            <UnifiedAutocomplete
-              label={t("search.to")}
-              type="airport"
-              value={to}
-              onChange={(value) => {
-                setTo(value);
-                handleBlur("destination");
-              }}
-              placeholder={t("search.cityOrAirport")}
-              required
-              className={errors.destination && touched.destination ? "border-destructive" : ""}
-            />
-            {errors.destination && touched.destination && (
-              <p className="text-xs text-destructive mt-1 animate-in slide-in-from-top-1">
-                {errors.destination}
-              </p>
-            )}
-          </div>
+          <UnifiedAutocomplete
+            label={t("search.to")}
+            type="airport"
+            value={to}
+            onChange={(value) => {
+              setTo(value);
+              handleBlur("destination");
+            }}
+            placeholder={t("search.cityOrAirport")}
+            required
+            className={cn("h-9 text-sm", errors.destination && touched.destination ? "border-destructive" : "")}
+          />
+          {errors.destination && touched.destination && (
+            <p className="text-[10px] text-destructive mt-0.5">{errors.destination}</p>
+          )}
         </div>
       </div>
 
-      {/* Dates - Stack on mobile */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
-        {/* Departure Date */}
-        <div className="space-y-1">
+      {/* Dates - Compact */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+        <div>
           <UnifiedDatePicker
             label={t("search.departure")}
             placeholder={t("flights.departureDate")}
@@ -281,15 +272,12 @@ export const FlightSearchForm = () => {
             required
           />
           {errors.departureDate && touched.departureDate && (
-            <p className="text-xs text-destructive mt-1 animate-in slide-in-from-top-1">
-              {errors.departureDate}
-            </p>
+            <p className="text-[10px] text-destructive mt-0.5">{errors.departureDate}</p>
           )}
         </div>
 
-        {/* Return Date */}
         {tripType === "round-trip" && (
-          <div className="space-y-1">
+          <div>
             <UnifiedDatePicker
               label={t("search.return")}
               placeholder={t("flights.returnDate")}
@@ -302,18 +290,16 @@ export const FlightSearchForm = () => {
               required
             />
             {errors.returnDate && touched.returnDate && (
-              <p className="text-xs text-destructive mt-1 animate-in slide-in-from-top-1">
-                {errors.returnDate}
-              </p>
+              <p className="text-[10px] text-destructive mt-0.5">{errors.returnDate}</p>
             )}
           </div>
         )}
       </div>
 
-      {/* Passengers & Class - 2x2 grid on mobile */}
-      <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4 mt-3">
-        <div className="space-y-1.5">
-          <label className="text-xs sm:text-sm font-medium text-foreground">
+      {/* Passengers & Class - Compact grid */}
+      <div className="grid grid-cols-4 gap-1.5 sm:gap-2 mt-2">
+        <div className="space-y-1">
+          <label className="text-[10px] sm:text-xs font-medium text-foreground">
             {t("search.adults")}
           </label>
           <Select 
@@ -323,21 +309,19 @@ export const FlightSearchForm = () => {
               handleBlur("adults");
             }}
           >
-            <SelectTrigger className={cn("h-11 sm:h-11 text-sm touch-target", errors.adults && touched.adults && "border-destructive")}>
+            <SelectTrigger className={cn("h-9 text-xs", errors.adults && touched.adults && "border-destructive")}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-                <SelectItem key={num} value={num.toString()}>
-                  {num}
-                </SelectItem>
+                <SelectItem key={num} value={num.toString()}>{num}</SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
 
-        <div className="space-y-1.5">
-          <label className="text-xs sm:text-sm font-medium text-foreground">{t("search.children")}</label>
+        <div className="space-y-1">
+          <label className="text-[10px] sm:text-xs font-medium text-foreground">{t("search.children")}</label>
           <Select 
             value={children.toString()} 
             onValueChange={(value) => {
@@ -345,21 +329,19 @@ export const FlightSearchForm = () => {
               handleBlur("children");
             }}
           >
-            <SelectTrigger className={cn("h-11 sm:h-11 text-sm touch-target", errors.children && touched.children && "border-destructive")}>
+            <SelectTrigger className={cn("h-9 text-xs", errors.children && touched.children && "border-destructive")}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-                <SelectItem key={num} value={num.toString()}>
-                  {num}
-                </SelectItem>
+                <SelectItem key={num} value={num.toString()}>{num}</SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
 
-        <div className="space-y-1.5">
-          <label className="text-xs sm:text-sm font-medium text-foreground">Bébés</label>
+        <div className="space-y-1">
+          <label className="text-[10px] sm:text-xs font-medium text-foreground">Bébés</label>
           <Select 
             value={infants.toString()} 
             onValueChange={(value) => {
@@ -367,21 +349,19 @@ export const FlightSearchForm = () => {
               handleBlur("infants");
             }}
           >
-            <SelectTrigger className={cn("h-11 sm:h-11 text-sm touch-target", errors.infants && touched.infants && "border-destructive")}>
+            <SelectTrigger className={cn("h-9 text-xs", errors.infants && touched.infants && "border-destructive")}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               {[0, 1, 2, 3, 4].map((num) => (
-                <SelectItem key={num} value={num.toString()}>
-                  {num}
-                </SelectItem>
+                <SelectItem key={num} value={num.toString()}>{num}</SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
 
-        <div className="space-y-1.5">
-          <label className="text-xs sm:text-sm font-medium text-foreground">{t("search.class.title")}</label>
+        <div className="space-y-1">
+          <label className="text-[10px] sm:text-xs font-medium text-foreground">{t("search.class.title")}</label>
           <Select 
             value={travelClass} 
             onValueChange={(value) => {
@@ -389,7 +369,7 @@ export const FlightSearchForm = () => {
               handleBlur("travelClass");
             }}
           >
-            <SelectTrigger className={cn("h-11 sm:h-11 text-sm touch-target", errors.travelClass && touched.travelClass && "border-destructive")}>
+            <SelectTrigger className={cn("h-9 text-xs", errors.travelClass && touched.travelClass && "border-destructive")}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -402,17 +382,17 @@ export const FlightSearchForm = () => {
         </div>
       </div>
 
-      {/* Comparateur de prix */}
+      {/* Comparateur de prix - Compact */}
       {departureDate && (
-        <div className="mt-3">
+        <div className="mt-2">
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={() => setShowPriceCalendar(!showPriceCalendar)}
-            className="w-full sm:w-auto h-10 text-sm"
+            className="w-full sm:w-auto h-8 text-xs"
           >
-            <TrendingDown className="h-4 w-4 mr-2" />
+            <TrendingDown className="h-3.5 w-3.5 mr-1.5" />
             {showPriceCalendar ? "Masquer" : "Comparer"} les prix
           </Button>
         </div>
@@ -424,7 +404,7 @@ export const FlightSearchForm = () => {
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
-          className="mt-3 overflow-hidden"
+          className="mt-2 overflow-hidden"
         >
           <PriceCalendar
             departureDate={format(departureDate, "yyyy-MM-dd")}
@@ -438,12 +418,12 @@ export const FlightSearchForm = () => {
         </motion.div>
       )}
 
-      {/* Submit Button - Full width on mobile */}
-      <div className="mt-4 sm:mt-5 md:mt-6">
+      {/* Submit Button - Compact */}
+      <div className="mt-3">
         <UnifiedSubmitButton 
           variant="search"
           disabled={hasErrors}
-          className={cn("w-full h-12 sm:h-11 text-base sm:text-sm touch-target", hasErrors && "opacity-50 cursor-not-allowed")}
+          className={cn("w-full h-10 text-sm", hasErrors && "opacity-50 cursor-not-allowed")}
         >
           {t("search.search")}
         </UnifiedSubmitButton>
