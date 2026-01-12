@@ -251,7 +251,59 @@ const Navbar = () => {
       {/* Mobile Menu - Fullscreen overlay */}
       {isMenuOpen && (
         <div className="lg:hidden fixed inset-0 top-14 sm:top-16 bg-primary z-50 overflow-y-auto safe-area-bottom animate-fade-in">
-          <div className="flex flex-col min-h-full pb-20">
+          <div className="flex flex-col pb-20">
+            {/* Section Compte - EN PREMIER pour être visible */}
+            <div className="px-4 pt-4 pb-2">
+              <p className="text-xs font-semibold text-white/50 uppercase tracking-wider">
+                {isLoggedIn ? t("nav.myAccount") : t("nav.login")}
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-2 px-4 pb-4">
+              {isLoggedIn ? (
+                <>
+                  <Link to="/account" onClick={() => setIsMenuOpen(false)}>
+                    <Button className="w-full h-12 gap-3 text-base bg-secondary hover:bg-secondary/90 text-primary justify-start">
+                      <UserCircle2 className="w-5 h-5" />
+                      {t("nav.profile")}
+                    </Button>
+                  </Link>
+                  <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="outline" className="w-full h-12 gap-3 text-base text-white border-white/20 hover:bg-white/10 justify-start">
+                      <LayoutDashboard className="w-5 h-5" />
+                      {t("nav.dashboard")}
+                    </Button>
+                  </Link>
+                  {isAdmin && (
+                    <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="outline" className="w-full h-12 gap-3 text-base text-white border-white/20 hover:bg-white/10 justify-start">
+                        <LayoutDashboard className="w-5 h-5" />
+                        {t("nav.admin")}
+                      </Button>
+                    </Link>
+                  )}
+                  <Button 
+                    variant="outline"
+                    className="w-full h-12 gap-3 text-base text-destructive border-destructive/30 hover:bg-destructive/10 justify-start" 
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="w-5 h-5" />
+                    {t("nav.logout")}
+                  </Button>
+                </>
+              ) : (
+                <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
+                  <Button className="w-full h-14 gap-3 text-lg font-semibold bg-secondary hover:bg-secondary/90 text-primary justify-center">
+                    <User className="w-6 h-6" />
+                    {t("nav.login")} / {t("nav.register")}
+                  </Button>
+                </Link>
+              )}
+            </div>
+
+            {/* Séparateur */}
+            <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent mx-4" />
+
             {/* Section Navigation */}
             <div className="px-4 pt-4 pb-2">
               <p className="text-xs font-semibold text-white/50 uppercase tracking-wider">
@@ -273,7 +325,7 @@ const Navbar = () => {
                 <Link
                   key={to}
                   to={to}
-                  className={`flex items-center gap-4 px-4 py-4 rounded-xl transition-all duration-200 touch-target ${
+                  className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 touch-target ${
                     isActive(to) 
                       ? 'bg-white/10 text-secondary' 
                       : 'text-white hover:bg-white/5 active:bg-white/10'
@@ -288,7 +340,7 @@ const Navbar = () => {
               {/* Subscriptions - Highlighted */}
               <Link
                 to="/subscriptions"
-                className="flex items-center gap-4 px-4 py-4 rounded-xl bg-secondary/10 border border-secondary/30 mt-2 touch-target"
+                className="flex items-center gap-4 px-4 py-3 rounded-xl bg-secondary/10 border border-secondary/30 mt-2 touch-target"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <Crown className="w-5 h-5 text-secondary" />
@@ -297,13 +349,13 @@ const Navbar = () => {
             </div>
 
             {/* Séparateur */}
-            <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-4 mx-4" />
+            <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-3 mx-4" />
 
             {/* Support */}
             <div className="px-3">
               <Link
                 to="/support"
-                className="flex items-center gap-4 px-4 py-4 rounded-xl text-white hover:bg-white/5 active:bg-white/10 transition-all duration-200 touch-target"
+                className="flex items-center gap-4 px-4 py-3 rounded-xl text-white hover:bg-white/5 active:bg-white/10 transition-all duration-200 touch-target"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <HelpCircle className="w-5 h-5 text-white/70" />
@@ -312,74 +364,21 @@ const Navbar = () => {
             </div>
 
             {/* Séparateur */}
-            <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-4 mx-4" />
+            <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-3 mx-4" />
 
             {/* Section Préférences */}
             <div className="px-4 pb-2">
               <p className="text-xs font-semibold text-white/50 uppercase tracking-wider">
-                Préférences
+                {t("common.preferences") || "Préférences"}
               </p>
             </div>
             
-            <div className="flex flex-col gap-4 px-4 py-2">
-              <div className="flex items-center justify-between py-2">
-                <span className="text-base text-white/90">{t("common.toggleTheme")}</span>
+            <div className="flex items-center justify-between gap-4 px-4 py-2">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-white/90">{t("common.toggleTheme")}</span>
                 <DarkModeToggle className="text-white" />
               </div>
-              <div className="py-2">
-                <LanguageSwitcher />
-              </div>
-            </div>
-
-            {/* Séparateur */}
-            <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-4 mx-4" />
-
-            {/* Section Compte - Fixed at bottom feel */}
-            <div className="mt-auto px-4 pb-2">
-              <p className="text-xs font-semibold text-white/50 uppercase tracking-wider">
-                {isLoggedIn ? "Mon Compte" : "Connexion"}
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-3 px-4 pb-6">
-              {isLoggedIn ? (
-                <>
-                  {isAdmin && (
-                    <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
-                      <Button variant="outline" className="w-full h-12 gap-3 text-base text-white border-white/20 hover:bg-white/10 justify-start">
-                        <LayoutDashboard className="w-5 h-5" />
-                        {t("nav.admin")}
-                      </Button>
-                    </Link>
-                  )}
-                  <Link to="/account" onClick={() => setIsMenuOpen(false)}>
-                    <Button className="w-full h-12 gap-3 text-base bg-secondary hover:bg-secondary/90 text-primary justify-start">
-                      <UserCircle2 className="w-5 h-5" />
-                      {t("nav.profile")}
-                    </Button>
-                  </Link>
-                  <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="outline" className="w-full h-12 gap-3 text-base text-white border-white/20 hover:bg-white/10 justify-start">
-                      <LayoutDashboard className="w-5 h-5" />
-                      {t("nav.dashboard")}
-                    </Button>
-                  </Link>
-                  <Button 
-                    className="w-full h-12 gap-3 text-base bg-destructive hover:bg-destructive/90 text-destructive-foreground justify-start" 
-                    onClick={handleLogout}
-                  >
-                    <LogOut className="w-5 h-5" />
-                    {t("nav.logout")}
-                  </Button>
-                </>
-              ) : (
-                <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
-                  <Button className="w-full h-12 gap-3 text-base bg-secondary hover:bg-secondary/90 text-primary justify-start">
-                    <User className="w-5 h-5" />
-                    {t("nav.login")}
-                  </Button>
-                </Link>
-              )}
+              <LanguageSwitcher />
             </div>
           </div>
         </div>
