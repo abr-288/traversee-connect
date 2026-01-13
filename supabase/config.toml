@@ -77,3 +77,9 @@ verify_jwt = true
 
 [functions.create-pnr]
 verify_jwt = false
+
+[functions.prebook]
+verify_jwt = true
+
+[functions.checkout]
+verify_jwt = true

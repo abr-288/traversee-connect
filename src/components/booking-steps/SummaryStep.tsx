@@ -1,16 +1,18 @@
 import { motion } from "framer-motion";
-import { Plane, User, Briefcase, Armchair, CreditCard, Calendar, Clock, MapPin, LogIn } from "lucide-react";
+import { Plane, User, Briefcase, Armchair, CreditCard, Calendar, Clock, MapPin, LogIn, AlertTriangle, Timer } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { UnifiedSubmitButton } from "@/components/forms/UnifiedSubmitButton";
-import { useState, useEffect } from "react";
-import { useCreateBooking } from "@/hooks/useCreateBooking";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Price } from "@/components/ui/price";
 import { supabase } from "@/integrations/supabase/client";
+import { useSecureFlightBooking, FlightData, PassengerData } from "@/hooks/useSecureFlightBooking";
+import { useCreateBooking } from "@/hooks/useCreateBooking";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Dialog,
   DialogContent,
@@ -38,6 +40,7 @@ interface SummaryStepProps {
     arrivalTime: string;
     duration: string;
     airline: string;
+    airlineCode?: string;
     flightNumber: string;
     price: string;
     stops: number;
@@ -75,18 +78,241 @@ export const SummaryStep = ({
   const [paymentMethod, setPaymentMethod] = useState<"mobile" | "card">("mobile");
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const { createBooking, loading } = useCreateBooking();
+  const [remainingTime, setRemainingTime] = useState<number>(0);
+  const [isPrebookingDone, setIsPrebookingDone] = useState(false);
+  
+  const { prebook, checkout, prebookingData, checkoutData, loading: secureLoading, isPrebookingValid, getRemainingSeconds, reset } = useSecureFlightBooking();
+  const { createBooking, loading: bookingLoading } = useCreateBooking();
   const navigate = useNavigate();
 
+  const loading = secureLoading || bookingLoading;
+
+  // Check authentication on mount
   useEffect(() => {
     checkAuth();
   }, []);
+
+  // Update remaining time every second
+  useEffect(() => {
+    if (prebookingData?.expires_at) {
+      const interval = setInterval(() => {
+        const remaining = getRemainingSeconds();
+        setRemainingTime(remaining);
+        
+        if (remaining <= 0) {
+          clearInterval(interval);
+          toast.error("Pré-réservation expirée", {
+            description: "Votre tarif a expiré. Veuillez recommencer la réservation.",
+          });
+        }
+      }, 1000);
+      
+      return () => clearInterval(interval);
+    }
+  }, [prebookingData, getRemainingSeconds]);
 
   const checkAuth = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     setIsAuthenticated(!!user);
   };
 
+  // Convert frontend passenger format to API format
+  const convertPassengers = (passengers: Passenger[]): PassengerData[] => {
+    return passengers.map(p => ({
+      first_name: p.firstName,
+      last_name: p.lastName,
+      date_of_birth: p.dateOfBirth,
+      nationality: p.nationality,
+      document_type: p.documentType,
+      document_number: p.documentNumber,
+    }));
+  };
+
+  // Convert frontend flight data to API format
+  const convertFlightData = (): FlightData | null => {
+    if (!flightData) return null;
+    
+    return {
+      origin: flightData.origin,
+      destination: flightData.destination,
+      departure_date: flightData.departureDate,
+      return_date: flightData.returnDate || undefined,
+      departure_time: flightData.departureTime,
+      arrival_time: flightData.arrivalTime,
+      duration: flightData.duration,
+      airline: flightData.airline,
+      airline_code: flightData.airlineCode || '',
+      flight_number: flightData.flightNumber,
+      price: parseFloat(flightData.price),
+      stops: flightData.stops,
+      fare: flightData.fare,
+      provider: 'amadeus',
+    };
+  };
+
+  // Format remaining time as MM:SS
+  const formatRemainingTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  /**
+   * SECURE BOOKING FLOW - Step 1: Pre-book (mandatory for flights)
+   */
+  const handlePrebook = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      setShowLoginDialog(true);
+      return;
+    }
+
+    if (serviceType === 'flight' && flightData) {
+      const apiFlightData = convertFlightData();
+      if (!apiFlightData) {
+        toast.error("Données de vol invalides");
+        return;
+      }
+
+      const result = await prebook(
+        apiFlightData,
+        convertPassengers(passengers),
+        adultsCount,
+        childrenCount,
+        selectedOptions,
+        selectedPreferences
+      );
+
+      if (result.success) {
+        setIsPrebookingDone(true);
+        toast.success("Tarif verrouillé", {
+          description: `Référence: ${result.booking_reference}. Vous avez ${result.expires_in_seconds! / 60} minutes pour payer.`,
+        });
+      }
+    } else {
+      // For non-flight services, skip pre-booking and go directly to payment
+      await handlePayment();
+    }
+  };
+
+  /**
+   * SECURE BOOKING FLOW - Step 2: Checkout and Payment
+   */
+  const handlePayment = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      setShowLoginDialog(true);
+      return;
+    }
+
+    try {
+      // For flights, validate pre-booking first
+      if (serviceType === 'flight' && prebookingData) {
+        if (!isPrebookingValid()) {
+          toast.error("Pré-réservation expirée", {
+            description: "Votre tarif a expiré. Veuillez recommencer la réservation.",
+          });
+          reset();
+          setIsPrebookingDone(false);
+          return;
+        }
+
+        // Call checkout to get signed price summary
+        const checkoutResult = await checkout();
+        
+        if (!checkoutResult.success) {
+          return;
+        }
+
+        // Use server-calculated price from checkout
+        const serverPrice = checkoutResult.checkout!.price_breakdown.total_amount;
+        
+        // Create booking with server-validated data
+        const bookingId = await createBooking({
+          service_type: 'flight',
+          service_name: `Vol ${flightData?.origin} - ${flightData?.destination}`,
+          service_description: `${flightData?.airline} - ${flightData?.flightNumber}`,
+          location: flightData?.origin || '',
+          start_date: startDate,
+          end_date: endDate || startDate,
+          guests: adultsCount + childrenCount,
+          total_price: serverPrice, // CRITICAL: Use server price
+          currency: "XOF",
+          customer_name: `${passengers[0].firstName} ${passengers[0].lastName}`,
+          customer_email: user.email || "client@example.com",
+          customer_phone: "+225 00 00 00 00",
+          passengers: convertPassengers(passengers),
+          booking_details: {
+            prebooking_id: prebookingData.prebooking_id,
+            booking_reference: prebookingData.booking_reference,
+            checkout_signature: checkoutResult.checkout!.checkout_signature,
+            flight: flightData,
+            price_breakdown: checkoutResult.checkout!.price_breakdown,
+            options: selectedOptions,
+            preferences: selectedPreferences,
+            paymentMethod,
+          },
+        });
+
+        if (bookingId) {
+          // Navigate to payment with prebooking reference
+          navigate(`/payment?bookingId=${bookingId}&prebookingId=${prebookingData.prebooking_id}`);
+        }
+      } else {
+        // Non-flight services - use existing flow
+        const totalPrice = getTotalPrice();
+        
+        const bookingId = await createBooking({
+          service_type: serviceType as any,
+          service_name: serviceName,
+          service_description: serviceLocation,
+          location: serviceLocation,
+          start_date: startDate,
+          end_date: endDate || startDate,
+          guests: adultsCount + childrenCount,
+          total_price: totalPrice,
+          currency: "XOF",
+          customer_name: `${passengers[0].firstName} ${passengers[0].lastName}`,
+          customer_email: user.email || "client@example.com",
+          customer_phone: "+225 00 00 00 00",
+          passengers: convertPassengers(passengers),
+          booking_details: {
+            options: selectedOptions,
+            preferences: selectedPreferences,
+            paymentMethod,
+          },
+        });
+
+        if (bookingId) {
+          navigate(`/payment?bookingId=${bookingId}`);
+        }
+      }
+    } catch (error) {
+      console.error("Erreur lors de la création de la réservation:", error);
+    }
+  };
+
+  const handleLoginRedirect = () => {
+    sessionStorage.setItem('pendingBooking', JSON.stringify({
+      flightData,
+      serviceType,
+      serviceName,
+      servicePrice,
+      serviceLocation,
+      startDate,
+      endDate,
+      passengers,
+      selectedOptions,
+      selectedPreferences,
+      adultsCount,
+      childrenCount,
+    }));
+    navigate('/auth');
+  };
+
+  // Price calculations - DISPLAY ONLY (real price comes from server)
   const getOptionsPrice = () => {
     const optionPrices: Record<string, number> = {
       "cabin-large": 15000,
@@ -124,74 +350,19 @@ export const SummaryStep = ({
   };
 
   const getTotalPrice = () => {
+    // If we have server-calculated price, use it
+    if (checkoutData?.checkout?.price_breakdown) {
+      return checkoutData.checkout.price_breakdown.total_amount;
+    }
+    if (prebookingData?.price_breakdown) {
+      return prebookingData.price_breakdown.total_amount;
+    }
+    // Fallback to estimated client-side calculation (display only)
     return getBasePrice() + getOptionsPrice() + getPreferencesPrice();
   };
 
-  const handlePayment = async () => {
-    // Vérifier si l'utilisateur est connecté
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      setShowLoginDialog(true);
-      return;
-    }
-
-    try {
-      const bookingId = await createBooking({
-        service_type: serviceType as any,
-        service_name: flightData ? `Vol ${flightData.origin} - ${flightData.destination}` : serviceName,
-        service_description: flightData ? `${flightData.airline} - ${flightData.flightNumber}` : serviceLocation,
-        location: flightData ? flightData.origin : serviceLocation,
-        start_date: startDate,
-        end_date: endDate || startDate,
-        guests: adultsCount + childrenCount,
-        total_price: getTotalPrice(),
-        currency: "EUR",
-        customer_name: `${passengers[0].firstName} ${passengers[0].lastName}`,
-        customer_email: user.email || "client@example.com",
-        customer_phone: "+225 00 00 00 00",
-        passengers: passengers.map((p) => ({
-          first_name: p.firstName,
-          last_name: p.lastName,
-          date_of_birth: p.dateOfBirth,
-          document_type: p.documentType,
-          document_number: p.documentNumber,
-          nationality: p.nationality,
-        })),
-        booking_details: {
-          ...(flightData && { flight: flightData }),
-          options: selectedOptions,
-          preferences: selectedPreferences,
-          paymentMethod,
-        },
-      });
-
-      if (bookingId) {
-        navigate(`/payment?bookingId=${bookingId}`);
-      }
-    } catch (error) {
-      console.error("Erreur lors de la création de la réservation:", error);
-    }
-  };
-
-  const handleLoginRedirect = () => {
-    // Sauvegarder l'état de la réservation en cours
-    sessionStorage.setItem('pendingBooking', JSON.stringify({
-      flightData,
-      serviceType,
-      serviceName,
-      servicePrice,
-      serviceLocation,
-      startDate,
-      endDate,
-      passengers,
-      selectedOptions,
-      selectedPreferences,
-      adultsCount,
-      childrenCount,
-    }));
-    navigate('/auth');
-  };
+  // Determine which price breakdown to display
+  const displayPriceBreakdown = prebookingData?.price_breakdown || checkoutData?.checkout?.price_breakdown;
 
   return (
     <motion.div
@@ -205,6 +376,46 @@ export const SummaryStep = ({
           Vérifiez vos informations avant de procéder au paiement
         </p>
       </div>
+
+      {/* Pre-booking timer alert */}
+      {isPrebookingDone && prebookingData && remainingTime > 0 && (
+        <Alert className={`border-2 ${remainingTime < 120 ? 'border-destructive bg-destructive/10' : 'border-amber-500 bg-amber-500/10'}`}>
+          <Timer className="h-4 w-4" />
+          <AlertDescription className="flex items-center justify-between">
+            <div>
+              <span className="font-semibold">Tarif verrouillé</span>
+              <span className="ml-2 text-muted-foreground">
+                Référence: {prebookingData.booking_reference}
+              </span>
+            </div>
+            <Badge variant={remainingTime < 120 ? "destructive" : "secondary"} className="text-lg px-3 py-1">
+              {formatRemainingTime(remainingTime)}
+            </Badge>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Expired alert */}
+      {isPrebookingDone && prebookingData && remainingTime <= 0 && (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            <span className="font-semibold">Tarif expiré</span>
+            <span className="ml-2">Veuillez recommencer votre réservation.</span>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="ml-4"
+              onClick={() => {
+                reset();
+                setIsPrebookingDone(false);
+              }}
+            >
+              Recommencer
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Détails de la réservation */}
@@ -355,35 +566,72 @@ export const SummaryStep = ({
               Détails du prix
             </h3>
             <div className="space-y-3">
-              <div className="flex justify-between text-sm">
-                <span>Service ({adultsCount + childrenCount} participants)</span>
-                <span className="font-medium">
-                  <Price amount={getBasePrice()} fromCurrency="EUR" />
-                </span>
-              </div>
-              {getOptionsPrice() > 0 && (
-                <div className="flex justify-between text-sm">
-                  <span>Options</span>
-                  <span className="font-medium">
-                    <Price amount={getOptionsPrice()} fromCurrency="EUR" />
-                  </span>
-                </div>
+              {/* Show server-calculated breakdown if available */}
+              {displayPriceBreakdown ? (
+                <>
+                  <div className="flex justify-between text-sm">
+                    <span>Prix de base</span>
+                    <span className="font-medium">
+                      <Price amount={displayPriceBreakdown.base_fare} />
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Taxes</span>
+                    <span className="font-medium">
+                      <Price amount={displayPriceBreakdown.taxes} />
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Frais de service</span>
+                    <span className="font-medium">
+                      <Price amount={displayPriceBreakdown.service_fee} />
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex justify-between text-sm">
+                    <span>Service ({adultsCount + childrenCount} participants)</span>
+                    <span className="font-medium">
+                      <Price amount={getBasePrice()} fromCurrency="EUR" />
+                    </span>
+                  </div>
+                  {getOptionsPrice() > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span>Options</span>
+                      <span className="font-medium">
+                        <Price amount={getOptionsPrice()} fromCurrency="EUR" />
+                      </span>
+                    </div>
+                  )}
+                  {getPreferencesPrice() > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span>Sièges</span>
+                      <span className="font-medium">
+                        <Price amount={getPreferencesPrice()} fromCurrency="EUR" />
+                      </span>
+                    </div>
+                  )}
+                </>
               )}
-              {getPreferencesPrice() > 0 && (
-                <div className="flex justify-between text-sm">
-                  <span>Sièges</span>
-                  <span className="font-medium">
-                    <Price amount={getPreferencesPrice()} fromCurrency="EUR" />
-                  </span>
-                </div>
-              )}
+              
               <Separator />
               <div className="flex justify-between items-center">
                 <span className="font-semibold text-lg">Total</span>
                 <span className="font-bold text-2xl text-primary">
-                  <Price amount={getTotalPrice()} fromCurrency="EUR" showLoader />
+                  <Price 
+                    amount={getTotalPrice()} 
+                    fromCurrency={displayPriceBreakdown ? undefined : "EUR"} 
+                    showLoader 
+                  />
                 </span>
               </div>
+              
+              {displayPriceBreakdown && (
+                <p className="text-xs text-muted-foreground text-center">
+                  Prix calculé par le serveur • Garanti jusqu'à expiration
+                </p>
+              )}
             </div>
 
             <Separator className="my-6" />
@@ -406,7 +654,7 @@ export const SummaryStep = ({
                     </div>
                     <div className="text-left">
                       <p className="font-medium">Mobile Money</p>
-                      <p className="text-xs text-muted-foreground">Orange, MTN, Moov</p>
+                      <p className="text-xs text-muted-foreground">Orange, MTN, Moov, Wave</p>
                     </div>
                   </div>
                 </button>
@@ -433,14 +681,41 @@ export const SummaryStep = ({
             </div>
 
             <div className="mt-6 space-y-3">
-              <UnifiedSubmitButton
-                variant="payment"
-                fullWidth
-                loading={loading}
-                onClick={handlePayment}
-              >
-                Procéder au paiement
-              </UnifiedSubmitButton>
+              {/* For flights: Two-step process */}
+              {serviceType === 'flight' && !isPrebookingDone && (
+                <UnifiedSubmitButton
+                  variant="default"
+                  fullWidth
+                  loading={loading}
+                  onClick={handlePrebook}
+                >
+                  Verrouiller le tarif
+                </UnifiedSubmitButton>
+              )}
+              
+              {serviceType === 'flight' && isPrebookingDone && remainingTime > 0 && (
+                <UnifiedSubmitButton
+                  variant="payment"
+                  fullWidth
+                  loading={loading}
+                  onClick={handlePayment}
+                >
+                  Procéder au paiement
+                </UnifiedSubmitButton>
+              )}
+
+              {/* For non-flight services: Direct payment */}
+              {serviceType !== 'flight' && (
+                <UnifiedSubmitButton
+                  variant="payment"
+                  fullWidth
+                  loading={loading}
+                  onClick={handlePayment}
+                >
+                  Procéder au paiement
+                </UnifiedSubmitButton>
+              )}
+
               <Button type="button" variant="outline" onClick={onBack} className="w-full">
                 Retour
               </Button>
