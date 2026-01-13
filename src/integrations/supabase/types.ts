@@ -140,10 +140,13 @@ export type Database = {
           customer_phone: string
           end_date: string | null
           external_ref: string | null
+          flight_status: string | null
           guests: number
           id: string
           notes: string | null
           payment_status: Database["public"]["Enums"]["payment_status"]
+          pnr: string | null
+          prebooking_id: string | null
           service_id: string
           start_date: string
           status: Database["public"]["Enums"]["booking_status"]
@@ -160,10 +163,13 @@ export type Database = {
           customer_phone: string
           end_date?: string | null
           external_ref?: string | null
+          flight_status?: string | null
           guests?: number
           id?: string
           notes?: string | null
           payment_status?: Database["public"]["Enums"]["payment_status"]
+          pnr?: string | null
+          prebooking_id?: string | null
           service_id: string
           start_date: string
           status?: Database["public"]["Enums"]["booking_status"]
@@ -180,10 +186,13 @@ export type Database = {
           customer_phone?: string
           end_date?: string | null
           external_ref?: string | null
+          flight_status?: string | null
           guests?: number
           id?: string
           notes?: string | null
           payment_status?: Database["public"]["Enums"]["payment_status"]
+          pnr?: string | null
+          prebooking_id?: string | null
           service_id?: string
           start_date?: string
           status?: Database["public"]["Enums"]["booking_status"]
@@ -348,6 +357,72 @@ export type Database = {
         }
         Relationships: []
       }
+      flight_prebookings: {
+        Row: {
+          adults_count: number
+          base_fare: number
+          booking_id: string | null
+          booking_reference: string
+          children_count: number
+          created_at: string
+          currency: string
+          expires_at: string
+          flight_data: Json
+          id: string
+          passengers: Json
+          price_signature: string | null
+          provider: string
+          service_fee: number
+          status: string
+          taxes: number
+          total_amount: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          adults_count?: number
+          base_fare: number
+          booking_id?: string | null
+          booking_reference: string
+          children_count?: number
+          created_at?: string
+          currency?: string
+          expires_at: string
+          flight_data: Json
+          id?: string
+          passengers?: Json
+          price_signature?: string | null
+          provider?: string
+          service_fee?: number
+          status?: string
+          taxes?: number
+          total_amount: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          adults_count?: number
+          base_fare?: number
+          booking_id?: string | null
+          booking_reference?: string
+          children_count?: number
+          created_at?: string
+          currency?: string
+          expires_at?: string
+          flight_data?: Json
+          id?: string
+          passengers?: Json
+          price_signature?: string | null
+          provider?: string
+          service_fee?: number
+          status?: string
+          taxes?: number
+          total_amount?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           created_at: string
@@ -426,10 +501,13 @@ export type Database = {
           payment_data: Json | null
           payment_method: string
           payment_provider: string
+          prebooking_id: string | null
           status: string
           transaction_id: string | null
           updated_at: string | null
           user_id: string
+          verification_signature: string | null
+          verified_at: string | null
         }
         Insert: {
           amount: number
@@ -440,10 +518,13 @@ export type Database = {
           payment_data?: Json | null
           payment_method: string
           payment_provider?: string
+          prebooking_id?: string | null
           status?: string
           transaction_id?: string | null
           updated_at?: string | null
           user_id: string
+          verification_signature?: string | null
+          verified_at?: string | null
         }
         Update: {
           amount?: number
@@ -454,10 +535,13 @@ export type Database = {
           payment_data?: Json | null
           payment_method?: string
           payment_provider?: string
+          prebooking_id?: string | null
           status?: string
           transaction_id?: string | null
           updated_at?: string | null
           user_id?: string
+          verification_signature?: string | null
+          verified_at?: string | null
         }
         Relationships: [
           {
@@ -988,6 +1072,7 @@ export type Database = {
     }
     Functions: {
       clean_expired_destinations_cache: { Args: never; Returns: undefined }
+      expire_old_prebookings: { Args: never; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1003,6 +1088,15 @@ export type Database = {
     Enums: {
       app_role: "admin" | "user" | "sub_agency"
       booking_status: "pending" | "confirmed" | "cancelled" | "completed"
+      flight_booking_status:
+        | "SEARCHED"
+        | "PREBOOKED"
+        | "PENDING_PAYMENT"
+        | "PAYMENT_CONFIRMED"
+        | "TICKET_ISSUED"
+        | "FAILED"
+        | "REFUNDED"
+        | "EXPIRED"
       payment_status: "pending" | "paid" | "refunded" | "failed"
       service_type:
         | "hotel"
@@ -1141,6 +1235,16 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "user", "sub_agency"],
       booking_status: ["pending", "confirmed", "cancelled", "completed"],
+      flight_booking_status: [
+        "SEARCHED",
+        "PREBOOKED",
+        "PENDING_PAYMENT",
+        "PAYMENT_CONFIRMED",
+        "TICKET_ISSUED",
+        "FAILED",
+        "REFUNDED",
+        "EXPIRED",
+      ],
       payment_status: ["pending", "paid", "refunded", "failed"],
       service_type: [
         "hotel",
