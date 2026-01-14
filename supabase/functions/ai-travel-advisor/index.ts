@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { getClientIP, checkRateLimit, createRateLimitResponse, RATE_LIMITS } from "../_shared/rate-limiter.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -9,6 +10,15 @@ const corsHeaders = {
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Rate limiting - more restrictive for AI endpoints
+  const clientIP = getClientIP(req);
+  const rateLimitResult = checkRateLimit(clientIP, { ...RATE_LIMITS.AI, keyPrefix: 'ai-advisor' });
+  
+  if (!rateLimitResult.allowed) {
+    console.log(`Rate limit exceeded for IP: ${clientIP.substring(0, 8)}...`);
+    return createRateLimitResponse(rateLimitResult, RATE_LIMITS.AI, corsHeaders);
   }
 
   try {
