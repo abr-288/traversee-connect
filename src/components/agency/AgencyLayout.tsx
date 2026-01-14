@@ -4,8 +4,10 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AgencySidebar } from "./AgencySidebar";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, Home } from "lucide-react";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 interface AgencyLayoutProps {
   children: ReactNode;
@@ -87,6 +89,11 @@ export function AgencyLayout({ children }: AgencyLayoutProps) {
           <header className="h-14 md:h-16 border-b flex items-center justify-between px-3 md:px-4 bg-background sticky top-0 z-50">
             <div className="flex items-center gap-2 md:gap-4 min-w-0">
               <SidebarTrigger className="touch-target flex-shrink-0" />
+              <Link to="/">
+                <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0" title="Retour à l'accueil">
+                  <Home className="h-4 w-4" />
+                </Button>
+              </Link>
               <span className="font-medium text-sm md:text-lg truncate">{agencyName}</span>
             </div>
             <DarkModeToggle />

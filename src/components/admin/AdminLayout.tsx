@@ -4,8 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminSidebar } from "./AdminSidebar";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { LogOut, Home, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -69,7 +70,14 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         
         <div className="flex-1 flex flex-col min-w-0">
           <header className="h-14 md:h-16 border-b bg-background flex items-center justify-between px-3 md:px-6 sticky top-0 z-50">
-            <SidebarTrigger className="touch-target" />
+            <div className="flex items-center gap-2">
+              <SidebarTrigger className="touch-target" />
+              <Link to="/">
+                <Button variant="ghost" size="icon" className="h-8 w-8" title="Retour à l'accueil">
+                  <Home className="h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
             <Button variant="ghost" onClick={handleLogout} className="gap-2 text-sm md:text-base">
               <LogOut className="h-4 w-4" />
               <span className="hidden sm:inline">Déconnexion</span>

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { Plane, Shield, Lock, Mail, User, Eye, EyeOff, CheckCircle, AlertCircle } from "lucide-react";
+import { Plane, Shield, Lock, Mail, User, Eye, EyeOff, CheckCircle, AlertCircle, ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence, type Transition } from "framer-motion";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
@@ -416,6 +416,23 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 relative overflow-hidden flex items-center justify-center p-4 md:p-6">
+      {/* Back button */}
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        className="absolute top-4 left-4 z-20"
+      >
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate("/")}
+          className="gap-2 hover:bg-background/80 backdrop-blur-sm rounded-xl"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span className="hidden sm:inline">Retour à l'accueil</span>
+        </Button>
+      </motion.div>
+
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
