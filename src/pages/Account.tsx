@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { User, Mail, Phone, Lock, Bell, CreditCard, Heart, MapPin, Calendar, Eye, EyeOff, Check, X, Loader2, Shield, Save } from "lucide-react";
+import { User, Mail, Phone, Lock, Bell, CreditCard, Heart, MapPin, Calendar, Eye, EyeOff, Check, X, Loader2, Shield, Save, ShieldCheck } from "lucide-react";
+import { TwoFactorAuth } from "@/components/TwoFactorAuth";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { z } from "zod";
@@ -425,15 +426,20 @@ const Account = () => {
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.3 }}
+                      className="space-y-6"
                     >
+                      {/* Two-Factor Authentication Section */}
+                      <TwoFactorAuth />
+                      
+                      {/* Password Change Section */}
                       <Card className="backdrop-blur-sm bg-card/80 border-primary/10 shadow-xl">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
                             <Lock className="h-5 w-5 text-primary" />
-                            Sécurité du Compte
+                            Changer le Mot de Passe
                           </CardTitle>
                           <CardDescription>
-                            Modifiez votre mot de passe et gérez la sécurité
+                            Modifiez votre mot de passe pour sécuriser votre compte
                           </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">

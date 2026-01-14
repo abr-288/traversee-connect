@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import { Plane, Shield, Lock, Mail, User, Eye, EyeOff, CheckCircle, AlertCircle, ArrowLeft } from "lucide-react";
+import { MFAVerification } from "@/components/MFAVerification";
 import { motion, AnimatePresence, type Transition } from "framer-motion";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
@@ -187,6 +188,7 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [showUpdatePassword, setShowUpdatePassword] = useState(false);
+  const [showMFAVerification, setShowMFAVerification] = useState(false);
   const [activeTab, setActiveTab] = useState("signin");
   
   // Form states
@@ -202,12 +204,20 @@ const Auth = () => {
   const [updateErrors, setUpdateErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'PASSWORD_RECOVERY') {
         setShowUpdatePassword(true);
       }
       if (event === 'SIGNED_IN' && session) {
-        navigate("/");
+        // Check if MFA is required
+        const { data: aalData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+        
+        if (aalData && aalData.nextLevel === 'aal2' && aalData.currentLevel === 'aal1') {
+          // User has MFA enabled but hasn't verified yet
+          setShowMFAVerification(true);
+        } else {
+          navigate("/");
+        }
       }
     });
 
@@ -413,6 +423,25 @@ const Auth = () => {
     t('auth.passwordStrength.strong'),
     t('auth.passwordStrength.veryStrong')
   ];
+
+  // Show MFA verification screen
+  if (showMFAVerification) {
+    return (
+      <MFAVerification 
+        onSuccess={() => {
+          toast({
+            title: "Vérification réussie",
+            description: "Bienvenue sur B-Reserve!",
+          });
+          navigate("/");
+        }}
+        onBack={() => {
+          setShowMFAVerification(false);
+          supabase.auth.signOut();
+        }}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 relative overflow-hidden flex items-center justify-center p-4 md:p-6">
