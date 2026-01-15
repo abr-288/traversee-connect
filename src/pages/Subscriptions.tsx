@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -29,7 +30,8 @@ import {
   GraduationCap,
   CalendarDays,
   Heart,
-  Loader2
+  Loader2,
+  CreditCard
 } from "lucide-react";
 
 const containerVariants = {
@@ -44,6 +46,9 @@ const itemVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 }
 };
+
+// Plans qui nécessitent une demande de contact au lieu d'un paiement direct
+const REQUEST_ONLY_PLANS = ["visa", "billets", "events"];
 
 interface SubscriptionPlanDB {
   id: string;
@@ -86,11 +91,18 @@ interface DisplayPlan {
   color: string;
 }
 
+// Vérifie si le plan nécessite une demande de contact
+const isRequestOnlyPlan = (planId: string): boolean => {
+  return REQUEST_ONLY_PLANS.includes(planId);
+};
+
 export default function Subscriptions() {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [plans, setPlans] = useState<DisplayPlan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedRequestPlan, setSelectedRequestPlan] = useState<DisplayPlan | null>(null);
   const [contactForm, setContactForm] = useState({
     name: "",
     email: "",
@@ -135,16 +147,18 @@ export default function Subscriptions() {
     fetchPlans();
   }, []);
 
-  const handleContactSubmit = async (e: React.FormEvent, plan: DisplayPlan) => {
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!selectedRequestPlan) return;
+    
     setIsSubmitting(true);
     
     try {
       const { error } = await supabase
         .from("subscription_requests")
         .insert({
-          plan_id: plan.plan_id,
-          plan_name: plan.name,
+          plan_id: selectedRequestPlan.plan_id,
+          plan_name: selectedRequestPlan.name,
           name: contactForm.name.trim(),
           email: contactForm.email.trim(),
           phone: contactForm.phone.trim(),
@@ -166,6 +180,7 @@ export default function Subscriptions() {
         company: "",
         message: ""
       });
+      setSelectedRequestPlan(null);
     } catch (error: any) {
       console.error("Error submitting subscription request:", error);
       toast({
@@ -175,6 +190,16 @@ export default function Subscriptions() {
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleSubscribe = (plan: DisplayPlan) => {
+    if (isRequestOnlyPlan(plan.plan_id)) {
+      // Ouvrir le formulaire de demande
+      setSelectedRequestPlan(plan);
+    } else {
+      // Rediriger vers la page de paiement
+      navigate(`/subscription-payment?planId=${plan.plan_id}`);
     }
   };
 
@@ -294,76 +319,23 @@ export default function Subscriptions() {
                       </CardContent>
                       
                       <CardFooter className="flex flex-col gap-3 pt-4">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button className="w-full" size="lg">
-                              {t("subscriptions.subscribe", "Souscrire")}
+                        <Button 
+                          className="w-full" 
+                          size="lg"
+                          onClick={() => handleSubscribe(plan)}
+                        >
+                          {isRequestOnlyPlan(plan.plan_id) ? (
+                            <>
+                              {t("subscriptions.requestInfo", "Demander un devis")}
                               <ArrowRight className="w-4 h-4 ml-2" />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="sm:max-w-md">
-                            <DialogHeader>
-                              <DialogTitle>{t("subscriptions.subscribeTo", "Souscrire à")} {plan.name}</DialogTitle>
-                              <DialogDescription>
-                                {t("subscriptions.fillForm", "Remplissez ce formulaire et notre équipe vous contactera rapidement.")}
-                              </DialogDescription>
-                            </DialogHeader>
-                            <form onSubmit={(e) => handleContactSubmit(e, plan)} className="space-y-4 mt-4">
-                              <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                  <Label htmlFor={`name-${plan.id}`}>{t("subscriptions.fullName", "Nom complet")} *</Label>
-                                  <Input
-                                    id={`name-${plan.id}`}
-                                    value={contactForm.name}
-                                    onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
-                                    required
-                                  />
-                                </div>
-                                <div className="space-y-2">
-                                  <Label htmlFor={`phone-${plan.id}`}>{t("subscriptions.phone", "Téléphone")} *</Label>
-                                  <Input
-                                    id={`phone-${plan.id}`}
-                                    type="tel"
-                                    value={contactForm.phone}
-                                    onChange={(e) => setContactForm({...contactForm, phone: e.target.value})}
-                                    required
-                                  />
-                                </div>
-                              </div>
-                              <div className="space-y-2">
-                                <Label htmlFor={`email-${plan.id}`}>{t("subscriptions.email", "Email")} *</Label>
-                                <Input
-                                  id={`email-${plan.id}`}
-                                  type="email"
-                                  value={contactForm.email}
-                                  onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
-                                  required
-                                />
-                              </div>
-                              <div className="space-y-2">
-                                <Label htmlFor={`company-${plan.id}`}>{t("subscriptions.company", "Entreprise")}</Label>
-                                <Input
-                                  id={`company-${plan.id}`}
-                                  value={contactForm.company}
-                                  onChange={(e) => setContactForm({...contactForm, company: e.target.value})}
-                                />
-                              </div>
-                              <div className="space-y-2">
-                                <Label htmlFor={`message-${plan.id}`}>{t("subscriptions.messageOptional", "Message (optionnel)")}</Label>
-                                <Textarea
-                                  id={`message-${plan.id}`}
-                                  value={contactForm.message}
-                                  onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
-                                  placeholder={t("subscriptions.specifyNeeds", "Précisez vos besoins...")}
-                                  rows={3}
-                                />
-                              </div>
-                              <Button type="submit" className="w-full" disabled={isSubmitting}>
-                                {isSubmitting ? t("subscriptions.sending", "Envoi en cours...") : t("subscriptions.sendRequest", "Envoyer ma demande")}
-                              </Button>
-                            </form>
-                          </DialogContent>
-                        </Dialog>
+                            </>
+                          ) : (
+                            <>
+                              <CreditCard className="w-4 h-4 mr-2" />
+                              {t("subscriptions.subscribeDirect", "Souscrire maintenant")}
+                            </>
+                          )}
+                        </Button>
                         
                         <Button 
                           variant="outline" 
@@ -404,6 +376,72 @@ export default function Subscriptions() {
       </main>
       
       <Footer />
+
+      {/* Dialog pour les plans nécessitant une demande */}
+      <Dialog open={!!selectedRequestPlan} onOpenChange={(open) => !open && setSelectedRequestPlan(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("subscriptions.subscribeTo", "Souscrire à")} {selectedRequestPlan?.name}</DialogTitle>
+            <DialogDescription>
+              {t("subscriptions.fillForm", "Remplissez ce formulaire et notre équipe vous contactera rapidement.")}
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleContactSubmit} className="space-y-4 mt-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="request-name">{t("subscriptions.fullName", "Nom complet")} *</Label>
+                <Input
+                  id="request-name"
+                  value={contactForm.name}
+                  onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="request-phone">{t("subscriptions.phone", "Téléphone")} *</Label>
+                <Input
+                  id="request-phone"
+                  type="tel"
+                  value={contactForm.phone}
+                  onChange={(e) => setContactForm({...contactForm, phone: e.target.value})}
+                  required
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="request-email">{t("subscriptions.email", "Email")} *</Label>
+              <Input
+                id="request-email"
+                type="email"
+                value={contactForm.email}
+                onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="request-company">{t("subscriptions.company", "Entreprise")}</Label>
+              <Input
+                id="request-company"
+                value={contactForm.company}
+                onChange={(e) => setContactForm({...contactForm, company: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="request-message">{t("subscriptions.messageOptional", "Message (optionnel)")}</Label>
+              <Textarea
+                id="request-message"
+                value={contactForm.message}
+                onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
+                placeholder={t("subscriptions.specifyNeeds", "Précisez vos besoins...")}
+                rows={3}
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? t("subscriptions.sending", "Envoi en cours...") : t("subscriptions.sendRequest", "Envoyer ma demande")}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
