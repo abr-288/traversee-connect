@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import DOMPurify from "dompurify";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +15,12 @@ import { useEmailTemplates, EmailTemplate } from "@/hooks/useEmailTemplates";
 import { useUserRole } from "@/hooks/useUserRole";
 import { Mail, Plus, Edit, Trash2, Eye, Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+// Configuration DOMPurify pour les templates email
+const DOMPURIFY_CONFIG = {
+  ALLOWED_TAGS: ['p', 'br', 'b', 'i', 'u', 'strong', 'em', 'a', 'div', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'table', 'tr', 'td', 'th', 'thead', 'tbody', 'img', 'hr', 'blockquote', 'pre', 'code'],
+  ALLOWED_ATTR: ['href', 'src', 'alt', 'style', 'class', 'id', 'target', 'rel', 'width', 'height', 'colspan', 'rowspan', 'align', 'valign', 'border', 'cellpadding', 'cellspacing']
+};
 
 const AdminEmailTemplates = () => {
   const navigate = useNavigate();
@@ -346,7 +353,9 @@ const AdminEmailTemplates = () => {
                 <Label>Aperçu HTML</Label>
                 <div 
                   className="mt-2 border rounded-lg p-4 bg-background"
-                  dangerouslySetInnerHTML={{ __html: previewTemplate?.html_content || "" }}
+                  dangerouslySetInnerHTML={{ 
+                    __html: DOMPurify.sanitize(previewTemplate?.html_content || "", DOMPURIFY_CONFIG) 
+                  }}
                 />
               </div>
             </div>
