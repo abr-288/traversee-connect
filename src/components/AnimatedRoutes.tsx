@@ -51,6 +51,7 @@ const Support = lazy(() => import("@/pages/Support"));
 const Install = lazy(() => import("@/pages/Install"));
 const PriceAlerts = lazy(() => import("@/pages/PriceAlerts"));
 const Subscriptions = lazy(() => import("@/pages/Subscriptions"));
+const SubscriptionPayment = lazy(() => import("@/pages/SubscriptionPayment"));
 const PaymentTest = lazy(() => import("@/pages/PaymentTest"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 
@@ -122,6 +123,7 @@ const AnimatedRoutes = () => {
           <Route path="/install" element={<PageTransition><Install /></PageTransition>} />
           <Route path="/price-alerts" element={<PageTransition><PriceAlerts /></PageTransition>} />
           <Route path="/subscriptions" element={<PageTransition><Subscriptions /></PageTransition>} />
+          <Route path="/subscription-payment" element={<PageTransition><SubscriptionPayment /></PageTransition>} />
           <Route path="/payment-test" element={<PageTransition><PaymentTest /></PageTransition>} />
           <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
         </Routes>
