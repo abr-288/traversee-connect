@@ -54,6 +54,24 @@ const getTemplateColors = (serviceType: string) => {
       accent: "#2d3e6f",
       gradient: "linear-gradient(135deg, #192342 0%, #00b894 100%)",
     },
+    stay: {
+      primary: "#0891b2", // Cyan pour les séjours
+      secondary: "#06b6d4",
+      accent: "#0e7490",
+      gradient: "linear-gradient(135deg, #0891b2 0%, #06b6d4 100%)",
+    },
+    activity: {
+      primary: "#ea580c", // Orange pour les activités
+      secondary: "#f97316",
+      accent: "#c2410c",
+      gradient: "linear-gradient(135deg, #ea580c 0%, #f97316 100%)",
+    },
+    train: {
+      primary: "#dc2626", // Rouge pour les trains
+      secondary: "#ef4444",
+      accent: "#b91c1c",
+      gradient: "linear-gradient(135deg, #dc2626 0%, #ef4444 100%)",
+    },
   };
   
   return templates[serviceType as keyof typeof templates] || templates.flight;
@@ -91,7 +109,10 @@ const generatePDFHTML = (booking: any, qrCodeSvg: string): string => {
     tour: "CIRCUIT",
     car: "LOCATION VOITURE",
     event: "ÉVÉNEMENT",
-    flight_hotel: "VOL + HÔTEL"
+    flight_hotel: "VOL + HÔTEL",
+    stay: "SÉJOUR",
+    activity: "ACTIVITÉ",
+    train: "TRAIN",
   };
 
   return `

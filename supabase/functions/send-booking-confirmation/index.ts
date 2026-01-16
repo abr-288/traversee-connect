@@ -22,6 +22,8 @@ const getServiceTypeLabel = (type: string): string => {
     event: "Événement",
     flight_hotel: "Vol + Hôtel",
     stay: "Séjour",
+    activity: "Activité",
+    train: "Train",
   };
   return labels[type] || type;
 };
