@@ -291,6 +291,11 @@ serve(async (req) => {
         user_id: user.id,
         payment_method: paymentMethod,
         created_at: new Date().toISOString(),
+        // Métadonnées pour abonnement
+        type: body.metadata?.type || 'booking',
+        subscriptionRequestId: body.metadata?.type === 'subscription' ? body.subscriptionRequestId : undefined,
+        planId: body.metadata?.planId,
+        planName: body.metadata?.planName,
       }),
     };
 

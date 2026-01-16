@@ -117,7 +117,7 @@ serve(async (req) => {
     
     const { data: existingPayment, error: fetchError } = await supabase
       .from('payments')
-      .select('id, status, transaction_id, booking_id')
+      .select('id, status, transaction_id, booking_id, payment_method')
       .eq('transaction_id', cpm_trans_id)
       .single();
 
@@ -255,63 +255,131 @@ serve(async (req) => {
     // ================================================================
     // ÉTAPE 8: Actions post-paiement (si accepté)
     // ================================================================
-    if (isAccepted && bookingId) {
+    if (isAccepted) {
       console.log('\n📋 Étape 8: Actions post-paiement...');
       
-      // Mise à jour de la réservation
-      const { error: bookingError } = await supabase
-        .from('bookings')
-        .update({
-          payment_status: 'paid',
-          status: 'confirmed',
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', bookingId);
-
-      if (bookingError) {
-        console.error('❌ Erreur mise à jour réservation:', bookingError.message);
-      } else {
-        console.log('✅ Réservation confirmée');
+      // Vérifier si c'est un paiement d'abonnement
+      let isSubscriptionPayment = false;
+      let subscriptionData: any = null;
+      
+      if (verifyData.data?.metadata) {
+        try {
+          const metadata = JSON.parse(verifyData.data.metadata);
+          if (metadata.type === 'subscription' && metadata.subscriptionRequestId) {
+            isSubscriptionPayment = true;
+            subscriptionData = {
+              subscriptionRequestId: metadata.subscriptionRequestId,
+              planId: metadata.planId,
+              planName: metadata.planName,
+            };
+            console.log('   - Type: Abonnement');
+            console.log('   - Plan:', subscriptionData.planName);
+          }
+        } catch (e) {
+          console.warn('⚠️ Impossible de parser les métadonnées');
+        }
       }
 
-      // Envoi de l'email de confirmation (async, non bloquant)
-      try {
-        console.log('   - Déclenchement email de confirmation...');
-        fetch(`${supabaseUrl}/functions/v1/send-booking-confirmation`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${supabaseServiceKey}`,
-          },
-          body: JSON.stringify({ bookingId }),
-        }).catch(e => console.warn('⚠️ Email non envoyé:', e.message));
-      } catch (emailError) {
-        console.warn('⚠️ Erreur déclenchement email');
-      }
+      if (isSubscriptionPayment && subscriptionData) {
+        // Traitement spécifique pour les abonnements
+        console.log('   - Traitement abonnement...');
+        
+        // Récupérer les infos de la demande d'abonnement
+        const { data: subscriptionRequest } = await supabase
+          .from('subscription_requests')
+          .select('*')
+          .eq('id', subscriptionData.subscriptionRequestId)
+          .single();
 
-      // Génération de la facture (async, non bloquant)
-      try {
-        console.log('   - Déclenchement génération facture...');
-        supabase.functions.invoke('generate-invoice', {
-          body: { bookingId }
-        }).catch(e => console.warn('⚠️ Facture non générée'));
-      } catch (invoiceError) {
-        console.warn('⚠️ Erreur génération facture');
-      }
+        if (subscriptionRequest) {
+          // Récupérer les infos du plan
+          const { data: planData } = await supabase
+            .from('subscription_plans')
+            .select('price')
+            .eq('plan_id', subscriptionData.planId)
+            .single();
 
-      // Création PNR (async, non bloquant)
-      try {
-        console.log('   - Déclenchement création PNR...');
-        fetch(`${supabaseUrl}/functions/v1/create-pnr`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${supabaseServiceKey}`,
-          },
-          body: JSON.stringify({ booking_id: bookingId }),
-        }).catch(e => console.warn('⚠️ PNR non créé'));
-      } catch (pnrError) {
-        console.warn('⚠️ Erreur création PNR');
+          // Envoyer l'email de confirmation d'abonnement
+          try {
+            console.log('   - Déclenchement email confirmation abonnement...');
+            fetch(`${supabaseUrl}/functions/v1/send-subscription-confirmation`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${supabaseServiceKey}`,
+              },
+              body: JSON.stringify({
+                subscriptionRequestId: subscriptionData.subscriptionRequestId,
+                planName: subscriptionData.planName,
+                planPrice: planData?.price || 'N/A',
+                customerName: subscriptionRequest.name,
+                customerEmail: subscriptionRequest.email,
+                customerPhone: subscriptionRequest.phone,
+                paymentMethod: existingPayment?.payment_method || 'unknown',
+                transactionId: cpm_trans_id,
+              }),
+            }).catch(e => console.warn('⚠️ Email abonnement non envoyé:', e.message));
+          } catch (emailError) {
+            console.warn('⚠️ Erreur déclenchement email abonnement');
+          }
+        }
+      } else if (bookingId) {
+        // Traitement pour les réservations classiques
+        // Mise à jour de la réservation
+        const { error: bookingError } = await supabase
+          .from('bookings')
+          .update({
+            payment_status: 'paid',
+            status: 'confirmed',
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', bookingId);
+
+        if (bookingError) {
+          console.error('❌ Erreur mise à jour réservation:', bookingError.message);
+        } else {
+          console.log('✅ Réservation confirmée');
+        }
+
+        // Envoi de l'email de confirmation (async, non bloquant)
+        try {
+          console.log('   - Déclenchement email de confirmation...');
+          fetch(`${supabaseUrl}/functions/v1/send-booking-confirmation`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${supabaseServiceKey}`,
+            },
+            body: JSON.stringify({ bookingId }),
+          }).catch(e => console.warn('⚠️ Email non envoyé:', e.message));
+        } catch (emailError) {
+          console.warn('⚠️ Erreur déclenchement email');
+        }
+
+        // Génération de la facture (async, non bloquant)
+        try {
+          console.log('   - Déclenchement génération facture...');
+          supabase.functions.invoke('generate-invoice', {
+            body: { bookingId }
+          }).catch(e => console.warn('⚠️ Facture non générée'));
+        } catch (invoiceError) {
+          console.warn('⚠️ Erreur génération facture');
+        }
+
+        // Création PNR (async, non bloquant)
+        try {
+          console.log('   - Déclenchement création PNR...');
+          fetch(`${supabaseUrl}/functions/v1/create-pnr`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${supabaseServiceKey}`,
+            },
+            body: JSON.stringify({ booking_id: bookingId }),
+          }).catch(e => console.warn('⚠️ PNR non créé'));
+        } catch (pnrError) {
+          console.warn('⚠️ Erreur création PNR');
+        }
       }
     }
 

@@ -210,8 +210,10 @@ export default function SubscriptionPayment() {
       if (requestError) throw requestError;
 
       // Appeler l'edge function de paiement
+      // On utilise subscriptionRequestId comme bookingId pour le traitement unifié
       const { data, error } = await supabase.functions.invoke("process-payment", {
         body: {
+          bookingId: requestData.id, // On utilise l'ID de la demande d'abonnement
           subscriptionRequestId: requestData.id,
           amount: amount,
           currency: "XOF",
@@ -225,6 +227,7 @@ export default function SubscriptionPayment() {
             type: "subscription",
             planId: plan.plan_id,
             planName: plan.name,
+            subscriptionRequestId: requestData.id,
           },
         },
       });
