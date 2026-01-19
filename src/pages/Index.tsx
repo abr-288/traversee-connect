@@ -10,6 +10,7 @@ import FeaturedSubscriptions from "@/components/FeaturedSubscriptions";
 import SpecialOffers from "@/components/SpecialOffers";
 import { SeasonalSuggestions } from "@/components/SeasonalSuggestions";
 import PromoBanner from "@/components/PromoBanner";
+import { AdvertisementBanner } from "@/components/AdvertisementBanner";
 import { useTranslation } from "react-i18next";
 
 const Index = () => {
@@ -26,6 +27,9 @@ const Index = () => {
         
         {/* Hero - Full Bleed */}
         <HeroSection />
+        
+        {/* Advertisement Banner - Before Subscriptions */}
+        <AdvertisementBanner />
         
         {/* Subscriptions Section - Full Bleed */}
         <FeaturedSubscriptions />
