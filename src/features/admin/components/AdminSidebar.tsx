@@ -1,4 +1,4 @@
-import { BarChart3, Users, Calendar, Settings, Home, Bed, Cog, Mail, CreditCard } from "lucide-react";
+import { BarChart3, Users, Calendar, Settings, Home, Bed, Cog, Mail, CreditCard, Megaphone } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
@@ -20,6 +20,7 @@ const menuItems = [
   { title: "Services", url: "/admin/services", icon: Settings },
   { title: "Activités", url: "/admin/activities", icon: Home },
   { title: "Hébergements", url: "/admin/stays", icon: Bed },
+  { title: "Publicités", url: "/admin/advertisements", icon: Megaphone },
   { title: "Abonnements", url: "/admin/subscriptions", icon: CreditCard },
   { title: "Templates Email", url: "/admin/email-templates", icon: Mail },
   { title: "Configuration", url: "/admin/configuration", icon: Cog },
