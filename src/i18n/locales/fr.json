@@ -42,6 +42,8 @@
     "to": "Vers",
     "departure": "Départ",
     "return": "Retour",
+    "departureDate": "Date de départ",
+    "returnDate": "Date de retour",
     "passengers": "Passagers",
     "adults": "Adultes",
     "children": "Enfants",

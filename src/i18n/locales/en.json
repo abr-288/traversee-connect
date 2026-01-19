@@ -42,6 +42,8 @@
     "to": "To",
     "departure": "Departure",
     "return": "Return",
+    "departureDate": "Departure date",
+    "returnDate": "Return date",
     "passengers": "Passengers",
     "adults": "Adults",
     "children": "Children",

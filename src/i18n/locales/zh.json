@@ -42,6 +42,8 @@
     "to": "目的地",
     "departure": "出发",
     "return": "返程",
+    "departureDate": "出发日期",
+    "returnDate": "返程日期",
     "passengers": "乘客",
     "adults": "成人",
     "children": "儿童",

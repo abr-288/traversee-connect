@@ -158,12 +158,12 @@ export const FlightSearchForm = () => {
   ].filter(Boolean).length;
 
   return (
-    <UnifiedForm onSubmit={handleSearch} variant="search" className="max-w-5xl mx-auto space-y-3">
+    <UnifiedForm onSubmit={handleSearch} variant="search" className="max-w-5xl mx-auto space-y-4">
       {/* Barre de progression */}
       <FormProgressBar 
         totalFields={totalFields} 
         completedFields={completedFields}
-        className="mb-1"
+        className="mb-2"
       />
 
       {/* Alert d'erreur générale */}
@@ -203,7 +203,7 @@ export const FlightSearchForm = () => {
       </div>
 
       {/* Ligne 1: Origine - Destination */}
-      <div className="grid grid-cols-1 sm:grid-cols-11 gap-2 items-end">
+      <div className="grid grid-cols-1 sm:grid-cols-11 gap-3 items-start">
         <div className="sm:col-span-5">
           <UnifiedAutocomplete
             label={t("search.departure")}
@@ -215,20 +215,20 @@ export const FlightSearchForm = () => {
             }}
             placeholder={t("search.cityOrAirport")}
             required
-            className={cn("h-10", errors.origin && touched.origin ? "border-destructive" : "")}
+            className={cn("h-11", errors.origin && touched.origin ? "border-destructive" : "")}
           />
           {errors.origin && touched.origin && (
             <p className="text-xs text-destructive mt-1">{errors.origin}</p>
           )}
         </div>
 
-        <div className="sm:col-span-1 flex justify-center py-2 sm:py-0">
+        <div className="sm:col-span-1 flex justify-center items-center pt-6">
           <Button
             type="button"
             variant="outline"
             size="icon"
             onClick={handleSwap}
-            className="h-9 w-9 rounded-full border-2 hover:border-primary hover:bg-primary/5 transition-all"
+            className="h-10 w-10 rounded-full border-2 hover:border-primary hover:bg-primary/5 transition-all"
           >
             <ArrowRightLeft className="h-4 w-4" />
           </Button>
@@ -245,7 +245,7 @@ export const FlightSearchForm = () => {
             }}
             placeholder={t("search.cityOrAirport")}
             required
-            className={cn("h-10", errors.destination && touched.destination ? "border-destructive" : "")}
+            className={cn("h-11", errors.destination && touched.destination ? "border-destructive" : "")}
           />
           {errors.destination && touched.destination && (
             <p className="text-xs text-destructive mt-1">{errors.destination}</p>
@@ -255,7 +255,7 @@ export const FlightSearchForm = () => {
 
       {/* Ligne 2: Dates */}
       <div className={cn(
-        "grid gap-2",
+        "grid gap-3",
         tripType === "round-trip" ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"
       )}>
         <div>
@@ -296,9 +296,9 @@ export const FlightSearchForm = () => {
       </div>
 
       {/* Ligne 3: Passagers et Classe */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-        <div className="space-y-1">
-          <label className="text-xs font-medium text-foreground">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-foreground">
             {t("search.adults")}
           </label>
           <Select 
@@ -308,7 +308,7 @@ export const FlightSearchForm = () => {
               handleBlur("adults");
             }}
           >
-            <SelectTrigger className={cn("h-10", errors.adults && touched.adults && "border-destructive")}>
+            <SelectTrigger className={cn("h-11 bg-background", errors.adults && touched.adults && "border-destructive")}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-popover">
@@ -319,8 +319,8 @@ export const FlightSearchForm = () => {
           </Select>
         </div>
 
-        <div className="space-y-1">
-          <label className="text-xs font-medium text-foreground">{t("search.children")}</label>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-foreground">{t("search.children")}</label>
           <Select 
             value={children.toString()} 
             onValueChange={(value) => {
@@ -328,7 +328,7 @@ export const FlightSearchForm = () => {
               handleBlur("children");
             }}
           >
-            <SelectTrigger className={cn("h-10", errors.children && touched.children && "border-destructive")}>
+            <SelectTrigger className={cn("h-11 bg-background", errors.children && touched.children && "border-destructive")}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-popover">
@@ -339,8 +339,8 @@ export const FlightSearchForm = () => {
           </Select>
         </div>
 
-        <div className="space-y-1">
-          <label className="text-xs font-medium text-foreground">{t("search.infants", "Bébés")}</label>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-foreground">{t("search.infants", "Bébés")}</label>
           <Select 
             value={infants.toString()} 
             onValueChange={(value) => {
@@ -348,7 +348,7 @@ export const FlightSearchForm = () => {
               handleBlur("infants");
             }}
           >
-            <SelectTrigger className={cn("h-10", errors.infants && touched.infants && "border-destructive")}>
+            <SelectTrigger className={cn("h-11 bg-background", errors.infants && touched.infants && "border-destructive")}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-popover">
@@ -359,8 +359,8 @@ export const FlightSearchForm = () => {
           </Select>
         </div>
 
-        <div className="space-y-1">
-          <label className="text-xs font-medium text-foreground">{t("search.class.title")}</label>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-foreground">{t("search.class.title")}</label>
           <Select 
             value={travelClass} 
             onValueChange={(value) => {
@@ -368,7 +368,7 @@ export const FlightSearchForm = () => {
               handleBlur("travelClass");
             }}
           >
-            <SelectTrigger className={cn("h-10", errors.travelClass && touched.travelClass && "border-destructive")}>
+            <SelectTrigger className={cn("h-11 bg-background", errors.travelClass && touched.travelClass && "border-destructive")}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-popover">
@@ -388,7 +388,7 @@ export const FlightSearchForm = () => {
           variant="outline"
           size="sm"
           onClick={() => setShowPriceCalendar(!showPriceCalendar)}
-          className="w-full sm:w-auto h-9"
+          className="w-full sm:w-auto h-10"
         >
           <TrendingDown className="h-4 w-4 mr-2" />
           {showPriceCalendar ? "Masquer" : "Comparer"} les prix
@@ -419,7 +419,7 @@ export const FlightSearchForm = () => {
       <UnifiedSubmitButton 
         variant="search"
         disabled={hasErrors}
-        className={cn("w-full h-11", hasErrors && "opacity-50 cursor-not-allowed")}
+        className={cn("w-full h-12 text-base font-semibold", hasErrors && "opacity-50 cursor-not-allowed")}
       >
         {t("search.search")}
       </UnifiedSubmitButton>
