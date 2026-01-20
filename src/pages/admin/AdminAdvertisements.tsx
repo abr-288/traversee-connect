@@ -25,6 +25,7 @@ import {
 import { Plus, Pencil, Trash2, Eye, EyeOff, MoveUp, MoveDown } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { ImageUpload } from "@/components/admin/ImageUpload";
 
 interface Advertisement {
   id: string;
@@ -224,14 +225,12 @@ export default function AdminAdvertisements() {
                     placeholder="Description courte"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label>URL de l'image</Label>
-                  <Input
-                    value={formData.image_url}
-                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                    placeholder="https://..."
-                  />
-                </div>
+                <ImageUpload
+                  value={formData.image_url}
+                  onChange={(url) => setFormData({ ...formData, image_url: url })}
+                  folder="advertisements"
+                  label="Image de la publicité"
+                />
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Lien (URL)</Label>
