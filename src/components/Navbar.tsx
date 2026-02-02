@@ -9,7 +9,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, X, User, LogOut, LayoutDashboard, Plane, Hotel, PlaneTakeoff, Train, Calendar, Car, HelpCircle, UserCircle2, Crown, ChevronDown, MapPin, Compass } from "lucide-react";
+import { 
+  Menu, X, User, LogOut, LayoutDashboard, Plane, Hotel, PlaneTakeoff, 
+  Train, Calendar, Car, HelpCircle, UserCircle2, Crown, ChevronDown, 
+  MapPin, Compass, ArrowRight, Sparkles
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
 import { usePWA } from "@/hooks/usePWA";
@@ -18,9 +22,10 @@ import { useTranslation } from "react-i18next";
 import logoDark from "@/assets/logo-dark.png";
 import logoLight from "@/assets/logo-light.png";
 import LanguageSwitcher from "./LanguageSwitcher";
-
 import DarkModeToggle from "./DarkModeToggle";
 import { useSiteConfigContext } from "@/contexts/SiteConfigContext";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -34,28 +39,19 @@ const Navbar = () => {
   const { t } = useTranslation();
 
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/');
-  
-  const navLinkClass = (path: string) => 
-    `relative transition-smooth text-xs xl:text-sm font-medium whitespace-nowrap px-2 py-1 ${
-      isActive(path) 
-        ? 'text-secondary after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-4/5 after:h-0.5 after:bg-secondary after:rounded-full' 
-        : 'text-white hover:text-secondary'
-    }`;
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close menu on route change
   useEffect(() => {
     setIsMenuOpen(false);
   }, [location.pathname]);
 
-  // Prevent body scroll when menu is open
   useEffect(() => {
     if (isMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -93,297 +89,493 @@ const Navbar = () => {
     }
   };
 
-  return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 bg-primary border-b border-primary-light w-full transition-all duration-300 ${isScrolled ? 'shadow-lg' : ''}`}>
-      <div className="w-full px-3 sm:px-4 xl:px-6">
-        <div className={`flex items-center justify-between transition-all duration-300 ${isScrolled ? 'h-14' : 'h-16'}`}>
-          {/* Logo - Plus compact sur mobile */}
-          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 group flex-shrink-0">
-            <img 
-              src={config.branding.logoLight || logoLight} 
-              alt={`${config.branding.siteName} Logo`} 
-              className={`transition-all duration-300 ${isScrolled ? 'h-8 sm:h-10' : 'h-10 sm:h-14 lg:h-16'} w-auto`} 
-            />
-            <span className={`font-bold text-white transition-all duration-300 hidden xs:inline ${isScrolled ? 'text-base sm:text-lg' : 'text-lg sm:text-xl'}`}>
-              {config.branding.siteName}
-            </span>
-          </Link>
+  const mainNavItems = [
+    { to: "/flights", icon: Plane, label: t("nav.flights") },
+    { to: "/hotels", icon: Hotel, label: t("nav.hotels") },
+    { to: "/flight-hotel", icon: PlaneTakeoff, label: t("nav.flightHotel") },
+    { to: "/cars", icon: Car, label: t("nav.carRental") },
+  ];
 
-          <div className="hidden lg:flex items-center flex-1 justify-between ml-6">
-            {/* Navigation Principale - Gauche */}
-            <div className="flex items-center gap-1 xl:gap-2">
-              <Link to="/flights" className={navLinkClass('/flights')}>
-                {t("nav.flights")}
-              </Link>
-              <Link to="/hotels" className={navLinkClass('/hotels')}>
-                {t("nav.hotels")}
-              </Link>
-              <Link to="/flight-hotel" className={navLinkClass('/flight-hotel')}>
-                {t("nav.flightHotel")}
-              </Link>
-              <Link to="/cars" className={navLinkClass('/cars')}>
-                {t("nav.carRental")}
-              </Link>
-              
-              {/* Dropdown Autres */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className={`relative transition-smooth text-xs xl:text-sm font-medium whitespace-nowrap px-2 py-1 flex items-center gap-1 ${
-                    isActive('/trains') || isActive('/events') || isActive('/destinations') || isActive('/stays')
-                      ? 'text-secondary after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-4/5 after:h-0.5 after:bg-secondary after:rounded-full'
-                      : 'text-white hover:text-secondary'
-                  }`}>
-                    {t("nav.others")}
-                    <ChevronDown className="w-3 h-3" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-48 bg-background border-border z-50">
-                  <DropdownMenuItem asChild>
-                    <Link to="/trains" className={`flex items-center gap-2 cursor-pointer ${isActive('/trains') ? 'text-secondary' : ''}`}>
-                      <Train className="w-4 h-4" />
-                      {t("nav.trains")}
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/events" className={`flex items-center gap-2 cursor-pointer ${isActive('/events') ? 'text-secondary' : ''}`}>
-                      <Calendar className="w-4 h-4" />
-                      {t("nav.events")}
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/destinations" className={`flex items-center gap-2 cursor-pointer ${isActive('/destinations') ? 'text-secondary' : ''}`}>
-                      <MapPin className="w-4 h-4" />
-                      {t("nav.destinations")}
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/stays" className={`flex items-center gap-2 cursor-pointer ${isActive('/stays') ? 'text-secondary' : ''}`}>
-                      <Compass className="w-4 h-4" />
-                      {t("nav.stays")}
-                    </Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+  const moreNavItems = [
+    { to: "/trains", icon: Train, label: t("nav.trains") },
+    { to: "/events", icon: Calendar, label: t("nav.events") },
+    { to: "/destinations", icon: MapPin, label: t("nav.destinations") },
+    { to: "/stays", icon: Compass, label: t("nav.stays") },
+  ];
+
+  const allNavItems = [...mainNavItems, ...moreNavItems];
+
+  return (
+    <>
+      <motion.nav 
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className={cn(
+          "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
+          isScrolled 
+            ? "bg-background/80 backdrop-blur-xl border-b border-border shadow-lg" 
+            : "bg-gradient-to-b from-primary/95 to-primary/90 backdrop-blur-md"
+        )}
+      >
+        {/* Decorative gradient line */}
+        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-secondary/50 to-transparent" />
+        
+        <div className="w-full px-4 lg:px-6 xl:px-8">
+          <div className={cn(
+            "flex items-center justify-between transition-all duration-300",
+            isScrolled ? "h-14" : "h-16"
+          )}>
+            {/* Logo */}
+            <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative"
+              >
+                <img 
+                  src={isScrolled ? logoDark : (config.branding.logoLight || logoLight)} 
+                  alt={`${config.branding.siteName} Logo`} 
+                  className={cn(
+                    "transition-all duration-300 w-auto",
+                    isScrolled ? "h-9" : "h-11 lg:h-12"
+                  )}
+                />
+              </motion.div>
+              <span className={cn(
+                "font-bold transition-all duration-300 hidden sm:inline",
+                isScrolled 
+                  ? "text-foreground text-lg" 
+                  : "text-white text-xl"
+              )}>
+                {config.branding.siteName}
+              </span>
+            </Link>
+
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center flex-1 justify-center">
+              <div className={cn(
+                "flex items-center gap-1 px-2 py-1.5 rounded-full transition-all duration-300",
+                isScrolled 
+                  ? "bg-muted/50" 
+                  : "bg-white/10 backdrop-blur-sm"
+              )}>
+                {mainNavItems.map(({ to, icon: Icon, label }) => (
+                  <Link
+                    key={to}
+                    to={to}
+                    className={cn(
+                      "relative flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300",
+                      isActive(to)
+                        ? isScrolled
+                          ? "bg-primary text-primary-foreground shadow-md"
+                          : "bg-white text-primary shadow-md"
+                        : isScrolled
+                          ? "text-foreground hover:bg-muted"
+                          : "text-white/90 hover:bg-white/10 hover:text-white"
+                    )}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span>{label}</span>
+                  </Link>
+                ))}
+                
+                {/* More Dropdown */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className={cn(
+                      "flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300",
+                      moreNavItems.some(item => isActive(item.to))
+                        ? isScrolled
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-white text-primary"
+                        : isScrolled
+                          ? "text-foreground hover:bg-muted"
+                          : "text-white/90 hover:bg-white/10"
+                    )}>
+                      {t("nav.others")}
+                      <ChevronDown className="w-3.5 h-3.5" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent 
+                    align="center" 
+                    className="w-56 p-2 bg-background/95 backdrop-blur-xl border-border shadow-xl rounded-xl"
+                  >
+                    {moreNavItems.map(({ to, icon: Icon, label }) => (
+                      <DropdownMenuItem key={to} asChild>
+                        <Link 
+                          to={to} 
+                          className={cn(
+                            "flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all",
+                            isActive(to) 
+                              ? "bg-primary/10 text-primary" 
+                              : "hover:bg-muted"
+                          )}
+                        >
+                          <div className={cn(
+                            "p-2 rounded-lg",
+                            isActive(to) ? "bg-primary text-primary-foreground" : "bg-muted"
+                          )}>
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <span className="font-medium">{label}</span>
+                          <ArrowRight className="w-4 h-4 ml-auto opacity-50" />
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
 
-            {/* Section Droite */}
-            <div className="flex items-center gap-2 xl:gap-3">
+            {/* Right Section */}
+            <div className="hidden lg:flex items-center gap-2">
+              {/* Prime Button */}
               <Link to="/subscriptions">
-                <Button variant="outline" size="sm" className="text-xs border-secondary text-secondary hover:bg-secondary hover:text-primary whitespace-nowrap px-3">
-                  <Crown className="w-3 h-3 mr-1" />
-                  {t("nav.subscriptions")}
-                </Button>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button 
+                    size="sm" 
+                    className={cn(
+                      "gap-2 font-semibold rounded-full px-4 transition-all duration-300",
+                      isScrolled
+                        ? "bg-gradient-to-r from-secondary to-accent-green text-primary hover:shadow-lg hover:shadow-secondary/25"
+                        : "bg-white/20 backdrop-blur-sm text-white border border-white/30 hover:bg-white/30"
+                    )}
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    {t("nav.subscriptions")}
+                  </Button>
+                </motion.div>
               </Link>
               
+              {/* Account Menu */}
               {isLoggedIn ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-white hover:bg-white/10 whitespace-nowrap px-2">
-                      <UserCircle2 className="w-4 h-4" />
-                      {t("nav.myAccount")}
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className={cn(
+                        "gap-2 rounded-full px-3",
+                        isScrolled 
+                          ? "text-foreground hover:bg-muted" 
+                          : "text-white hover:bg-white/10"
+                      )}
+                    >
+                      <div className={cn(
+                        "p-1.5 rounded-full",
+                        isScrolled ? "bg-primary/10" : "bg-white/20"
+                      )}>
+                        <UserCircle2 className="w-4 h-4" />
+                      </div>
+                      <span className="hidden xl:inline">{t("nav.myAccount")}</span>
+                      <ChevronDown className="w-3.5 h-3.5" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48 bg-background border-border z-50">
-                    <DropdownMenuLabel className="text-foreground">
+                  <DropdownMenuContent 
+                    align="end" 
+                    className="w-56 p-2 bg-background/95 backdrop-blur-xl border-border shadow-xl rounded-xl"
+                  >
+                    <DropdownMenuLabel className="px-3 py-2">
                       {t("nav.myAccount")}
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     {isAdmin && (
                       <DropdownMenuItem asChild>
-                        <Link to="/admin" className="flex items-center gap-2 cursor-pointer">
-                          <LayoutDashboard className="w-4 h-4" />
-                          {t("nav.admin")}
+                        <Link to="/admin" className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer">
+                          <div className="p-2 rounded-lg bg-primary text-primary-foreground">
+                            <LayoutDashboard className="w-4 h-4" />
+                          </div>
+                          <span className="font-medium">{t("nav.admin")}</span>
                         </Link>
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem asChild>
-                      <Link to="/account" className="flex items-center gap-2 cursor-pointer">
-                        <UserCircle2 className="w-4 h-4" />
-                        {t("nav.profile")}
+                      <Link to="/account" className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer">
+                        <div className="p-2 rounded-lg bg-muted">
+                          <UserCircle2 className="w-4 h-4" />
+                        </div>
+                        <span className="font-medium">{t("nav.profile")}</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link to="/dashboard" className="flex items-center gap-2 cursor-pointer">
-                        <LayoutDashboard className="w-4 h-4" />
-                        {t("nav.dashboard")}
+                      <Link to="/dashboard" className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer">
+                        <div className="p-2 rounded-lg bg-muted">
+                          <LayoutDashboard className="w-4 h-4" />
+                        </div>
+                        <span className="font-medium">{t("nav.dashboard")}</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
                       onClick={handleLogout}
-                      className="flex items-center gap-2 cursor-pointer text-destructive focus:text-destructive"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer text-destructive focus:text-destructive"
                     >
-                      <LogOut className="w-4 h-4" />
-                      {t("nav.logout")}
+                      <div className="p-2 rounded-lg bg-destructive/10">
+                        <LogOut className="w-4 h-4" />
+                      </div>
+                      <span className="font-medium">{t("nav.logout")}</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
                 <Link to="/auth">
-                  <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-white hover:bg-white/10 whitespace-nowrap px-2">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className={cn(
+                      "gap-2 rounded-full px-4",
+                      isScrolled 
+                        ? "text-foreground hover:bg-muted" 
+                        : "text-white hover:bg-white/10"
+                    )}
+                  >
                     <User className="w-4 h-4" />
                     {t("nav.login")}
                   </Button>
                 </Link>
               )}
 
-              <Link to="/support" className={`${navLinkClass('/support')} flex items-center gap-1.5`}>
-                <HelpCircle className="w-4 h-4" />
-                {t("nav.support")}
+              {/* Support */}
+              <Link 
+                to="/support" 
+                className={cn(
+                  "p-2 rounded-full transition-all duration-300",
+                  isScrolled 
+                    ? "text-foreground hover:bg-muted" 
+                    : "text-white hover:bg-white/10"
+                )}
+              >
+                <HelpCircle className="w-5 h-5" />
               </Link>
               
-              <DarkModeToggle variant="compact" className="text-white hover:bg-white/10" />
-              <LanguageSwitcher />
+              {/* Theme & Language */}
+              <div className="flex items-center gap-1 pl-2 border-l border-border/50">
+                <DarkModeToggle 
+                  variant="compact" 
+                  className={isScrolled ? "text-foreground hover:bg-muted" : "text-white hover:bg-white/10"} 
+                />
+                <LanguageSwitcher />
+              </div>
             </div>
+
+            {/* Mobile Menu Button */}
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className={cn(
+                "lg:hidden p-2.5 rounded-xl transition-all duration-300",
+                isScrolled 
+                  ? "text-foreground hover:bg-muted" 
+                  : "text-white hover:bg-white/10"
+              )}
+              aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+            >
+              <AnimatePresence mode="wait">
+                {isMenuOpen ? (
+                  <motion.div
+                    key="close"
+                    initial={{ rotate: -90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: 90, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <X className="w-6 h-6" />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="menu"
+                    initial={{ rotate: 90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: -90, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Menu className="w-6 h-6" />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.button>
           </div>
-
-          {/* Mobile Menu Button - Plus grand pour touch */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="lg:hidden p-3 -mr-2 text-white hover:text-secondary transition-smooth touch-target"
-            aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-          >
-            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
         </div>
-      </div>
+      </motion.nav>
 
-      {/* Mobile Menu - Fullscreen overlay */}
-      {isMenuOpen && (
-        <div className="lg:hidden fixed inset-0 top-14 sm:top-16 bg-primary z-50 overflow-y-auto safe-area-bottom animate-fade-in">
-          <div className="flex flex-col pb-20">
-            {/* Section Compte - EN PREMIER pour être visible */}
-            <div className="px-4 pt-4 pb-2">
-              <p className="text-xs font-semibold text-white/50 uppercase tracking-wider">
-                {isLoggedIn ? t("nav.myAccount") : t("nav.login")}
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-2 px-4 pb-4">
-              {isLoggedIn ? (
-                <>
-                  <Link to="/account" onClick={() => setIsMenuOpen(false)}>
-                    <Button className="w-full h-12 gap-3 text-base bg-secondary hover:bg-secondary/90 text-primary justify-start">
-                      <UserCircle2 className="w-5 h-5" />
-                      {t("nav.profile")}
-                    </Button>
-                  </Link>
-                  <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="outline" className="w-full h-12 gap-3 text-base text-white border-white/20 hover:bg-white/10 justify-start">
-                      <LayoutDashboard className="w-5 h-5" />
-                      {t("nav.dashboard")}
-                    </Button>
-                  </Link>
-                  {isAdmin && (
-                    <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
-                      <Button variant="outline" className="w-full h-12 gap-3 text-base text-white border-white/20 hover:bg-white/10 justify-start">
-                        <LayoutDashboard className="w-5 h-5" />
-                        {t("nav.admin")}
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="lg:hidden fixed inset-0 z-40 pt-14"
+          >
+            {/* Backdrop */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-background/95 backdrop-blur-xl"
+              onClick={() => setIsMenuOpen(false)}
+            />
+            
+            {/* Content */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+              className="relative h-full overflow-y-auto pb-20"
+            >
+              <div className="p-4 space-y-6">
+                {/* Account Section */}
+                <div className="space-y-3">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-2">
+                    {isLoggedIn ? t("nav.myAccount") : t("nav.login")}
+                  </p>
+                  
+                  {isLoggedIn ? (
+                    <div className="grid grid-cols-2 gap-2">
+                      <Link to="/account" onClick={() => setIsMenuOpen(false)}>
+                        <Button className="w-full h-12 gap-2 bg-primary hover:bg-primary-light text-primary-foreground rounded-xl">
+                          <UserCircle2 className="w-5 h-5" />
+                          {t("nav.profile")}
+                        </Button>
+                      </Link>
+                      <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>
+                        <Button variant="outline" className="w-full h-12 gap-2 rounded-xl">
+                          <LayoutDashboard className="w-5 h-5" />
+                          {t("nav.dashboard")}
+                        </Button>
+                      </Link>
+                      {isAdmin && (
+                        <Link to="/admin" onClick={() => setIsMenuOpen(false)} className="col-span-2">
+                          <Button variant="outline" className="w-full h-12 gap-2 rounded-xl border-primary/30 text-primary">
+                            <LayoutDashboard className="w-5 h-5" />
+                            {t("nav.admin")}
+                          </Button>
+                        </Link>
+                      )}
+                    </div>
+                  ) : (
+                    <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
+                      <Button className="w-full h-14 gap-3 text-lg font-semibold bg-gradient-to-r from-primary to-primary-light text-primary-foreground rounded-xl shadow-lg">
+                        <User className="w-6 h-6" />
+                        {t("nav.login")} / {t("nav.register")}
                       </Button>
                     </Link>
                   )}
-                  <Button 
-                    variant="outline"
-                    className="w-full h-12 gap-3 text-base text-destructive border-destructive/30 hover:bg-destructive/10 justify-start" 
-                    onClick={handleLogout}
+                </div>
+
+                {/* Navigation Grid */}
+                <div className="space-y-3">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-2">
+                    Navigation
+                  </p>
+                  
+                  <div className="grid grid-cols-2 gap-2">
+                    {allNavItems.map(({ to, icon: Icon, label }, index) => (
+                      <motion.div
+                        key={to}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                      >
+                        <Link
+                          to={to}
+                          onClick={() => setIsMenuOpen(false)}
+                          className={cn(
+                            "flex flex-col items-center gap-2 p-4 rounded-xl transition-all duration-200",
+                            isActive(to) 
+                              ? "bg-primary text-primary-foreground shadow-lg" 
+                              : "bg-muted/50 hover:bg-muted text-foreground"
+                          )}
+                        >
+                          <Icon className="w-6 h-6" />
+                          <span className="text-sm font-medium text-center">{label}</span>
+                        </Link>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Premium CTA */}
+                <Link to="/subscriptions" onClick={() => setIsMenuOpen(false)}>
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary-light to-secondary p-5 shadow-xl"
                   >
-                    <LogOut className="w-5 h-5" />
-                    {t("nav.logout")}
-                  </Button>
-                </>
-              ) : (
-                <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
-                  <Button className="w-full h-14 gap-3 text-lg font-semibold bg-secondary hover:bg-secondary/90 text-primary justify-center">
-                    <User className="w-6 h-6" />
-                    {t("nav.login")} / {t("nav.register")}
-                  </Button>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+                    <div className="relative flex items-center gap-4">
+                      <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                        <Crown className="w-7 h-7 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-bold text-white">{t("nav.subscriptions")}</h3>
+                        <p className="text-sm text-white/80">Accédez aux avantages exclusifs</p>
+                      </div>
+                      <ArrowRight className="w-5 h-5 text-white" />
+                    </div>
+                  </motion.div>
                 </Link>
-              )}
-            </div>
 
-            {/* Séparateur */}
-            <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent mx-4" />
+                {/* Support & Settings */}
+                <div className="space-y-3">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-2">
+                    {t("common.preferences") || "Préférences"}
+                  </p>
+                  
+                  <div className="space-y-2">
+                    <Link
+                      to="/support"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center gap-3 p-3 rounded-xl bg-muted/50 hover:bg-muted transition-all"
+                    >
+                      <div className="p-2 rounded-lg bg-background">
+                        <HelpCircle className="w-5 h-5" />
+                      </div>
+                      <span className="font-medium">{t("nav.support")}</span>
+                      <ArrowRight className="w-4 h-4 ml-auto text-muted-foreground" />
+                    </Link>
+                    
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-muted/50">
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-medium">{t("common.toggleTheme")}</span>
+                      </div>
+                      <DarkModeToggle />
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-muted/50">
+                      <span className="text-sm font-medium">Langue</span>
+                      <LanguageSwitcher />
+                    </div>
+                  </div>
+                </div>
 
-            {/* Section Navigation */}
-            <div className="px-4 pt-4 pb-2">
-              <p className="text-xs font-semibold text-white/50 uppercase tracking-wider">
-                Navigation
-              </p>
-            </div>
-            
-            <div className="flex flex-col px-3">
-              {[
-                { to: "/flights", icon: Plane, label: t("nav.flights") },
-                { to: "/hotels", icon: Hotel, label: t("nav.hotels") },
-                { to: "/flight-hotel", icon: PlaneTakeoff, label: t("nav.flightHotel") },
-                { to: "/cars", icon: Car, label: t("nav.carRental") },
-                { to: "/trains", icon: Train, label: t("nav.trains") },
-                { to: "/events", icon: Calendar, label: t("nav.events") },
-                { to: "/destinations", icon: MapPin, label: t("nav.destinations") },
-                { to: "/stays", icon: Compass, label: t("nav.stays") },
-              ].map(({ to, icon: Icon, label }) => (
-                <Link
-                  key={to}
-                  to={to}
-                  className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 touch-target ${
-                    isActive(to) 
-                      ? 'bg-white/10 text-secondary' 
-                      : 'text-white hover:bg-white/5 active:bg-white/10'
-                  }`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <Icon className={`w-5 h-5 ${isActive(to) ? 'text-secondary' : 'text-white/70'}`} />
-                  <span className="text-base font-medium">{label}</span>
-                </Link>
-              ))}
-              
-              {/* Subscriptions - Highlighted */}
-              <Link
-                to="/subscriptions"
-                className="flex items-center gap-4 px-4 py-3 rounded-xl bg-secondary/10 border border-secondary/30 mt-2 touch-target"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Crown className="w-5 h-5 text-secondary" />
-                <span className="text-base font-semibold text-secondary">{t("nav.subscriptions")}</span>
-              </Link>
-            </div>
-
-            {/* Séparateur */}
-            <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-3 mx-4" />
-
-            {/* Support */}
-            <div className="px-3">
-              <Link
-                to="/support"
-                className="flex items-center gap-4 px-4 py-3 rounded-xl text-white hover:bg-white/5 active:bg-white/10 transition-all duration-200 touch-target"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <HelpCircle className="w-5 h-5 text-white/70" />
-                <span className="text-base font-medium">{t("nav.support")}</span>
-              </Link>
-            </div>
-
-            {/* Séparateur */}
-            <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-3 mx-4" />
-
-            {/* Section Préférences */}
-            <div className="px-4 pb-2">
-              <p className="text-xs font-semibold text-white/50 uppercase tracking-wider">
-                {t("common.preferences") || "Préférences"}
-              </p>
-            </div>
-            
-            <div className="flex items-center justify-between gap-4 px-4 py-2">
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-white/90">{t("common.toggleTheme")}</span>
-                <DarkModeToggle className="text-white" />
+                {/* Logout */}
+                {isLoggedIn && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                  >
+                    <Button 
+                      variant="outline"
+                      className="w-full h-12 gap-3 text-destructive border-destructive/30 hover:bg-destructive/10 rounded-xl" 
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="w-5 h-5" />
+                      {t("nav.logout")}
+                    </Button>
+                  </motion.div>
+                )}
               </div>
-              <LanguageSwitcher />
-            </div>
-          </div>
-        </div>
-      )}
-    </nav>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 
