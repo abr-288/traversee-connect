@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +12,7 @@ import {
 import { 
   Menu, X, User, LogOut, LayoutDashboard, Plane, Hotel, PlaneTakeoff, 
   Train, Calendar, Car, HelpCircle, UserCircle2, Crown, ChevronDown, 
-  MapPin, Compass, ArrowRight, Sparkles
+  MapPin, Compass, ArrowRight, Sparkles, Grid3X3
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -27,10 +27,23 @@ import { useSiteConfigContext } from "@/contexts/SiteConfigContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
+// Import banner images for mega menu
+import bannerFlights from "@/assets/banner-flights.jpg";
+import bannerHotels from "@/assets/banner-hotels.jpg";
+import bannerCars from "@/assets/banner-cars.jpg";
+import bannerFlightHotel from "@/assets/banner-flight-hotel.jpg";
+import bannerTrains from "@/assets/banner-trains.jpg";
+import bannerEvents from "@/assets/banner-events.jpg";
+import bannerTours from "@/assets/banner-tours.jpg";
+import bannerStays from "@/assets/banner-stays.jpg";
+
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const megaMenuRef = useRef<HTMLDivElement>(null);
+  const megaMenuTriggerRef = useRef<HTMLButtonElement>(null);
   const { isAdmin, loading: roleLoading } = useUserRole();
   const { isInstallable, isInstalled, install } = usePWA();
   const { config } = useSiteConfigContext();
@@ -39,6 +52,74 @@ const Navbar = () => {
   const { t } = useTranslation();
 
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/');
+
+  // Mega menu categories with images
+  const megaMenuCategories = [
+    { 
+      to: "/flights", 
+      icon: Plane, 
+      label: t("nav.flights"),
+      description: "Trouvez les meilleurs tarifs",
+      image: bannerFlights,
+      color: "from-blue-500 to-blue-600"
+    },
+    { 
+      to: "/hotels", 
+      icon: Hotel, 
+      label: t("nav.hotels"),
+      description: "Hôtels du monde entier",
+      image: bannerHotels,
+      color: "from-amber-500 to-orange-500"
+    },
+    { 
+      to: "/flight-hotel", 
+      icon: PlaneTakeoff, 
+      label: t("nav.flightHotel"),
+      description: "Économisez sur les packs",
+      image: bannerFlightHotel,
+      color: "from-purple-500 to-pink-500"
+    },
+    { 
+      to: "/cars", 
+      icon: Car, 
+      label: t("nav.carRental"),
+      description: "Location partout",
+      image: bannerCars,
+      color: "from-emerald-500 to-teal-500"
+    },
+    { 
+      to: "/trains", 
+      icon: Train, 
+      label: t("nav.trains"),
+      description: "Voyagez en train",
+      image: bannerTrains,
+      color: "from-red-500 to-rose-500"
+    },
+    { 
+      to: "/events", 
+      icon: Calendar, 
+      label: t("nav.events"),
+      description: "Concerts et spectacles",
+      image: bannerEvents,
+      color: "from-indigo-500 to-violet-500"
+    },
+    { 
+      to: "/destinations", 
+      icon: MapPin, 
+      label: t("nav.destinations"),
+      description: "Explorez le monde",
+      image: bannerTours,
+      color: "from-cyan-500 to-blue-500"
+    },
+    { 
+      to: "/stays", 
+      icon: Compass, 
+      label: t("nav.stays"),
+      description: "Séjours uniques",
+      image: bannerStays,
+      color: "from-fuchsia-500 to-purple-500"
+    },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -50,6 +131,7 @@ const Navbar = () => {
 
   useEffect(() => {
     setIsMenuOpen(false);
+    setIsMegaMenuOpen(false);
   }, [location.pathname]);
 
   useEffect(() => {
@@ -62,6 +144,22 @@ const Navbar = () => {
       document.body.style.overflow = '';
     };
   }, [isMenuOpen]);
+
+  // Close mega menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        megaMenuRef.current && 
+        !megaMenuRef.current.contains(event.target as Node) &&
+        megaMenuTriggerRef.current &&
+        !megaMenuTriggerRef.current.contains(event.target as Node)
+      ) {
+        setIsMegaMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -89,22 +187,6 @@ const Navbar = () => {
     }
   };
 
-  const mainNavItems = [
-    { to: "/flights", icon: Plane, label: t("nav.flights") },
-    { to: "/hotels", icon: Hotel, label: t("nav.hotels") },
-    { to: "/flight-hotel", icon: PlaneTakeoff, label: t("nav.flightHotel") },
-    { to: "/cars", icon: Car, label: t("nav.carRental") },
-  ];
-
-  const moreNavItems = [
-    { to: "/trains", icon: Train, label: t("nav.trains") },
-    { to: "/events", icon: Calendar, label: t("nav.events") },
-    { to: "/destinations", icon: MapPin, label: t("nav.destinations") },
-    { to: "/stays", icon: Compass, label: t("nav.stays") },
-  ];
-
-  const allNavItems = [...mainNavItems, ...moreNavItems];
-
   return (
     <>
       <motion.nav 
@@ -114,7 +196,7 @@ const Navbar = () => {
         className={cn(
           "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
           isScrolled 
-            ? "bg-background/80 backdrop-blur-xl border-b border-border shadow-lg" 
+            ? "bg-background/95 backdrop-blur-xl border-b border-border shadow-lg" 
             : "bg-gradient-to-b from-primary/95 to-primary/90 backdrop-blur-md"
         )}
       >
@@ -160,12 +242,40 @@ const Navbar = () => {
                   ? "bg-muted/50" 
                   : "bg-white/10 backdrop-blur-sm"
               )}>
-                {mainNavItems.map(({ to, icon: Icon, label }) => (
+                {/* Mega Menu Trigger */}
+                <button
+                  ref={megaMenuTriggerRef}
+                  onClick={() => setIsMegaMenuOpen(!isMegaMenuOpen)}
+                  className={cn(
+                    "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300",
+                    isMegaMenuOpen
+                      ? isScrolled
+                        ? "bg-primary text-primary-foreground shadow-md"
+                        : "bg-white text-primary shadow-md"
+                      : isScrolled
+                        ? "text-foreground hover:bg-muted"
+                        : "text-white/90 hover:bg-white/10 hover:text-white"
+                  )}
+                >
+                  <Grid3X3 className="w-4 h-4" />
+                  <span>Nos Services</span>
+                  <ChevronDown className={cn(
+                    "w-3.5 h-3.5 transition-transform duration-300",
+                    isMegaMenuOpen && "rotate-180"
+                  )} />
+                </button>
+
+                {/* Quick Links */}
+                {[
+                  { to: "/flights", label: t("nav.flights") },
+                  { to: "/hotels", label: t("nav.hotels") },
+                  { to: "/flight-hotel", label: t("nav.flightHotel") },
+                ].map(({ to, label }) => (
                   <Link
                     key={to}
                     to={to}
                     className={cn(
-                      "relative flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300",
+                      "px-4 py-2 rounded-full text-sm font-medium transition-all duration-300",
                       isActive(to)
                         ? isScrolled
                           ? "bg-primary text-primary-foreground shadow-md"
@@ -175,56 +285,9 @@ const Navbar = () => {
                           : "text-white/90 hover:bg-white/10 hover:text-white"
                     )}
                   >
-                    <Icon className="w-4 h-4" />
-                    <span>{label}</span>
+                    {label}
                   </Link>
                 ))}
-                
-                {/* More Dropdown */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button className={cn(
-                      "flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300",
-                      moreNavItems.some(item => isActive(item.to))
-                        ? isScrolled
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-white text-primary"
-                        : isScrolled
-                          ? "text-foreground hover:bg-muted"
-                          : "text-white/90 hover:bg-white/10"
-                    )}>
-                      {t("nav.others")}
-                      <ChevronDown className="w-3.5 h-3.5" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent 
-                    align="center" 
-                    className="w-56 p-2 bg-background/95 backdrop-blur-xl border-border shadow-xl rounded-xl"
-                  >
-                    {moreNavItems.map(({ to, icon: Icon, label }) => (
-                      <DropdownMenuItem key={to} asChild>
-                        <Link 
-                          to={to} 
-                          className={cn(
-                            "flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all",
-                            isActive(to) 
-                              ? "bg-primary/10 text-primary" 
-                              : "hover:bg-muted"
-                          )}
-                        >
-                          <div className={cn(
-                            "p-2 rounded-lg",
-                            isActive(to) ? "bg-primary text-primary-foreground" : "bg-muted"
-                          )}>
-                            <Icon className="w-4 h-4" />
-                          </div>
-                          <span className="font-medium">{label}</span>
-                          <ArrowRight className="w-4 h-4 ml-auto opacity-50" />
-                        </Link>
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
               </div>
             </div>
 
@@ -274,7 +337,7 @@ const Navbar = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent 
                     align="end" 
-                    className="w-56 p-2 bg-background/95 backdrop-blur-xl border-border shadow-xl rounded-xl"
+                    className="w-56 p-2 bg-background border-border shadow-xl rounded-xl z-50"
                   >
                     <DropdownMenuLabel className="px-3 py-2">
                       {t("nav.myAccount")}
@@ -397,6 +460,103 @@ const Navbar = () => {
             </motion.button>
           </div>
         </div>
+
+        {/* Mega Menu Desktop */}
+        <AnimatePresence>
+          {isMegaMenuOpen && (
+            <motion.div
+              ref={megaMenuRef}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              className="hidden lg:block absolute top-full left-0 right-0 bg-background border-b border-border shadow-2xl z-40"
+            >
+              <div className="max-w-7xl mx-auto p-6">
+                <div className="grid grid-cols-4 gap-4">
+                  {megaMenuCategories.map((category, index) => (
+                    <motion.div
+                      key={category.to}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                    >
+                      <Link
+                        to={category.to}
+                        onClick={() => setIsMegaMenuOpen(false)}
+                        className="group block relative overflow-hidden rounded-2xl bg-muted/50 hover:bg-muted transition-all duration-300 hover:shadow-lg"
+                      >
+                        {/* Image Background */}
+                        <div className="relative h-32 overflow-hidden">
+                          <img 
+                            src={category.image} 
+                            alt={category.label}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          />
+                          <div className={cn(
+                            "absolute inset-0 bg-gradient-to-t opacity-80",
+                            category.color
+                          )} />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                          
+                          {/* Icon Badge */}
+                          <div className="absolute top-3 left-3 p-2 bg-white/20 backdrop-blur-sm rounded-xl">
+                            <category.icon className="w-5 h-5 text-white" />
+                          </div>
+                          
+                          {/* Active Indicator */}
+                          {isActive(category.to) && (
+                            <div className="absolute top-3 right-3 w-2 h-2 bg-secondary rounded-full animate-pulse" />
+                          )}
+                        </div>
+                        
+                        {/* Content */}
+                        <div className="p-4">
+                          <h3 className="font-bold text-foreground group-hover:text-primary transition-colors">
+                            {category.label}
+                          </h3>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {category.description}
+                          </p>
+                          
+                          {/* Arrow */}
+                          <div className="mt-3 flex items-center gap-1 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span>Explorer</span>
+                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                          </div>
+                        </div>
+                      </Link>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Bottom Banner */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="mt-6 p-4 bg-gradient-to-r from-primary via-primary-light to-secondary rounded-xl flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-white/20 rounded-xl">
+                      <Crown className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-white">Passez à Premium</h4>
+                      <p className="text-sm text-white/80">Économisez jusqu'à 30% sur tous vos voyages</p>
+                    </div>
+                  </div>
+                  <Link to="/subscriptions" onClick={() => setIsMegaMenuOpen(false)}>
+                    <Button className="bg-white text-primary hover:bg-white/90 rounded-full px-6">
+                      Découvrir
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </Link>
+                </motion.div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.nav>
 
       {/* Mobile Menu Overlay */}
@@ -466,32 +626,53 @@ const Navbar = () => {
                   )}
                 </div>
 
-                {/* Navigation Grid */}
+                {/* Services Grid with Images */}
                 <div className="space-y-3">
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-2">
-                    Navigation
+                    Nos Services
                   </p>
                   
-                  <div className="grid grid-cols-2 gap-2">
-                    {allNavItems.map(({ to, icon: Icon, label }, index) => (
+                  <div className="grid grid-cols-2 gap-3">
+                    {megaMenuCategories.map(({ to, icon: Icon, label, image, color }, index) => (
                       <motion.div
                         key={to}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.05 }}
+                        transition={{ delay: index * 0.03 }}
                       >
                         <Link
                           to={to}
                           onClick={() => setIsMenuOpen(false)}
                           className={cn(
-                            "flex flex-col items-center gap-2 p-4 rounded-xl transition-all duration-200",
+                            "relative flex flex-col overflow-hidden rounded-xl transition-all duration-200",
                             isActive(to) 
-                              ? "bg-primary text-primary-foreground shadow-lg" 
-                              : "bg-muted/50 hover:bg-muted text-foreground"
+                              ? "ring-2 ring-primary shadow-lg" 
+                              : "hover:shadow-md"
                           )}
                         >
-                          <Icon className="w-6 h-6" />
-                          <span className="text-sm font-medium text-center">{label}</span>
+                          {/* Image */}
+                          <div className="relative h-20">
+                            <img 
+                              src={image} 
+                              alt={label}
+                              className="w-full h-full object-cover"
+                            />
+                            <div className={cn(
+                              "absolute inset-0 bg-gradient-to-br opacity-75",
+                              color
+                            )} />
+                            <div className="absolute inset-0 bg-black/20" />
+                            
+                            {/* Icon */}
+                            <div className="absolute top-2 left-2 p-1.5 bg-white/20 backdrop-blur-sm rounded-lg">
+                              <Icon className="w-4 h-4 text-white" />
+                            </div>
+                          </div>
+                          
+                          {/* Label */}
+                          <div className="p-2.5 bg-card">
+                            <span className="text-sm font-medium text-foreground">{label}</span>
+                          </div>
                         </Link>
                       </motion.div>
                     ))}
