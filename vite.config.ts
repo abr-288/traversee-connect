@@ -15,65 +15,138 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'robots.txt'],
+      includeAssets: ['favicon.ico', 'robots.txt', 'pwa-icons/*.png'],
       devOptions: {
         enabled: true,
         type: 'module'
       },
       manifest: {
-        name: 'B-Reserve - Réservation de Voyages',
+        id: '/',
+        name: 'B-Reserve - Voyages & Réservations',
         short_name: 'B-Reserve',
-        description: 'Plateforme de réservation de voyages - Hôtels, vols, trains, voitures, circuits touristiques et événements',
-        theme_color: '#0EA5E9',
-        background_color: '#ffffff',
+        description: 'Votre compagnon de voyage - Réservez vols, hôtels, voitures et plus encore en quelques clics',
+        theme_color: '#0c4a6e',
+        background_color: '#0c4a6e',
         display: 'standalone',
-        orientation: 'portrait',
+        orientation: 'portrait-primary',
         scope: '/',
-        start_url: '/',
-        categories: ['travel', 'booking'],
+        start_url: '/?source=pwa',
+        lang: 'fr',
+        dir: 'ltr',
+        categories: ['travel', 'booking', 'lifestyle'],
+        prefer_related_applications: false,
         icons: [
           {
-            src: 'https://storage.googleapis.com/gpt-engineer-file-uploads/eELbhqThzPVCUnExIw7dfxcDOAj2/uploads/1761678567741-new_logo_bossizG.png',
-            sizes: '192x192',
+            src: '/pwa-icons/icon-72x72.png',
+            sizes: '72x72',
             type: 'image/png',
-            purpose: 'any maskable'
+            purpose: 'any'
           },
           {
-            src: 'https://storage.googleapis.com/gpt-engineer-file-uploads/eELbhqThzPVCUnExIw7dfxcDOAj2/uploads/1761678567741-new_logo_bossizG.png',
+            src: '/pwa-icons/icon-96x96.png',
+            sizes: '96x96',
+            type: 'image/png',
+            purpose: 'any'
+          },
+          {
+            src: '/pwa-icons/icon-128x128.png',
+            sizes: '128x128',
+            type: 'image/png',
+            purpose: 'any'
+          },
+          {
+            src: '/pwa-icons/icon-144x144.png',
+            sizes: '144x144',
+            type: 'image/png',
+            purpose: 'any'
+          },
+          {
+            src: '/pwa-icons/icon-152x152.png',
+            sizes: '152x152',
+            type: 'image/png',
+            purpose: 'any'
+          },
+          {
+            src: '/pwa-icons/icon-192x192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'any'
+          },
+          {
+            src: '/pwa-icons/icon-384x384.png',
+            sizes: '384x384',
+            type: 'image/png',
+            purpose: 'any'
+          },
+          {
+            src: '/pwa-icons/icon-512x512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable'
+            purpose: 'any'
+          },
+          {
+            src: '/pwa-icons/maskable-icon-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable'
+          }
+        ],
+        screenshots: [
+          {
+            src: '/pwa-icons/screenshot-mobile.png',
+            sizes: '390x844',
+            type: 'image/png',
+            form_factor: 'narrow',
+            label: 'Accueil B-Reserve Mobile'
+          },
+          {
+            src: '/pwa-icons/screenshot-desktop.png',
+            sizes: '1920x1080',
+            type: 'image/png',
+            form_factor: 'wide',
+            label: 'Accueil B-Reserve Desktop'
           }
         ],
         shortcuts: [
           {
             name: 'Rechercher des vols',
             short_name: 'Vols',
-            description: 'Rechercher et réserver des vols',
-            url: '/flights',
-            icons: [{ src: 'https://storage.googleapis.com/gpt-engineer-file-uploads/eELbhqThzPVCUnExIw7dfxcDOAj2/uploads/1761678567741-new_logo_bossizG.png', sizes: '192x192' }]
+            description: 'Trouvez les meilleurs tarifs de vols',
+            url: '/flights?source=pwa',
+            icons: [{ src: '/pwa-icons/shortcut-flights.png', sizes: '192x192' }]
           },
           {
             name: 'Rechercher des hôtels',
             short_name: 'Hôtels',
-            description: 'Rechercher et réserver des hôtels',
-            url: '/hotels',
-            icons: [{ src: 'https://storage.googleapis.com/gpt-engineer-file-uploads/eELbhqThzPVCUnExIw7dfxcDOAj2/uploads/1761678567741-new_logo_bossizG.png', sizes: '192x192' }]
+            description: 'Réservez votre hébergement',
+            url: '/hotels?source=pwa',
+            icons: [{ src: '/pwa-icons/shortcut-hotels.png', sizes: '192x192' }]
           },
           {
             name: 'Mes réservations',
             short_name: 'Réservations',
-            description: 'Voir mes réservations',
-            url: '/dashboard',
-            icons: [{ src: 'https://storage.googleapis.com/gpt-engineer-file-uploads/eELbhqThzPVCUnExIw7dfxcDOAj2/uploads/1761678567741-new_logo_bossizG.png', sizes: '192x192' }]
+            description: 'Consultez vos réservations',
+            url: '/dashboard?source=pwa',
+            icons: [{ src: '/pwa-icons/shortcut-bookings.png', sizes: '192x192' }]
+          },
+          {
+            name: 'Location de voitures',
+            short_name: 'Voitures',
+            description: 'Louez une voiture',
+            url: '/cars?source=pwa',
+            icons: [{ src: '/pwa-icons/shortcut-cars.png', sizes: '192x192' }]
           }
-        ]
+        ],
+        related_applications: [],
+        handle_links: 'preferred'
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,jpg,jpeg,svg,woff,woff2}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,jpg,jpeg,svg,woff,woff2,webp}'],
         navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/api/, /^\/supabase/],
+        navigateFallbackDenylist: [/^\/api/, /^\/supabase/, /^\/auth\/callback/],
         cleanupOutdatedCaches: true,
+        skipWaiting: true,
+        clientsClaim: true,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -110,7 +183,7 @@ export default defineConfig(({ mode }) => ({
               cacheName: 'api-cache',
               networkTimeoutSeconds: 10,
               expiration: {
-                maxEntries: 50,
+                maxEntries: 100,
                 maxAgeSeconds: 60 * 5
               },
               cacheableResponse: {
@@ -122,9 +195,9 @@ export default defineConfig(({ mode }) => ({
             urlPattern: /^https:\/\/.*\.supabase\.co\/storage\/.*/i,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'images-cache',
+              cacheName: 'storage-images-cache',
               expiration: {
-                maxEntries: 100,
+                maxEntries: 200,
                 maxAgeSeconds: 60 * 60 * 24 * 30
               },
               cacheableResponse: {
@@ -133,13 +206,27 @@ export default defineConfig(({ mode }) => ({
             }
           },
           {
-            urlPattern: /\.(png|jpg|jpeg|svg|gif|webp)$/i,
+            urlPattern: /\.(png|jpg|jpeg|svg|gif|webp|avif)$/i,
             handler: 'CacheFirst',
             options: {
               cacheName: 'local-images-cache',
               expiration: {
-                maxEntries: 100,
+                maxEntries: 200,
                 maxAgeSeconds: 60 * 60 * 24 * 30
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          {
+            urlPattern: /^https:\/\/storage\.googleapis\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'gcs-assets-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 7
               },
               cacheableResponse: {
                 statuses: [0, 200]
