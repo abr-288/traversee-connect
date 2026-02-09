@@ -12,6 +12,9 @@ import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import logoLight from "@/assets/logo-light.png";
+import bannerHotels from "@/assets/ordinateur.jpg";
+import heroBeach from "@/assets/hero-beach.jpg";
+import destinationCity from "@/assets/destination-city.jpg";
 import { useTranslation } from "react-i18next";
 
 // Schémas de validation Zod sécurisés
@@ -190,6 +193,9 @@ const Auth = () => {
   const [showUpdatePassword, setShowUpdatePassword] = useState(false);
   const [showMFAVerification, setShowMFAVerification] = useState(false);
   const [activeTab, setActiveTab] = useState("signin");
+  const [rememberMe, setRememberMe] = useState(false);
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
   
   // Form states
   const [signInForm, setSignInForm] = useState({ email: "", password: "" });
@@ -444,521 +450,375 @@ const Auth = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 relative overflow-hidden flex items-center justify-center p-4 md:p-6">
-      {/* Back button */}
-      <motion.div
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        className="absolute top-4 left-4 z-20"
-      >
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate("/")}
-          className="gap-2 hover:bg-background/80 backdrop-blur-sm rounded-xl"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <span className="hidden sm:inline">Retour à l'accueil</span>
-        </Button>
-      </motion.div>
-
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          animate={{ y: [-10, 10, -10], rotate: [-2, 2, -2] }}
-          transition={{ duration: 6, repeat: Infinity }}
-          className="absolute -top-20 -left-20 w-48 md:w-64 h-48 md:h-64 bg-primary/10 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{ y: [10, -10, 10], rotate: [2, -2, 2] }}
-          transition={{ duration: 8, repeat: Infinity, delay: 2 }}
-          className="absolute -bottom-20 -right-20 w-64 md:w-96 h-64 md:h-96 bg-secondary/15 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{ scale: [1, 1.1, 1] }}
-          transition={{ duration: 10, repeat: Infinity, delay: 1 }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-primary/5 rounded-full blur-3xl"
-        />
-        
-        {/* Floating icons */}
-        {[...Array(4)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute text-primary/20 hidden md:block"
-            style={{
-              top: `${15 + i * 20}%`,
-              left: `${10 + i * 20}%`,
-            }}
-            animate={{
-              y: [0, -30, 0],
-              rotate: [0, 360],
-              scale: [1, 1.2, 1],
-            }}
-            transition={{
-              duration: 8 + i * 2,
-              repeat: Infinity,
-              delay: i * 0.5,
-            }}
-          >
-            <Plane className="w-6 h-6 md:w-8 md:h-8" />
-          </motion.div>
-        ))}
-      </div>
-
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        exit="exit"
-        className="relative z-10 w-full max-w-[440px]"
-      >
-        <Card className="backdrop-blur-xl bg-card border border-border/50 shadow-2xl shadow-primary/10 rounded-2xl md:rounded-3xl overflow-hidden">
-          <CardHeader className="text-center pb-2 pt-6 md:pt-8 px-5 md:px-8">
-            <motion.div 
-              className="flex justify-center mb-3 md:mb-4"
-              animate={{ scale: [1, 1.02, 1] }}
-              transition={{ duration: 3, repeat: Infinity }}
+    <>
+      <div className="min-h-screen bg-gray-50">
+      {/* Professional Navbar */}
+      <nav className="bg-white border-b border-gray-200 px-4 lg:px-8 py-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <img 
+              src={logoLight}
+              alt="B-Reserve"
+              className="h-8 w-auto"
+            />
+            <span className="text-xl font-semibold text-gray-900">B-Reserve</span>
+          </div>
+          
+          <div className="flex items-center gap-6">
+            <a href="#" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+              Accueil
+            </a>
+            <a href="#" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+              Services
+            </a>
+            <a href="#" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+              Contact
+            </a>
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-gray-300 hover:border-gray-400 hover:bg-gray-50 rounded-lg"
             >
-              <motion.img 
-                src={logoLight}
-                alt="B-Reserve Logo"
-                className="h-12 md:h-16 w-auto"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              />
-            </motion.div>
-            <motion.div variants={itemVariants}>
-              <CardTitle className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Connexion
+            </Button>
+          </div>
+        </div>
+      </nav>
+      
+      </div>
+      
+      <div className="flex-1 flex items-center justify-center p-4">
+      {/* Back button */}
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => navigate("/")}
+        className="absolute top-4 left-4 z-20 gap-2 hover:bg-gray-100 rounded-lg text-gray-600 border border-gray-200"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        <span className="hidden sm:inline">Retour</span>
+      </Button>
+      
+      <div className="w-full max-w-6xl flex flex-col lg:flex-row">
+        {/* Left side - Form */}
+        <div className="flex-1 flex items-center justify-center">
+          <Card className="bg-white border border-gray-200 shadow-sm rounded-3xl w-full max-w-lg">
+            <CardHeader className="text-center pb-6 pt-4 px-6">
+              <div className="flex justify-center mb-4">
+                <img 
+                  src={logoLight}
+                  alt="B-Reserve"
+                  className="h-10 w-auto"
+                />
+              </div>
+              <CardTitle className="text-2xl font-semibold text-gray-900 mb-2">
                 B-Reserve
               </CardTitle>
-            </motion.div>
-            <motion.div variants={itemVariants}>
-              <CardDescription className="text-sm md:text-base text-muted-foreground mt-1">
+              <CardDescription className="text-gray-600">
                 {t('auth.yourAgency')}
               </CardDescription>
-            </motion.div>
+            </CardHeader>
             
-            {/* Security badge */}
-            <motion.div 
-              variants={itemVariants}
-              className="inline-flex items-center justify-center gap-2 mt-3 text-xs text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-full mx-auto"
-            >
-              <Shield className="h-3 w-3 text-green-500" />
-              <span>{t('auth.secureConnection')}</span>
-              <Lock className="h-3 w-3 text-green-500" />
-            </motion.div>
-          </CardHeader>
-          
-          <CardContent className="pt-4 pb-6 md:pb-8 px-5 md:px-8">
+            <CardContent className="px-6 pb-8">
             <AnimatePresence mode="wait">
               {showUpdatePassword ? (
-                <motion.div
-                  key="update-password"
-                  variants={containerVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="exit"
-                >
-                  <form onSubmit={handleUpdatePassword} className="space-y-4 md:space-y-5">
-                    <AnimatedFormField
-                      label="Nouveau mot de passe"
-                      name="password"
-                      type="password"
-                      placeholder="••••••••"
-                      icon={<Lock className="h-4 w-4" />}
-                      error={updateErrors.password}
-                      value={updateForm.password}
-                      onChange={(value) => setUpdateForm({ ...updateForm, password: value })}
-                      showPasswordToggle
-                    />
-                    <AnimatedFormField
-                      label="Confirmer le mot de passe"
-                      name="confirmPassword"
-                      type="password"
-                      placeholder="••••••••"
-                      icon={<Lock className="h-4 w-4" />}
-                      error={updateErrors.confirmPassword}
-                      value={updateForm.confirmPassword}
-                      onChange={(value) => setUpdateForm({ ...updateForm, confirmPassword: value })}
-                      showPasswordToggle
-                    />
-                    <motion.div variants={itemVariants}>
-                      <Button 
-                        type="submit" 
-                        className="w-full gradient-primary h-12 md:h-11 text-base font-semibold rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow" 
-                        disabled={loading}
-                      >
-                        {loading ? (
-                          <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                          >
-                            ⏳
-                          </motion.div>
-                        ) : (
-                          <>
-                            <CheckCircle className="mr-2 h-4 w-4" />
-                            Mettre à jour le mot de passe
-                          </>
-                        )}
-                      </Button>
-                    </motion.div>
-                  </form>
-                </motion.div>
-              ) : showResetPassword ? (
-                <motion.div
-                  key="reset-password"
-                  variants={containerVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="exit"
-                  className="space-y-4"
-                >
-                  <motion.div variants={itemVariants}>
-                    <Button
-                      variant="ghost"
-                      onClick={() => setShowResetPassword(false)}
-                      className="mb-2 hover:bg-primary/10 rounded-xl h-10"
+                <div key="update-password">
+                  <form onSubmit={handleUpdatePassword} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Nouveau mot de passe
+                      </label>
+                      <Input
+                        type="password"
+                        placeholder="••••••••"
+                        value={updateForm.password}
+                        onChange={(e) => setUpdateForm({ ...updateForm, password: e.target.value })}
+                        className="h-11 border-gray-300 rounded-md"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Confirmer le mot de passe
+                      </label>
+                      <Input
+                        type="password"
+                        placeholder="••••••••"
+                        value={updateForm.confirmPassword}
+                        onChange={(e) => setUpdateForm({ ...updateForm, confirmPassword: e.target.value })}
+                        className="h-11 border-gray-300 rounded-md"
+                      />
+                    </div>
+                    <Button 
+                      type="submit" 
+                      className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-md transition-colors" 
+                      disabled={loading}
                     >
-                      ← Retour à la connexion
+                      {loading ? "Chargement..." : "Mettre à jour"}
                     </Button>
-                  </motion.div>
-                  <form onSubmit={handleResetPassword} className="space-y-4 md:space-y-5">
-                    <AnimatedFormField
-                      label="Email"
-                      name="email"
-                      type="email"
-                      placeholder="votre@email.com"
-                      icon={<Mail className="h-4 w-4" />}
-                      error={resetErrors.email}
-                      value={resetForm.email}
-                      onChange={(value) => setResetForm({ email: value })}
-                    />
-                    <motion.div variants={itemVariants}>
-                      <Button 
-                        type="submit" 
-                        className="w-full gradient-primary h-12 md:h-11 text-base font-semibold rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow" 
-                        disabled={loading}
-                      >
-                        {loading ? (
-                          <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                          >
-                            ⏳
-                          </motion.div>
-                        ) : (
-                          "Réinitialiser le mot de passe"
-                        )}
-                      </Button>
-                    </motion.div>
                   </form>
-                </motion.div>
+                </div>
+              ) : showResetPassword ? (
+                <div key="reset-password" className="space-y-4">
+                  <Button
+                    variant="ghost"
+                    onClick={() => setShowResetPassword(false)}
+                    className="mb-4 text-gray-600 hover:text-gray-900"
+                  >
+                    ← Retour à la connexion
+                  </Button>
+                  <form onSubmit={handleResetPassword} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Email
+                      </label>
+                      <Input
+                        type="email"
+                        placeholder="votre@email.com"
+                        value={resetForm.email}
+                        onChange={(e) => setResetForm({ email: e.target.value })}
+                        className="h-11 border-gray-300 rounded-md"
+                      />
+                    </div>
+                    <Button 
+                      type="submit" 
+                      className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-md transition-colors" 
+                      disabled={loading}
+                    >
+                      {loading ? "Chargement..." : "Réinitialiser le mot de passe"}
+                    </Button>
+                  </form>
+                </div>
               ) : (
-                <motion.div
-                  key="main-form"
-                  variants={containerVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="exit"
-                >
+                <div key="main-form">
                   <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                    <motion.div variants={itemVariants}>
-                      <TabsList className="grid w-full grid-cols-2 mb-5 md:mb-6 h-11 md:h-10 bg-muted/50 p-1 rounded-xl">
-                        <TabsTrigger 
-                          value="signin"
-                          className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg text-sm font-medium transition-all duration-300"
-                        >
-                          {t('auth.login')}
-                        </TabsTrigger>
-                        <TabsTrigger 
-                          value="signup"
-                          className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg text-sm font-medium transition-all duration-300"
-                        >
-                          {t('auth.signup')}
-                        </TabsTrigger>
-                      </TabsList>
-                    </motion.div>
+                    <TabsList className="grid w-full grid-cols-2 mb-6 h-11 bg-gray-100 p-1 rounded-xl">
+                      <TabsTrigger 
+                        value="signin"
+                        className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg text-sm font-medium text-gray-700 data-[state=active]:text-gray-900"
+                      >
+                        Connexion
+                      </TabsTrigger>
+                      <TabsTrigger 
+                        value="signup"
+                        className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg text-sm font-medium text-gray-700 data-[state=active]:text-gray-900"
+                      >
+                        Inscription
+                      </TabsTrigger>
+                    </TabsList>
 
                     <AnimatePresence mode="wait">
                       <TabsContent value="signin" className="mt-0">
-                        <motion.form 
-                          onSubmit={handleSignIn} 
-                          className="space-y-4 md:space-y-5"
-                          variants={containerVariants}
-                          initial="hidden"
-                          animate="visible"
-                        >
-                          <AnimatedFormField
-                            label="Email"
-                            name="email"
-                            type="email"
-                            placeholder="votre@email.com"
-                            icon={<Mail className="h-4 w-4" />}
-                            error={signInErrors.email}
-                            value={signInForm.email}
-                            onChange={(value) => setSignInForm({ ...signInForm, email: value })}
-                          />
-                          <AnimatedFormField
-                            label="Mot de passe"
-                            name="password"
-                            type="password"
-                            placeholder="••••••••"
-                            icon={<Lock className="h-4 w-4" />}
-                            error={signInErrors.password}
-                            value={signInForm.password}
-                            onChange={(value) => setSignInForm({ ...signInForm, password: value })}
-                            showPasswordToggle
-                          />
+                        <form onSubmit={handleSignIn} className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Email
+                            </label>
+                            <Input
+                              type="email"
+                              placeholder="votre@email.com"
+                              value={signInForm.email}
+                              onChange={(e) => setSignInForm({ ...signInForm, email: e.target.value })}
+                              className="h-11 border-gray-300 rounded-xl"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Mot de passe
+                            </label>
+                            <Input
+                              type="password"
+                              placeholder="••••••••"
+                              value={signInForm.password}
+                              onChange={(e) => setSignInForm({ ...signInForm, password: e.target.value })}
+                              className="h-11 border-gray-300 rounded-xl"
+                            />
+                          </div>
                           
-                          <motion.button
-                            variants={itemVariants}
-                            type="button"
-                            onClick={() => setShowResetPassword(true)}
-                            className="text-sm text-primary hover:text-primary/80 transition-colors font-medium"
-                            whileHover={{ scale: 1.02 }}
-                          >
-                            Mot de passe oublié ?
-                          </motion.button>
-                          
-                          <motion.div variants={itemVariants}>
-                            <Button 
-                              type="submit" 
-                              className="w-full gradient-primary h-12 md:h-11 text-base font-semibold rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all active:scale-[0.98]" 
-                              disabled={loading}
-                            >
-                              {loading ? (
-                                <motion.div
-                                  animate={{ rotate: 360 }}
-                                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                                  className="mr-2"
-                                >
-                                  ⏳
-                                </motion.div>
-                              ) : (
-                                <motion.span
-                                  className="flex items-center justify-center gap-2"
-                                  whileHover={{ scale: 1.02 }}
-                                >
-                                  Se connecter
-                                </motion.span>
-                              )}
-                            </Button>
-                          </motion.div>
-                          
-                          {/* Divider */}
-                          <motion.div variants={itemVariants} className="relative my-5 md:my-4">
-                            <div className="absolute inset-0 flex items-center">
-                              <div className="w-full border-t border-border/50" />
-                            </div>
-                            <div className="relative flex justify-center text-xs uppercase">
-                              <span className="bg-background px-3 text-muted-foreground font-medium">ou</span>
-                            </div>
-                          </motion.div>
-                          
-                          {/* Google OAuth Button */}
-                          <motion.div variants={itemVariants}>
-                            <Button 
+                          <div className="flex items-center justify-between">
+                            <label className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                checked={rememberMe}
+                                onChange={(e) => setRememberMe(e.target.checked)}
+                                className="w-4 h-4 text-gray-900 border-gray-300 rounded focus:ring-gray-900"
+                              />
+                              <span className="text-sm text-gray-600">Se souvenir de moi</span>
+                            </label>
+                            <button
                               type="button"
-                              variant="outline"
-                              className="w-full h-12 md:h-11 text-base font-medium border-2 border-border/50 hover:border-border hover:bg-muted/50 transition-all duration-300 rounded-xl active:scale-[0.98]"
-                              disabled={loading}
-                              onClick={handleGoogleSignIn}
+                              onClick={() => setShowResetPassword(true)}
+                              className="text-sm text-gray-600 hover:text-gray-900"
                             >
-                              <motion.div
-                                className="flex items-center justify-center gap-3"
-                                whileHover={{ scale: 1.02 }}
-                              >
-                                <svg className="h-5 w-5" viewBox="0 0 24 24">
-                                  <path
-                                    fill="#4285F4"
-                                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                                  />
-                                  <path
-                                    fill="#34A853"
-                                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                                  />
-                                  <path
-                                    fill="#FBBC05"
-                                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                                  />
-                                  <path
-                                    fill="#EA4335"
-                                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                                  />
-                                </svg>
-                                Continuer avec Google
-                              </motion.div>
-                            </Button>
-                          </motion.div>
-                        </motion.form>
+                              Mot de passe oublié ?
+                            </button>
+                          </div>
+                          
+                          <Button 
+                            type="submit" 
+                            className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-xl transition-colors" 
+                            disabled={loading}
+                          >
+                            {loading ? "Chargement..." : "Se connecter"}
+                          </Button>
+                          
+                          <div className="relative my-6">
+                            <div className="absolute inset-0 flex items-center">
+                              <div className="w-full border-t border-gray-300"></div>
+                            </div>
+                            <div className="relative flex justify-center text-sm">
+                              <span className="px-4 bg-white text-gray-500">ou</span>
+                            </div>
+                          </div>
+                          
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="w-full h-11 border-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-colors rounded-xl"
+                            disabled={loading}
+                            onClick={handleGoogleSignIn}
+                          >
+                            <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
+                              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                            </svg>
+                            Continuer avec Google
+                          </Button>
+                        </form>
                       </TabsContent>
 
                       <TabsContent value="signup" className="mt-0">
-                        <motion.form 
-                          onSubmit={handleSignUp} 
-                          className="space-y-4 md:space-y-5"
-                          variants={containerVariants}
-                          initial="hidden"
-                          animate="visible"
-                        >
-                          <AnimatedFormField
-                            label="Nom complet"
-                            name="fullName"
-                            type="text"
-                            placeholder="Jean Dupont"
-                            icon={<User className="h-4 w-4" />}
-                            error={signUpErrors.fullName}
-                            value={signUpForm.fullName}
-                            onChange={(value) => setSignUpForm({ ...signUpForm, fullName: value })}
-                          />
-                          <AnimatedFormField
-                            label="Email"
-                            name="email"
-                            type="email"
-                            placeholder="votre@email.com"
-                            icon={<Mail className="h-4 w-4" />}
-                            error={signUpErrors.email}
-                            value={signUpForm.email}
-                            onChange={(value) => setSignUpForm({ ...signUpForm, email: value })}
-                          />
-                          <AnimatedFormField
-                            label="Mot de passe"
-                            name="password"
-                            type="password"
-                            placeholder="••••••••"
-                            icon={<Lock className="h-4 w-4" />}
-                            error={signUpErrors.password}
-                            value={signUpForm.password}
-                            onChange={(value) => setSignUpForm({ ...signUpForm, password: value })}
-                            showPasswordToggle
-                          />
+                        <form onSubmit={handleSignUp} className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Nom complet
+                            </label>
+                            <Input
+                              type="text"
+                              placeholder="Jean Dupont"
+                              value={signUpForm.fullName}
+                              onChange={(e) => setSignUpForm({ ...signUpForm, fullName: e.target.value })}
+                              className="h-11 border-gray-300 rounded-xl"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Email
+                            </label>
+                            <Input
+                              type="email"
+                              placeholder="votre@email.com"
+                              value={signUpForm.email}
+                              onChange={(e) => setSignUpForm({ ...signUpForm, email: e.target.value })}
+                              className="h-11 border-gray-300 rounded-xl"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Mot de passe
+                            </label>
+                            <Input
+                              type="password"
+                              placeholder="••••••••"
+                              value={signUpForm.password}
+                              onChange={(e) => setSignUpForm({ ...signUpForm, password: e.target.value })}
+                              className="h-11 border-gray-300 rounded-xl"
+                            />
+                          </div>
                           
-                          {/* Password strength indicator */}
-                          {signUpForm.password && (
-                            <motion.div
-                              initial={{ opacity: 0, height: 0 }}
-                              animate={{ opacity: 1, height: "auto" }}
-                              className="space-y-1.5"
-                            >
-                              <div className="flex gap-1">
-                                {[...Array(5)].map((_, i) => (
-                                  <motion.div
-                                    key={i}
-                                    className={`h-1 md:h-1.5 flex-1 rounded-full transition-colors duration-300 ${
-                                      i < passwordStrength ? strengthColors[passwordStrength - 1] : "bg-muted"
-                                    }`}
-                                    initial={{ scaleX: 0 }}
-                                    animate={{ scaleX: 1 }}
-                                    transition={{ delay: i * 0.1 }}
-                                  />
-                                ))}
-                              </div>
-                              <p className="text-xs text-muted-foreground">
-                                Force: <span className="font-medium">{strengthLabels[passwordStrength - 1] || "Très faible"}</span>
-                              </p>
-                            </motion.div>
-                          )}
-                          
-                          <motion.div variants={itemVariants}>
-                            <Button 
-                              type="submit" 
-                              className="w-full gradient-primary h-12 md:h-11 text-base font-semibold rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all active:scale-[0.98]" 
-                              disabled={loading}
-                            >
-                              {loading ? (
-                                <motion.div
-                                  animate={{ rotate: 360 }}
-                                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                                  className="mr-2"
-                                >
-                                  ⏳
-                                </motion.div>
-                              ) : (
-                                <motion.span
-                                  className="flex items-center justify-center gap-2"
-                                  whileHover={{ scale: 1.02 }}
-                                >
-                                  Créer mon compte
-                                </motion.span>
-                              )}
-                            </Button>
-                          </motion.div>
-                          
-                          {/* Divider */}
-                          <motion.div variants={itemVariants} className="relative my-5 md:my-4">
-                            <div className="absolute inset-0 flex items-center">
-                              <div className="w-full border-t border-border/50" />
-                            </div>
-                            <div className="relative flex justify-center text-xs uppercase">
-                              <span className="bg-background px-3 text-muted-foreground font-medium">ou</span>
-                            </div>
-                          </motion.div>
-                          
-                          {/* Google OAuth Button */}
-                          <motion.div variants={itemVariants}>
-                            <Button 
-                              type="button"
-                              variant="outline"
-                              className="w-full h-12 md:h-11 text-base font-medium border-2 border-border/50 hover:border-border hover:bg-muted/50 transition-all duration-300 rounded-xl active:scale-[0.98]"
-                              disabled={loading}
-                              onClick={handleGoogleSignIn}
-                            >
-                              <motion.div
-                                className="flex items-center justify-center gap-3"
-                                whileHover={{ scale: 1.02 }}
-                              >
-                                <svg className="h-5 w-5" viewBox="0 0 24 24">
-                                  <path
-                                    fill="#4285F4"
-                                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                                  />
-                                  <path
-                                    fill="#34A853"
-                                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                                  />
-                                  <path
-                                    fill="#FBBC05"
-                                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                                  />
-                                  <path
-                                    fill="#EA4335"
-                                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                                  />
-                                </svg>
-                                S'inscrire avec Google
-                              </motion.div>
-                            </Button>
-                          </motion.div>
-                          
-                          <motion.p 
-                            variants={itemVariants}
-                            className="text-xs text-center text-muted-foreground leading-relaxed pt-2"
+                          <Button 
+                            type="submit" 
+                            className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-xl transition-colors" 
+                            disabled={loading}
                           >
+                            {loading ? "Chargement..." : "Créer un compte"}
+                          </Button>
+                          
+                          <div className="relative my-6">
+                            <div className="absolute inset-0 flex items-center">
+                              <div className="w-full border-t border-gray-300"></div>
+                            </div>
+                            <div className="relative flex justify-center text-sm">
+                              <span className="px-4 bg-white text-gray-500">ou</span>
+                            </div>
+                          </div>
+                          
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="w-full h-11 border-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-colors rounded-xl"
+                            disabled={loading}
+                            onClick={handleGoogleSignIn}
+                          >
+                            <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
+                              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                            </svg>
+                            S'inscrire avec Google
+                          </Button>
+                          
+                          <p className="text-xs text-center text-gray-500 leading-relaxed">
                             En vous inscrivant, vous acceptez nos{" "}
-                            <a href="#" className="text-primary hover:underline font-medium">conditions d'utilisation</a>
+                            <a href="#" className="text-gray-700 hover:text-gray-900 font-medium">conditions d'utilisation</a>
                             {" "}et notre{" "}
-                            <a href="#" className="text-primary hover:underline font-medium">politique de confidentialité</a>
-                          </motion.p>
-                        </motion.form>
+                            <a href="#" className="text-gray-700 hover:text-gray-900 font-medium">politique de confidentialité</a>
+                          </p>
+                        </form>
                       </TabsContent>
                     </AnimatePresence>
                   </Tabs>
-                </motion.div>
+                </div>
               )}
             </AnimatePresence>
           </CardContent>
         </Card>
-        
-        {/* Bottom decoration */}
-        <motion.div 
-          className="text-center mt-6 text-white/60 text-sm"
-          variants={itemVariants}
-        >
-          © 2024 B-Reserve. Tous droits réservés.
-        </motion.div>
-      </motion.div>
+        </div>
+
+        {/* Right side - Image */}
+        <div className="flex-1 hidden lg:flex items-center justify-center">
+          <div className="relative w-full h-[550px] lg:h-[650px] rounded-3xl overflow-hidden shadow-xl">
+            <img 
+              src={bannerHotels}
+              alt="Connexion sécurisée"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-900/60" />
+            
+            {/* Content overlay on image */}
+            <div className="relative z-10 flex flex-col justify-center items-center h-full text-white p-8">
+              <h2 className="text-3xl lg:text-4xl font-bold text-center mb-4">
+                {activeTab === "signin" ? "Bienvenue" : "Rejoignez-nous"}
+              </h2>
+              <p className="text-lg text-center text-white/90 max-w-md">
+                {activeTab === "signin" 
+                  ? "Connectez-vous pour accéder à des milliers de destinations et réserver vos prochains voyages."
+                  : "Créez votre compte et découvrez un monde de possibilités de voyage à portée de clic."
+                }
+              </p>
+              
+              <div className="mt-8 grid grid-cols-3 gap-6 text-center">
+                <div>
+                  <div className="text-2xl font-bold">500+</div>
+                  <div className="text-sm text-white/70">destinations</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">100%</div>
+                  <div className="text-sm text-white/70">sécurisé</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">24/7</div>
+                  <div className="text-sm text-white/70">support</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+    </>
   );
 };
 

@@ -18,6 +18,8 @@ const Events = lazy(() => import("@/pages/Events"));
 const Trains = lazy(() => import("@/pages/Trains"));
 const FlightHotel = lazy(() => import("@/pages/FlightHotel"));
 const Auth = lazy(() => import("@/pages/Auth"));
+const ForgotPassword = lazy(() => import("@/pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("@/pages/ResetPassword"));
 const Dashboard = lazy(() => import("@/pages/UserDashboard"));
 const BookingHistory = lazy(() => import("@/pages/BookingHistory"));
 const Account = lazy(() => import("@/pages/Account"));
@@ -92,6 +94,8 @@ const AnimatedRoutes = () => {
           <Route path="/flight-hotel" element={<PageTransition><FlightHotel /></PageTransition>} />
           <Route path="/flight-hotel/booking" element={<PageTransition><FlightHotelBookingProcess /></PageTransition>} />
           <Route path="/auth" element={<PageTransition><Auth /></PageTransition>} />
+          <Route path="/forgot-password" element={<PageTransition><ForgotPassword /></PageTransition>} />
+          <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
           <Route path="/dashboard" element={<PageTransition><Dashboard /></PageTransition>} />
           <Route path="/booking-history" element={<PageTransition><BookingHistory /></PageTransition>} />
           <Route path="/account" element={<PageTransition><Account /></PageTransition>} />
