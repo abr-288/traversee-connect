@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { Car, Lock, CheckCircle } from "lucide-react";
 import { z } from "zod";
-import authBg from "@/assets/auth-login-bg.jpg";
+import authBg from "@/assets/hero-slide-1.jpg";
 
 const passwordSchema = z.object({
   password: z.string().min(6, { message: "Le mot de passe doit contenir au moins 6 caractères" }),
