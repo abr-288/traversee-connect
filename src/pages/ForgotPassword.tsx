@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { Car, Mail, ArrowLeft } from "lucide-react";
 import { z } from "zod";
-import authBg from "@/assets/auth-login-bg.jpg";
+import authBg from "@/assets/hero-slide-1.jpg";
 
 const emailSchema = z.object({
   email: z.string().trim().email({ message: "Email invalide" }).max(255),
