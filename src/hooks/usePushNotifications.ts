@@ -18,7 +18,7 @@ export const usePushNotifications = () => {
       
       // Get existing subscription
       navigator.serviceWorker.ready.then((registration) => {
-        registration.pushManager.getSubscription().then((sub) => {
+        (registration as any).pushManager?.getSubscription().then((sub: PushSubscription | null) => {
           setSubscription(sub);
         });
       });
@@ -51,7 +51,7 @@ export const usePushNotifications = () => {
       const registration = await navigator.serviceWorker.ready;
       
       // Check for existing subscription
-      const existingSubscription = await registration.pushManager.getSubscription();
+      const existingSubscription = await (registration as any).pushManager?.getSubscription();
       if (existingSubscription) {
         setSubscription(existingSubscription);
         await savePushSubscription(existingSubscription);
@@ -59,7 +59,7 @@ export const usePushNotifications = () => {
       }
       
       // Create a subscription
-      const sub = await registration.pushManager.subscribe({
+      const sub = await (registration as any).pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(
           // VAPID public key - you should replace this with your own
