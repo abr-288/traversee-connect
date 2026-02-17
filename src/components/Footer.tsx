@@ -218,10 +218,10 @@ const Footer = () => {
             <Link to="/support" className="text-white/80 hover:text-secondary transition-smooth">
               {t("footer.about")}
             </Link>
-            <Link to="/support" className="text-white/80 hover:text-secondary transition-smooth">
+            <Link to="/terms" className="text-white/80 hover:text-secondary transition-smooth">
               {t("footer.terms")}
             </Link>
-            <Link to="/support" className="text-white/80 hover:text-secondary transition-smooth">
+            <Link to="/privacy" className="text-white/80 hover:text-secondary transition-smooth">
               {t("footer.privacy")}
             </Link>
             <Link to="/support" className="text-white/80 hover:text-secondary transition-smooth">
