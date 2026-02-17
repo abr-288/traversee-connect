@@ -56,6 +56,8 @@ const PriceAlerts = lazy(() => import("@/pages/PriceAlerts"));
 const Subscriptions = lazy(() => import("@/pages/Subscriptions"));
 const SubscriptionPayment = lazy(() => import("@/pages/SubscriptionPayment"));
 const PaymentTest = lazy(() => import("@/pages/PaymentTest"));
+const PrivacyPolicy = lazy(() => import("@/pages/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("@/pages/TermsOfService"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 
 // Loading fallback component
@@ -131,6 +133,8 @@ const AnimatedRoutes = () => {
           <Route path="/subscriptions" element={<PageTransition><Subscriptions /></PageTransition>} />
           <Route path="/subscription-payment" element={<PageTransition><SubscriptionPayment /></PageTransition>} />
           <Route path="/payment-test" element={<PageTransition><PaymentTest /></PageTransition>} />
+          <Route path="/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
+          <Route path="/terms" element={<PageTransition><TermsOfService /></PageTransition>} />
           <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
         </Routes>
       </Suspense>
