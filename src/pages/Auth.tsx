@@ -11,6 +11,7 @@ import { MFAVerification } from "@/components/MFAVerification";
 import { motion, AnimatePresence, type Transition } from "framer-motion";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import logoLight from "@/assets/logo-light.png";
 import bannerHotels from "@/assets/ordinateur.jpg";
