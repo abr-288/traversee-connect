@@ -201,6 +201,7 @@ const Auth = () => {
   // Form states
   const [signInForm, setSignInForm] = useState({ email: "", password: "" });
   const [signUpForm, setSignUpForm] = useState({ fullName: "", email: "", password: "" });
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const [resetForm, setResetForm] = useState({ email: "" });
   const [updateForm, setUpdateForm] = useState({ password: "", confirmPassword: "" });
   
