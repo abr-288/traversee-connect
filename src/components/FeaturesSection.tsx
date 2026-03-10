@@ -1,4 +1,4 @@
-import { Shield, Award, Headphones, CreditCard } from "lucide-react";
+import { Shield, Award, Headphones } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const FeaturesSection = () => {
@@ -23,19 +23,21 @@ const FeaturesSection = () => {
   ];
 
   return (
-    <section className="py-12 md:py-16 bg-background w-full">
+    <section className="py-10 md:py-14 bg-background w-full">
       <div className="site-container">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto">
           {features.map((feature, index) => (
             <div
               key={index}
-              className="text-center"
+              className="flex items-start gap-4 p-5 rounded-xl bg-card border border-border hover:shadow-md transition-shadow"
             >
-              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-secondary/10 flex items-center justify-center">
-                <feature.icon className="w-10 h-10 text-secondary" />
+              <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                <feature.icon className="w-6 h-6 text-secondary" />
               </div>
-              <h3 className="text-xl font-bold text-foreground mb-3">{t(feature.titleKey)}</h3>
-              <p className="text-muted-foreground">{t(feature.descriptionKey)}</p>
+              <div>
+                <h3 className="text-sm font-bold text-foreground mb-1">{t(feature.titleKey)}</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">{t(feature.descriptionKey)}</p>
+              </div>
             </div>
           ))}
         </div>
