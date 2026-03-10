@@ -28,7 +28,7 @@ export const EventLocationAutocomplete = ({
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLDivElement>(null);
-  const debounceTimer = useRef<NodeJS.Timeout>();
+  const debounceTimer = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
     if (value.length > 1) {

@@ -63,7 +63,7 @@ export const safeValidate = <T>(
  * Affiche les erreurs de formulaire dans la console (dev uniquement)
  */
 export const logFormErrors = (errors: Record<string, string>, formName: string) => {
-  if (process.env.NODE_ENV === "development") {
+  if (import.meta.env.DEV) {
     console.group(`🔴 Erreurs de formulaire: ${formName}`);
     Object.entries(errors).forEach(([field, error]) => {
       console.error(`  • ${field}: ${error}`);

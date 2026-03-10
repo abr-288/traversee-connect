@@ -17,63 +17,66 @@ const Index = () => {
   const { t } = useTranslation();
   
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
+    <div className="min-h-screen bg-muted/30 overflow-x-hidden">
       <Navbar />
       <main>
-        {/* Promo Banner - Sticky top */}
-        <div className="pt-16">
-          <PromoBanner />
-        </div>
+        {/* Navbar spacer */}
+        <div className="pt-[88px] lg:pt-[96px]" />
         
-        {/* Hero - Full Bleed */}
+        {/* Promo Banner */}
+        <PromoBanner />
+        
+        {/* Hero with integrated search */}
         <HeroSection />
         
-        {/* Advertisement Banner - Before Subscriptions */}
+        {/* Advertisement Banner */}
         <AdvertisementBanner />
+
+        {/* Features - Card widget style */}
+        <FeaturesSection />
         
-        {/* Subscriptions Section - Full Bleed */}
+        {/* Subscriptions */}
         <FeaturedSubscriptions />
         
-        {/* Seasonal Suggestions Section - Full Bleed with Container */}
-        <section className="py-12 md:py-16 bg-muted/30 w-full">
+        {/* Seasonal Suggestions - Widget card style */}
+        <section className="py-8 md:py-12 w-full">
           <div className="site-container">
-            <div className="text-center mb-6 md:mb-8">
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">
-                {t("pages.index.seasonalTitle", "Suggestions Saisonnières Intelligentes")}
+            <div className="mb-5">
+              <h2 className="text-xl md:text-2xl font-bold text-foreground">
+                {t("pages.index.seasonalTitle", "Suggestions Saisonnières")}
               </h2>
-              <p className="text-muted-foreground text-base md:text-lg">
-                {t("pages.index.seasonalSubtitle", "Découvrez les meilleures périodes pour voyager selon la météo, les événements et la saisonnalité")}
+              <p className="text-sm text-muted-foreground mt-1">
+                {t("pages.index.seasonalSubtitle", "Découvrez les meilleures périodes pour voyager")}
               </p>
             </div>
             <SeasonalSuggestions />
           </div>
         </section>
         
-        {/* Popular Destinations - Full Bleed */}
+        {/* Popular Destinations */}
         <DestinationsSection />
         
-        {/* Special Offers - Full Bleed */}
+        {/* Special Offers */}
         <SpecialOffers />
         
-        {/* AI Travel Advisor Section - Full Bleed with Container */}
-        <section className="py-12 md:py-16 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 w-full">
+        {/* AI Travel Advisor - Widget card */}
+        <section className="py-8 md:py-12 w-full">
           <div className="site-container max-w-4xl">
-            <div className="text-center mb-6 md:mb-8">
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">
+            <div className="mb-5">
+              <h2 className="text-xl md:text-2xl font-bold text-foreground">
                 {t("pages.index.aiTitle")}
               </h2>
-              <p className="text-muted-foreground text-base md:text-lg">
+              <p className="text-sm text-muted-foreground mt-1">
                 {t("pages.index.aiSubtitle")}
               </p>
             </div>
-            <AITravelAdvisor />
+            <div className="bg-card rounded-xl border border-border p-4 md:p-6 shadow-sm">
+              <AITravelAdvisor />
+            </div>
           </div>
         </section>
         
-        {/* Features - Boxed */}
-        <FeaturesSection />
-        
-        {/* Testimonials - Full Bleed */}
+        {/* Testimonials */}
         <TestimonialsSection />
       </main>
       <Footer />

@@ -10,9 +10,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { 
-  Menu, X, User, LogOut, LayoutDashboard, Plane, Hotel, PlaneTakeoff, 
+  Menu, User, LogOut, LayoutDashboard, Plane, Hotel, PlaneTakeoff, 
   Train, Calendar, Car, HelpCircle, UserCircle2, Crown, 
-  MapPin, Compass, ChevronDown, Sparkles
+  MapPin, Compass, ChevronDown, Sparkles, Search
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -87,63 +87,69 @@ const Navbar = () => {
   return (
     <nav className={cn(
       "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-      isScrolled
-        ? "shadow-lg"
-        : ""
+      isScrolled ? "shadow-md" : "shadow-sm"
     )}>
-      {/* Top Bar */}
-      <div className={cn(
-        "transition-all duration-300",
-        isScrolled
-          ? "bg-background/95 backdrop-blur-xl border-b border-border"
-          : "bg-primary"
-      )}>
+      {/* Main Bar - Upjunoo style: clean white with centered search */}
+      <div className="bg-background border-b border-border">
         <div className="max-w-[1200px] mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-14 gap-4">
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-2.5 flex-shrink-0">
+            <Link to="/" className="flex items-center gap-2 flex-shrink-0">
               <img
-                src={isScrolled ? logoDark : (config.branding.logoLight || logoLight)}
+                src={logoDark}
                 alt={`${config.branding.siteName} Logo`}
-                className="h-10 w-auto"
+                className="h-9 w-auto dark:hidden"
               />
-              <span className={cn(
-                "font-bold text-lg hidden sm:inline transition-colors duration-300",
-                isScrolled ? "text-foreground" : "text-white"
-              )}>
+              <img
+                src={config.branding.logoLight || logoLight}
+                alt={`${config.branding.siteName} Logo`}
+                className="h-9 w-auto hidden dark:block"
+              />
+              <span className="font-bold text-lg text-foreground hidden sm:inline">
                 {config.branding.siteName}
               </span>
             </Link>
 
-            {/* Desktop Right Actions */}
-            <div className="hidden lg:flex items-center gap-3">
-              {/* Premium */}
-              <Link to="/subscriptions">
+            {/* Central Search Bar - Upjunoo style */}
+            <div className="hidden md:flex flex-1 max-w-lg mx-4">
+              <div className="relative w-full group">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder={t('hero.searchPlaceholder', 'Recherchez vols, hôtels, destinations...')}
+                  className="w-full h-9 pl-9 pr-20 rounded-full bg-muted/60 border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary transition-all"
+                  onFocus={() => navigate('/flights')}
+                  readOnly
+                />
                 <Button
                   size="sm"
-                  className={cn(
-                    "gap-2 rounded-md font-medium transition-all duration-300",
-                    isScrolled
-                      ? "bg-secondary text-secondary-foreground hover:bg-secondary/90"
-                      : "bg-white/15 text-white border border-white/25 hover:bg-white/25"
-                  )}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-7 rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/90 text-xs px-3 font-medium"
+                  onClick={() => navigate('/flights')}
+                >
+                  {t('common.search', 'Rechercher')}
+                </Button>
+              </div>
+            </div>
+
+            {/* Right Actions */}
+            <div className="hidden lg:flex items-center gap-1">
+              {/* Premium Button */}
+              <Link to="/subscriptions">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="gap-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg text-sm"
                 >
                   <Sparkles className="w-4 h-4" />
-                  {t("nav.subscriptions")}
+                  <span className="hidden xl:inline">{t("nav.subscriptions")}</span>
                 </Button>
               </Link>
 
               {/* Support */}
-              <Link
-                to="/support"
-                className={cn(
-                  "p-2 rounded-md transition-colors",
-                  isScrolled
-                    ? "text-muted-foreground hover:text-foreground hover:bg-muted"
-                    : "text-white/80 hover:text-white hover:bg-white/10"
-                )}
-              >
-                <HelpCircle className="w-5 h-5" />
+              <Link to="/support">
+                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg">
+                  <HelpCircle className="w-4 h-4" />
+                </Button>
               </Link>
 
               {/* Account */}
@@ -153,16 +159,11 @@ const Navbar = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className={cn(
-                        "gap-2 rounded-md",
-                        isScrolled
-                          ? "text-foreground hover:bg-muted"
-                          : "text-white hover:bg-white/10"
-                      )}
+                      className="gap-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg"
                     >
                       <UserCircle2 className="w-5 h-5" />
-                      <span className="hidden xl:inline">{t("nav.myAccount")}</span>
-                      <ChevronDown className="w-3.5 h-3.5" />
+                      <span className="hidden xl:inline text-sm">{t("nav.myAccount")}</span>
+                      <ChevronDown className="w-3 h-3" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-52 z-50">
@@ -201,14 +202,9 @@ const Navbar = () => {
               ) : (
                 <Link to="/auth">
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    className={cn(
-                      "gap-2 rounded-md",
-                      isScrolled
-                        ? "text-foreground hover:bg-muted"
-                        : "text-white hover:bg-white/10"
-                    )}
+                    className="gap-1.5 rounded-full border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground text-sm font-medium"
                   >
                     <User className="w-4 h-4" />
                     {t("nav.login")}
@@ -217,33 +213,19 @@ const Navbar = () => {
               )}
 
               {/* Theme & Language */}
-              <div className="flex items-center gap-1 pl-2 border-l border-border/30">
-                <DarkModeToggle
-                  variant="compact"
-                  className={isScrolled ? "text-foreground hover:bg-muted" : "text-white hover:bg-white/10"}
-                />
+              <div className="flex items-center gap-0.5 pl-1.5 ml-1 border-l border-border">
+                <DarkModeToggle variant="compact" className="text-muted-foreground hover:bg-muted" />
                 <LanguageSwitcher />
               </div>
             </div>
 
-            {/* Mobile Menu */}
-            <div className="lg:hidden flex items-center gap-2">
-              <DarkModeToggle
-                variant="compact"
-                className={isScrolled ? "text-foreground" : "text-white"}
-              />
+            {/* Mobile */}
+            <div className="lg:hidden flex items-center gap-1">
+              <DarkModeToggle variant="compact" className="text-muted-foreground" />
               <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
                 <SheetTrigger asChild>
-                  <button
-                    className={cn(
-                      "p-2 rounded-md transition-colors",
-                      isScrolled
-                        ? "text-foreground hover:bg-muted"
-                        : "text-white hover:bg-white/10"
-                    )}
-                    aria-label="Menu"
-                  >
-                    <Menu className="w-6 h-6" />
+                  <button className="p-2 rounded-lg text-muted-foreground hover:bg-muted transition-colors" aria-label="Menu">
+                    <Menu className="w-5 h-5" />
                   </button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-80 p-0 overflow-y-auto">
@@ -252,25 +234,24 @@ const Navbar = () => {
                   </SheetHeader>
 
                   <div className="p-4 space-y-6">
-                    {/* Auth Section */}
                     {isLoggedIn ? (
-                      <div className="space-y-2">
-                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      <div className="space-y-1">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                           {t("nav.myAccount")}
                         </p>
                         <Link to="/account" onClick={() => setIsMenuOpen(false)}
-                          className="flex items-center gap-3 p-3 rounded-md hover:bg-muted transition-colors">
+                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors">
                           <UserCircle2 className="w-5 h-5 text-muted-foreground" />
                           <span className="font-medium">{t("nav.profile")}</span>
                         </Link>
                         <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}
-                          className="flex items-center gap-3 p-3 rounded-md hover:bg-muted transition-colors">
+                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors">
                           <LayoutDashboard className="w-5 h-5 text-muted-foreground" />
                           <span className="font-medium">{t("nav.dashboard")}</span>
                         </Link>
                         {isAdmin && (
                           <Link to="/admin" onClick={() => setIsMenuOpen(false)}
-                            className="flex items-center gap-3 p-3 rounded-md hover:bg-muted transition-colors">
+                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors">
                             <LayoutDashboard className="w-5 h-5 text-primary" />
                             <span className="font-medium text-primary">{t("nav.admin")}</span>
                           </Link>
@@ -278,15 +259,14 @@ const Navbar = () => {
                       </div>
                     ) : (
                       <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
-                        <Button className="w-full gap-2">
+                        <Button className="w-full gap-2 rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/90">
                           <User className="w-4 h-4" />
                           {t("nav.login")} / {t("nav.register")}
                         </Button>
                       </Link>
                     )}
 
-                    {/* Services */}
-                    <div className="space-y-1">
+                    <div className="space-y-0.5">
                       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                         Nos Services
                       </p>
@@ -296,9 +276,9 @@ const Navbar = () => {
                           to={to}
                           onClick={() => setIsMenuOpen(false)}
                           className={cn(
-                            "flex items-center gap-3 p-3 rounded-md transition-colors",
+                            "flex items-center gap-3 p-3 rounded-lg transition-colors",
                             isActive(to)
-                              ? "bg-primary/10 text-primary font-medium"
+                              ? "bg-secondary/10 text-secondary font-medium"
                               : "hover:bg-muted text-foreground"
                           )}
                         >
@@ -308,35 +288,31 @@ const Navbar = () => {
                       ))}
                     </div>
 
-                    {/* Premium */}
                     <Link to="/subscriptions" onClick={() => setIsMenuOpen(false)}>
-                      <div className="flex items-center gap-3 p-4 rounded-lg bg-primary text-primary-foreground">
-                        <Crown className="w-5 h-5" />
+                      <div className="flex items-center gap-3 p-4 rounded-xl bg-secondary/10 border border-secondary/20">
+                        <Crown className="w-5 h-5 text-secondary" />
                         <div>
-                          <p className="font-semibold">{t("nav.subscriptions")}</p>
-                          <p className="text-xs opacity-80">Avantages exclusifs</p>
+                          <p className="font-semibold text-foreground">{t("nav.subscriptions")}</p>
+                          <p className="text-xs text-muted-foreground">Avantages exclusifs</p>
                         </div>
                       </div>
                     </Link>
 
-                    {/* Support */}
                     <Link to="/support" onClick={() => setIsMenuOpen(false)}
-                      className="flex items-center gap-3 p-3 rounded-md hover:bg-muted transition-colors">
+                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors">
                       <HelpCircle className="w-5 h-5 text-muted-foreground" />
                       <span className="font-medium">{t("nav.support")}</span>
                     </Link>
 
-                    {/* Language */}
-                    <div className="flex items-center justify-between p-3 rounded-md bg-muted/50">
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                       <span className="text-sm font-medium">Langue</span>
                       <LanguageSwitcher />
                     </div>
 
-                    {/* Logout */}
                     {isLoggedIn && (
                       <Button
                         variant="outline"
-                        className="w-full gap-2 text-destructive border-destructive/30 hover:bg-destructive/10"
+                        className="w-full gap-2 text-destructive border-destructive/30 hover:bg-destructive/10 rounded-lg"
                         onClick={handleLogout}
                       >
                         <LogOut className="w-4 h-4" />
@@ -351,28 +327,19 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Second Level: Service Links (Desktop only) */}
-      <div className={cn(
-        "hidden lg:block transition-all duration-300 border-b",
-        isScrolled
-          ? "bg-muted/80 backdrop-blur-md border-border"
-          : "bg-primary-dark/60 backdrop-blur-sm border-white/10"
-      )}>
+      {/* Second Level: Service Tabs - Upjunoo category style */}
+      <div className="hidden lg:block bg-background/95 backdrop-blur-sm border-b border-border">
         <div className="max-w-[1200px] mx-auto px-4">
-          <div className="flex items-center gap-1 h-10 overflow-x-auto">
+          <div className="flex items-center gap-0.5 h-10 overflow-x-auto">
             {serviceLinks.map(({ to, icon: Icon, label }) => (
               <Link
                 key={to}
                 to={to}
                 className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium whitespace-nowrap transition-all duration-200",
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200",
                   isActive(to)
-                    ? isScrolled
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-white/20 text-white"
-                    : isScrolled
-                      ? "text-muted-foreground hover:text-foreground hover:bg-muted"
-                      : "text-white/75 hover:text-white hover:bg-white/10"
+                    ? "bg-secondary/15 text-secondary border border-secondary/20"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 )}
               >
                 <Icon className="w-4 h-4" />

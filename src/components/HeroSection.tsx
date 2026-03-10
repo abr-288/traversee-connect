@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Hotel, Car, Plane } from "lucide-react";
@@ -16,40 +16,21 @@ import { useSiteConfigContext } from "@/contexts/SiteConfigContext";
 const DEFAULT_SLIDES = [heroSlide1, heroSlide2, heroSlide3, heroSlide4, heroSlide5];
 
 /**
- * HeroSection - Section héro premium avec recherche unifiée
- * Design Opodo/Booking avec système UnifiedForm et effet parallax
- * Optimisé pour mobile
+ * HeroSection - Clean, modern hero inspired by Upjunoo
+ * Prominent search card with subtle background
  */
 const HeroSection = () => {
   const { t } = useTranslation();
   const { config } = useSiteConfigContext();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [activeTab, setActiveTab] = useState("flight");
-  const [scrollY, setScrollY] = useState(0);
-  const sectionRef = useRef<HTMLElement>(null);
 
-  // Use dynamic slides from config or fallback to defaults
   const heroSlides = useMemo(() => {
     if (config.hero.slides && config.hero.slides.length > 0) {
       return config.hero.slides.map(slide => slide.image);
     }
     return DEFAULT_SLIDES;
   }, [config.hero.slides]);
-
-  // Parallax scroll effect - disabled on mobile for performance
-  useEffect(() => {
-    const handleScroll = () => {
-      if (sectionRef.current && window.innerWidth > 768) {
-        const rect = sectionRef.current.getBoundingClientRect();
-        if (rect.bottom > 0) {
-          setScrollY(window.scrollY * 0.4);
-        }
-      }
-    };
-    
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -59,22 +40,15 @@ const HeroSection = () => {
   }, [heroSlides.length]);
 
   return (
-    <section ref={sectionRef} className="relative min-h-[280px] sm:min-h-[320px] md:min-h-[380px] flex items-center overflow-hidden w-full">
-      {/* Background Image Carousel with Parallax Effect - GPU Optimized */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
+    <section className="relative w-full overflow-hidden">
+      {/* Background - Compact with image */}
+      <div className="relative h-[200px] sm:h-[240px] md:h-[280px]">
         {heroSlides.map((slide, index) => (
           <div
             key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ease-out ${
+            className={`absolute inset-0 transition-opacity duration-1000 ${
               index === currentSlide ? "opacity-100" : "opacity-0"
             }`}
-            style={{
-              transform: `translate3d(0, ${scrollY}px, 0) scale(1.1)`,
-              willChange: index === currentSlide ? 'transform, opacity' : 'auto',
-              backfaceVisibility: 'hidden',
-              perspective: 1000,
-              WebkitBackfaceVisibility: 'hidden'
-            }}
           >
             <img
               src={slide}
@@ -84,117 +58,85 @@ const HeroSection = () => {
             />
           </div>
         ))}
-        {/* Modern dark overlay with gradient - GPU accelerated */}
-        <div 
-          className="absolute inset-0 bg-gradient-to-b from-primary/70 via-primary/50 to-primary/80"
-          style={{ transform: 'translate3d(0, 0, 0)' }}
-        />
-        <div 
-          className="absolute inset-0 bg-gradient-to-r from-primary/60 via-transparent to-primary/60"
-          style={{ transform: 'translate3d(0, 0, 0)' }}
-        />
+        {/* Clean gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/50 via-primary/40 to-background" />
         
-        {/* Animated particles/shapes - Hidden on mobile, GPU optimized */}
-        <div 
-          className="hidden sm:block absolute top-10 left-10 w-60 h-60 bg-secondary/20 rounded-full blur-[80px] animate-float-gpu" 
-          style={{ animationDelay: '0s', transform: 'translate3d(0, 0, 0)' }} 
-        />
-        <div 
-          className="hidden sm:block absolute bottom-10 right-10 w-72 h-72 bg-secondary/15 rounded-full blur-[100px] animate-float-gpu" 
-          style={{ animationDelay: '1s', transform: 'translate3d(0, 0, 0)' }} 
-        />
-      </div>
-
-      {/* Content */}
-      <div className="site-container relative z-10 py-3 sm:py-4 md:py-6">
-        <div className="max-w-3xl mx-auto text-center mb-3 sm:mb-4 md:mb-5 px-2">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-2 sm:mb-3 animate-slide-up-fade" style={{ animationDelay: '0s' }}>
-            <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
-            <span className="text-white/90 text-[10px] sm:text-xs font-medium">{t('hero.badge', 'Votre voyage commence ici')}</span>
-          </div>
-          
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-1.5 sm:mb-2 md:mb-3 animate-slide-up-fade drop-shadow-2xl leading-tight tracking-tight" style={{ animationDelay: '0.1s' }}>
+        {/* Hero text */}
+        <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
+          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2 drop-shadow-lg leading-tight">
             {config.hero.title || t('hero.title')}
           </h1>
-          <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white/90 mb-2 sm:mb-3 md:mb-4 font-light animate-slide-up-fade drop-shadow-lg leading-relaxed max-w-2xl mx-auto" style={{ animationDelay: '0.3s' }}>
+          <p className="text-xs sm:text-sm md:text-base text-white/90 max-w-xl drop-shadow">
             {config.hero.subtitle || t('hero.subtitle')}
           </p>
         </div>
 
-        {/* Search Card - Compact */}
-        <div className="max-w-5xl mx-auto bg-white/95 dark:bg-card/95 backdrop-blur-md rounded-xl sm:rounded-2xl shadow-xl overflow-hidden animate-scale-in border border-white/30" style={{ animationDelay: '0.4s' }}>
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            {/* Tabs - Compact */}
-            <TabsList className="w-full h-auto p-0 bg-background border-b flex justify-start overflow-x-auto rounded-none gap-0 scroll-snap-x">
-              <TabsTrigger 
-                value="flight" 
-                className="gap-1 sm:gap-1.5 py-2 sm:py-2.5 px-2.5 sm:px-3 md:px-4 rounded-none data-[state=active]:bg-background data-[state=active]:border-b-2 data-[state=active]:border-secondary flex-shrink-0 scroll-snap-item min-w-fit"
-              >
-                <Plane className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span className="text-[11px] sm:text-xs md:text-sm whitespace-nowrap">{t('nav.flights')}</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="hotel" 
-                className="gap-1 sm:gap-1.5 py-2 sm:py-2.5 px-2.5 sm:px-3 md:px-4 rounded-none data-[state=active]:bg-background data-[state=active]:border-b-2 data-[state=active]:border-secondary flex-shrink-0 scroll-snap-item min-w-fit"
-              >
-                <Hotel className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span className="text-[11px] sm:text-xs md:text-sm whitespace-nowrap">{t('nav.hotels')}</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="flight-hotel" 
-                className="gap-1 sm:gap-1.5 py-2 sm:py-2.5 px-2.5 sm:px-3 md:px-4 rounded-none data-[state=active]:bg-background data-[state=active]:border-b-2 data-[state=active]:border-secondary flex-shrink-0 scroll-snap-item min-w-fit"
-              >
-                <Plane className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                <Hotel className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                <span className="text-[11px] sm:text-xs md:text-sm whitespace-nowrap">{t('nav.flightHotel')}</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="car" 
-                className="gap-1 sm:gap-1.5 py-2 sm:py-2.5 px-2.5 sm:px-3 md:px-4 rounded-none data-[state=active]:bg-background data-[state=active]:border-b-2 data-[state=active]:border-secondary flex-shrink-0 scroll-snap-item min-w-fit"
-              >
-                <Car className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span className="text-[11px] sm:text-xs md:text-sm whitespace-nowrap">{t('nav.carRental')}</span>
-              </TabsTrigger>
-            </TabsList>
-
-            {/* Formulaires compacts */}
-            <TabsContent value="flight" className="p-2.5 sm:p-3 md:p-4">
-              <FlightSearchForm />
-            </TabsContent>
-
-            <TabsContent value="hotel" className="p-2.5 sm:p-3 md:p-4">
-              <HotelSearchForm />
-            </TabsContent>
-
-            <TabsContent value="flight-hotel" className="p-2.5 sm:p-3 md:p-4">
-              <FlightHotelSearchForm 
-                onSearch={(params) => {
-                  // Navigation handled by the form
-                }}
-              />
-            </TabsContent>
-
-            <TabsContent value="car" className="p-2.5 sm:p-3 md:p-4">
-              <CarSearchForm />
-            </TabsContent>
-          </Tabs>
-        </div>
-
-        {/* Slide indicators - Mobile optimized */}
-        <div className="flex justify-center gap-1.5 sm:gap-2 mt-4 sm:mt-6">
+        {/* Slide indicators */}
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex gap-1.5">
           {heroSlides.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
-              className={`h-1.5 sm:h-2 rounded-full transition-all duration-300 ${
+              className={`h-1.5 rounded-full transition-all duration-300 ${
                 index === currentSlide 
-                  ? 'w-6 sm:w-8 bg-secondary' 
-                  : 'w-1.5 sm:w-2 bg-white/40 hover:bg-white/60'
+                  ? 'w-6 bg-secondary' 
+                  : 'w-1.5 bg-white/50 hover:bg-white/70'
               }`}
               aria-label={`Slide ${index + 1}`}
             />
           ))}
+        </div>
+      </div>
+
+      {/* Search Card - Floating over the background transition */}
+      <div className="site-container relative z-20 -mt-10 sm:-mt-12 md:-mt-14 pb-4">
+        <div className="max-w-4xl mx-auto bg-card rounded-xl sm:rounded-2xl shadow-lg border border-border overflow-hidden">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="w-full h-auto p-0 bg-muted/50 flex justify-start overflow-x-auto rounded-none gap-0 scroll-snap-x border-b border-border">
+              <TabsTrigger 
+                value="flight" 
+                className="gap-1.5 py-2.5 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-secondary data-[state=active]:bg-background data-[state=active]:text-secondary flex-shrink-0 scroll-snap-item text-sm font-medium"
+              >
+                <Plane className="w-4 h-4" />
+                <span className="whitespace-nowrap">{t('nav.flights')}</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="hotel" 
+                className="gap-1.5 py-2.5 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-secondary data-[state=active]:bg-background data-[state=active]:text-secondary flex-shrink-0 scroll-snap-item text-sm font-medium"
+              >
+                <Hotel className="w-4 h-4" />
+                <span className="whitespace-nowrap">{t('nav.hotels')}</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="flight-hotel" 
+                className="gap-1.5 py-2.5 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-secondary data-[state=active]:bg-background data-[state=active]:text-secondary flex-shrink-0 scroll-snap-item text-sm font-medium"
+              >
+                <Plane className="w-3.5 h-3.5" />
+                <Hotel className="w-3.5 h-3.5" />
+                <span className="whitespace-nowrap">{t('nav.flightHotel')}</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="car" 
+                className="gap-1.5 py-2.5 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-secondary data-[state=active]:bg-background data-[state=active]:text-secondary flex-shrink-0 scroll-snap-item text-sm font-medium"
+              >
+                <Car className="w-4 h-4" />
+                <span className="whitespace-nowrap">{t('nav.carRental')}</span>
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="flight" className="p-3 md:p-5">
+              <FlightSearchForm />
+            </TabsContent>
+            <TabsContent value="hotel" className="p-3 md:p-5">
+              <HotelSearchForm />
+            </TabsContent>
+            <TabsContent value="flight-hotel" className="p-3 md:p-5">
+              <FlightHotelSearchForm onSearch={() => {}} />
+            </TabsContent>
+            <TabsContent value="car" className="p-3 md:p-5">
+              <CarSearchForm />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </section>
