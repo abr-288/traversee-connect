@@ -11,6 +11,7 @@ import { MFAVerification } from "@/components/MFAVerification";
 import { motion, AnimatePresence, type Transition } from "framer-motion";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import logoLight from "@/assets/logo-light.png";
 import bannerHotels from "@/assets/ordinateur.jpg";
@@ -201,6 +202,7 @@ const Auth = () => {
   // Form states
   const [signInForm, setSignInForm] = useState({ email: "", password: "" });
   const [signUpForm, setSignUpForm] = useState({ fullName: "", email: "", password: "" });
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const [resetForm, setResetForm] = useState({ email: "" });
   const [updateForm, setUpdateForm] = useState({ password: "", confirmPassword: "" });
   
@@ -249,9 +251,15 @@ const Auth = () => {
     e.preventDefault();
     
     const validation = validateForm(signUpSchema, signUpForm);
-    setSignUpErrors(validation.errors);
+    const errors = { ...validation.errors };
     
-    if (!validation.valid) return;
+    if (!acceptTerms) {
+      errors.terms = "Vous devez accepter les CGU et la politique de confidentialité";
+    }
+    
+    setSignUpErrors(errors);
+    
+    if (!validation.valid || !acceptTerms) return;
     
     setLoading(true);
 
@@ -725,6 +733,27 @@ const Auth = () => {
                             />
                           </div>
                           
+                          <div className="flex items-start space-x-2">
+                            <Checkbox
+                              id="accept-terms"
+                              checked={acceptTerms}
+                              onCheckedChange={(checked) => setAcceptTerms(checked === true)}
+                              className="mt-0.5"
+                            />
+                            <label htmlFor="accept-terms" className="text-sm text-gray-600 leading-tight cursor-pointer">
+                              J'accepte les{" "}
+                              <a href="/terms" target="_blank" className="text-primary underline hover:text-primary/80">
+                                Conditions Générales d'Utilisation
+                              </a>{" "}
+                              et la{" "}
+                              <a href="/privacy" target="_blank" className="text-primary underline hover:text-primary/80">
+                                Politique de Confidentialité
+                              </a>
+                            </label>
+                          </div>
+                          {signUpErrors.terms && (
+                            <p className="text-sm text-destructive">{signUpErrors.terms}</p>
+                          )}
                           <Button 
                             type="submit" 
                             className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-xl transition-colors" 
