@@ -250,9 +250,15 @@ const Auth = () => {
     e.preventDefault();
     
     const validation = validateForm(signUpSchema, signUpForm);
-    setSignUpErrors(validation.errors);
+    const errors = { ...validation.errors };
     
-    if (!validation.valid) return;
+    if (!acceptTerms) {
+      errors.terms = "Vous devez accepter les CGU et la politique de confidentialité";
+    }
+    
+    setSignUpErrors(errors);
+    
+    if (!validation.valid || !acceptTerms) return;
     
     setLoading(true);
 
