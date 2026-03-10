@@ -733,6 +733,27 @@ const Auth = () => {
                             />
                           </div>
                           
+                          <div className="flex items-start space-x-2">
+                            <Checkbox
+                              id="accept-terms"
+                              checked={acceptTerms}
+                              onCheckedChange={(checked) => setAcceptTerms(checked === true)}
+                              className="mt-0.5"
+                            />
+                            <label htmlFor="accept-terms" className="text-sm text-gray-600 leading-tight cursor-pointer">
+                              J'accepte les{" "}
+                              <a href="/terms" target="_blank" className="text-primary underline hover:text-primary/80">
+                                Conditions Générales d'Utilisation
+                              </a>{" "}
+                              et la{" "}
+                              <a href="/privacy" target="_blank" className="text-primary underline hover:text-primary/80">
+                                Politique de Confidentialité
+                              </a>
+                            </label>
+                          </div>
+                          {signUpErrors.terms && (
+                            <p className="text-sm text-destructive">{signUpErrors.terms}</p>
+                          )}
                           <Button 
                             type="submit" 
                             className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-xl transition-colors" 
