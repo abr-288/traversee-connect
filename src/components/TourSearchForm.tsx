@@ -33,8 +33,8 @@ export const TourSearchForm = () => {
 
   return (
     <UnifiedForm onSubmit={handleSearch} variant="search" className="w-full max-w-5xl mx-auto">
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <div className="md:col-span-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="sm:col-span-2 lg:col-span-2 min-w-0">
           <UnifiedAutocomplete
             label={t("search.destination")}
             type="location"
@@ -45,7 +45,7 @@ export const TourSearchForm = () => {
           />
         </div>
 
-        <div className="md:col-span-1">
+        <div className="min-w-0">
           <UnifiedDatePicker
             label={t("search.departure")}
             value={date}
@@ -54,7 +54,7 @@ export const TourSearchForm = () => {
           />
         </div>
 
-        <div className="md:col-span-1">
+        <div className="min-w-0">
           <UnifiedFormField
             label={t("search.guests")}
             name="guests"
@@ -65,7 +65,7 @@ export const TourSearchForm = () => {
           />
         </div>
 
-        <div className="md:col-span-1 flex items-end">
+        <div className="sm:col-span-2 lg:col-span-1 flex items-end">
           <UnifiedSubmitButton fullWidth>
             {t("search.search")}
           </UnifiedSubmitButton>

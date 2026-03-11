@@ -121,8 +121,8 @@ export const StaySearchForm = () => {
         </Alert>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
-        <div className="md:col-span-2 space-y-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+        <div className="sm:col-span-2 lg:col-span-2 space-y-1 min-w-0">
           <UnifiedAutocomplete
             label={t("search.destination")}
             type="location"
@@ -142,7 +142,7 @@ export const StaySearchForm = () => {
           )}
         </div>
 
-        <div className="md:col-span-1 space-y-1">
+        <div className="min-w-0 space-y-1">
           <UnifiedDatePicker
             label={t("search.checkIn")}
             value={checkIn}
@@ -159,7 +159,7 @@ export const StaySearchForm = () => {
           )}
         </div>
 
-        <div className="md:col-span-1 space-y-1">
+        <div className="min-w-0 space-y-1">
           <UnifiedDatePicker
             label={t("search.checkOut")}
             value={checkOut}
@@ -176,7 +176,7 @@ export const StaySearchForm = () => {
           )}
         </div>
 
-        <div className="md:col-span-1 space-y-2">
+        <div className="min-w-0 space-y-2">
           <label className="text-sm font-medium text-foreground">{t("search.guests")} *</label>
           <Select 
             value={guests.toString()} 
@@ -201,7 +201,7 @@ export const StaySearchForm = () => {
           )}
         </div>
 
-        <div className="md:col-span-1 flex items-end">
+        <div className="sm:col-span-2 lg:col-span-1 flex items-end">
           <UnifiedSubmitButton 
             fullWidth
             disabled={hasErrors}

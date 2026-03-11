@@ -138,8 +138,8 @@ export const EventSearchForm = ({ onResults }: EventSearchFormProps) => {
             </Alert>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <div className="md:col-span-2 space-y-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            <div className="sm:col-span-2 lg:col-span-2 space-y-1 min-w-0">
               <UnifiedAutocomplete
                 label={t("search.location")}
                 type="location"
@@ -159,7 +159,7 @@ export const EventSearchForm = ({ onResults }: EventSearchFormProps) => {
               )}
             </div>
 
-            <div className="space-y-1">
+            <div className="min-w-0 space-y-1">
               <UnifiedDatePicker
                 label={t("search.date")}
                 value={date}
@@ -176,7 +176,7 @@ export const EventSearchForm = ({ onResults }: EventSearchFormProps) => {
               )}
             </div>
 
-            <div className="space-y-2">
+            <div className="min-w-0 space-y-2">
               <label className="text-sm font-medium text-foreground" htmlFor="category">{t("search.category")}</label>
               <Select 
                 value={category} 
@@ -202,7 +202,7 @@ export const EventSearchForm = ({ onResults }: EventSearchFormProps) => {
               )}
             </div>
 
-            <div className="space-y-2">
+            <div className="min-w-0 space-y-2">
               <label className="text-sm font-medium text-foreground">Participants *</label>
               <Select 
                 value={guests.toString()} 
