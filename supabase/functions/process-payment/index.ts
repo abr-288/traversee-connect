@@ -242,7 +242,7 @@ serve(async (req) => {
         channels = 'WALLET';
         break;
       case 'bank_transfer':
-        channels = 'CREDIT_CARD';
+        channels = 'ALL';
         break;
       default:
         channels = 'ALL';
