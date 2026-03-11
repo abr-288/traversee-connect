@@ -176,7 +176,7 @@ export const StaySearchForm = () => {
           )}
         </div>
 
-        <div className="md:col-span-1 space-y-2">
+        <div className="min-w-0 space-y-2">
           <label className="text-sm font-medium text-foreground">{t("search.guests")} *</label>
           <Select 
             value={guests.toString()} 
