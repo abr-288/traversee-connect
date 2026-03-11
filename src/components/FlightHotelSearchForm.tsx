@@ -107,7 +107,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
             </Button>
           </div>
 
-          <div className="md:col-span-5">
+          <div className="lg:col-span-5 min-w-0">
             <UnifiedAutocomplete
               label={t("search.destination")}
               value={destination}
