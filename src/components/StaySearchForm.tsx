@@ -122,7 +122,7 @@ export const StaySearchForm = () => {
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
-        <div className="md:col-span-2 space-y-1">
+        <div className="sm:col-span-2 lg:col-span-2 space-y-1 min-w-0">
           <UnifiedAutocomplete
             label={t("search.destination")}
             type="location"
