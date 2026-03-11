@@ -176,7 +176,7 @@ export const EventSearchForm = ({ onResults }: EventSearchFormProps) => {
               )}
             </div>
 
-            <div className="space-y-2">
+            <div className="min-w-0 space-y-2">
               <label className="text-sm font-medium text-foreground" htmlFor="category">{t("search.category")}</label>
               <Select 
                 value={category} 
