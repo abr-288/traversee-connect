@@ -191,7 +191,7 @@ export const UnifiedAutocomplete = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="absolute z-50 w-full mt-1 bg-white border-2 border-primary/20 rounded-xl shadow-xl overflow-hidden"
+            className="absolute z-50 w-full mt-1 bg-popover border-2 border-primary/20 rounded-xl shadow-xl overflow-hidden"
           >
             <div className="max-h-64 overflow-y-auto">
               {suggestions.map((suggestion, index) => (

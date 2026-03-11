@@ -201,7 +201,7 @@ export const StaySearchForm = () => {
           )}
         </div>
 
-        <div className="md:col-span-1 flex items-end">
+        <div className="sm:col-span-2 lg:col-span-1 flex items-end">
           <UnifiedSubmitButton 
             fullWidth
             disabled={hasErrors}

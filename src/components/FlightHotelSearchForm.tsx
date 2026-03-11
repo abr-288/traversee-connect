@@ -140,7 +140,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
         </div>
 
         {/* Ligne 3: Voyageurs et Options */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4 mt-3 md:mt-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mt-3 md:mt-4">
           <UnifiedFormField
             label={t("search.adults")}
             name="adults"
