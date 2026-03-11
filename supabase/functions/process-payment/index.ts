@@ -260,7 +260,7 @@ serve(async (req) => {
     }
 
     // URLs de retour et notification
-    const returnUrl = 'https://traversee-connect.lovable.app/dashboard?tab=bookings';
+    const returnUrl = `https://traversee-connect.lovable.app/confirmation?bookingId=${body.bookingId}`;
     const notifyUrl = `${supabaseUrl}/functions/v1/payment-callback`;
 
     console.log('   - Return URL:', returnUrl);
