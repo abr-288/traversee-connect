@@ -159,7 +159,7 @@ export const EventSearchForm = ({ onResults }: EventSearchFormProps) => {
               )}
             </div>
 
-            <div className="space-y-1">
+            <div className="min-w-0 space-y-1">
               <UnifiedDatePicker
                 label={t("search.date")}
                 value={date}
