@@ -80,8 +80,8 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
 
       <div className="space-y-3 md:space-y-4">
         {/* Ligne 1: Origine et Destination */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4">
-          <div className="md:col-span-5">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 md:gap-4">
+          <div className="lg:col-span-5 min-w-0">
             <UnifiedAutocomplete
               label={t("search.departure")}
               value={origin}
