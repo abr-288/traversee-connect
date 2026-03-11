@@ -94,7 +94,7 @@ export const FlightHotelSearchForm = ({ onSearch }: FlightHotelSearchFormProps) 
           </div>
 
           {/* Bouton Swap */}
-          <div className="md:col-span-2 flex items-center justify-center pt-6">
+          <div className="hidden lg:flex lg:col-span-2 items-center justify-center pt-6">
             <Button
               type="button"
               variant="outline"
