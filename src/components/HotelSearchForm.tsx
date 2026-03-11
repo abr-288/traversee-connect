@@ -185,7 +185,7 @@ export const HotelSearchForm = () => {
         </div>
 
         {/* Check-in */}
-        <div className="md:col-span-3 lg:col-span-2">
+        <div className="min-w-0 lg:col-span-2">
           <div className="space-y-1">
             <UnifiedDatePicker
               label={t("search.checkIn")}
