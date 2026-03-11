@@ -142,7 +142,7 @@ export const StaySearchForm = () => {
           )}
         </div>
 
-        <div className="md:col-span-1 space-y-1">
+        <div className="min-w-0 space-y-1">
           <UnifiedDatePicker
             label={t("search.checkIn")}
             value={checkIn}
