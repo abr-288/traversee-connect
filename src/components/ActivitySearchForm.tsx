@@ -46,7 +46,7 @@ export const ActivitySearchForm = () => {
           />
         </div>
 
-        <div className="md:col-span-1">
+        <div className="min-w-0">
           <UnifiedDatePicker
             label={t("search.date")}
             value={date}
