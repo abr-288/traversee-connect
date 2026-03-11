@@ -129,12 +129,7 @@ export const TrainSearchForm = () => {
   const hasErrors = Object.keys(errors).length > 0;
 
   return (
-    <div className="bg-card rounded-lg shadow-lg p-6">
-      <div className="flex items-center gap-2 mb-6">
-        <Train className="h-6 w-6 text-primary" />
-        <h2 className="text-2xl font-bold">{t('search.from')} / {t('search.to')}</h2>
-      </div>
-
+    <div className="w-full">
       <UnifiedForm onSubmit={handleSearch} variant="search">
         {/* Alert d'erreur générale */}
         {hasErrors && (
