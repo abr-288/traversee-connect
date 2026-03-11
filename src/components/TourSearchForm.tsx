@@ -54,7 +54,7 @@ export const TourSearchForm = () => {
           />
         </div>
 
-        <div className="md:col-span-1">
+        <div className="min-w-0">
           <UnifiedFormField
             label={t("search.guests")}
             name="guests"
