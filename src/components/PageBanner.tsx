@@ -32,7 +32,7 @@ export const PageBanner = ({
   const [activeTab, setActiveTab] = useState(defaultTab);
 
   return (
-    <section className="relative bg-gradient-to-br from-primary via-primary-light to-secondary py-16 md:py-20">
+    <section className="relative bg-gradient-to-br from-primary via-primary-light to-secondary pt-16 pb-8 sm:py-16 md:py-20">
       {/* Background avec overlay */}
       {backgroundImage && (
         <>
