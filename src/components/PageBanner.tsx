@@ -54,7 +54,7 @@ export const PageBanner = ({
             {title}
           </h1>
           {subtitle && (
-            <p className="text-lg md:text-xl text-white/95 animate-fade-in">
+            <p className="text-sm sm:text-lg md:text-xl text-white/95 animate-fade-in">
               {subtitle}
             </p>
           )}
