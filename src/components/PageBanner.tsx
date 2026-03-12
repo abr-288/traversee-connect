@@ -50,7 +50,7 @@ export const PageBanner = ({
       <div className="container relative z-10 mx-auto px-4">
         {/* Titre */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-5xl font-bold text-white mb-3 animate-fade-in">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-white mb-2 sm:mb-3 animate-fade-in">
             {title}
           </h1>
           {subtitle && (
