@@ -136,7 +136,7 @@ export const PageBanner = ({
               <HotelSearchForm />
             </TabsContent>
 
-            <TabsContent value="flight-hotel" className="p-6">
+            <TabsContent value="flight-hotel" className="p-3 sm:p-6">
               <FlightHotelSearchForm 
                 onSearch={(params) => {
                   // Navigation gérée par le formulaire
