@@ -96,10 +96,10 @@ const SpecialOffers = () => {
               <Percent className="w-5 h-5" />
               {t('offers.limited')}
             </Badge>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gradient mb-6">
+            <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold text-gradient mb-4 md:mb-6 px-4">
               {t('offers.title')}
             </h2>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
               {t('offers.subtitle')}
             </p>
             
