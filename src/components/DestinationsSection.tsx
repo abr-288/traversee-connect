@@ -31,7 +31,7 @@ const DestinationsSection = () => {
   };
 
   return (
-    <section className="py-16 md:py-20 lg:py-24 bg-gradient-to-b from-muted/20 via-background to-muted/30 relative overflow-hidden w-full">
+    <section className="py-10 sm:py-16 md:py-20 lg:py-24 bg-gradient-to-b from-muted/20 via-background to-muted/30 relative overflow-hidden w-full">
       {/* Decorative background */}
       <div className="absolute inset-0 gradient-mesh opacity-30" />
       <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
@@ -44,10 +44,10 @@ const DestinationsSection = () => {
               🌍 Découvrez le Monde
             </span>
           </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gradient mb-4 md:mb-6">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gradient mb-4 md:mb-6 px-4">
             {t('destinations.title')}
           </h2>
-          <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
+          <p className="text-sm sm:text-base md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
             {t('destinations.subtitle')}
           </p>
           

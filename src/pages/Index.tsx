@@ -20,8 +20,8 @@ const Index = () => {
     <div className="min-h-screen bg-muted/30 overflow-x-hidden">
       <Navbar />
       <main>
-        {/* Navbar spacer */}
-        <div className="pt-[88px] lg:pt-[96px]" />
+        {/* Navbar spacer - single bar on mobile, double on desktop */}
+        <div className="pt-14 lg:pt-24" />
         
         {/* Promo Banner */}
         <PromoBanner />

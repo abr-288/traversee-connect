@@ -134,22 +134,22 @@ export const SeasonalSuggestions = () => {
 
       {searchTrigger && destination && (
         <Tabs defaultValue="seasonal" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="seasonal">
-              <Calendar className="h-4 w-4 mr-2" />
-              Saisonnalité
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto gap-1">
+            <TabsTrigger value="seasonal" className="text-xs sm:text-sm px-2 py-1.5">
+              <Calendar className="h-3.5 w-3.5 mr-1 sm:mr-2 shrink-0" />
+              <span className="truncate">Saisons</span>
             </TabsTrigger>
-            <TabsTrigger value="weather">
-              <Cloud className="h-4 w-4 mr-2" />
-              Météo
+            <TabsTrigger value="weather" className="text-xs sm:text-sm px-2 py-1.5">
+              <Cloud className="h-3.5 w-3.5 mr-1 sm:mr-2 shrink-0" />
+              <span className="truncate">Météo</span>
             </TabsTrigger>
-            <TabsTrigger value="events">
-              <TrendingUp className="h-4 w-4 mr-2" />
-              Événements
+            <TabsTrigger value="events" className="text-xs sm:text-sm px-2 py-1.5">
+              <TrendingUp className="h-3.5 w-3.5 mr-1 sm:mr-2 shrink-0" />
+              <span className="truncate">Événements</span>
             </TabsTrigger>
-            <TabsTrigger value="ai">
-              <Sparkles className="h-4 w-4 mr-2" />
-              Recommandations IA
+            <TabsTrigger value="ai" className="text-xs sm:text-sm px-2 py-1.5">
+              <Sparkles className="h-3.5 w-3.5 mr-1 sm:mr-2 shrink-0" />
+              <span className="truncate">IA</span>
             </TabsTrigger>
           </TabsList>
 

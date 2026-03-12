@@ -84,7 +84,7 @@ const SpecialOffers = () => {
           service={selectedService}
         />
       )}
-      <section className="py-20 md:py-24 lg:py-28 bg-gradient-to-br from-primary/5 via-secondary/5 to-background relative overflow-hidden w-full">
+      <section className="py-10 sm:py-16 md:py-24 lg:py-28 bg-gradient-to-br from-primary/5 via-secondary/5 to-background relative overflow-hidden w-full">
         {/* Animated background elements */}
         <div className="absolute inset-0 gradient-mesh opacity-40" />
         <div className="absolute top-10 left-10 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-float" />
@@ -96,10 +96,10 @@ const SpecialOffers = () => {
               <Percent className="w-5 h-5" />
               {t('offers.limited')}
             </Badge>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gradient mb-6">
+            <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold text-gradient mb-4 md:mb-6 px-4">
               {t('offers.title')}
             </h2>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
               {t('offers.subtitle')}
             </p>
             
@@ -110,7 +110,7 @@ const SpecialOffers = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-10">
             {promotions.map((promo, index) => {
               const daysLeft = calculateDaysUntilExpiry(promo.expires_at);
               const discountedPrice = Number(promo.original_price) * (1 - promo.discount / 100);
