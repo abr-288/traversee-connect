@@ -154,7 +154,7 @@ export const PageBanner = ({
                   <TrainSearchForm />
                 </TabsContent>
 
-                <TabsContent value="event" className="p-6">
+                <TabsContent value="event" className="p-3 sm:p-6">
                   <EventSearchForm onResults={() => {}} />
                 </TabsContent>
 
