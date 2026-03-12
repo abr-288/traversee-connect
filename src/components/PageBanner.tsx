@@ -162,7 +162,7 @@ export const PageBanner = ({
                   <TourSearchForm />
                 </TabsContent>
 
-                <TabsContent value="stay" className="p-6">
+                <TabsContent value="stay" className="p-3 sm:p-6">
                   <StaySearchForm />
                 </TabsContent>
               </>
