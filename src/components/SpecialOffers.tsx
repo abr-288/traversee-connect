@@ -110,7 +110,7 @@ const SpecialOffers = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-10">
             {promotions.map((promo, index) => {
               const daysLeft = calculateDaysUntilExpiry(promo.expires_at);
               const discountedPrice = Number(promo.original_price) * (1 - promo.discount / 100);

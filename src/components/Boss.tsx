@@ -55,7 +55,7 @@ export const Boss = () => {
 
       {/* Fenêtre du chatbot */}
       {isOpen && (
-        <Card className="fixed bottom-24 right-6 w-96 h-[500px] shadow-2xl flex flex-col z-50">
+        <Card className="fixed bottom-24 right-4 left-4 sm:left-auto sm:right-6 sm:w-96 h-[80vh] sm:h-[500px] max-h-[500px] shadow-2xl flex flex-col z-50">
           {/* En-tête */}
           <div className="flex items-center justify-between p-4 border-b bg-primary text-white rounded-t-lg">
             <div className="flex items-center gap-2">
