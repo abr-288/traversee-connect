@@ -132,7 +132,7 @@ export const PageBanner = ({
               <FlightSearchForm />
             </TabsContent>
 
-            <TabsContent value="hotel" className="p-6">
+            <TabsContent value="hotel" className="p-3 sm:p-6">
               <HotelSearchForm />
             </TabsContent>
 
