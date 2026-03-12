@@ -144,7 +144,7 @@ export const PageBanner = ({
               />
             </TabsContent>
 
-            <TabsContent value="car" className="p-6">
+            <TabsContent value="car" className="p-3 sm:p-6">
               <CarSearchForm />
             </TabsContent>
 
