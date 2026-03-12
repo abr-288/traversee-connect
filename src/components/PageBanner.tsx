@@ -150,7 +150,7 @@ export const PageBanner = ({
 
             {showAllTabs && (
               <>
-                <TabsContent value="train" className="p-6">
+                <TabsContent value="train" className="p-3 sm:p-6">
                   <TrainSearchForm />
                 </TabsContent>
 
