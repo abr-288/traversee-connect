@@ -63,7 +63,7 @@ export const PageBanner = ({
         {/* Formulaires de recherche */}
         <div className="max-w-6xl mx-auto bg-background rounded-xl shadow-2xl overflow-hidden animate-scale-in">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="w-full h-auto p-0 bg-background border-b flex justify-start overflow-x-auto rounded-none gap-0">
+            <TabsList className="w-full h-auto p-0 bg-background border-b flex justify-start overflow-x-auto rounded-none gap-0 scrollbar-hide">
               <TabsTrigger 
                 value="flight" 
                 className="gap-2 py-4 px-6 rounded-none data-[state=active]:bg-background data-[state=active]:border-b-2 data-[state=active]:border-secondary flex-shrink-0"
