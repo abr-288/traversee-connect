@@ -84,7 +84,7 @@ const SpecialOffers = () => {
           service={selectedService}
         />
       )}
-      <section className="py-20 md:py-24 lg:py-28 bg-gradient-to-br from-primary/5 via-secondary/5 to-background relative overflow-hidden w-full">
+      <section className="py-10 sm:py-16 md:py-24 lg:py-28 bg-gradient-to-br from-primary/5 via-secondary/5 to-background relative overflow-hidden w-full">
         {/* Animated background elements */}
         <div className="absolute inset-0 gradient-mesh opacity-40" />
         <div className="absolute top-10 left-10 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-float" />
