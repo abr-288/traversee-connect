@@ -128,7 +128,7 @@ export const PageBanner = ({
             </TabsList>
 
             {/* Formulaires avec UnifiedForm */}
-            <TabsContent value="flight" className="p-6">
+            <TabsContent value="flight" className="p-3 sm:p-6">
               <FlightSearchForm />
             </TabsContent>
 
