@@ -63,7 +63,7 @@ const handler = async (req: Request): Promise<Response> => {
       from: "B-Reserve Contact <onboarding@resend.dev>",
       to: ["katersoro@gmail.com"],
       reply_to: email,
-      subject: `[B-Reserve Contact] ${subject}`,
+      subject: `[B-Reserve Contact] ${safeSubject}`,
       html: `
         <!DOCTYPE html>
         <html>
