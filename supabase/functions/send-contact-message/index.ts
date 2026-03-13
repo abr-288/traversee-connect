@@ -89,25 +89,25 @@ const handler = async (req: Request): Promise<Response> => {
             <div class="content">
               <div class="field">
                 <div class="label">👤 Nom</div>
-                <div class="value">${name}</div>
+                <div class="value">${safeName}</div>
               </div>
               <div class="field">
                 <div class="label">📧 Email</div>
-                <div class="value"><a href="mailto:${email}">${email}</a></div>
+                <div class="value"><a href="mailto:${safeEmail}">${safeEmail}</a></div>
               </div>
-              ${phone ? `
+              ${safePhone ? `
               <div class="field">
                 <div class="label">📞 Téléphone</div>
-                <div class="value"><a href="tel:${phone}">${phone}</a></div>
+                <div class="value"><a href="tel:${safePhone}">${safePhone}</a></div>
               </div>
               ` : ""}
               <div class="field">
                 <div class="label">📝 Sujet</div>
-                <div class="value">${subject}</div>
+                <div class="value">${safeSubject}</div>
               </div>
               <div class="field">
                 <div class="label">💬 Message</div>
-                <div class="value message-box">${message}</div>
+                <div class="value message-box">${safeMessage}</div>
               </div>
             </div>
             <div class="footer">
