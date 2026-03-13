@@ -17,6 +17,19 @@ interface ContactMessageRequest {
   message: string;
 }
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function sanitize(str: string, maxLength: number): string {
+  return escapeHtml(str.trim().slice(0, maxLength));
+}
+
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -28,7 +41,6 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Validate required fields
     if (!name || !email || !subject || !message) {
-      console.error("Missing required fields:", { name, email, subject, message });
       throw new Error("Missing required fields");
     }
 
