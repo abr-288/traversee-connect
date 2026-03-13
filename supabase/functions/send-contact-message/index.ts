@@ -17,6 +17,19 @@ interface ContactMessageRequest {
   message: string;
 }
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function sanitize(str: string, maxLength: number): string {
+  return escapeHtml(str.trim().slice(0, maxLength));
+}
+
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -28,24 +41,29 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Validate required fields
     if (!name || !email || !subject || !message) {
-      console.error("Missing required fields:", { name, email, subject, message });
       throw new Error("Missing required fields");
     }
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      console.error("Invalid email format:", email);
       throw new Error("Invalid email format");
     }
 
-    console.log("Sending contact message from:", name, email);
+    // Sanitize and escape all user inputs
+    const safeName = sanitize(name, 100);
+    const safeEmail = sanitize(email, 255);
+    const safePhone = phone ? sanitize(phone, 20) : null;
+    const safeSubject = sanitize(subject, 200);
+    const safeMessage = sanitize(message, 2000);
+
+    console.log("Sending contact message");
 
     const emailResponse = await resend.emails.send({
       from: "B-Reserve Contact <onboarding@resend.dev>",
       to: ["katersoro@gmail.com"],
       reply_to: email,
-      subject: `[B-Reserve Contact] ${subject}`,
+      subject: `[B-Reserve Contact] ${safeSubject}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -71,25 +89,25 @@ const handler = async (req: Request): Promise<Response> => {
             <div class="content">
               <div class="field">
                 <div class="label">👤 Nom</div>
-                <div class="value">${name}</div>
+                <div class="value">${safeName}</div>
               </div>
               <div class="field">
                 <div class="label">📧 Email</div>
-                <div class="value"><a href="mailto:${email}">${email}</a></div>
+                <div class="value"><a href="mailto:${safeEmail}">${safeEmail}</a></div>
               </div>
-              ${phone ? `
+              ${safePhone ? `
               <div class="field">
                 <div class="label">📞 Téléphone</div>
-                <div class="value"><a href="tel:${phone}">${phone}</a></div>
+                <div class="value"><a href="tel:${safePhone}">${safePhone}</a></div>
               </div>
               ` : ""}
               <div class="field">
                 <div class="label">📝 Sujet</div>
-                <div class="value">${subject}</div>
+                <div class="value">${safeSubject}</div>
               </div>
               <div class="field">
                 <div class="label">💬 Message</div>
-                <div class="value message-box">${message}</div>
+                <div class="value message-box">${safeMessage}</div>
               </div>
             </div>
             <div class="footer">
