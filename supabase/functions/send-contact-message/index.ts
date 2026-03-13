@@ -47,11 +47,17 @@ const handler = async (req: Request): Promise<Response> => {
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      console.error("Invalid email format:", email);
       throw new Error("Invalid email format");
     }
 
-    console.log("Sending contact message from:", name, email);
+    // Sanitize and escape all user inputs
+    const safeName = sanitize(name, 100);
+    const safeEmail = sanitize(email, 255);
+    const safePhone = phone ? sanitize(phone, 20) : null;
+    const safeSubject = sanitize(subject, 200);
+    const safeMessage = sanitize(message, 2000);
+
+    console.log("Sending contact message");
 
     const emailResponse = await resend.emails.send({
       from: "B-Reserve Contact <onboarding@resend.dev>",
