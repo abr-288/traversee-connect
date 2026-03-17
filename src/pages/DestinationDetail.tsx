@@ -13,6 +13,7 @@ import {
 import { useState, useEffect } from "react";
 import { useDestinations } from "@/hooks/useDestinations";
 import { useWeather, WeatherData } from "@/hooks/useWeather";
+import { Price } from "@/components/ui/price";
 
 const DestinationDetail = () => {
   const { id } = useParams();
