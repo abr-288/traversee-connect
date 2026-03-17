@@ -13,6 +13,7 @@ import {
 import { useState, useEffect } from "react";
 import { useDestinations } from "@/hooks/useDestinations";
 import { useWeather, WeatherData } from "@/hooks/useWeather";
+import { Price } from "@/components/ui/price";
 
 const DestinationDetail = () => {
   const { id } = useParams();
@@ -185,8 +186,10 @@ const DestinationDetail = () => {
                 <CardContent className="p-6">
                   <div className="flex items-baseline justify-between mb-4">
                     <div>
-                      <span className="text-3xl font-bold text-primary">{destination.price}</span>
-                      <span className="text-muted-foreground ml-2">EUR / nuit</span>
+                      <span className="text-3xl font-bold text-primary">
+                        <Price amount={typeof destination.price === 'number' ? destination.price : parseFloat(String(destination.price).replace(/\s/g, '')) || 0} fromCurrency="EUR" />
+                      </span>
+                      <span className="text-muted-foreground ml-2">/ nuit</span>
                     </div>
                   </div>
                   <Button 
