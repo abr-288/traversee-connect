@@ -353,28 +353,22 @@ function getEstimatedPrice(destinationName: string, category: string): number {
 function generateDescription(name: string, category: string): string {
   const descriptions: Record<string, string[]> = {
     'Plage': [
-      `Plages paradisiaques et eaux cristallines vous attendent à ${name}.`,
-      `${name} offre des plages de sable fin et un soleil généreux toute l'année.`
+      `${name} est une destination balnéaire de premier choix, réputée pour ses plages paradisiaques aux eaux cristallines et son climat ensoleillé toute l'année. Que vous soyez amateur de farniente, de sports nautiques ou de couchers de soleil spectaculaires, cette destination saura combler toutes vos attentes. Les hôtels en bord de mer offrent un confort exceptionnel avec vue imprenable sur l'océan.`,
     ],
     'Montagne': [
-      `Découvrez les sommets majestueux et l'air pur de ${name}.`,
-      `${name} propose des paysages montagneux à couper le souffle.`
+      `${name} vous invite à découvrir des panoramas montagneux à couper le souffle, entre sommets enneigés et vallées verdoyantes. Idéale pour les amateurs de randonnée, d'escalade ou simplement de grand air, cette destination offre une escapade revitalisante loin de l'agitation urbaine. Profitez des refuges de charme, de la gastronomie locale et d'une biodiversité remarquable.`,
     ],
     'Île': [
-      `Évadez-vous sur l'île paradisiaque de ${name}.`,
-      `${name} : un écrin de nature préservée au milieu de l'océan.`
+      `${name} est un véritable paradis terrestre niché au cœur de l'océan. Avec ses lagons turquoise, ses plages de sable blanc immaculé et sa végétation luxuriante, cette île offre un cadre idyllique pour des vacances inoubliables. Entre snorkeling dans les récifs coralliens, détente dans des spas de luxe et découverte de la culture locale, chaque moment devient un souvenir précieux.`,
     ],
     'Culture': [
-      `Plongez dans l'histoire et la culture fascinante de ${name}.`,
-      `${name} regorge de trésors historiques et culturels.`
+      `${name} est un haut lieu de culture et d'histoire, où chaque rue raconte une histoire millénaire. Des monuments classés au patrimoine mondial aux marchés traditionnels animés, cette destination séduit par son authenticité et sa richesse culturelle. Laissez-vous envoûter par l'artisanat local, la gastronomie traditionnelle et l'hospitalité légendaire de ses habitants.`,
     ],
     'Ville': [
-      `Explorez les charmes urbains et la vie trépidante de ${name}.`,
-      `${name} : une métropole vibrante aux mille facettes.`
+      `${name} est une métropole vibrante qui ne cesse de surprendre par sa diversité et son dynamisme. Architecture emblématique, quartiers cosmopolites, scène gastronomique de renommée mondiale et vie nocturne animée : cette ville offre une multitude d'expériences pour tous les goûts. Des musées de classe mondiale aux boutiques tendance, en passant par les parcs urbains, chaque coin de rue réserve une découverte.`,
     ],
     'Nature': [
-      `Immergez-vous dans la nature préservée de ${name}.`,
-      `${name} offre des paysages naturels exceptionnels.`
+      `${name} est un sanctuaire naturel préservé, offrant des paysages d'une beauté saisissante. Entre forêts primaires, cascades majestueuses et faune sauvage exceptionnelle, cette destination est le paradis des amoureux de la nature. Partez en randonnée sur des sentiers balisés, observez des espèces rares dans leur habitat naturel et ressourcez-vous au cœur d'une nature intacte.`,
     ]
   };
   
