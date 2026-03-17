@@ -15,6 +15,27 @@ import { useDestinations } from "@/hooks/useDestinations";
 import { useWeather, WeatherData } from "@/hooks/useWeather";
 import { Price } from "@/components/ui/price";
 
+// Destination-specific gallery images as fallback
+const destinationGalleryMap: Record<string, string[]> = {
+  'Paris': ['https://images.unsplash.com/photo-1549144511-f099e773c147?w=800&q=80','https://images.unsplash.com/photo-1431274172761-fca41d930114?w=800&q=80','https://images.unsplash.com/photo-1478391679764-b2d8b3cd1e94?w=800&q=80'],
+  'Dubaï': ['https://images.unsplash.com/photo-1518684079-3c830dcef090?w=800&q=80','https://images.unsplash.com/photo-1580674684081-7617fbf3d745?w=800&q=80','https://images.unsplash.com/photo-1546412414-e1885259563a?w=800&q=80'],
+  'Maldives': ['https://images.unsplash.com/photo-1573843981267-be1999ff37cd?w=800&q=80','https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?w=800&q=80','https://images.unsplash.com/photo-1578922746465-3a80a228f223?w=800&q=80'],
+  'Tokyo': ['https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=800&q=80','https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800&q=80','https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&q=80'],
+  'Bali': ['https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800&q=80','https://images.unsplash.com/photo-1573790387438-4da905039392?w=800&q=80','https://images.unsplash.com/photo-1539367628448-4bc5c9d171c8?w=800&q=80'],
+  'New York': ['https://images.unsplash.com/photo-1534430480872-3498386e7856?w=800&q=80','https://images.unsplash.com/photo-1522083165195-3424ed129620?w=800&q=80','https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?w=800&q=80'],
+  'Santorini': ['https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800&q=80','https://images.unsplash.com/photo-1571406252241-db0280bd36cd?w=800&q=80','https://images.unsplash.com/photo-1560703650-ef3e0f254ae0?w=800&q=80'],
+  'Marrakech': ['https://images.unsplash.com/photo-1587974928442-77dc3e0748b1?w=800&q=80','https://images.unsplash.com/photo-1509735579945-1d10071d0cb4?w=800&q=80','https://images.unsplash.com/photo-1548820492-2c9fadb873c3?w=800&q=80'],
+  'Barcelona': ['https://images.unsplash.com/photo-1562883676-8c7feb83f09b?w=800&q=80','https://images.unsplash.com/photo-1523531294919-4bcd7c65e216?w=800&q=80','https://images.unsplash.com/photo-1529551739587-e242c564f727?w=800&q=80'],
+};
+
+function getDestinationGalleryImages(name: string): string[] {
+  return destinationGalleryMap[name] || [
+    'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80',
+    'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80',
+    'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800&q=80',
+  ];
+}
+
 const DestinationDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -44,13 +65,14 @@ const DestinationDetail = () => {
     );
   }
 
-  // Generate additional images for gallery
-  const galleryImages = [
+  // Use destination's own images for gallery, deduplicate
+  const rawImages = [destination.image, ...(destination.images || [])];
+  const uniqueImages = [...new Set(rawImages)].filter(Boolean);
+  const galleryImages = uniqueImages.length >= 2 ? uniqueImages : [
     destination.image,
-    `https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80`,
-    `https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80`,
-    `https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800&q=80`,
+    ...getDestinationGalleryImages(destination.name),
   ];
+
 
   // Generate activities based on destination category
   const activities = [
