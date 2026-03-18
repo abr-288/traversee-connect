@@ -75,7 +75,74 @@ const DestinationDetail = () => {
 
 
   // Generate activities based on destination category
-  const activities = [
+  const destinationActivitiesMap: Record<string, typeof defaultActivities> = {
+    'Paris': [
+      { icon: Camera, name: "Tour Eiffel & Croisière Seine", duration: "4h", price: "35 000 FCFA", description: "Montez au sommet de la Tour Eiffel puis croisière panoramique sur la Seine" },
+      { icon: Building2, name: "Musée du Louvre guidé", duration: "3h", price: "28 000 FCFA", description: "Découvrez la Joconde et les chefs-d'œuvre avec un guide expert" },
+      { icon: Utensils, name: "Dégustation dans le Marais", duration: "2h30", price: "40 000 FCFA", description: "Fromages, vins et pâtisseries dans le quartier historique du Marais" },
+      { icon: Mountain, name: "Versailles & ses jardins", duration: "6h", price: "55 000 FCFA", description: "Excursion au Château de Versailles avec visite des jardins royaux" },
+      { icon: Waves, name: "Balade en bateau-mouche", duration: "1h30", price: "20 000 FCFA", description: "Navigation commentée passant sous les ponts historiques de Paris" },
+      { icon: ThermometerSun, name: "Montmartre & Sacré-Cœur", duration: "3h", price: "22 000 FCFA", description: "Promenade artistique à Montmartre, vignes et vue panoramique" },
+    ],
+    'Dubai': [
+      { icon: Building2, name: "Burj Khalifa & Dubai Mall", duration: "4h", price: "45 000 FCFA", description: "Montée au 148e étage du plus haut gratte-ciel et shopping au Dubai Mall" },
+      { icon: ThermometerSun, name: "Safari dans le désert", duration: "6h", price: "65 000 FCFA", description: "Dunes bashing en 4x4, balade en chameau et dîner bédouin sous les étoiles" },
+      { icon: Waves, name: "Croisière en dhow", duration: "2h", price: "30 000 FCFA", description: "Dîner-croisière traditionnelle sur la Creek de Dubai au coucher du soleil" },
+      { icon: Camera, name: "Vieux Dubai & souks", duration: "3h", price: "20 000 FCFA", description: "Découverte du quartier historique, souk de l'or et souk des épices" },
+      { icon: Utensils, name: "Brunch panoramique", duration: "2h", price: "50 000 FCFA", description: "Brunch gastronomique avec vue sur la skyline depuis un rooftop" },
+      { icon: Mountain, name: "Excursion à Abu Dhabi", duration: "Full day", price: "75 000 FCFA", description: "Grande Mosquée Sheikh Zayed, Louvre Abu Dhabi et corniche" },
+    ],
+    'Tokyo': [
+      { icon: Building2, name: "Temples & sanctuaires", duration: "4h", price: "25 000 FCFA", description: "Visite du Senso-ji à Asakusa et du sanctuaire Meiji à Harajuku" },
+      { icon: Utensils, name: "Street food à Tsukiji", duration: "2h30", price: "30 000 FCFA", description: "Dégustation de sushi frais, takoyaki et spécialités au marché extérieur" },
+      { icon: Camera, name: "Shibuya & Harajuku", duration: "3h", price: "18 000 FCFA", description: "Traversée du célèbre carrefour, mode kawaii et culture pop japonaise" },
+      { icon: Mountain, name: "Excursion Mont Fuji", duration: "Full day", price: "80 000 FCFA", description: "Journée au pied du Mont Fuji avec lac Kawaguchi et onsen traditionnel" },
+      { icon: ThermometerSun, name: "Cérémonie du thé", duration: "1h30", price: "22 000 FCFA", description: "Initiation à la cérémonie du thé dans une maison traditionnelle" },
+      { icon: Waves, name: "Croisière baie de Tokyo", duration: "2h", price: "35 000 FCFA", description: "Navigation dans la baie avec vue sur Rainbow Bridge et Odaiba" },
+    ],
+    'Bali': [
+      { icon: Mountain, name: "Rizières de Tegallalang", duration: "4h", price: "20 000 FCFA", description: "Trek dans les rizières en terrasses classées UNESCO" },
+      { icon: Waves, name: "Surf à Kuta Beach", duration: "3h", price: "25 000 FCFA", description: "Cours de surf pour débutants sur les vagues douces de Kuta" },
+      { icon: Building2, name: "Temples sacrés d'Ubud", duration: "5h", price: "28 000 FCFA", description: "Visite de Tirta Empul, Goa Gajah et de la forêt des singes" },
+      { icon: ThermometerSun, name: "Lever de soleil au Mont Batur", duration: "6h", price: "35 000 FCFA", description: "Randonnée nocturne pour admirer le lever de soleil sur le volcan" },
+      { icon: Utensils, name: "Cours de cuisine balinaise", duration: "4h", price: "30 000 FCFA", description: "Marché local et préparation de plats traditionnels avec un chef" },
+      { icon: Camera, name: "Cascades de Sekumpul", duration: "5h", price: "22 000 FCFA", description: "Randonnée tropicale vers les plus belles cascades de Bali" },
+    ],
+    'New York': [
+      { icon: Building2, name: "Empire State & Times Square", duration: "3h", price: "30 000 FCFA", description: "Vue panoramique depuis l'Empire State et immersion à Times Square" },
+      { icon: Camera, name: "Statue de la Liberté", duration: "4h", price: "35 000 FCFA", description: "Ferry vers Liberty Island et Ellis Island avec audio-guide" },
+      { icon: Mountain, name: "Central Park à vélo", duration: "2h30", price: "18 000 FCFA", description: "Balade à vélo dans le poumon vert de Manhattan" },
+      { icon: Utensils, name: "Food tour à Brooklyn", duration: "3h", price: "40 000 FCFA", description: "Pizza, bagels et spécialités de Brooklyn avec un guide foodie" },
+      { icon: Waves, name: "Croisière autour de Manhattan", duration: "2h", price: "28 000 FCFA", description: "Tour complet de l'île avec vues sur la skyline et les ponts" },
+      { icon: ThermometerSun, name: "Broadway & spectacle", duration: "4h", price: "65 000 FCFA", description: "Visite du quartier des théâtres et billet pour un spectacle Broadway" },
+    ],
+    'Marrakech': [
+      { icon: Building2, name: "Médina & souks", duration: "3h", price: "15 000 FCFA", description: "Plongée dans le labyrinthe coloré des souks avec guide local" },
+      { icon: Utensils, name: "Cours de cuisine marocaine", duration: "4h", price: "25 000 FCFA", description: "Préparez tagine, couscous et pastilla dans un riad traditionnel" },
+      { icon: Mountain, name: "Excursion Atlas", duration: "Full day", price: "45 000 FCFA", description: "Randonnée dans les montagnes de l'Atlas et villages berbères" },
+      { icon: ThermometerSun, name: "Hammam & spa", duration: "2h", price: "20 000 FCFA", description: "Rituel de hammam traditionnel avec gommage et massage" },
+      { icon: Camera, name: "Jardin Majorelle & palais", duration: "3h", price: "18 000 FCFA", description: "Visite du jardin Majorelle, Palais Bahia et tombeaux Saadiens" },
+      { icon: Waves, name: "Excursion Essaouira", duration: "Full day", price: "40 000 FCFA", description: "Journée dans la cité portuaire avec médina, plage et poisson frais" },
+    ],
+    'Abidjan': [
+      { icon: Camera, name: "Tour du Plateau", duration: "3h", price: "12 000 FCFA", description: "Découverte du quartier d'affaires, cathédrale Saint-Paul et marché" },
+      { icon: Waves, name: "Plages de Grand-Bassam", duration: "Full day", price: "20 000 FCFA", description: "Journée balnéaire dans la cité historique classée UNESCO" },
+      { icon: Utensils, name: "Maquis & street food", duration: "3h", price: "15 000 FCFA", description: "Tour des meilleurs maquis pour attiéké, alloco et grillades" },
+      { icon: Building2, name: "Musée des civilisations", duration: "2h", price: "8 000 FCFA", description: "Art et histoire de la Côte d'Ivoire au musée d'Abidjan" },
+      { icon: Mountain, name: "Parc du Banco", duration: "4h", price: "10 000 FCFA", description: "Randonnée en forêt tropicale au cœur de la ville" },
+      { icon: ThermometerSun, name: "Île Boulay en pirogue", duration: "5h", price: "18 000 FCFA", description: "Traversée en pirogue et découverte de la vie insulaire lagunaire" },
+    ],
+    'Dakar': [
+      { icon: Camera, name: "Île de Gorée", duration: "4h", price: "15 000 FCFA", description: "Visite historique de l'île classée UNESCO, Maison des Esclaves" },
+      { icon: Waves, name: "Surf à Ngor", duration: "3h", price: "20 000 FCFA", description: "Cours de surf sur les spots réputés de la presqu'île de Ngor" },
+      { icon: Utensils, name: "Thiéboudienne & saveurs", duration: "3h", price: "18 000 FCFA", description: "Dégustation du plat national et spécialités sénégalaises" },
+      { icon: Mountain, name: "Lac Rose", duration: "Full day", price: "30 000 FCFA", description: "Excursion au Lac Retba avec baignade et villages de pêcheurs" },
+      { icon: Building2, name: "Monument de la Renaissance", duration: "2h", price: "10 000 FCFA", description: "Visite du monument et vue panoramique sur Dakar" },
+      { icon: ThermometerSun, name: "Marché Sandaga", duration: "2h", price: "8 000 FCFA", description: "Immersion dans le plus grand marché de Dakar, tissus et artisanat" },
+    ],
+  };
+
+  const defaultActivities = [
     { icon: Camera, name: "Visite guidée de la ville", duration: "3-4h", price: "25 000 FCFA", description: "Explorez les sites emblématiques avec un guide local expérimenté" },
     { icon: Utensils, name: "Découverte gastronomique", duration: "2-3h", price: "35 000 FCFA", description: "Dégustez les spécialités culinaires locales authentiques" },
     { icon: Mountain, name: "Randonnée & Nature", duration: "5-6h", price: "40 000 FCFA", description: "Parcourez les paysages naturels spectaculaires de la région" },
@@ -83,6 +150,9 @@ const DestinationDetail = () => {
     { icon: Waves, name: "Activités nautiques", duration: "2-3h", price: "45 000 FCFA", description: "Sports et loisirs aquatiques pour tous les niveaux" },
     { icon: ThermometerSun, name: "Expérience locale", duration: "Full day", price: "50 000 FCFA", description: "Immersion complète dans la culture et les traditions locales" },
   ];
+
+  const destName = destination?.name || '';
+  const activities = destinationActivitiesMap[destName] || defaultActivities;
 
   const availabilities = [
     { date: "Aujourd'hui", slots: 5, status: "available" },
@@ -92,29 +162,36 @@ const DestinationDetail = () => {
     { date: new Date(Date.now() + 4 * 86400000).toLocaleDateString('fr-FR'), slots: 12, status: "available" },
   ];
 
-  const reviews = [
-    {
-      author: "Marie Dubois",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Marie",
-      rating: 5,
-      date: "Il y a 2 semaines",
-      comment: "Destination absolument magnifique ! L'accueil était chaleureux et les paysages à couper le souffle."
-    },
-    {
-      author: "Jean Martin",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jean",
-      rating: 4,
-      date: "Il y a 1 mois",
-      comment: "Très belle expérience. Quelques points d'amélioration mais globalement très satisfait."
-    },
-    {
-      author: "Sophie Laurent",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sophie",
-      rating: 5,
-      date: "Il y a 2 mois",
-      comment: "Un voyage inoubliable ! Je recommande vivement cette destination."
-    },
+  const destinationReviewsMap: Record<string, typeof defaultReviews> = {
+    'Paris': [
+      { author: "Aminata Diallo", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Aminata", rating: 5, date: "Il y a 1 semaine", comment: "Paris est magique ! La Tour Eiffel illuminée le soir et les croissants chauds le matin, un vrai rêve éveillé." },
+      { author: "Kouamé Yao", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Kouame", rating: 4, date: "Il y a 3 semaines", comment: "Le Louvre est immense, prévoyez une journée entière. Les quais de Seine sont parfaits pour se balader." },
+      { author: "Fatou Sow", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Fatou", rating: 5, date: "Il y a 1 mois", comment: "Montmartre est mon coup de cœur ! Ambiance bohème et vue exceptionnelle sur tout Paris." },
+    ],
+    'Dubai': [
+      { author: "Ibrahim Koné", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Ibrahim", rating: 5, date: "Il y a 2 semaines", comment: "Le safari dans le désert est absolument incroyable. Le dîner sous les étoiles restera gravé dans ma mémoire." },
+      { author: "Awa Traoré", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Awa", rating: 5, date: "Il y a 1 mois", comment: "Dubai dépasse toutes les attentes ! Le Burj Khalifa au coucher du soleil, c'est juste extraordinaire." },
+      { author: "Moussa Camara", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Moussa", rating: 4, date: "Il y a 2 mois", comment: "Le Dubai Mall est gigantesque. Les souks traditionnels offrent un beau contraste avec la modernité." },
+    ],
+    'Abidjan': [
+      { author: "Adjoua Kouassi", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Adjoua", rating: 5, date: "Il y a 1 semaine", comment: "Grand-Bassam est magnifique ! La plage et la cité historique, un mélange parfait de détente et culture." },
+      { author: "Seydou Ouattara", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Seydou", rating: 4, date: "Il y a 2 semaines", comment: "Le Parc du Banco est une vraie surprise au cœur d'Abidjan. Nature et tranquillité garanties." },
+      { author: "Marie-Laure Aka", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=MarieLaure", rating: 5, date: "Il y a 1 mois", comment: "Les maquis d'Abidjan sont incontournables ! Attiéké poisson braisé, un régal absolu." },
+    ],
+    'Dakar': [
+      { author: "Ousmane Ndiaye", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Ousmane", rating: 5, date: "Il y a 1 semaine", comment: "L'île de Gorée est un lieu chargé d'histoire. Émouvant et magnifique, à visiter absolument." },
+      { author: "Aïssatou Ba", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Aissatou", rating: 5, date: "Il y a 3 semaines", comment: "Le Lac Rose est spectaculaire ! Les couleurs changent selon la lumière, c'est fascinant." },
+      { author: "Pape Diop", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Pape", rating: 4, date: "Il y a 1 mois", comment: "Dakar est vivante et accueillante. Le thiéboudienne sur la corniche, moment parfait." },
+    ],
+  };
+
+  const defaultReviews = [
+    { author: "Marie Dubois", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Marie", rating: 5, date: "Il y a 2 semaines", comment: "Destination absolument magnifique ! L'accueil était chaleureux et les paysages à couper le souffle." },
+    { author: "Jean Martin", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jean", rating: 4, date: "Il y a 1 mois", comment: "Très belle expérience. Quelques points d'amélioration mais globalement très satisfait." },
+    { author: "Sophie Laurent", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sophie", rating: 5, date: "Il y a 2 mois", comment: "Un voyage inoubliable ! Je recommande vivement cette destination." },
   ];
+
+  const reviews = destinationReviewsMap[destName] || defaultReviews;
 
   return (
     <div className="min-h-screen bg-background pt-16">
