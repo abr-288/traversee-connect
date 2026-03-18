@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, Activity, Home, Calendar, Users, Crown, Mail, Cog, Percent, Tags, Building2, DollarSign, Megaphone } from "lucide-react";
+import { LayoutDashboard, Package, Activity, Home, Calendar, Users, Crown, Mail, Cog, Percent, Tags, Building2, DollarSign, Megaphone, CreditCard, Star, MapPin, Newspaper } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
 import {
   Sidebar,
