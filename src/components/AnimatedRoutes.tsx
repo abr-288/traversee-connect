@@ -43,6 +43,10 @@ const AdminConfiguration = lazy(() => import("@/pages/admin/AdminConfiguration")
 const AdminAgencies = lazy(() => import("@/pages/admin/AdminAgencies"));
 const AdminCommissions = lazy(() => import("@/pages/admin/AdminCommissions"));
 const AdminAdvertisements = lazy(() => import("@/pages/admin/AdminAdvertisements"));
+const AdminPayments = lazy(() => import("@/pages/admin/AdminPayments"));
+const AdminReviews = lazy(() => import("@/pages/admin/AdminReviews"));
+const AdminNewsletter = lazy(() => import("@/pages/admin/AdminNewsletter"));
+const AdminDestinations = lazy(() => import("@/pages/admin/AdminDestinations"));
 const AgencyDashboard = lazy(() => import("@/pages/agency/AgencyDashboard"));
 const AgencyServices = lazy(() => import("@/pages/agency/AgencyServices"));
 const AgencyActivities = lazy(() => import("@/pages/agency/AgencyActivities"));
