@@ -1,4 +1,4 @@
-import { BarChart3, Users, Calendar, Settings, Home, Bed, Cog, Mail, CreditCard, Megaphone } from "lucide-react";
+import { LayoutDashboard, Package, Activity, Home, Calendar, Users, Crown, Mail, Cog, Percent, Tags, Building2, DollarSign, Megaphone, CreditCard, Star, MapPin, Newspaper } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
@@ -14,14 +14,22 @@ import {
 } from "@/components/ui/sidebar";
 
 const menuItems = [
-  { title: "Vue d'ensemble", url: "/admin", icon: BarChart3 },
+  { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
   { title: "Réservations", url: "/admin/bookings", icon: Calendar },
-  { title: "Utilisateurs", url: "/admin/users", icon: Users },
-  { title: "Services", url: "/admin/services", icon: Settings },
-  { title: "Activités", url: "/admin/activities", icon: Home },
-  { title: "Hébergements", url: "/admin/stays", icon: Bed },
+  { title: "Services", url: "/admin/services", icon: Package },
+  { title: "Activités", url: "/admin/activities", icon: Activity },
+  { title: "Séjours", url: "/admin/stays", icon: Home },
+  { title: "Sous-Agences", url: "/admin/agencies", icon: Building2 },
+  { title: "Commissions", url: "/admin/commissions", icon: DollarSign },
+  { title: "Demandes Abonnements", url: "/admin/subscriptions", icon: Crown },
+  { title: "Plans d'abonnement", url: "/admin/subscription-plans", icon: Tags },
+  { title: "Promotions", url: "/admin/promotions", icon: Percent },
   { title: "Publicités", url: "/admin/advertisements", icon: Megaphone },
-  { title: "Abonnements", url: "/admin/subscriptions", icon: CreditCard },
+  { title: "Paiements", url: "/admin/payments", icon: CreditCard },
+  { title: "Avis Clients", url: "/admin/reviews", icon: Star },
+  { title: "Newsletter", url: "/admin/newsletter", icon: Newspaper },
+  { title: "Destinations", url: "/admin/destinations", icon: MapPin },
+  { title: "Utilisateurs", url: "/admin/users", icon: Users },
   { title: "Templates Email", url: "/admin/email-templates", icon: Mail },
   { title: "Configuration", url: "/admin/configuration", icon: Cog },
 ];
