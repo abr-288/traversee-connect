@@ -1,0 +1,862 @@
+{
+  "nav": {
+    "flights": "Flights",
+    "hotels": "Hotels",
+    "flightHotel": "Flight + Hotel",
+    "trains": "Trains",
+    "events": "Events",
+    "carRental": "Car Rental",
+    "subscriptions": "Subscriptions",
+    "support": "Support",
+    "login": "Login",
+    "signup": "Sign Up",
+    "myAccount": "My Account",
+    "admin": "Admin",
+    "logout": "Logout",
+    "logoutSuccess": "Logout successful",
+    "dashboard": "Dashboard",
+    "profile": "My Profile",
+    "others": "Others",
+    "destinations": "Destinations",
+    "stays": "Stays"
+  },
+  "hero": {
+    "title": "Travel anywhere, book in one click",
+    "subtitle": "Find the best deals for your flights, hotels, trains and much more",
+    "search": "Search"
+  },
+  "flights": {
+    "from": "From where?",
+    "to": "To where?",
+    "departure": "Departure",
+    "arrival": "Arrival",
+    "departureDate": "Pick date",
+    "returnDate": "Pick date",
+    "passengers": "Passengers",
+    "roundtrip": "Round trip",
+    "oneway": "One way",
+    "search": "Search"
+  },
+  "search": {
+    "from": "From",
+    "to": "To",
+    "departure": "Departure",
+    "return": "Return",
+    "departureDate": "Departure date",
+    "returnDate": "Return date",
+    "passengers": "Passengers",
+    "adults": "Adults",
+    "children": "Children",
+    "infants": "Infants",
+    "oneWay": "One Way",
+    "roundTrip": "Round Trip",
+    "multiCity": "Multi-City",
+    "class": {
+      "title": "Class",
+      "economy": "Economy",
+      "premium": "Premium",
+      "business": "Business",
+      "first": "First"
+    },
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "rooms": "Rooms",
+    "pickup": "Pickup",
+    "dropoff": "Drop-off",
+    "search": "Search",
+    "results": "results found",
+    "book": "Book",
+    "seatsAvailable": "seats available",
+    "destination": "Destination",
+    "location": "Location",
+    "date": "Date",
+    "time": "Time",
+    "category": "Category",
+    "allCategories": "All categories",
+    "cityOrAirport": "City or airport",
+    "cityRegionCountry": "City, region or country",
+    "guests": "Guests",
+    "duration": "Duration",
+    "days": "days",
+    "type": "Type",
+    "searching": "Searching..."
+  },
+  "features": {
+    "title": "Why Choose B-Reserve?",
+    "bestPrices": "Best Prices",
+    "bestPricesDesc": "Guaranteed lowest prices",
+    "support": "24/7 Support",
+    "supportDesc": "Assistance available anytime",
+    "easyBooking": "Easy Booking",
+    "easyBookingDesc": "Simple booking process",
+    "securePayment": "Secure Payment",
+    "securePaymentDesc": "100% secure transactions",
+    "secureBooking": {
+      "title": "Secure Booking",
+      "description": "100% secure payments with data protection"
+    },
+    "bestPrices": {
+      "title": "Best Prices Guaranteed",
+      "description": "We guarantee you the best rates on the market"
+    },
+    "support247": {
+      "title": "24/7 Support",
+      "description": "Our team is available at all times to help you"
+    }
+  },
+  "destinations": {
+    "title": "Popular Destinations",
+    "subtitle": "Explore our most popular destinations and live unforgettable experiences",
+    "explore": "Explore",
+    "book": "Book",
+    "perNight": "per night",
+    "reviews": "reviews",
+    "viewAll": "View All Destinations"
+  },
+  "testimonials": {
+    "title": "What Our Customers Say",
+    "subtitle": "Thousands of satisfied travelers share their experiences",
+    "readMore": "Read more",
+    "traveler": "Regular Traveler",
+    "entrepreneur": "Entrepreneur",
+    "guide": "Tour Guide",
+    "comment1": "An exceptional platform! I booked my stay in Grand-Bassam in just a few clicks. Impeccable service and magnificent hotel.",
+    "comment2": "The best booking service I've used. Prices are competitive and customer support is very responsive.",
+    "comment3": "I highly recommend! The variety of options and the simplicity of the booking process are remarkable."
+  },
+  "offers": {
+    "title": "Exclusive Promotions",
+    "subtitle": "Take advantage of our best offers before they expire!",
+    "limited": "Limited Offers",
+    "expiresIn": "Expires in",
+    "days": "days",
+    "bookNow": "Book now"
+  },
+  "stats": {
+    "bookings": "Bookings",
+    "destinations": "Destinations",
+    "services": "Available Services",
+    "rating": "Average Rating"
+  },
+  "footer": {
+    "description": "Your trusted partner for unforgettable travels around the world.",
+    "services": "Our Services",
+    "flights": "Flights",
+    "hotels": "Hotels",
+    "flightHotel": "Flight + Hotel",
+    "cars": "Cars",
+    "stays": "Stays",
+    "activities": "Activities",
+    "company": "Company",
+    "about": "About",
+    "careers": "Careers",
+    "press": "Press",
+    "support": "Support",
+    "help": "Help Center",
+    "contact": "Contact",
+    "faq": "FAQ",
+    "legal": "Legal",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "rights": "All rights reserved",
+    "newsletter": {
+      "title": "Newsletter",
+      "description": "Get our latest offers and news",
+      "placeholder": "Your email",
+      "subscribe": "Subscribe",
+      "emailRequired": "Please enter your email",
+      "subscribeSuccess": "Subscription successful!",
+      "subscribeError": "Subscription error"
+    }
+  },
+  "boss": {
+    "title": "Boss - Travel Assistant",
+    "welcome": "Hello! I'm Boss, your travel assistant. How can I help you?",
+    "placeholder": "Ask your question...",
+    "response": "I'm here to help you with your flight, hotel, train and event bookings. How can I assist you?"
+  },
+  "dashboard": {
+    "title": "My Dashboard",
+    "welcome": "Welcome",
+    "subtitle": "Manage your bookings and track your travels",
+    "stats": {
+      "totalBookings": "Total Bookings",
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "totalSpent": "Total Spent"
+    },
+    "tabs": {
+      "all": "All",
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "calendar": "Calendar"
+    },
+    "noBookings": {
+      "title": "No bookings",
+      "description": "Start planning your next trip",
+      "action": "Explore destinations"
+    },
+    "reminders": {
+      "title": "Upcoming Reminders",
+      "departingTomorrow": "Departing tomorrow!",
+      "departingIn": "Departing in"
+    }
+  },
+  "booking": {
+    "reference": "Reference",
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "cancelled": "Cancelled",
+      "completed": "Completed"
+    },
+    "payment": {
+      "paid": "Paid",
+      "pending": "Pending",
+      "failed": "Failed",
+      "refunded": "Refunded"
+    },
+    "actions": {
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "delete": "Delete",
+      "exportPDF": "Export PDF",
+      "viewDetails": "View details"
+    },
+    "dialogs": {
+      "delete": {
+        "title": "Delete booking",
+        "description": "Are you sure you want to delete this booking? This action is irreversible.",
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      },
+      "cancel": {
+        "title": "Cancel booking",
+        "description": "Are you sure you want to cancel this booking? A refund will be processed according to our policy.",
+        "cancel": "No, keep it",
+        "confirm": "Yes, cancel"
+      }
+    },
+    "details": {
+      "traveler": "Traveler",
+      "email": "Email",
+      "phone": "Phone",
+      "guests": "Guests",
+      "destination": "Destination",
+      "departure": "Departure date",
+      "return": "Return date",
+      "totalPrice": "Total amount",
+      "paymentStatus": "Payment status",
+      "serviceType": "Service type"
+    }
+  },
+  "payment": {
+    "title": "Payment",
+    "subtitle": "Complete your booking by making the payment",
+    "bookingDetails": "Booking details",
+    "reference": "Reference",
+    "amount": "Amount",
+    "paymentInfo": "Payment information",
+    "method": "Payment method",
+    "methods": {
+      "wave": "Wave (Mobile Money)",
+      "orangeMoney": "Orange Money",
+      "mtn": "MTN Mobile Money",
+      "moov": "Moov Money",
+      "card": "Credit/Debit Card",
+      "bankTransfer": "Bank Transfer"
+    },
+    "customerInfo": "Customer information",
+    "fullName": "Full name",
+    "email": "Email",
+    "phone": "Phone",
+    "phoneNote": "This number will be used for mobile payment",
+    "address": "Address",
+    "city": "City",
+    "payButton": "Pay",
+    "processing": "Processing...",
+    "securedBy": "Payment secured by CinetPay",
+    "errors": {
+      "missingFields": "Please fill in all required fields",
+      "invalidPhone": "Invalid phone number (minimum 8 digits)",
+      "invalidEmail": "Invalid email address",
+      "alreadyPaid": "Payment already completed",
+      "bookingNotFound": "Booking not found or access denied",
+      "bookingCancelled": "This booking has been cancelled and cannot be paid",
+      "paymentFailed": "Error processing payment"
+    },
+    "success": {
+      "title": "Payment successful",
+      "description": "Your payment has been processed successfully",
+      "emailSent": "A confirmation email has been sent"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "noNotifications": "No notifications",
+    "markAllRead": "Mark all as read",
+    "types": {
+      "success": "Success",
+      "info": "Information",
+      "warning": "Warning",
+      "error": "Error"
+    }
+  },
+  "calendar": {
+    "title": "Booking Calendar",
+    "filterByType": "Filter by type",
+    "filterByStatus": "Filter by status",
+    "all": "All",
+    "selectDate": "Select a date to view bookings",
+    "bookingsOn": "Bookings on",
+    "noBookings": "No bookings for this date"
+  },
+  "profile": {
+    "title": "My Profile",
+    "personalInfo": "Personal information",
+    "fullName": "Full name",
+    "email": "Email",
+    "phone": "Phone",
+    "save": "Save",
+    "cancel": "Cancel",
+    "passwordChange": "Change password",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password"
+  },
+  "auth": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "email": "Email address",
+    "password": "Password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "signupNow": "Sign up now",
+    "loginNow": "Login",
+    "welcomeBack": "Welcome back",
+    "createAccount": "Create an account",
+    "fullName": "Full name",
+    "or": "or",
+    "continueWithGoogle": "Continue with Google",
+    "termsAgreement": "By signing up, you agree to our",
+    "termsOfUse": "terms of use",
+    "and": "and our",
+    "privacyPolicy": "privacy policy",
+    "passwordStrength": {
+      "veryWeak": "Very weak",
+      "weak": "Weak",
+      "medium": "Medium",
+      "strong": "Strong",
+      "veryStrong": "Very strong"
+    },
+    "yourAgency": "Your trusted travel agency",
+    "secureConnection": "Secure SSL connection",
+    "validation": {
+      "emailRequired": "Email is required",
+      "emailInvalid": "Invalid email format",
+      "emailTooLong": "Email cannot exceed 255 characters",
+      "passwordMin": "Password must be at least 8 characters",
+      "passwordMax": "Password cannot exceed 128 characters",
+      "passwordUppercase": "Password must contain at least one uppercase letter",
+      "passwordLowercase": "Password must contain at least one lowercase letter",
+      "passwordNumber": "Password must contain at least one number",
+      "nameMin": "Name must be at least 2 characters",
+      "nameMax": "Name cannot exceed 100 characters",
+      "nameInvalid": "Name contains invalid characters",
+      "passwordRequired": "Password is required",
+      "passwordMismatch": "Passwords do not match"
+    },
+    "errors": {
+      "existingAccount": "Existing account",
+      "existingAccountDesc": "An account already exists with this email. Log in or reset your password.",
+      "signupError": "Signup error",
+      "invalidCredentials": "Invalid credentials",
+      "invalidCredentialsDesc": "Invalid email or password. Please check your information.",
+      "loginError": "Login error",
+      "googleError": "Google error"
+    },
+    "success": {
+      "signup": "Signup successful",
+      "signupDesc": "Check your email to confirm your account",
+      "login": "Login successful",
+      "loginDesc": "Welcome to B-Reserve!",
+      "resetSent": "Email sent",
+      "resetSentDesc": "Check your inbox to reset your password",
+      "passwordUpdated": "Password updated",
+      "passwordUpdatedDesc": "Your password has been changed successfully"
+    },
+    "updatePassword": "New password",
+    "updatePasswordDesc": "Enter your new password below",
+    "confirmNewPassword": "Confirm new password",
+    "updateBtn": "Update"
+  },
+  "errors": {
+    "generic": "An error occurred",
+    "networkError": "Network error",
+    "unauthorized": "Unauthorized",
+    "notFound": "Not found",
+    "serverError": "Server error"
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "export": "Export",
+    "download": "Download",
+    "upload": "Upload",
+    "required": "Required",
+    "optional": "Optional",
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Information",
+    "install": "Install app",
+    "lightMode": "Light mode",
+    "darkMode": "Dark mode",
+    "systemMode": "System",
+    "toggleTheme": "Toggle theme"
+  },
+  "pages": {
+    "index": {
+      "aiTitle": "Plan your trip with AI",
+      "aiSubtitle": "Get personalized recommendations for your next destination"
+    },
+    "flights": {
+      "title": "Search Flights",
+      "subtitle": "Compare and book the best flights at the best prices",
+      "filters": {
+        "title": "Filters",
+        "price": "Price",
+        "duration": "Max duration",
+        "hours": "hours",
+        "stops": "Stops",
+        "all": "All",
+        "direct": "Direct",
+        "oneStop": "1 stop",
+        "airlines": "Airlines",
+        "sortBy": "Sort by",
+        "cheapest": "Cheapest",
+        "fastest": "Fastest",
+        "earliest": "Earliest"
+      },
+      "results": {
+        "showing": "Showing",
+        "of": "of",
+        "flights": "flights",
+        "noResults": "No results",
+        "noResultsDesc": "Modify your search criteria",
+        "duration": "Duration",
+        "stops": "stops",
+        "direct": "Direct"
+      }
+    },
+    "hotels": {
+      "title": "Search Hotels",
+      "subtitle": "Find the perfect accommodation for your stay",
+      "filters": {
+        "title": "Filters",
+        "destination": "Destination",
+        "allDestinations": "All destinations",
+        "stars": "Stars",
+        "allStars": "All",
+        "amenities": "Amenities",
+        "wifi": "WiFi",
+        "restaurant": "Restaurant",
+        "parking": "Parking",
+        "price": "Price per night",
+        "sortBy": "Sort by",
+        "priceLow": "Price ascending",
+        "priceHigh": "Price descending",
+        "rating": "Rating",
+        "stars": "Stars"
+      },
+      "results": {
+        "showing": "Showing",
+        "to": "to",
+        "of": "of",
+        "hotels": "hotels",
+        "night": "per night",
+        "reviews": "reviews",
+        "noResults": "No results",
+        "noResultsDesc": "Modify your search criteria",
+        "compare": "Compare",
+        "comparing": "Comparing",
+        "viewComparison": "View comparison"
+      }
+    },
+    "support": {
+      "title": "Support Center",
+      "subtitle": "We're here to help you 24/7",
+      "contact": {
+        "phone": "Phone",
+        "phoneDesc": "Available 24/7",
+        "email": "Email",
+        "emailDesc": "Response within 24h",
+        "chat": "Live Chat",
+        "chatDesc": "Immediate response"
+      },
+      "form": {
+        "title": "Send us a message",
+        "name": "Full name",
+        "email": "Email",
+        "reference": "Booking reference (optional)",
+        "subject": "Subject",
+        "message": "Your message",
+        "send": "Send",
+        "sending": "Sending..."
+      },
+      "faq": {
+        "title": "Frequently Asked Questions",
+        "q1": "How can I modify my booking?",
+        "a1": "You can modify your booking by logging into your account and accessing 'My Bookings'. Click on the relevant booking and select 'Modify'. Note that fees may apply depending on fare conditions.",
+        "q2": "What payment methods are accepted?",
+        "a2": "We accept credit cards (Visa, Mastercard), Mobile Money (Orange Money, MTN Money, Moov Money), and bank transfers. Cash payment is possible at our agencies.",
+        "q3": "How can I get a refund?",
+        "a3": "Refund requests must be submitted through your account within 24h after cancellation. Processing time is 7 to 14 business days depending on your bank.",
+        "q4": "Can I travel with children?",
+        "a4": "Yes, children are welcome. Reduced rates are available for children under 12. Some services offer free travel for children under 2.",
+        "q5": "What documents are needed for travel?",
+        "a5": "For international flights, a valid passport is mandatory. Depending on the destination, a visa may be required. For domestic flights, an ID card is sufficient. Check our destination guide for more information.",
+        "q6": "What to do in case of flight delay or cancellation?",
+        "a6": "In case of delay or cancellation, contact our customer service immediately available 24/7. We will assist you in finding an alternative solution or processing your refund."
+      },
+      "hours": {
+        "title": "Opening Hours",
+        "247": "Service available 24/7"
+      }
+    }
+  },
+  "booking": {
+    "dialog": {
+      "flight": {
+        "title": "Book this flight",
+        "description": "Fill in the information below to complete your booking",
+        "tripType": "Trip type",
+        "oneWay": "One way",
+        "roundTrip": "Round trip",
+        "summary": "Booking summary",
+        "flightDetails": "Flight details",
+        "passengerInfo": "Passenger information",
+        "confirmBooking": "Confirm booking",
+        "backToForm": "Back"
+      },
+      "hotel": {
+        "title": "Book",
+        "description": "Fill in the information below to complete your booking",
+        "rooms": "Number of rooms",
+        "adults": "Adults",
+        "children": "Children"
+      },
+      "car": {
+        "title": "Book",
+        "description": "Fill in the information below to complete your booking",
+        "pickupInfo": "Pickup information",
+        "dropoffInfo": "Drop-off information",
+        "pickupDate": "Pickup date",
+        "pickupTime": "Pickup time",
+        "pickupLocation": "Pickup location",
+        "dropoffDate": "Drop-off date",
+        "dropoffTime": "Drop-off time",
+        "dropoffLocation": "Drop-off location",
+        "driverLicense": "Driver's license number"
+      },
+      "generic": {
+        "title": "Book",
+        "description": "Fill in the information below to complete your booking",
+        "startDate": "Start date",
+        "endDate": "End date",
+        "guests": "Number of guests"
+      }
+    },
+    "form": {
+      "passengers": "Number of passengers",
+      "customerInfo": "Traveler information",
+      "customerName": "Full name",
+      "customerEmail": "Email",
+      "customerPhone": "Phone",
+      "passportNumber": "Passport number",
+      "passportIssueDate": "Passport issue date",
+      "passportExpiryDate": "Passport expiry date",
+      "notes": "Additional notes",
+      "specialRequests": "Special requests, preferences...",
+      "driverInfo": "Driver information"
+    },
+    "summary": {
+      "flightDetails": "Flight details",
+      "hotelDetails": "Hotel details",
+      "carDetails": "Car details",
+      "from": "From",
+      "to": "To",
+      "departure": "Departure",
+      "arrival": "Arrival",
+      "class": "Class",
+      "airline": "Airline",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "nights": "night(s)",
+      "location": "Location",
+      "category": "Category",
+      "transmission": "Transmission",
+      "seats": "Seats",
+      "pickupDate": "Pickup date",
+      "dropoffDate": "Drop-off date",
+      "days": "day(s)",
+      "passengerInfo": "Passenger information",
+      "totalPrice": "Total price",
+      "modify": "Modify",
+      "confirm": "Confirm booking",
+      "confirming": "Confirming...",
+      "downloadTicket": "Download ticket",
+      "proceedToPayment": "Proceed to payment",
+      "route": "Route",
+      "type": "Type",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone"
+    },
+    "validation": {
+      "checkInfo": "Please check your information",
+      "mustBeLoggedIn": "You must be logged in to book",
+      "selectDates": "Please select dates",
+      "selectCheckInOut": "Please select check-in and check-out dates",
+      "checkOutAfterCheckIn": "Check-out date must be after check-in date",
+      "dropoffAfterPickup": "Drop-off date must be after pickup date",
+      "confirmFirst": "Please confirm the booking first"
+    },
+    "success": {
+      "created": "Booking created",
+      "description": "Your booking has been created successfully",
+      "emailSent": "Confirmation email sent",
+      "ticketGenerated": "Ticket generated successfully",
+      "ticketDownloaded": "Ticket downloaded successfully"
+    },
+    "error": {
+      "createService": "Unable to create service",
+      "createBooking": "Unable to create booking",
+      "sendEmail": "Error sending confirmation email",
+      "generateTicket": "Error generating ticket",
+      "downloadTicket": "Error downloading ticket"
+    },
+    "loading": {
+      "generatingTicket": "Generating ticket..."
+    }
+  },
+  "notFound": {
+    "title": "404",
+    "subtitle": "Page not found",
+    "description": "The page you are looking for does not exist or has been moved.",
+    "backHome": "Back to home"
+  },
+  "priceAlerts": {
+    "title": "Price Alerts",
+    "subtitle": "Monitor prices and get notified when they drop",
+    "myAlerts": "My Alerts",
+    "createAlert": "Create Alert"
+  },
+  "activities": {
+    "title": "Activities & Experiences",
+    "subtitle": "Live unique moments with our selected activities",
+    "noActivities": "No activities available",
+    "startingFrom": "Starting from",
+    "book": "Book"
+  },
+  "cars": {
+    "title": "Car Rental",
+    "subtitle": "Rent a car suited to your needs",
+    "filters": "Filters",
+    "pickupLocation": "Pickup location",
+    "cityOrAirport": "City or airport...",
+    "category": "Category",
+    "all": "All",
+    "economy": "Economy",
+    "sedan": "Sedan",
+    "suv": "SUV",
+    "luxury": "Luxury",
+    "pricePerDay": "Price per day",
+    "transmission": "Transmission",
+    "automatic": "Automatic",
+    "manual": "Manual",
+    "fuel": "Fuel",
+    "petrol": "Petrol",
+    "diesel": "Diesel",
+    "resetFilters": "Reset filters",
+    "loading": "Loading...",
+    "vehiclesAvailable": "vehicle(s) available",
+    "noVehicles": "No vehicles match your criteria",
+    "perDay": "per day",
+    "sortBy": {
+      "popular": "Most popular",
+      "priceAsc": "Price ascending",
+      "priceDesc": "Price descending",
+      "rating": "Best rated"
+    },
+    "carsFound": "cars found",
+    "displayLocal": "Displaying locally available cars"
+  },
+  "bookingHistory": {
+    "title": "My Bookings",
+    "subtitle": "View and manage all your bookings",
+    "tabs": {
+      "all": "All",
+      "flights": "Flights",
+      "hotels": "Hotels",
+      "cars": "Cars",
+      "tours": "Tours"
+    },
+    "noBookings": "No bookings found",
+    "discoverOffers": "Discover our offers",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "travelers": "Travelers",
+    "person": "person(s)",
+    "totalAmount": "Total amount",
+    "notes": "Notes",
+    "downloadTicket": "Download ticket",
+    "modifyBooking": "Modify booking",
+    "finalizePayment": "Finalize payment",
+    "bookingMadeOn": "Booking made on",
+    "loadingError": "Error loading your bookings",
+    "ticketGenerating": "Generating ticket...",
+    "ticketSuccess": "Ticket sent by email! Use Ctrl+P to save as PDF",
+    "ticketError": "Error downloading ticket"
+  },
+  "subscriptions": {
+    "title": "Our Subscription Plans",
+    "subtitle": "Choose the plan that suits your needs",
+    "popular": "Popular",
+    "selectPlan": "Select this plan",
+    "contactUs": "Contact us",
+    "contactCta": {
+      "title": "Need help choosing?",
+      "subtitle": "Our team is here to help you choose the right plan for your needs.",
+      "button": "Contact us"
+    },
+    "dialog": {
+      "title": "Request a quote for",
+      "description": "Fill out this form and our team will contact you as soon as possible.",
+      "name": "Full name",
+      "email": "Email",
+      "phone": "Phone",
+      "company": "Company (optional)",
+      "message": "Message (optional)",
+      "submit": "Send request",
+      "submitting": "Sending...",
+      "success": "Request sent successfully!",
+      "successDesc": "Our team will contact you within 24h.",
+      "error": "Error sending",
+      "errorDesc": "Please try again later."
+    }
+  },
+  "confirmation": {
+    "loading": "Loading your booking...",
+    "error": "Error",
+    "notFound": "Booking not found",
+    "notFoundDesc": "Unable to find details for this booking.",
+    "backToHome": "Back to home",
+    "bookingNumber": "Booking number",
+    "actions": "Actions",
+    "print": "Print",
+    "share": "Share",
+    "contactSupport": "Contact support",
+    "confirmed": "Booking confirmed!",
+    "confirmedDesc": "Your booking has been successfully confirmed. A confirmation email has been sent.",
+    "failed": "Booking failed",
+    "failedDesc": "Your booking confirmation failed. Please contact support.",
+    "paymentPending": "Payment in progress",
+    "paymentPendingDesc": "Your payment is being processed. Please wait...",
+    "pending": "Pending",
+    "pendingDesc": "Your booking is awaiting confirmation.",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "participants": "Participants",
+    "person": "person(s)",
+    "contact": "Contact",
+    "amountPaid": "Amount paid",
+    "paid": "Paid",
+    "viewBookings": "View my bookings",
+    "important": "Important information",
+    "keepRef": "Keep your booking number",
+    "emailSent": "A confirmation email has been sent to",
+    "presentRef": "Present this number upon arrival",
+    "questions": "For any questions, contact our 24/7 support",
+    "serviceTypes": {
+      "flight": "Flight",
+      "hotel": "Hotel",
+      "car": "Car rental",
+      "tour": "Tour",
+      "stay": "Stay",
+      "default": "Service"
+    },
+    "passenger": {
+      "main": "Main",
+      "other": "Passenger"
+    },
+    "bornOn": "Born on"
+  },
+  "dashboardPage": {
+    "title": "My Dashboard",
+    "welcome": "Welcome",
+    "subtitle": "Manage your bookings and track your travels",
+    "totalBookings": "Total Bookings",
+    "pending": "Pending",
+    "confirmed": "Confirmed",
+    "completed": "Completed",
+    "totalSpent": "Total Spent",
+    "tabs": {
+      "all": "All",
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "calendar": "Calendar"
+    },
+    "noBookings": "No bookings",
+    "startPlanning": "Start planning your next trip",
+    "explore": "Explore destinations",
+    "notifications": {
+      "departingTomorrow": "Departing tomorrow!",
+      "startsTomorrow": "starts tomorrow",
+      "confirmSuccess": "Confirmation successful",
+      "redirectPayment": "Redirecting to payment...",
+      "emailSent": "Booking confirmed and email sent",
+      "emailNotSent": "Email not sent. You can download it manually.",
+      "confirmed": "Booking confirmed",
+      "cancelSuccess": "Cancellation successful",
+      "cancelledRefund": "Booking cancelled. Refund in progress.",
+      "cancelled": "Booking cancelled successfully",
+      "cancelledNotif": "Booking cancelled",
+      "refundNotif": "Refund within 5-7 business days",
+      "comingSoon": "Coming soon",
+      "editSoon": "Edit feature coming soon",
+      "cannotDelete": "Cannot delete",
+      "cannotDeleteDesc": "Cannot delete a paid booking. Please cancel it first.",
+      "deleteSuccess": "Deletion successful",
+      "deleted": "Booking permanently deleted",
+      "deletedNotif": "Booking deleted",
+      "deletedFromHistory": "Booking has been removed from your history"
+    },
+    "errors": {
+      "notFound": "Booking not found",
+      "confirmError": "Unable to confirm booking",
+      "cancelError": "Unable to cancel booking",
+      "deleteError": "Unable to delete booking"
+    }
+  }
+}

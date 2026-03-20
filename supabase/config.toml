@@ -1,0 +1,85 @@
+project_id = "jcjfjyvmtfvmrplonxrg"
+
+[functions.send-booking-confirmation]
+verify_jwt = false
+
+[functions.search-flights]
+verify_jwt = false
+
+[functions.search-hotels]
+verify_jwt = false
+
+[functions.search-trains]
+verify_jwt = false
+
+[functions.search-destinations]
+verify_jwt = false
+
+[functions.search-events]
+verify_jwt = false
+
+[functions.process-payment]
+verify_jwt = true
+
+[functions.payment-callback]
+verify_jwt = false
+
+[functions.generate-invoice]
+verify_jwt = true
+
+[functions.generate-ticket]
+verify_jwt = true
+
+[functions.get-weather]
+verify_jwt = false
+
+[functions.currency-exchange]
+verify_jwt = false
+
+[functions.travel-recommendations]
+verify_jwt = false
+
+[functions.airport-info]
+verify_jwt = false
+
+[functions.car-rental]
+verify_jwt = false
+
+[functions.ai-travel-advisor]
+verify_jwt = false
+
+[functions.search-flight-hotel-packages]
+verify_jwt = false
+
+[functions.newsletter-subscribe]
+verify_jwt = false
+
+[functions.send-support-email]
+verify_jwt = false
+
+[functions.travel-chatbot]
+verify_jwt = false
+
+[functions.send-invoice-email]
+verify_jwt = true
+
+[functions.send-flight-confirmation]
+verify_jwt = true
+
+[functions.generate-booking-pdf]
+verify_jwt = true
+
+[functions.send-booking-pdf-email]
+verify_jwt = true
+
+[functions.create-booking]
+verify_jwt = true
+
+[functions.create-pnr]
+verify_jwt = false
+
+[functions.prebook]
+verify_jwt = true
+
+[functions.checkout]
+verify_jwt = true

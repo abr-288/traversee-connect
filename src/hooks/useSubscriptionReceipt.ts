@@ -1,0 +1,113 @@
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+
+export const useSubscriptionReceipt = () => {
+  const { toast } = useToast();
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const generateReceipt = async (subscriptionRequestId: string) => {
+    setIsGenerating(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("Not authenticated");
+      }
+
+      const { data, error } = await supabase.functions.invoke("generate-subscription-receipt", {
+        body: { subscriptionRequestId },
+      });
+
+      if (error) throw error;
+
+      if (!data || !data.html) {
+        throw new Error("No receipt data received");
+      }
+
+      // Create a new window with the receipt HTML
+      const receiptWindow = window.open("", "_blank");
+      if (!receiptWindow) {
+        throw new Error("Popup blocked. Please allow popups for this site.");
+      }
+
+      receiptWindow.document.write(data.html);
+      receiptWindow.document.close();
+
+      // Trigger print dialog after a short delay to ensure content is loaded
+      setTimeout(() => {
+        receiptWindow.print();
+      }, 500);
+
+      toast({
+        title: "Reçu généré avec succès",
+        description: `Abonnement ${data.receiptRef} - Utilisez Ctrl/Cmd+P pour imprimer`,
+      });
+
+      return true;
+    } catch (error: any) {
+      console.error("Error generating receipt:", error);
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de générer le reçu",
+        variant: "destructive",
+      });
+      return false;
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const downloadReceipt = async (subscriptionRequestId: string) => {
+    setIsGenerating(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("Not authenticated");
+      }
+
+      const { data, error } = await supabase.functions.invoke("generate-subscription-receipt", {
+        body: { subscriptionRequestId },
+      });
+
+      if (error) throw error;
+
+      if (!data || !data.html) {
+        throw new Error("No receipt data received");
+      }
+
+      // Create a blob from the HTML and download it
+      const blob = new Blob([data.html], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `recu-abonnement-${data.receiptRef}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Reçu téléchargé",
+        description: "Ouvrez le fichier dans votre navigateur pour l'imprimer en PDF",
+      });
+
+      return true;
+    } catch (error: any) {
+      console.error("Error downloading receipt:", error);
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de télécharger le reçu",
+        variant: "destructive",
+      });
+      return false;
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  return {
+    generateReceipt,
+    downloadReceipt,
+    isGenerating,
+  };
+};
