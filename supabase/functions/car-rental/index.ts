@@ -806,14 +806,13 @@ serve(async (req) => {
 
     const rapidApiKey = Deno.env.get('RAPIDAPI_KEY');
     if (!rapidApiKey) {
-      console.log('RapidAPI key not configured, returning mock data');
+      console.error('RapidAPI key not configured');
       return new Response(
-        JSON.stringify({ success: true, data: getMockCarRentals(pickupLocation), source: 'mock' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ success: false, error: 'Service location de voitures indisponible. Clé API non configurée.', data: [] }),
+        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Search all available car rental APIs in parallel
     const [bookingResults, pricelineResults, skyscannerResults, carsRentalResults] = await Promise.all([
       searchBookingCars(pickupLocation, pickupDate, dropoffDate, pickupTime, dropoffTime, rapidApiKey),
       searchPricelineCars(pickupLocation, pickupDate, dropoffDate, pickupTime, dropoffTime, rapidApiKey),
@@ -822,14 +821,11 @@ serve(async (req) => {
     ]);
 
     const allCars = [...bookingResults, ...pricelineResults, ...skyscannerResults, ...carsRentalResults];
-    
-    console.log(`Total cars found: ${allCars.length} (Booking: ${bookingResults.length}, Priceline: ${pricelineResults.length}, Skyscanner: ${skyscannerResults.length}, CarsRental: ${carsRentalResults.length})`);
+    console.log(`Total cars found: ${allCars.length}`);
 
-    // If no API results, return mock data
     if (allCars.length === 0) {
-      console.log('No car rental results from APIs, returning mock data');
       return new Response(
-        JSON.stringify({ success: true, data: getMockCarRentals(pickupLocation), source: 'mock' }),
+        JSON.stringify({ success: true, data: [], source: 'api', message: 'Aucune voiture disponible pour cette recherche.' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
