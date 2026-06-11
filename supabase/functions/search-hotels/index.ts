@@ -1124,7 +1124,7 @@ const results: {
         data: results,
         count: results.booking.length + results.xotelo.length + 
                results.tripadvisor.length + results.amadeus.length + results.priceline.length,
-        mock: !apiSuccess || totalResults === 0,
+        mock: false,
         sources: {
           amadeus: results.amadeus.length,
           booking: results.booking.length,
