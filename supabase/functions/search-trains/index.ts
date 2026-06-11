@@ -194,22 +194,19 @@ async function searchSNCFAlternative(
     );
 
     if (!response.ok) {
-      console.log('SNCF alternative API also failed:', response.status);
-      return generateSNCFMockTrains(origin, destination, departureDate, travelClass);
+      console.log('SNCF alternative API failed:', response.status);
+      return [];
     }
 
     const data = await response.json();
-    
-    // If we found stations, generate realistic train data
+    // SNCF station dataset doesn't return real journeys — no synthetic data
     if (data.results && data.results.length > 0) {
-      console.log('Found SNCF stations, generating train schedules');
-      return generateSNCFMockTrains(origin, destination, departureDate, travelClass);
+      console.log('Found SNCF stations but no real journey API available');
     }
-
     return [];
   } catch (error) {
     console.error('SNCF alternative API exception:', error);
-    return generateSNCFMockTrains(origin, destination, departureDate, travelClass);
+    return [];
   }
 }
 
