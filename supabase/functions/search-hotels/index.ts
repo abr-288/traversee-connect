@@ -1113,9 +1113,7 @@ const results: {
     });
     
     if (!apiSuccess || totalResults === 0) {
-      console.log('⚠️ NO API RESULTS - Using realistic hotel data for location:', location);
-      const mockHotels = getMockHotels(location);
-      results.booking = mockHotels;
+      console.log('⚠️ NO API RESULTS for location:', location);
     } else {
       console.log('✅ REAL API DATA - Returning results from', totalResults, 'hotels');
     }
@@ -1126,7 +1124,7 @@ const results: {
         data: results,
         count: results.booking.length + results.xotelo.length + 
                results.tripadvisor.length + results.amadeus.length + results.priceline.length,
-        mock: !apiSuccess || totalResults === 0,
+        mock: false,
         sources: {
           amadeus: results.amadeus.length,
           booking: results.booking.length,

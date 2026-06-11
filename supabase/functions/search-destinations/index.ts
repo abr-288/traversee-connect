@@ -493,38 +493,21 @@ serve(async (req) => {
     }
     
     const rapidApiKey = Deno.env.get('RAPIDAPI_KEY');
-    
+
     if (!rapidApiKey) {
-      console.log('RAPIDAPI_KEY not configured, returning fallback destinations');
-      let destinations = getFallbackDestinations();
-      
-      if (searchQuery) {
-        destinations = destinations.filter(d => 
-          d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          d.country.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-      }
-      
-      if (category && category !== 'all') {
-        destinations = destinations.filter(d => d.category.toLowerCase() === category.toLowerCase());
-      }
-      
-      // Cache fallback results too
-      await setCachedDestinations(cacheKey, destinations, 'fallback');
-      
+      console.error('RAPIDAPI_KEY not configured');
       return new Response(
-        JSON.stringify({ destinations, source: 'fallback', total: destinations.length, cached: false }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ destinations: [], source: 'error', total: 0, error: 'Service destinations indisponible. Clé API non configurée.' }),
+        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     console.log('Fetching destinations from TripAdvisor API...');
 
-    const popularQueries = searchQuery 
-      ? [searchQuery] 
+    const popularQueries = searchQuery
+      ? [searchQuery]
       : ['Paris', 'Dubai', 'Bali', 'Tokyo', 'Maldives', 'Santorini', 'Barcelona', 'Marrakech', 'New York'];
-    
-    // Fetch from TripAdvisor with locations and attractions
+
     const allResults = await Promise.all(
       popularQueries.map(async (query) => {
         const [locations, attractions] = await Promise.all([
@@ -535,7 +518,6 @@ serve(async (req) => {
       })
     );
 
-    // Flatten and deduplicate by name
     const allDestinations = allResults.flat();
     let uniqueDestinations = allDestinations.reduce((acc: Destination[], dest) => {
       if (!acc.find(d => d.name.toLowerCase() === dest.name.toLowerCase())) {
@@ -544,9 +526,8 @@ serve(async (req) => {
       return acc;
     }, []);
 
-    // Apply category filter
     if (category && category !== 'all') {
-      uniqueDestinations = uniqueDestinations.filter(d => 
+      uniqueDestinations = uniqueDestinations.filter(d =>
         d.category.toLowerCase() === category.toLowerCase()
       );
     }
@@ -554,41 +535,29 @@ serve(async (req) => {
     console.log(`Total unique destinations: ${uniqueDestinations.length}`);
 
     if (uniqueDestinations.length > 0) {
-      // Cache the API results
       await setCachedDestinations(cacheKey, uniqueDestinations, 'tripadvisor');
-      
       return new Response(
-        JSON.stringify({ 
-          destinations: uniqueDestinations, 
-          source: 'tripadvisor', 
+        JSON.stringify({
+          destinations: uniqueDestinations,
+          source: 'tripadvisor',
           total: uniqueDestinations.length,
-          cached: false 
+          cached: false
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Fallback if no results
-    console.log('No destinations from API, using fallback');
-    let fallback = getFallbackDestinations();
-    
-    if (category && category !== 'all') {
-      fallback = fallback.filter(d => d.category.toLowerCase() === category.toLowerCase());
-    }
-    
-    // Cache fallback too
-    await setCachedDestinations(cacheKey, fallback, 'fallback');
-    
+    // No real results — return empty, no mock fallback
     return new Response(
-      JSON.stringify({ destinations: fallback, source: 'fallback', total: fallback.length, cached: false }),
+      JSON.stringify({ destinations: [], source: 'tripadvisor', total: 0, cached: false, message: 'Aucune destination trouvée.' }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
     console.error('Error in search-destinations function:', error);
     return new Response(
-      JSON.stringify({ destinations: getFallbackDestinations(), source: 'error-fallback', cached: false }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ destinations: [], source: 'error', error: error instanceof Error ? error.message : 'Unknown error' }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });

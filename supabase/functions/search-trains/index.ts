@@ -194,22 +194,19 @@ async function searchSNCFAlternative(
     );
 
     if (!response.ok) {
-      console.log('SNCF alternative API also failed:', response.status);
-      return generateSNCFMockTrains(origin, destination, departureDate, travelClass);
+      console.log('SNCF alternative API failed:', response.status);
+      return [];
     }
 
     const data = await response.json();
-    
-    // If we found stations, generate realistic train data
+    // SNCF station dataset doesn't return real journeys — no synthetic data
     if (data.results && data.results.length > 0) {
-      console.log('Found SNCF stations, generating train schedules');
-      return generateSNCFMockTrains(origin, destination, departureDate, travelClass);
+      console.log('Found SNCF stations but no real journey API available');
     }
-
     return [];
   } catch (error) {
     console.error('SNCF alternative API exception:', error);
-    return generateSNCFMockTrains(origin, destination, departureDate, travelClass);
+    return [];
   }
 }
 
@@ -354,22 +351,10 @@ serve(async (req) => {
     }
     
     if (region === 'europe') {
-      console.log('Generating European train results...');
-      const euroResults = getMockTrains(origin, destination, departureDate, travelClass);
-      allTrains.push(...euroResults);
+      console.log('European trains: no real API integrated yet');
     }
 
-    // If no results or unknown region, provide mock data
-    if (allTrains.length === 0) {
-      console.log('No API results, generating simulation data...');
-      // Try SNCF first as it's free
-      const sncfResults = await searchSNCF(origin, destination, departureDate, travelClass);
-      if (sncfResults.length > 0) {
-        allTrains.push(...sncfResults);
-      } else {
-        allTrains = getMockTrains(origin, destination, departureDate, travelClass);
-      }
-    }
+    // No mock fallback — return empty if APIs returned nothing
 
     // Sort by price
     allTrains.sort((a, b) => a.price - b.price);

@@ -174,30 +174,27 @@ serve(async (req) => {
     const rapidApiKey = Deno.env.get('RAPIDAPI_KEY');
     
     if (!rapidApiKey) {
-      console.log('RAPIDAPI_KEY not configured, returning mock data');
+      console.error('RAPIDAPI_KEY not configured');
       return new Response(
         JSON.stringify({
-          success: true,
-          events: getMockEvents(location, date, category),
-          total: 5,
+          success: false,
+          error: 'Service événements indisponible. Clé API non configurée.',
+          events: [],
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Search Real-Time Events API (seule API disponible)
     const realTimeResults = await searchRealTimeEvents(location, date, category, rapidApiKey);
-    
     console.log(`Total events found: ${realTimeResults.length}`);
 
-    // If no results from API, return mock data
     if (realTimeResults.length === 0) {
-      console.log('No events from API, returning mock data');
       return new Response(
         JSON.stringify({
           success: true,
-          events: getMockEvents(location, date, category),
-          total: 5,
+          events: [],
+          total: 0,
+          message: 'Aucun événement trouvé pour cette recherche.',
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
