@@ -1113,9 +1113,7 @@ const results: {
     });
     
     if (!apiSuccess || totalResults === 0) {
-      console.log('⚠️ NO API RESULTS - Using realistic hotel data for location:', location);
-      const mockHotels = getMockHotels(location);
-      results.booking = mockHotels;
+      console.log('⚠️ NO API RESULTS for location:', location);
     } else {
       console.log('✅ REAL API DATA - Returning results from', totalResults, 'hotels');
     }
