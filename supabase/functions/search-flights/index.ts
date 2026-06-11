@@ -96,28 +96,39 @@ serve(async (req) => {
     }
 
     if (apiPromises.length === 0) {
-      console.log('No API credentials configured, returning mock data');
-      return getMockFlights(originCode, destinationCode, departureDate, returnDate, adults, finalTravelClass);
+      console.error('No API credentials configured');
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Service de recherche de vols indisponible. Aucun fournisseur API configuré.',
+          data: [],
+        }),
+        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Wait for all API calls to complete
     const apiResults = await Promise.allSettled(apiPromises);
-    
-    // Collect all successful results
+
     apiResults.forEach((result, index) => {
       if (result.status === 'fulfilled' && result.value.length > 0) {
         results.push(...result.value);
         console.log(`API ${index + 1} returned ${result.value.length} flights`);
       } else if (result.status === 'rejected') {
-        // Security: Don't log full error details which may contain API keys or sensitive data
         console.error(`API ${index + 1} failed`);
       }
     });
 
-    // If no results, return mock data
+    // No mock fallback — return empty if APIs returned nothing
     if (results.length === 0) {
-      console.log('No results from API, returning mock data');
-      return getMockFlights(originCode, destinationCode, departureDate, returnDate, adults, finalTravelClass);
+      return new Response(
+        JSON.stringify({
+          success: true,
+          data: [],
+          message: 'Aucun vol disponible pour cette recherche.',
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     return new Response(
