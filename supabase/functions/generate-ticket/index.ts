@@ -9,6 +9,14 @@ const corsHeaders = {
 
 const resend = new Resend(Deno.env.get('RESEND_API_KEY') as string);
 
+const escapeHtml = (str: unknown): string =>
+  String(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -71,7 +79,7 @@ serve(async (req) => {
       <html>
         <head>
           <meta charset="utf-8">
-          <title>Billet et Facture - ${booking.services.name}</title>
+          <title>Billet et Facture - ${escapeHtml(booking.services.name)}</title>
           <style>
             body {
               font-family: Arial, sans-serif;
@@ -180,15 +188,15 @@ serve(async (req) => {
               <div class="section-title">Informations du service</div>
               <div class="info-row">
                 <span class="info-label">Service</span>
-                <span class="info-value">${booking.services.name}</span>
+                <span class="info-value">${escapeHtml(booking.services.name)}</span>
               </div>
               <div class="info-row">
                 <span class="info-label">Type</span>
-                <span class="info-value">${booking.services.type}</span>
+                <span class="info-value">${escapeHtml(booking.services.type)}</span>
               </div>
               <div class="info-row">
                 <span class="info-label">Destination</span>
-                <span class="info-value">${booking.services.location}</span>
+                <span class="info-value">${escapeHtml(booking.services.location)}</span>
               </div>
             </div>
 
@@ -200,7 +208,7 @@ serve(async (req) => {
               </div>
               <div class="info-row">
                 <span class="info-label">Passager</span>
-                <span class="info-value">${booking.customer_name}</span>
+                <span class="info-value">${escapeHtml(booking.customer_name)}</span>
               </div>
               <div class="info-row">
                 <span class="info-label">Date de départ</span>
@@ -232,7 +240,7 @@ serve(async (req) => {
               <div class="section-title" style="margin-bottom: 15px;">Informations du Passeport</div>
               <div class="info-row" style="border: none; padding: 8px 0;">
                 <span class="info-label">Numéro de passeport</span>
-                <span class="info-value">${bookingDetails.passportNumber || 'N/A'}</span>
+                <span class="info-value">${escapeHtml(bookingDetails.passportNumber || 'N/A')}</span>
               </div>
               <div class="info-row" style="border: none; padding: 8px 0;">
                 <span class="info-label">Date de délivrance</span>
@@ -277,9 +285,9 @@ serve(async (req) => {
             <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
               <div>
                 <h3 style="margin: 0 0 10px 0;">Informations client</h3>
-                <p style="margin: 5px 0;"><strong>${booking.customer_name}</strong></p>
-                <p style="margin: 5px 0; color: #666;">${booking.customer_email}</p>
-                <p style="margin: 5px 0; color: #666;">${booking.customer_phone}</p>
+                <p style="margin: 5px 0;"><strong>${escapeHtml(booking.customer_name)}</strong></p>
+                <p style="margin: 5px 0; color: #666;">${escapeHtml(booking.customer_email)}</p>
+                <p style="margin: 5px 0; color: #666;">${escapeHtml(booking.customer_phone)}</p>
               </div>
               <div style="text-align: right;">
                 <h3 style="margin: 0 0 10px 0;">Détails de la facture</h3>
@@ -300,7 +308,7 @@ serve(async (req) => {
               </thead>
               <tbody>
                 <tr>
-                  <td>${booking.services.name}</td>
+                  <td>${escapeHtml(booking.services.name)}</td>
                   <td>${booking.guests}</td>
                   <td>${(booking.total_price / booking.guests).toLocaleString()} ${booking.currency}</td>
                   <td>${booking.total_price.toLocaleString()} ${booking.currency}</td>
@@ -338,12 +346,12 @@ serve(async (req) => {
       await resend.emails.send({
         from: 'Voyage <onboarding@resend.dev>',
         to: [booking.customer_email],
-        subject: `Votre billet de voyage - ${booking.services.name}`,
+        subject: `Votre billet de voyage - ${escapeHtml(booking.services.name)}`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h1 style="color: #0EA5E9;">Votre billet de voyage est prêt!</h1>
-            <p>Bonjour ${booking.customer_name},</p>
-            <p>Nous sommes ravis de confirmer votre réservation pour <strong>${booking.services.name}</strong>.</p>
+            <p>Bonjour ${escapeHtml(booking.customer_name)},</p>
+            <p>Nous sommes ravis de confirmer votre réservation pour <strong>${escapeHtml(booking.services.name)}</strong>.</p>
             <p>Vous trouverez en pièce jointe votre billet et votre facture au format PDF.</p>
             <p><strong>Référence de réservation:</strong> ${bookingId.substring(0, 8).toUpperCase()}</p>
             <p>N'oubliez pas d'apporter votre passeport lors de votre voyage.</p>

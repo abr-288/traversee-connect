@@ -10,6 +10,14 @@ interface BookingPDFRequest {
   bookingId: string;
 }
 
+const escapeHtml = (str: unknown): string =>
+  String(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
 const generateQRCodeSVG = async (data: string): Promise<string> => {
   const QRCode = await import("https://esm.sh/qrcode@1.5.3");
   return await QRCode.toString(data, { type: "svg", width: 200 });
@@ -380,7 +388,7 @@ const generatePDFHTML = (booking: any, qrCodeSvg: string): string => {
               ${booking.notes ? `
                 <div class="footer-note">
                   <strong>⚠️ Note importante:</strong><br>
-                  ${booking.notes}
+                  ${escapeHtml(booking.notes)}
                 </div>
               ` : ''}
             </div>
