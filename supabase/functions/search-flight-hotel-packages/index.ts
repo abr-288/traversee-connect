@@ -561,12 +561,12 @@ serve(async (req) => {
     console.log('Searching flight + hotel packages:', { origin, destination, departureDate, returnDate, adults, rooms, travelClass });
 
     const rapidApiKey = Deno.env.get('RAPIDAPI_KEY');
-    
+
     if (!rapidApiKey) {
-      console.log('RapidAPI key not configured, returning mock data');
+      console.error('RAPIDAPI_KEY not configured');
       return new Response(
-        JSON.stringify(getMockData(origin, destination, departureDate, returnDate, travelClass)),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ success: false, error: 'Package search is not configured', flights: [], hotels: [] }),
+        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
       );
     }
 
@@ -583,26 +583,20 @@ serve(async (req) => {
 
     console.log(`Package search: ${allFlights.length} flights, ${allHotels.length} hotels`);
 
-    // Use mock data if no results
-    if (allFlights.length === 0 && allHotels.length === 0) {
-      console.log('No results from APIs, returning mock data');
-      return new Response(
-        JSON.stringify(getMockData(origin, destination, departureDate, returnDate, travelClass)),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
     // Sort by price
     allFlights.sort((a, b) => a.price - b.price);
     allHotels.sort((a, b) => a.price - b.price);
 
-    // Fallback to mock if partial results
-    const finalFlights = allFlights.length > 0 ? allFlights : getMockData(origin, destination, departureDate, returnDate, travelClass).flights;
-    const finalHotels = allHotels.length > 0 ? allHotels : getMockData(origin, destination, departureDate, returnDate, travelClass).hotels;
-
     return new Response(
-      JSON.stringify({ flights: finalFlights, hotels: finalHotels }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({
+        success: true,
+        flights: allFlights,
+        hotels: allHotels,
+        message: allFlights.length === 0 && allHotels.length === 0
+          ? 'No packages found for the selected criteria'
+          : undefined,
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
   } catch (error) {
     console.error('Error in search-flight-hotel-packages:', error);
