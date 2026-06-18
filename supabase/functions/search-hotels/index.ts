@@ -955,7 +955,7 @@ const results: {
       console.log('AMADEUS credentials not configured');
     }
 
-    // If no API results, use mock data
+    // Real API results only — no mock fallback
     const totalResults = results.booking.length + results.xotelo.length + 
                          results.tripadvisor.length + results.amadeus.length + results.priceline.length;
     
