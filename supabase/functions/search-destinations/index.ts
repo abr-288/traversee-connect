@@ -107,6 +107,9 @@ interface Destination {
   source: string;
 }
 
+// Track upstream API failures across the request lifecycle
+const upstreamFailures: number[] = [];
+
 // Enhanced TripAdvisor API search with location details
 async function searchTripAdvisorLocation(
   query: string,
@@ -128,6 +131,7 @@ async function searchTripAdvisorLocation(
 
     if (!searchResponse.ok) {
       console.error('TripAdvisor search error:', searchResponse.status);
+      upstreamFailures.push(searchResponse.status);
       return [];
     }
 
