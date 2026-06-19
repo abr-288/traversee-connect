@@ -2,17 +2,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LazyImage } from "@/components/ui/lazy-image";
-import { MapPin, Star, Loader2, Users, Calendar, Wifi, Coffee, Utensils, Waves, Mountain, Building2, Sparkles } from "lucide-react";
+import { MapPin, Star, Loader2, Users, Calendar, Wifi, Coffee, Utensils, Waves, Mountain, Building2, Sparkles, AlertCircle, RefreshCw } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useDestinations } from "@/hooks/useDestinations";
 import { Price } from "@/components/ui/price";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 
 const DestinationsSection = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { data: destinations, isLoading } = useDestinations();
+  const { data: destinations, isLoading, isError, error, refetch, isFetching } = useDestinations();
 
   const getDestinationIcon = (name: string) => {
     const nameLower = name.toLowerCase();
@@ -62,6 +63,32 @@ const DestinationsSection = () => {
           <div className="flex justify-center items-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
+        ) : isError ? (
+          <Alert variant="destructive" className="max-w-2xl mx-auto">
+            <AlertCircle className="h-5 w-5" />
+            <AlertTitle>Impossible de charger les destinations</AlertTitle>
+            <AlertDescription className="flex flex-col gap-3">
+              <span>{error instanceof Error ? error.message : "Le service est temporairement indisponible."}</span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => refetch()}
+                disabled={isFetching}
+                className="self-start"
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
+                Réessayer
+              </Button>
+            </AlertDescription>
+          </Alert>
+        ) : !destinations || destinations.length === 0 ? (
+          <Alert className="max-w-2xl mx-auto">
+            <AlertCircle className="h-5 w-5" />
+            <AlertTitle>Aucune destination disponible</AlertTitle>
+            <AlertDescription>
+              Aucun résultat trouvé pour le moment. Veuillez réessayer plus tard.
+            </AlertDescription>
+          </Alert>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
             {destinations?.slice(0, 9).map((destination, index) => {

@@ -107,6 +107,9 @@ interface Destination {
   source: string;
 }
 
+// Track upstream API failures across the request lifecycle
+const upstreamFailures: number[] = [];
+
 // Enhanced TripAdvisor API search with location details
 async function searchTripAdvisorLocation(
   query: string,
@@ -128,6 +131,7 @@ async function searchTripAdvisorLocation(
 
     if (!searchResponse.ok) {
       console.error('TripAdvisor search error:', searchResponse.status);
+      upstreamFailures.push(searchResponse.status);
       return [];
     }
 
@@ -238,7 +242,10 @@ async function searchTripAdvisorAttractions(
       }
     );
 
-    if (!searchResponse.ok) return [];
+    if (!searchResponse.ok) {
+      upstreamFailures.push(searchResponse.status);
+      return [];
+    }
 
     const searchData = await searchResponse.json();
     const locationId = searchData.data?.[0]?.result_object?.location_id;
@@ -256,7 +263,10 @@ async function searchTripAdvisorAttractions(
       }
     );
 
-    if (!attractionsResponse.ok) return [];
+    if (!attractionsResponse.ok) {
+      upstreamFailures.push(attractionsResponse.status);
+      return [];
+    }
 
     const attractionsData = await attractionsResponse.json();
     const results: Destination[] = [];
@@ -484,7 +494,7 @@ serve(async (req) => {
     if (!rapidApiKey) {
       console.error('RAPIDAPI_KEY not configured');
       return new Response(
-        JSON.stringify({ destinations: [], source: 'error', total: 0, error: 'Service destinations indisponible. Clé API non configurée.' }),
+        JSON.stringify({ success: false, destinations: [], source: 'error', total: 0, error: 'MISSING_API_KEY', message: 'Service destinations indisponible. Clé API non configurée.' }),
         { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -525,6 +535,7 @@ serve(async (req) => {
       await setCachedDestinations(cacheKey, uniqueDestinations, 'tripadvisor');
       return new Response(
         JSON.stringify({
+          success: true,
           destinations: uniqueDestinations,
           source: 'tripadvisor',
           total: uniqueDestinations.length,
@@ -534,16 +545,53 @@ serve(async (req) => {
       );
     }
 
-    // No real results — return empty, no mock fallback
+    // No results: distinguish "API failed" from "empty results"
+    if (upstreamFailures.length > 0) {
+      const has429 = upstreamFailures.includes(429);
+      const has403 = upstreamFailures.includes(403) || upstreamFailures.includes(401);
+      const message = has429
+        ? "Le service de destinations a atteint sa limite de requêtes. Veuillez réessayer dans quelques minutes."
+        : has403
+        ? "Le service de destinations a refusé l'accès. Vérifiez la configuration de la clé API."
+        : "Le service de destinations est temporairement indisponible. Veuillez réessayer plus tard.";
+      return new Response(
+        JSON.stringify({
+          success: false,
+          destinations: [],
+          source: 'tripadvisor',
+          total: 0,
+          error: 'UPSTREAM_API_ERROR',
+          upstream_status: upstreamFailures[0],
+          message,
+        }),
+        { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     return new Response(
-      JSON.stringify({ destinations: [], source: 'tripadvisor', total: 0, cached: false, message: 'Aucune destination trouvée.' }),
+      JSON.stringify({
+        success: true,
+        destinations: [],
+        source: 'tripadvisor',
+        total: 0,
+        cached: false,
+        message: searchQuery
+          ? `Aucune destination trouvée pour "${searchQuery}".`
+          : 'Aucune destination trouvée.',
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
     console.error('Error in search-destinations function:', error);
     return new Response(
-      JSON.stringify({ destinations: [], source: 'error', error: error instanceof Error ? error.message : 'Unknown error' }),
+      JSON.stringify({
+        success: false,
+        destinations: [],
+        source: 'error',
+        error: 'INTERNAL_ERROR',
+        message: 'Une erreur interne est survenue. Veuillez réessayer plus tard.',
+      }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

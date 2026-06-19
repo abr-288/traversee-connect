@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { extractEdgeFunctionError, getPayloadError } from "@/lib/edgeFunctionError";
 
 export interface HotelSearchParams {
   location: string;
@@ -20,15 +22,25 @@ export const useHotelSearch = () => {
 
     try {
       const { data, error: functionError } = await supabase.functions.invoke('search-hotels', {
-        body: params
+        body: params,
       });
 
-      if (functionError) throw functionError;
-      
+      if (functionError) {
+        const msg = await extractEdgeFunctionError(
+          functionError,
+          "Le service de recherche d'hôtels est temporairement indisponible."
+        );
+        throw new Error(msg);
+      }
+
+      const payloadError = getPayloadError(data);
+      if (payloadError) throw new Error(payloadError);
+
       return data;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Une erreur est survenue';
+      const errorMessage = err instanceof Error ? err.message : "Une erreur est survenue lors de la recherche d'hôtels.";
       setError(errorMessage);
+      toast.error("Recherche d'hôtels échouée", { description: errorMessage });
       console.error('Hotel search error:', err);
       return null;
     } finally {
