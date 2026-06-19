@@ -494,7 +494,7 @@ serve(async (req) => {
     if (!rapidApiKey) {
       console.error('RAPIDAPI_KEY not configured');
       return new Response(
-        JSON.stringify({ destinations: [], source: 'error', total: 0, error: 'Service destinations indisponible. Clé API non configurée.' }),
+        JSON.stringify({ success: false, destinations: [], source: 'error', total: 0, error: 'MISSING_API_KEY', message: 'Service destinations indisponible. Clé API non configurée.' }),
         { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
