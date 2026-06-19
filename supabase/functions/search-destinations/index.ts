@@ -242,7 +242,10 @@ async function searchTripAdvisorAttractions(
       }
     );
 
-    if (!searchResponse.ok) return [];
+    if (!searchResponse.ok) {
+      upstreamFailures.push(searchResponse.status);
+      return [];
+    }
 
     const searchData = await searchResponse.json();
     const locationId = searchData.data?.[0]?.result_object?.location_id;
@@ -260,7 +263,10 @@ async function searchTripAdvisorAttractions(
       }
     );
 
-    if (!attractionsResponse.ok) return [];
+    if (!attractionsResponse.ok) {
+      upstreamFailures.push(attractionsResponse.status);
+      return [];
+    }
 
     const attractionsData = await attractionsResponse.json();
     const results: Destination[] = [];
