@@ -2,17 +2,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LazyImage } from "@/components/ui/lazy-image";
-import { MapPin, Star, Loader2, Users, Calendar, Wifi, Coffee, Utensils, Waves, Mountain, Building2, Sparkles } from "lucide-react";
+import { MapPin, Star, Loader2, Users, Calendar, Wifi, Coffee, Utensils, Waves, Mountain, Building2, Sparkles, AlertCircle, RefreshCw } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useDestinations } from "@/hooks/useDestinations";
 import { Price } from "@/components/ui/price";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 
 const DestinationsSection = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { data: destinations, isLoading } = useDestinations();
+  const { data: destinations, isLoading, isError, error, refetch, isFetching } = useDestinations();
 
   const getDestinationIcon = (name: string) => {
     const nameLower = name.toLowerCase();
