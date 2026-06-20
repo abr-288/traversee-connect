@@ -564,7 +564,7 @@ serve(async (req) => {
           upstream_status: upstreamFailures[0],
           message,
         }),
-        { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
