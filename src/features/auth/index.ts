@@ -1,3 +1,3 @@
-// Hooks
+// Hooks (canonique : src/hooks/useUserRole)
 export { useAuth } from "./hooks/useAuth";
-export { useUserRole } from "./hooks/useUserRole";
+export { useUserRole } from "@/hooks/useUserRole";

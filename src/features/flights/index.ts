@@ -1,6 +1,6 @@
 // Components
 export { FlightSearchForm } from "./components/FlightSearchForm";
 
-// Hooks
-export { useFlightSearch } from "./hooks/useFlightSearch";
-export type { FlightSearchParams, Flight } from "./hooks/useFlightSearch";
+// Hooks (canonique : src/hooks/useFlightSearch)
+export { useFlightSearch } from "@/hooks/useFlightSearch";
+export type { FlightSearchParams } from "@/hooks/useFlightSearch";
